@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+// The Maven plugin is only required if your package is used as a library.
+apply plugin: 'maven'
+
+// The Application plugin and mainClassName attribute are only required if
+// your package is used as a binary.
+apply plugin: 'application'
+// The main class that will be executed when you do 'gradle run'
+mainClassName = 'TestSimpleSTNPlanner'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+repositories {
+
+  mavenCentral()
+  mavenLocal()
+
+}
+
+version = '0.0.0-SNAPSHOT'
+group = 'metacsp_htn_planner'
+
+dependencies {
+
+  //compile fileTree(dir: 'lib', include: '**/*.jar')
+
+  // This pulls in the meta-csp-framework jar
+  compile 'org.metacsp:meta-csp-framework:1.0.175'
+  //compile 'meta_csp_framework:meta_csp_framework:0.0.0-SNAPSHOT'
+
+}
