@@ -36,8 +36,13 @@ public class TaskNetworkSolver extends MultiConstraintSolver {
 				Activity.class,
 				createConstraintSolvers(origin, horizon, -1),
 				new int[] {1, 1});
-		
-				
+	}
+	
+	public TaskNetworkSolver(long origin, long horizon, String[] symbols) {
+		super(new Class[] {AllenIntervalConstraint.class, SymbolicValueConstraint.class}, //TODO DecompositionConstraint.class}
+				Activity.class,
+				createConstraintSolvers(origin, horizon, -1, symbols),
+				new int[] {1, 1});
 	}
 	
 	
@@ -47,6 +52,15 @@ public class TaskNetworkSolver extends MultiConstraintSolver {
 //				new ConstraintSolver[] {new ActivityNetworkSolver(origin, horizon, numActivities)} :new ConstraintSolver[] {new ActivityNetworkSolver(origin, horizon)};
 				new ConstraintSolver[] {new AllenIntervalNetworkSolver(origin, horizon, numActivities), new SymbolicVariableConstraintSolver()}
 				:new ConstraintSolver[] {new AllenIntervalNetworkSolver(origin, horizon), new SymbolicVariableConstraintSolver()};
+		return ret;
+	}
+	
+	protected static ConstraintSolver[] createConstraintSolvers(long origin,
+			long horizon, int numActivities, String[] symbols) {
+		ConstraintSolver[] ret = numActivities != -1 ? 
+//				new ConstraintSolver[] {new ActivityNetworkSolver(origin, horizon, numActivities)} :new ConstraintSolver[] {new ActivityNetworkSolver(origin, horizon)};
+				new ConstraintSolver[] {new AllenIntervalNetworkSolver(origin, horizon, numActivities), new SymbolicVariableConstraintSolver(symbols, numActivities)}
+				:new ConstraintSolver[] {new AllenIntervalNetworkSolver(origin, horizon), new SymbolicVariableConstraintSolver(symbols, 500)};
 		return ret;
 	}
 	
