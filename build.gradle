@@ -28,7 +28,7 @@ dependencies {
   //compile fileTree(dir: 'lib', include: '**/*.jar')
 
   // This pulls in the meta-csp-framework jar
-  compile 'org.metacsp:meta-csp-framework:1.0.175'
-  //compile 'meta_csp_framework:meta_csp_framework:0.0.0-SNAPSHOT'
+  //compile 'org.metacsp:meta-csp-framework:1.0.175'
+  compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
 
 }
