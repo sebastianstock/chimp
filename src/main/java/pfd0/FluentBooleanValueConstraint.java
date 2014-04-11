@@ -18,7 +18,7 @@ public class FluentBooleanValueConstraint extends MultiBinaryConstraint {
 	
 	private transient Logger logger = MetaCSPLogging.getLogger(this.getClass());
 	
-	public static enum Type {EQUALS, UNARYTRUE}; // TODO UNARYFALSE
+	public static enum Type {EQUALS, UNARYTRUE, UNARYFALSE};
 	
 	private Type type;
 	
@@ -42,6 +42,9 @@ public class FluentBooleanValueConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.UNARYTRUE)) {
 			wff = "(w1)";
 			logger.finest("Generated WFF for UNARYTRUE constraint: " + wff);
+		} else if (this.type.equals(Type.UNARYFALSE)) {
+			wff = "(~w1)";
+			logger.finest("Generated WFF for UNARYFALSE constraint: " + wff);
 		}
 		logger.finest("Generated WFF for EQUALS constraint: " + wff);
 		BooleanConstraint[] cons = BooleanConstraint.createBooleanConstraints(new BooleanVariable[] {bFrom, bTo}, wff);

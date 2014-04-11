@@ -23,10 +23,10 @@ public class TestFluentBooleanConstraintSolver {
 		//logger.info("Added con0? " + solver.addConstraint(con0));
 		solver.addConstraint(con0);
 		
-//		FluentBooleanValueConstraint con2 = new FluentBooleanValueConstraint(Type.UNARYTRUE);
-//		con2.setFrom(vars[1]);
-//		con2.setTo(vars[1]);
-//		logger.info("Added con2? " + solver.addConstraint(con2));
+		FluentBooleanValueConstraint con2 = new FluentBooleanValueConstraint(Type.UNARYFALSE);
+		con2.setFrom(vars[1]);
+		con2.setTo(vars[1]);
+		logger.info("Added con2? " + solver.addConstraint(con2));
 		
 		FluentBooleanValueConstraint con1 = new FluentBooleanValueConstraint(Type.EQUALS);
 		con1.setFrom(vars[0]);
