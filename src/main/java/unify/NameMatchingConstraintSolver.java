@@ -1,7 +1,5 @@
 package unify;
 
-import java.util.HashMap;
-
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;

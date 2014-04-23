@@ -1,14 +1,11 @@
 /**
  * 
  */
-package pfd0;
-
-import java.io.Serializable;
+package pfd0Activity;
 
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.activity.Activity;
-import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 import org.metacsp.multi.symbols.SymbolicValueConstraint;

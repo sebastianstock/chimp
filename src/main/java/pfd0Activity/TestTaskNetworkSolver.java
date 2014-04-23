@@ -1,16 +1,12 @@
-package pfd0;
+package pfd0Activity;
 
 import java.util.logging.Level;
 
-import org.metacsp.booleanSAT.BooleanConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.activity.Activity;
-import org.metacsp.multi.activity.ActivityNetworkSolver;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.symbols.SymbolicValueConstraint;
 import org.metacsp.multi.symbols.SymbolicValueConstraint.Type;
-import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 public class TestTaskNetworkSolver {

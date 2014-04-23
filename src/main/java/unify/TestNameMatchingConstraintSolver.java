@@ -2,7 +2,6 @@ package unify;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
 
 public class TestNameMatchingConstraintSolver {
 

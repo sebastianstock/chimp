@@ -1,13 +1,8 @@
-package pfd0;
+package pfd0Activity;
 
 import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
-import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
-import org.metacsp.multi.spatial.rectangleAlgebra.RectangleConstraint;
-import org.metacsp.multi.spatial.rectangleAlgebra.RectangularRegion;
-import org.metacsp.multi.spatial.rectangleAlgebra.UnaryRectangleConstraint;
-import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 
 public class FluentBooleanConstraintSolver extends MultiConstraintSolver {
 
