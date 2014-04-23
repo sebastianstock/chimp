@@ -1,4 +1,4 @@
-package pfd0Activity;
+package pfd0;
 
 import java.util.logging.Logger;
 
@@ -6,7 +6,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Activity.FluentBooleanValueConstraint.Type;
+import pfd0.FluentBooleanValueConstraint.Type;
 
 public class TestFluentBooleanConstraintSolver {
 

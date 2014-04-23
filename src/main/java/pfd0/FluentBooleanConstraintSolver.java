@@ -1,4 +1,4 @@
-package pfd0Activity;
+package pfd0;
 
 import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
 import org.metacsp.framework.ConstraintSolver;
