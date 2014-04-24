@@ -58,8 +58,7 @@ public class SimpleBooleanValueConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public String getEdgeLabel() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.type.toString();
 	}
 
 	@Override

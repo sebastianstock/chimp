@@ -22,5 +22,7 @@ public class SimpleBooleanValueConstraintSolver extends MultiConstraintSolver {
 		ConstraintSolver[] ret = new ConstraintSolver[] {new BooleanSatisfiabilitySolver()};
 		return ret;
 	}
+	
+	
 
 }

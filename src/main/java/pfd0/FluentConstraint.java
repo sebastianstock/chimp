@@ -5,6 +5,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 
 import unify.NameMatchingConstraint;
+import unify.NameVariable;
 
 public class FluentConstraint extends MultiBinaryConstraint {
 
@@ -26,12 +27,16 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		if (!( f instanceof Fluent) || !(t instanceof Fluent)) return null;
 		
 		SimpleBooleanValueConstraint scon = new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
-		scon.setFrom(f);
-		scon.setTo(t);
+		SimpleBooleanValueVariable bf = ((Fluent) f).getSimpleBooleanValueVariable();
+		scon.setFrom(bf);
+		SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
+		scon.setTo(bt);
 		
 		NameMatchingConstraint ncon = new NameMatchingConstraint();
-		ncon.setFrom(f);
-		ncon.setTo(t);
+		NameVariable nf = ((Fluent) f).getNameVariable();
+		ncon.setFrom(nf);
+		NameVariable nt = ((Fluent) t).getNameVariable();
+		ncon.setTo(nt);
 		
 		return new Constraint[]{scon, ncon};
 	}

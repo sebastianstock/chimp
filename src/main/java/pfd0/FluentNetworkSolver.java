@@ -15,7 +15,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	private static final long serialVersionUID = -5831971530237352714L;
 	
 	public FluentNetworkSolver(long origin, long horizon) {
-		super(new Class[] {NameMatchingConstraint.class, SimpleBooleanValueConstraint.class}, Fluent.class, createConstraintSolvers(origin, horizon, -1), new int[] {1, 1});
+		super(new Class[] {FluentConstraint.class}, Fluent.class, createConstraintSolvers(origin, horizon, -1), new int[] {1, 1});
 	}
 
 	@Override

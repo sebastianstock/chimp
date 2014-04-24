@@ -19,9 +19,12 @@ public class TestFluentNetworkSolver {
 		
 		
 		SimpleBooleanValueConstraint con0 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
-		con0.setFrom(fluents[0]);
-		con0.setTo(fluents[0]);
-		logger.info("Added con0? " + solver.addConstraint(con0));
+		con0.setFrom(fluents[0].getSimpleBooleanValueVariable());
+		con0.setTo(fluents[0].getSimpleBooleanValueVariable());
+		
+		SimpleBooleanValueConstraintSolver bsolver = (SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
+//		ConstraintNetwork.draw(bsolver.getConstraintNetwork());
+		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
 		((NameVariable) fluents[0].getNameVariable()).setName("On mug1 counter1");
 		((NameVariable) fluents[1].getNameVariable()).setName("On mug1 counter1");
@@ -30,7 +33,7 @@ public class TestFluentNetworkSolver {
 		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
 		con2.setFrom(fluents[1]);
 		con2.setTo(fluents[1]);
-		logger.info("Added con2? " + solver.addConstraint(con2));
+//		logger.info("Added con2? " + solver.addConstraint(con2));
 		
 //		try { Thread.sleep(5000); }
 //		catch (InterruptedException e) { e.printStackTrace(); }
@@ -38,17 +41,17 @@ public class TestFluentNetworkSolver {
 		SimpleBooleanValueConstraint con1 = new SimpleBooleanValueConstraint(Type.EQUALS);
 		con1.setFrom(fluents[0]);
 		con1.setTo(fluents[1]);
-		logger.info("Added con1? " + solver.addConstraint(con1));
+//		logger.info("Added con1? " + solver.addConstraint(con1));
 		
 		NameMatchingConstraint ncon0 = new NameMatchingConstraint();
 		ncon0.setFrom(fluents[0]);
 		ncon0.setTo(fluents[1]);
-		logger.info("Added ncon0? " + solver.addConstraint(ncon0));
+//		logger.info("Added ncon0? " + solver.addConstraint(ncon0));
 		
 		FluentConstraint fcon = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon.setFrom(fluents[0]);
 		fcon.setTo(fluents[1]);
-//		logger.info("Added fcon? " + solver.addConstraint(fcon));
+		logger.info("Added fcon? " + solver.addConstraint(fcon));
 
 	}
 
