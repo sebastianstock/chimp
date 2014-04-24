@@ -9,7 +9,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-public class FluentBooleanValueConstraint extends MultiBinaryConstraint {
+public class SimpleBooleanValueConstraint extends MultiBinaryConstraint {
 
 	/**
 	 * 
@@ -22,17 +22,17 @@ public class FluentBooleanValueConstraint extends MultiBinaryConstraint {
 	
 	private Type type;
 	
-	public FluentBooleanValueConstraint(Type type) {
+	public SimpleBooleanValueConstraint(Type type) {
 		this.type = type;
 	}
 
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
-		if (!(f instanceof Fluent) || !(t instanceof Fluent)) return null;
+		if (!(f instanceof SimpleBooleanValueVariable) || !(t instanceof SimpleBooleanValueVariable)) return null;
 		
-		Fluent fFrom = ((Fluent) f);
+		SimpleBooleanValueVariable fFrom = ((SimpleBooleanValueVariable) f);
 		BooleanVariable bFrom = ((BooleanVariable) fFrom.getInternalVariables()[0]);
-		Fluent fTo = ((Fluent) t);
+		SimpleBooleanValueVariable fTo = ((SimpleBooleanValueVariable) t);
 		BooleanVariable bTo = ((BooleanVariable) fTo.getInternalVariables()[0]);
 		
 		String wff = "";
@@ -53,7 +53,7 @@ public class FluentBooleanValueConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public Object clone() {
-		return new FluentBooleanValueConstraint(this.type);
+		return new SimpleBooleanValueConstraint(this.type);
 	}
 
 	@Override

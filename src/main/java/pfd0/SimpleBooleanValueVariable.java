@@ -6,23 +6,22 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
-import org.metacsp.multi.activity.Activity;
-import org.metacsp.multi.allenInterval.AllenInterval;
 
-public class Fluent extends MultiVariable {
+public class SimpleBooleanValueVariable extends MultiVariable {
 
 	private static final long serialVersionUID = -3155335762297801220L;
 	
-	public Fluent(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers, Variable[] internalVars) {
+	public SimpleBooleanValueVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers, Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
 	}
 	
 	/**
-	 * @return The {@link AllenInterval} representing the temporal value of this {@link Activity}.
+	 * @return The {@link BooleanVariable} representing the temporal value of this {@link SimpleBooleanValueVariable}.
 	 */
 	public BooleanVariable getBooleanVariable() {
 		return (BooleanVariable)this.getInternalVariables()[0];
 	}
+	
 
 	@Override
 	public int compareTo(Variable arg0) {
