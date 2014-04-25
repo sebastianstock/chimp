@@ -14,7 +14,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
 	
-	public static enum Type {MATCHES};
+	public static enum Type {MATCHES, DC};
 	
 	private Type type;
 	
@@ -26,19 +26,25 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
 		if (!( f instanceof Fluent) || !(t instanceof Fluent)) return null;
 		
-		SimpleBooleanValueConstraint scon = new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
-		SimpleBooleanValueVariable bf = ((Fluent) f).getSimpleBooleanValueVariable();
-		scon.setFrom(bf);
-		SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
-		scon.setTo(bt);
+		if (this.type.equals(Type.MATCHES)) {
+			SimpleBooleanValueConstraint scon = new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
+			SimpleBooleanValueVariable bf = ((Fluent) f).getSimpleBooleanValueVariable();
+			scon.setFrom(bf);
+			SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
+			scon.setTo(bt);
+
+			NameMatchingConstraint ncon = new NameMatchingConstraint();
+			NameVariable nf = ((Fluent) f).getNameVariable();
+			ncon.setFrom(nf);
+			NameVariable nt = ((Fluent) t).getNameVariable();
+			ncon.setTo(nt);
+
+			return new Constraint[]{scon, ncon};
+		} else if (this.type.equals(Type.DC)) {
+			// TODO nothing to add here?
+		}
 		
-		NameMatchingConstraint ncon = new NameMatchingConstraint();
-		NameVariable nf = ((Fluent) f).getNameVariable();
-		ncon.setFrom(nf);
-		NameVariable nt = ((Fluent) t).getNameVariable();
-		ncon.setTo(nt);
-		
-		return new Constraint[]{scon, ncon};
+		return null;
 	}
 
 	@Override
