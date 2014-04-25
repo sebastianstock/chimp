@@ -33,6 +33,10 @@ public class Fluent extends MultiVariable {
 	public SimpleBooleanValueVariable getSimpleBooleanValueVariable() {
 		return (SimpleBooleanValueVariable)this.getInternalVariables()[1];
 	}
+	
+	public void setName(String name) {
+		this.getNameVariable().setName(name);
+	}
 
 	@Override
 	public int compareTo(Variable arg0) {
