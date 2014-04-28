@@ -13,6 +13,9 @@ import org.metacsp.meta.hybridPlanner.FluentBasedSimpleDomain;
 import org.metacsp.meta.simplePlanner.SimpleReusableResource;
 import org.metacsp.multi.activity.Activity;
 
+import pfd0.PFD0MetaConstraint.markings;
+
+
 public class PFD0Planner extends MetaConstraintSolver {
 
 	public PFD0Planner(long origin, long horizon, long animationTime) {
@@ -32,8 +35,9 @@ public class PFD0Planner extends MetaConstraintSolver {
 	}
 
 	@Override
-	public void postBacktrack(MetaVariable metaVariable) {
-		// TODO DO I need to do something here? For example change markings?
+	public void postBacktrack(MetaVariable mv) {
+		if (mv.getMetaConstraint() instanceof PFD0MetaConstraint)
+			for (Variable v : mv.getConstraintNetwork().getVariables()) v.setMarking(markings.UNPLANNED);
 
 	}
 
@@ -103,7 +107,6 @@ public class PFD0Planner extends MetaConstraintSolver {
 			metaValue.removeConstraint(con);
 			metaValue.addConstraint(clonedConstraint);
 		}
-		
 		
 		return true;
 	}

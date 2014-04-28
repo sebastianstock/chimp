@@ -16,7 +16,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 
 	public enum markings {UNPLANNED, DECOMPOSED,PLANNED, OPEN, CLOSED}; 
 	
-	public PFD0MetaConstraint(VariableOrderingH varOH, ValueOrderingH valOH) {
+	public PFD0MetaConstraint() {
 		super(null, null);
 		
 	}
@@ -62,7 +62,10 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
 		// TODO replace this by applying real htn-methods
-		ret.add(applyMethod(fl, groundSolver));
+		ConstraintNetwork cn = applyMethod(fl, groundSolver);
+		if (cn != null) {
+			ret.add(cn);
+		}
 		
 		if (!ret.isEmpty()) 
 			return ret.toArray(new ConstraintNetwork[ret.size()]);
@@ -72,15 +75,20 @@ public class PFD0MetaConstraint extends MetaConstraint {
 	/**
 	 * Only a dummy method that should be replaced when we have an htn-method class.
 	 */
-	public ConstraintNetwork applyMethod(Fluent fl, FluentNetworkSolver groundSolver) {
+	private ConstraintNetwork applyMethod(Fluent fl, FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
+
+		String newSymbol =  "!drive (counter1)";
+
+		if (fl.getNameVariable().getName().equals(newSymbol)) 
+			return new ConstraintNetwork(null);
+
 		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-		
+
 		// create prototypes
 		String component = "TestComponent";
-		String symbol =  "On mug1 counter1";
-		VariablePrototype newFluent0 = new VariablePrototype(groundSolver, component, symbol);
+		VariablePrototype newFluent0 = new VariablePrototype(groundSolver, component, newSymbol);
 		newFluent0.setMarking(markings.UNPLANNED);
 		newFluents.add(newFluent0);
 		// create constraints
@@ -88,14 +96,14 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		dc0.setFrom(fl);
 		dc0.setTo(newFluent0);
 		newConstraints.add(dc0);
-		
+
 		// TODO add fluents for the preconditions
 		// TODO add constraints for the preconditions
-		
+
 		// add constraints to the network
 		for (FluentConstraint con : newConstraints)
 			ret.addConstraint(con);
-		
+
 		return ret;
 	}
 

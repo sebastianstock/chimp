@@ -38,6 +38,10 @@ public class NameVariable extends Variable {
 		if(this.domain != null)
 			this.domain.setName(name);
 	}
+	
+	public String getName() {
+		return ((NameDomain)domain).getName();
+	}
 
 	@Override
 	public String toString() {

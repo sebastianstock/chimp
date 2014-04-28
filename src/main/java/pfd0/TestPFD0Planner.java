@@ -16,14 +16,17 @@ public class TestPFD0Planner {
 		
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		
+		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
+		
+		planner.addMetaConstraint(metaConstraint);
+		
 		Fluent getmugFluent = (Fluent) groundSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug mug1");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
-		planner.backtrack();
-		
 		ConstraintNetwork.draw(groundSolver.getConstraintNetwork(), "Constraint Network");
-
+		
+		System.out.println("Backtrack: " + planner.backtrack());
 	}
 
 }
