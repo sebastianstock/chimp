@@ -18,6 +18,9 @@ public class TestPFD0Planner {
 		
 		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
 		
+		addMethods(metaConstraint);
+		addOperatros(metaConstraint);
+		
 		planner.addMetaConstraint(metaConstraint);
 		
 		Fluent getmugFluent = (Fluent) groundSolver.createVariable("Robot1");
@@ -27,6 +30,19 @@ public class TestPFD0Planner {
 		ConstraintNetwork.draw(groundSolver.getConstraintNetwork(), "Constraint Network");
 		
 		System.out.println("Backtrack: " + planner.backtrack());
+	}
+	
+	public static void addMethods(PFD0MetaConstraint metaConstraint) {
+		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", new String[] {"!drive counter1", "grasp mug1"});
+		metaConstraint.addMethod(getMug1Method);
+		
+		PFD0Method graspMug1Method = new PFD0Method("grasp mug1", null);
+		metaConstraint.addMethod(graspMug1Method);
+	}
+	
+	public static void addOperatros(PFD0MetaConstraint metaConstraint) {
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1");
+		metaConstraint.addOperator(driveCounter1Op);
 	}
 
 }

@@ -12,19 +12,33 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
-public class PFD0MetaConstraint extends MetaConstraint {
+import simpleSTNPlanner.SimpleSTNOperator;
 
-	public enum markings {UNPLANNED, DECOMPOSED,PLANNED, OPEN, CLOSED}; 
+public class PFD0MetaConstraint extends MetaConstraint {
+	
+	private Vector<PFD0Operator> operators;
+	private Vector<PFD0Method> methods;
+
+	public enum markings {UNPLANNED, DECOMPOSED, PLANNED, OPEN, CLOSED}; 
 	
 	public PFD0MetaConstraint() {
 		super(null, null);
-		
+		operators = new Vector<PFD0Operator>();
+		methods = new Vector<PFD0Method>();
 	}
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6968387716912116132L;
+	
+	public void addOperator(PFD0Operator o) {
+		operators.add(o);
+	}
+	
+	public void addMethod(PFD0Method m) {
+		methods.add(m);
+	}
 
 	
 	/** 
@@ -61,10 +75,27 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
-		// TODO replace this by applying real htn-methods
-		ConstraintNetwork cn = applyMethod(fl, groundSolver);
-		if (cn != null) {
-			ret.add(cn);
+		logger.info("getMetaValues for: " + fl);
+		if (fl.getNameVariable().getName().charAt(0) == '!') {
+			for (PFD0Operator o : operators) {
+				if (o.checkApplicability(fl)) {
+					logger.info("Applying operator " + o);
+					ConstraintNetwork newResolver = o.expand(fl,  groundSolver);
+					if (newResolver != null) {
+						ret.add(newResolver);
+					}
+				}
+			}
+		} else {
+			for (PFD0Method m : methods) {
+				if (m.checkApplicability(fl)) {
+					logger.info("Applying method " + m);
+					ConstraintNetwork newResolver = m.expand(fl,  groundSolver);
+					if (newResolver != null) {
+						ret.add(newResolver);
+					}
+				}
+			}
 		}
 		
 		if (!ret.isEmpty()) 
@@ -72,40 +103,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		return null;
 	}
 	
-	/**
-	 * Only a dummy method that should be replaced when we have an htn-method class.
-	 */
-	private ConstraintNetwork applyMethod(Fluent fl, FluentNetworkSolver groundSolver) {
-		ConstraintNetwork ret = new ConstraintNetwork(null);
 
-		String newSymbol =  "!drive (counter1)";
-
-		if (fl.getNameVariable().getName().equals(newSymbol)) 
-			return new ConstraintNetwork(null);
-
-		Vector<Variable> newFluents = new Vector<Variable>();
-		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-
-		// create prototypes
-		String component = "TestComponent";
-		VariablePrototype newFluent0 = new VariablePrototype(groundSolver, component, newSymbol);
-		newFluent0.setMarking(markings.UNPLANNED);
-		newFluents.add(newFluent0);
-		// create constraints
-		FluentConstraint dc0 = new FluentConstraint(FluentConstraint.Type.DC);
-		dc0.setFrom(fl);
-		dc0.setTo(newFluent0);
-		newConstraints.add(dc0);
-
-		// TODO add fluents for the preconditions
-		// TODO add constraints for the preconditions
-
-		// add constraints to the network
-		for (FluentConstraint con : newConstraints)
-			ret.addConstraint(con);
-
-		return ret;
-	}
 
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
@@ -120,7 +118,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 	public void markResolvedSub(MetaVariable metaVariable,
 			ConstraintNetwork metaValue) {
 		// TODO if it is a primitive task, set the marking to PLANNED
-		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.DECOMPOSED);
+		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
 	}
 
 	@Override

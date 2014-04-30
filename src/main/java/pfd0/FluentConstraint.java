@@ -14,7 +14,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
 	
-	public static enum Type {MATCHES, DC};
+	public static enum Type {MATCHES, DC, PRE};
 	
 	private Type type;
 	
@@ -41,6 +41,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 
 			return new Constraint[]{scon, ncon};
 		} else if (this.type.equals(Type.DC)) {
+			// TODO nothing to add here?
+		} else if (this.type.equals(Type.PRE)) {
 			// TODO nothing to add here?
 		}
 		
