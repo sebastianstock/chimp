@@ -19,7 +19,7 @@ public class TestPFD0Planner {
 		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
 		
 		addMethods(metaConstraint);
-		addOperatros(metaConstraint);
+		addOperators(metaConstraint);
 		
 		planner.addMetaConstraint(metaConstraint);
 		
@@ -40,8 +40,8 @@ public class TestPFD0Planner {
 		metaConstraint.addMethod(graspMug1Method);
 	}
 	
-	public static void addOperatros(PFD0MetaConstraint metaConstraint) {
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1");
+	public static void addOperators(PFD0MetaConstraint metaConstraint) {
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", new String[] {"RobotAt(counter1"});
 		metaConstraint.addOperator(driveCounter1Op);
 	}
 

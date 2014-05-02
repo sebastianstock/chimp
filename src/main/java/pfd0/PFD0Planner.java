@@ -72,6 +72,9 @@ public class PFD0Planner extends MetaConstraintSolver {
 	/**
 	 * Defines additional operations that should happen before
 	 * adding a meta-value in the meta-CSP search (e.g., when branching).
+	 * 
+	 * Make real {@link Variable}s from {@link VariablePrototype}s.
+	 * Involve real {@link Variable}s in the Constraints.
 	 * @param metaVariable The {@link MetaVariable} over which the search is branching.
 	 * @param metaValue The meta-value that has been selected (the branch). 
 	 */
@@ -83,7 +86,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
 			if (v instanceof VariablePrototype) {
-				// 	Parameters for real instantiation: the first is the componenet 
+				// 	Parameters for real instantiation: the first is the component 
 				//  and the second is the symbol of the fluent
 				String component = (String)((VariablePrototype) v).getParameters()[0];
 				String symbol = (String)((VariablePrototype) v).getParameters()[1];
