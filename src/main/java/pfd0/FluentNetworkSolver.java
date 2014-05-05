@@ -1,9 +1,13 @@
 package pfd0;
 
+import java.util.ArrayList;
+
 import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
 import org.metacsp.framework.ConstraintSolver;
+import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
+import pfd0.PFD0MetaConstraint.markings;
 import unify.NameMatchingConstraint;
 import unify.NameMatchingConstraintSolver;
 
@@ -29,5 +33,19 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 				new NameMatchingConstraintSolver(), new SimpleBooleanValueConstraintSolver(origin, horizon)};
 		return ret;
 	}
+	
+	/**
+	 * @return All Fluents with the marking OPEN.
+	 */
+	public Fluent[] getOpenFluents() {
+		ArrayList<Fluent> ret = new ArrayList<Fluent>();
+		for (Variable var: getVariables()) {
+			if (var.getMarking() == markings.OPEN) {
+				ret.add((Fluent) var);
+			}
+		}
+		return ret.toArray(new Fluent[ret.size()]);
+	}
+
 
 }

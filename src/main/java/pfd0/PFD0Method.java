@@ -12,8 +12,8 @@ public class PFD0Method extends PlanReportroryItem {
 	
 	private String[] subtasks;
 
-	public PFD0Method(String taskname, String[] subtasks) {
-		super(taskname);
+	public PFD0Method(String taskname, String[] preconditions, String[] subtasks) {
+		super(taskname, preconditions);
 		this.subtasks = subtasks;
 	}
 	

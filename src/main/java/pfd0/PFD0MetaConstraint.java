@@ -1,5 +1,6 @@
 package pfd0;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
@@ -13,6 +14,7 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import simpleSTNPlanner.SimpleSTNOperator;
+import simpleSTNPlanner.SimpleSTNDomain.markings;
 
 public class PFD0MetaConstraint extends MetaConstraint {
 	
@@ -74,11 +76,12 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		Fluent fl = (Fluent)problematicNetwork.getVariables()[0];
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
+		Fluent[] openFluents = groundSolver.getOpenFluents();
 		
 		logger.info("getMetaValues for: " + fl);
 		if (fl.getNameVariable().getName().charAt(0) == '!') {
 			for (PFD0Operator o : operators) {
-				if (o.checkApplicability(fl)) {
+				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
 					logger.info("Applying operator " + o);
 					ConstraintNetwork newResolver = o.expand(fl,  groundSolver);
 					if (newResolver != null) {
@@ -88,7 +91,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 			}
 		} else {
 			for (PFD0Method m : methods) {
-				if (m.checkApplicability(fl)) {
+				if (m.checkApplicability(fl) && m.checkPreconditions(openFluents)) {
 					logger.info("Applying method " + m);
 					ConstraintNetwork newResolver = m.expand(fl,  groundSolver);
 					if (newResolver != null) {
@@ -103,8 +106,6 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		return null;
 	}
 	
-
-
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
 			int initial_time) {
