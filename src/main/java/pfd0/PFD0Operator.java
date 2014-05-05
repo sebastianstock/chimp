@@ -11,9 +11,11 @@ import pfd0.PFD0MetaConstraint.markings;
 public class PFD0Operator extends PlanReportroryItem {
 	
 	private String[] positiveEffects;
+	private String[] negativeEffects;
 
-	public PFD0Operator(String taskname, String[] preconditions, String[] positiveEffects) {
+	public PFD0Operator(String taskname, String[] preconditions, String[] negativeEffects, String[] positiveEffects) {
 		super(taskname, preconditions);
+		this.negativeEffects = negativeEffects;
 		this.positiveEffects = positiveEffects;
 	}
 
@@ -26,6 +28,22 @@ public class PFD0Operator extends PlanReportroryItem {
 		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
 		
+		// close negative effects
+		Fluent[] openFluents = groundSolver.getOpenFluents();
+		if (negativeEffects != null) {
+			for (String e : negativeEffects) {
+				for (Fluent fl : openFluents) {
+					if (fl.getNameVariable().getName().equals(e)) {
+						fl.setMarking(markings.CLOSED);
+						FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+						closes.setFrom(taskfluent);
+						closes.setTo(fl);
+						newConstraints.add(closes);
+					}
+				}
+			}
+		}
+		
 		// add positive effects
 		if (positiveEffects != null) {
 			for(String e : positiveEffects) {
@@ -33,10 +51,10 @@ public class PFD0Operator extends PlanReportroryItem {
 				VariablePrototype newFluent = new VariablePrototype(groundSolver, composnent, e);
 				newFluent.setMarking(markings.OPEN);
 				newFluents.add(newFluent);
-				FluentConstraint eff = new FluentConstraint(FluentConstraint.Type.EFF);
-				eff.setFrom(taskfluent);
-				eff.setTo(newFluent);
-				newConstraints.add(eff);
+				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS);
+				opens.setFrom(taskfluent);
+				opens.setTo(newFluent);
+				newConstraints.add(opens);
 			}
 		}
 		

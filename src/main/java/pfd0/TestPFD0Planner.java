@@ -44,12 +44,12 @@ public class TestPFD0Planner {
 		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new String[] {"!drive counter1", "grasp mug1"});
 		metaConstraint.addMethod(getMug1Method);
 		
-		PFD0Method graspMug1Method = new PFD0Method("grasp mug1", null, null);
+		PFD0Method graspMug1Method = new PFD0Method("grasp mug1", null, new String[] {"fail"});
 		metaConstraint.addMethod(graspMug1Method);
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", new String[] {"RobotAt(table1)"}, new String[] {"RobotAt(counter1"});
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", null, new String[] {"RobotAt(table1)"}, new String[] {"RobotAt(counter1"});
 		metaConstraint.addOperator(driveCounter1Op);
 	}
 

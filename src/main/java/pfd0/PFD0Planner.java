@@ -66,7 +66,13 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 		groundSolver.removeVariables(varsToRemove.toArray(new Variable[varsToRemove.size()]));
 		
-		// TODO do we need to remove the added constraints here?
+		
+		// change CLOSED fluents back to OPEN
+		for(Constraint c : metaValue.getConstraints()) {
+			if ((c instanceof FluentConstraint) && (((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
+				((FluentConstraint) c).getTo().setMarking(markings.OPEN);
+			}
+		}
 	}
 
 	/**
@@ -82,6 +88,11 @@ public class PFD0Planner extends MetaConstraintSolver {
 	protected boolean addResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
+		
+		System.out.println("addResolverSub Constraints: ");
+		for(Constraint c : metaValue.getConstraints()) {
+			System.out.println(c);
+		}
 		
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
