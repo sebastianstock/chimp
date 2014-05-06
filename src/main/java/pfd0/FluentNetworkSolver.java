@@ -1,14 +1,14 @@
 package pfd0;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
-import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
+import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
 import pfd0.PFD0MetaConstraint.markings;
-import unify.NameMatchingConstraint;
 import unify.NameMatchingConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
@@ -45,6 +45,16 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 			}
 		}
 		return ret.toArray(new Fluent[ret.size()]);
+	}
+	
+	public Constraint[] getConstraintsTo(Variable to) {
+		Vector<Constraint> ret = new Vector<Constraint>();
+		for (Constraint con : this.getConstraints()) {
+			if (con.getScope().length == 2) {
+				if (con.getScope()[1].equals(to)) ret.add(con);
+			}
+		}
+		return ret.toArray(new Constraint[ret.size()]);
 	}
 
 

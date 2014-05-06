@@ -3,6 +3,7 @@ package pfd0;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.VariablePrototype;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0.PFD0MetaConstraint.markings;
@@ -18,7 +19,7 @@ public class TestPFD0Planner {
 		
 		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
 		
-		addMethods(metaConstraint);
+		addMethods(metaConstraint, groundSolver);
 		addOperators(metaConstraint);
 		
 		planner.addMetaConstraint(metaConstraint);
@@ -26,6 +27,10 @@ public class TestPFD0Planner {
 		Fluent getmugFluent = (Fluent) groundSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug mug1");
 		getmugFluent.setMarking(markings.UNPLANNED);
+		
+//		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
+//		getmugFluent2.setName("get_mug mug1");
+//		getmugFluent2.setMarking(markings.UNPLANNED);
 		
 		createState(groundSolver);
 		
@@ -40,17 +45,27 @@ public class TestPFD0Planner {
 		robotAt.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(PFD0MetaConstraint metaConstraint) {
-		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new String[] {"!drive counter1", "grasp mug1"});
+	public static void addMethods(PFD0MetaConstraint metaConstraint, FluentNetworkSolver groundSolver) {
+		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive counter1");
+		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp mug1");
+		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		before.setFrom(drive);
+		before.setTo(grasp);
+		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new VariablePrototype[] {drive, grasp}, new FluentConstraint[] {before});
+//		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new String[] {"!drive counter1", "grasp mug1"});
 		metaConstraint.addMethod(getMug1Method);
 		
-		PFD0Method graspMug1Method = new PFD0Method("grasp mug1", null, new String[] {"fail"});
-		metaConstraint.addMethod(graspMug1Method);
+//		PFD0Method graspMug1Method = new PFD0Method("grasp mug1", null, new String[] {}); //new String[] {"fail"});
+//		metaConstraint.addMethod(graspMug1Method);
+		
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", null, new String[] {"RobotAt(table1)"}, new String[] {"RobotAt(counter1"});
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", null, new String[] {"RobotAt(table1)"}, new String[] {"RobotAt(counter1)"});
 		metaConstraint.addOperator(driveCounter1Op);
+		
+		PFD0Operator graspOp = new PFD0Operator("!grasp mug1", null, null, new String[] {"Holding(mug1)"});
+		metaConstraint.addOperator(graspOp);
 	}
 
 }

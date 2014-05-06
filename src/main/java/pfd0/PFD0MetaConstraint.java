@@ -44,22 +44,50 @@ public class PFD0MetaConstraint extends MetaConstraint {
 
 	
 	/** 
-	 * @return All {@link MetaVariable}s with the marking UNPLANNED.
+	 * @return All {@link MetaVariable}s with the marking UNPLANNED and which have no unplanned predecessors.
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-		// for every varible that has the marking UNPLANNED a ConstraintNetwork is built.
-		// this becomes a task
+		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors 
+		// a ConstraintNetwork is built.
+		// this becomes a task.
 		for (Variable var : groundSolver.getVariables()) {
 			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
-				ConstraintNetwork nw = new ConstraintNetwork(null);
-				nw.addVariable(var);
-				ret.add(nw);
+				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
+					ConstraintNetwork nw = new ConstraintNetwork(null);
+					nw.addVariable(var);
+					ret.add(nw);
+				}
 			}
 		}
+		System.out.println("MetaVariables: " + ret);
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
+	
+	}
+	
+	
+	
+	/**
+	 * Checks if a Variable has a Before with an UNPLANNED task.
+	 * @return False if the Variable has an unplanned predecessor, otherwise true.
+	 */
+	private boolean checkPredecessors(Variable var, 
+			FluentNetworkSolver groundSolver) {
+		Constraint[] cons = groundSolver.getConstraintsTo(var);
+		if (cons != null) {
+			for (Constraint c : cons) {
+				if ( (c instanceof FluentConstraint) ) {
+					FluentConstraint flc = (FluentConstraint) c;
+					if (flc.getType() == FluentConstraint.Type.BEFORE 
+							&& flc.getScope()[0].getMarking() == markings.UNPLANNED) {
+						return false;
+					}	 
+				}
+			}	
+		}
+		return true;
 	}
 
 	
