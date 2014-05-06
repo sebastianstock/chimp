@@ -22,7 +22,8 @@ public class TestFluentNetworkSolver {
 		con0.setFrom(fluents[0].getSimpleBooleanValueVariable());
 		con0.setTo(fluents[0].getSimpleBooleanValueVariable());
 		
-		SimpleBooleanValueConstraintSolver bsolver = (SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
+		SimpleBooleanValueConstraintSolver bsolver = 
+				(SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
 //		ConstraintNetwork.draw(bsolver.getConstraintNetwork());
 		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
@@ -46,7 +47,8 @@ public class TestFluentNetworkSolver {
 		NameMatchingConstraint ncon0 = new NameMatchingConstraint();
 		ncon0.setFrom(fluents[0].getNameVariable());
 		ncon0.setTo(fluents[1].getNameVariable());
-		NameMatchingConstraintSolver nsolver = (NameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
+		NameMatchingConstraintSolver nsolver = 
+				(NameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
 //		logger.info("Added ncon0? " + nsolver.addConstraint(ncon0));
 		
 		FluentConstraint fcon = new FluentConstraint(FluentConstraint.Type.MATCHES);

@@ -43,15 +43,23 @@ public class TestPFD0Planner {
 		Fluent robotAt = (Fluent) groundSolver.createVariable("RobotAt");
 		robotAt.setName("RobotAt(table1)");
 		robotAt.setMarking(markings.OPEN);
+		
+		Fluent on = (Fluent) groundSolver.createVariable("On");
+		on.setName("On(mug1, counter1)");
+		on.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(PFD0MetaConstraint metaConstraint, FluentNetworkSolver groundSolver) {
+	public static void addMethods(PFD0MetaConstraint metaConstraint, 
+			FluentNetworkSolver groundSolver) {
 		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive counter1");
 		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp mug1");
 		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
 		before.setFrom(drive);
 		before.setTo(grasp);
-		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new VariablePrototype[] {drive, grasp}, new FluentConstraint[] {before});
+		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", 
+				null, 
+				new VariablePrototype[] {drive, grasp}, 
+				new FluentConstraint[] {before});
 //		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new String[] {"!drive counter1", "grasp mug1"});
 		metaConstraint.addMethod(getMug1Method);
 		
@@ -61,10 +69,16 @@ public class TestPFD0Planner {
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", null, new String[] {"RobotAt(table1)"}, new String[] {"RobotAt(counter1)"});
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", 
+				new String[] {"RobotAt(table1)"}, 
+				new String[] {"RobotAt(table1)"}, 
+				new String[] {"RobotAt(counter1)"});
 		metaConstraint.addOperator(driveCounter1Op);
 		
-		PFD0Operator graspOp = new PFD0Operator("!grasp mug1", null, null, new String[] {"Holding(mug1)"});
+		PFD0Operator graspOp = new PFD0Operator("!grasp mug1", 
+				new String[] {"On(mug1, counter1)"}, 
+				new String[] {"On(mug1, counter1)"}, 
+				new String[] {"Holding(mug1)"});
 		metaConstraint.addOperator(graspOp);
 	}
 
