@@ -40,7 +40,7 @@ public class NameDomain extends Domain {
 		return domain;
 	}
 	
-	public boolean isGrounded() {
+	public boolean isGround() {
 		return domain.indexOf('?') < 0;
 	}
 

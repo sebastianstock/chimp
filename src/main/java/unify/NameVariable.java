@@ -48,5 +48,9 @@ public class NameVariable extends Variable {
 //		return this.getClass().getSimpleName() + " " + this.id + " " + this.getDomain();
 		return getName();
 	}
+	
+	public boolean isGround() {
+		return ((NameDomain) domain).isGround();
+	}
 
 }
