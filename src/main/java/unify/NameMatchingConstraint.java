@@ -37,7 +37,11 @@ public class NameMatchingConstraint extends BinaryConstraint {
 	public boolean getResult() {
 		NameDomain domFrom = ((NameDomain) ((NameVariable) this.getFrom()).getDomain());
 		NameDomain domTo = ((NameDomain) ((NameVariable) this.getTo()).getDomain());
-		return domFrom.getName().equals(domTo.getName());
+		if (domFrom.getName() == null || domTo.getName() == null) {
+			return false;
+		} else {
+			return domFrom.getName().equals(domTo.getName());
+		}
 	}
 
 }

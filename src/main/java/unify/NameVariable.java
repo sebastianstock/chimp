@@ -45,7 +45,8 @@ public class NameVariable extends Variable {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + " " + this.id + " " + this.getDomain();
+//		return this.getClass().getSimpleName() + " " + this.id + " " + this.getDomain();
+		return getName();
 	}
 
 }

@@ -22,7 +22,7 @@ public class TestNameMatchingConstraintSolver {
 		
 		NameMatchingConstraint con0 = new NameMatchingConstraint();
 		con0.setFrom(vars[0]);
-		con0.setTo(vars[1]);
+		con0.setTo(vars[2]);
 		
 		System.out.println("Scope: " + con0.toString());
 		
