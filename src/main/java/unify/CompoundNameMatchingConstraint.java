@@ -1,5 +1,7 @@
 package unify;
 
+import java.util.Vector;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
@@ -27,18 +29,19 @@ public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
 		
 		Variable[] finternals = ((CompoundNameVariable) f).getInternalVariables();
 		Variable[] tinternals = ((CompoundNameVariable) t).getInternalVariables();
-//		Vector<NameMatchingConstraint> cons = new Vector<NameMatchingConstraint>();
-		NameMatchingConstraint[] ret = new NameMatchingConstraint[finternals.length];
+		Vector<NameMatchingConstraint> constraints = 
+				new Vector<NameMatchingConstraint>(finternals.length);
 		if (this.type.equals(Type.MATCHES)) {
 			for(int i = 0; i < finternals.length; i++) {
 				NameMatchingConstraint con = new NameMatchingConstraint();
-				if(finternals[i] != null && tinternals[i] != null) {
+				if(((NameVariable) finternals[i]).getName() != null 
+						&& ((NameVariable) tinternals[i]).getName() != null) {
 					con.setFrom(finternals[i]);
 					con.setTo(tinternals[i]);
-					ret[i] = con;
+					constraints.add(con);
 				}
 			}
-			return ret;
+			return constraints.toArray(new Constraint[constraints.size()]);
 		}
 		
 		return null;

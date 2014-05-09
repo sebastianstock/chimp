@@ -82,6 +82,9 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 				int toId = ((NameMatchingConstraint) c).getTo().getID();
 				String fromStr = getVaribaleById.get(fromId);
 				String toStr = getVaribaleById.get(toId);
+				if (fromStr == null && toStr == null) {
+					continue;
+				}
 				if (fromStr == null || toStr == null) {
 					return false;
 				}
