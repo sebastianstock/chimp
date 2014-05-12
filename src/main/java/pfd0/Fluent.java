@@ -16,19 +16,22 @@ public class Fluent extends MultiVariable {
 	 */
 	private static final long serialVersionUID = -3155335762297801220L;
 	
-	public Fluent(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers, Variable[] internalVars) {
+	public Fluent(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers, Variable[] 
+			internalVars) {
 		super(cs, id, internalSolvers, internalVars);
 	}
 	
 	/**
-	 * @return The {@link BooleanVariable} representing the temporal value of this {@link SimpleBooleanValueVariable}.
+	 * @return The {@link BooleanVariable} representing the temporal value 
+	 * of this {@link SimpleBooleanValueVariable}.
 	 */
 	public NameVariable getNameVariable() {
 		return (NameVariable)this.getInternalVariables()[0];
 	}
 	
 	/**
-	 * @return The {@link NameVariable} representing the symbolic value of this {@link SimpleBooleanValueVariable}.
+	 * @return The {@link NameVariable} representing the symbolic value 
+	 * of this {@link SimpleBooleanValueVariable}.
 	 */
 	public SimpleBooleanValueVariable getSimpleBooleanValueVariable() {
 		return (SimpleBooleanValueVariable)this.getInternalVariables()[1];
@@ -58,10 +61,20 @@ public class Fluent extends MultiVariable {
 
 	@Override
 	public String toString() {
-		String ret="";
-		ret += this.getComponent()+"("+this.getID()+")" + "::<" + this.getInternalVariables()[0].toString() + ">U<" + this.getInternalVariables()[1].toString() + ">";
-		if (this.getMarking() != null) ret += "/" + this.getMarking();
-		return ret;
+		StringBuilder ret = new StringBuilder();
+		ret.append(this.getComponent());
+		ret.append("(");
+		ret.append(this.getID());
+		ret.append(")::<");
+		ret.append(this.getInternalVariables()[0].toString());
+		ret.append(">U<");
+		ret.append(this.getInternalVariables()[1].toString());
+		ret.append(">");
+		if (this.getMarking() != null) {
+			ret.append("/");
+			ret.append(this.getMarking());
+		}
+		return ret.toString();
 	}
 
 }

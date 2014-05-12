@@ -17,9 +17,10 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	 * 
 	 */
 	private static final long serialVersionUID = -5831971530237352714L;
-	
+
 	public FluentNetworkSolver(long origin, long horizon) {
-		super(new Class[] {FluentConstraint.class}, Fluent.class, createConstraintSolvers(origin, horizon, -1), new int[] {1, 1});
+		super(new Class[] {FluentConstraint.class}, Fluent.class, 
+				createConstraintSolvers(origin, horizon, -1), new int[] {1, 1});
 	}
 
 	@Override
@@ -27,13 +28,15 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, int maxFluents) {
-		ConstraintSolver[] ret = new ConstraintSolver[] {
-				new NameMatchingConstraintSolver(), new SimpleBooleanValueConstraintSolver(origin, horizon)};
+
+	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, 
+			int maxFluents) {
+		ConstraintSolver[] ret = new ConstraintSolver[] { 
+				new NameMatchingConstraintSolver(), 
+				new SimpleBooleanValueConstraintSolver(origin, horizon)};
 		return ret;
 	}
-	
+
 	/**
 	 * @return All Fluents with the marking OPEN.
 	 */
@@ -46,7 +49,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		}
 		return ret.toArray(new Fluent[ret.size()]);
 	}
-	
+
 	public Constraint[] getConstraintsTo(Variable to) {
 		Vector<Constraint> ret = new Vector<Constraint>();
 		for (Constraint con : this.getConstraints()) {

@@ -13,11 +13,11 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 * 
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
-	
+
 	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE};
-	
+
 	private Type type;
-	
+
 	public FluentConstraint(Type type) {
 		this.type = type;
 	}
@@ -25,9 +25,10 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
 		if (!( f instanceof Fluent) || !(t instanceof Fluent)) return null;
-		
+
 		if (this.type.equals(Type.MATCHES)) {
-			SimpleBooleanValueConstraint scon = new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
+			SimpleBooleanValueConstraint scon = 
+					new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
 			SimpleBooleanValueVariable bf = ((Fluent) f).getSimpleBooleanValueVariable();
 			scon.setFrom(bf);
 			SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
@@ -45,7 +46,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.PRE)) {
 			// TODO nothing to add here?
 		}
-		
+
 		return null;
 	}
 
@@ -68,8 +69,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public Type getType() {
 		return type;
 	}
-	
-	
-	
+
+
+
 
 }
