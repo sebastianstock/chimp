@@ -31,7 +31,7 @@ public abstract class PlanReportroryItem {
 	 * @return True if it is applicable, i.e., the names match, false otherwise.
 	 */
 	public boolean checkApplicability(Fluent fluent) {
-		if (taskname.equals(fluent.getNameVariable().getName()))
+		if (taskname.equals(fluent.getCompoundNameVariable().getName()))
 			return true;
 		return false;
 	}
@@ -41,7 +41,7 @@ public abstract class PlanReportroryItem {
 		HashMap<String, Fluent> map = new HashMap<String, Fluent>();
 		if (fluents != null) {
 			for (int i = 0; i < fluents.length; i++) {
-				map.put(fluents[i].getNameVariable().getName(), fluents[i]);
+				map.put(fluents[i].getCompoundNameVariable().getName(), fluents[i]);
 			}
 		}
 		return map;

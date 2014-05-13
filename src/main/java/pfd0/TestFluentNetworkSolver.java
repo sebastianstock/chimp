@@ -6,8 +6,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0.SimpleBooleanValueConstraint.Type;
-import unify.NameMatchingConstraint;
-import unify.NameMatchingConstraintSolver;
+import unify.CompoundNameMatchingConstraint;
+import unify.CompoundNameMatchingConstraintSolver;
 
 public class TestFluentNetworkSolver {
 
@@ -27,8 +27,8 @@ public class TestFluentNetworkSolver {
 //		ConstraintNetwork.draw(bsolver.getConstraintNetwork());
 		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
-		fluents[0].setName("On mug1 counter1");
-		fluents[1].setName("On mug1 counter1");
+		fluents[0].setName("On(mug1 counter1)");
+		fluents[1].setName("On(mug1 counter1)");
 		
 
 		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
@@ -44,11 +44,12 @@ public class TestFluentNetworkSolver {
 		con1.setTo(fluents[1]);
 //		logger.info("Added con1? " + bsolver.addConstraint(con1));
 		
-		NameMatchingConstraint ncon0 = new NameMatchingConstraint();
-		ncon0.setFrom(fluents[0].getNameVariable());
-		ncon0.setTo(fluents[1].getNameVariable());
-		NameMatchingConstraintSolver nsolver = 
-				(NameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
+		CompoundNameMatchingConstraint ncon0 = 
+				new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.MATCHES);
+		ncon0.setFrom(fluents[0].getCompoundNameVariable());
+		ncon0.setTo(fluents[1].getCompoundNameVariable());
+		CompoundNameMatchingConstraintSolver nsolver = 
+				(CompoundNameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
 //		logger.info("Added ncon0? " + nsolver.addConstraint(ncon0));
 		
 		FluentConstraint fcon = new FluentConstraint(FluentConstraint.Type.MATCHES);

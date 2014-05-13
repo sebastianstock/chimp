@@ -34,8 +34,8 @@ public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
 		if (this.type.equals(Type.MATCHES)) {
 			for(int i = 0; i < finternals.length; i++) {
 				NameMatchingConstraint con = new NameMatchingConstraint();
-				if(((NameVariable) finternals[i]).getName() != null 
-						&& ((NameVariable) tinternals[i]).getName() != null) {
+				if(((NameVariable) finternals[i]).getName().length() > 0 
+						&& ((NameVariable) tinternals[i]).getName().length() > 0) {
 					con.setFrom(finternals[i]);
 					con.setTo(tinternals[i]);
 					constraints.add(con);

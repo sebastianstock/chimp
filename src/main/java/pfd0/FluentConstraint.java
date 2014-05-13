@@ -4,8 +4,8 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 
-import unify.NameMatchingConstraint;
-import unify.NameVariable;
+import unify.CompoundNameMatchingConstraint;
+import unify.CompoundNameVariable;
 
 public class FluentConstraint extends MultiBinaryConstraint {
 
@@ -34,10 +34,11 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
 			scon.setTo(bt);
 
-			NameMatchingConstraint ncon = new NameMatchingConstraint();
-			NameVariable nf = ((Fluent) f).getNameVariable();
+			CompoundNameMatchingConstraint ncon = 
+					new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.MATCHES);
+			CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
 			ncon.setFrom(nf);
-			NameVariable nt = ((Fluent) t).getNameVariable();
+			CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
 			ncon.setTo(nt);
 
 			return new Constraint[]{scon, ncon};

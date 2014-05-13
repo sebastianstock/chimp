@@ -25,7 +25,7 @@ public class TestPFD0Planner {
 		planner.addMetaConstraint(metaConstraint);
 		
 		Fluent getmugFluent = (Fluent) groundSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug mug1");
+		getmugFluent.setName("get_mug(mug1)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
 //		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
@@ -51,12 +51,12 @@ public class TestPFD0Planner {
 	
 	public static void addMethods(PFD0MetaConstraint metaConstraint, 
 			FluentNetworkSolver groundSolver) {
-		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive counter1");
-		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp mug1");
+		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive(counter1)");
+		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp(mug1)");
 		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
 		before.setFrom(drive);
 		before.setTo(grasp);
-		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", 
+		PFD0Method getMug1Method = new PFD0Method("get_mug(mug1)", 
 				null, 
 				new VariablePrototype[] {drive, grasp}, 
 				new FluentConstraint[] {before});
@@ -69,13 +69,13 @@ public class TestPFD0Planner {
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive counter1", 
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive(counter1)", 
 				new String[] {"RobotAt(table1)"}, 
 				new String[] {"RobotAt(table1)"}, 
 				new String[] {"RobotAt(counter1)"});
 		metaConstraint.addOperator(driveCounter1Op);
 		
-		PFD0Operator graspOp = new PFD0Operator("!grasp mug1", 
+		PFD0Operator graspOp = new PFD0Operator("!grasp(mug1)", 
 				new String[] {"On(mug1, counter1)"}, 
 				new String[] {"On(mug1, counter1)"}, 
 				new String[] {"Holding(mug1)"});

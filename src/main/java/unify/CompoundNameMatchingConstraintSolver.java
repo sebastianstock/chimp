@@ -5,7 +5,7 @@ import org.metacsp.framework.multi.MultiConstraintSolver;
 
 public class CompoundNameMatchingConstraintSolver extends MultiConstraintSolver {
 
-	protected CompoundNameMatchingConstraintSolver() {
+	public CompoundNameMatchingConstraintSolver() {
 		super(new Class[] {CompoundNameMatchingConstraint.class}, CompoundNameVariable.class,
 				createConstraintSolvers(), new int[] {10});
 		// TODO Auto-generated constructor stub

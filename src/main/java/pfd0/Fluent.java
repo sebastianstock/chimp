@@ -7,6 +7,7 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 
+import unify.CompoundNameVariable;
 import unify.NameVariable;
 
 public class Fluent extends MultiVariable {
@@ -22,15 +23,15 @@ public class Fluent extends MultiVariable {
 	}
 	
 	/**
-	 * @return The {@link BooleanVariable} representing the temporal value 
+	 * @return The {@link CompoundNameVariable} representing the temporal value 
 	 * of this {@link SimpleBooleanValueVariable}.
 	 */
-	public NameVariable getNameVariable() {
-		return (NameVariable)this.getInternalVariables()[0];
+	public CompoundNameVariable getCompoundNameVariable() {
+		return (CompoundNameVariable)this.getInternalVariables()[0];
 	}
 	
 	/**
-	 * @return The {@link NameVariable} representing the symbolic value 
+	 * @return The {@link BooleanVariable} representing the symbolic value 
 	 * of this {@link SimpleBooleanValueVariable}.
 	 */
 	public SimpleBooleanValueVariable getSimpleBooleanValueVariable() {
@@ -38,7 +39,8 @@ public class Fluent extends MultiVariable {
 	}
 	
 	public void setName(String name) {
-		this.getNameVariable().setName(name);
+		
+		this.getCompoundNameVariable().setFullName(name);
 	}
 
 	@Override

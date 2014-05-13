@@ -1,5 +1,8 @@
 package unify;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
@@ -13,6 +16,8 @@ public class CompoundNameVariable extends MultiVariable {
 	 */
 	private static final long serialVersionUID = -1194147485131064251L;
 	
+	private static Pattern namepattern = Pattern.compile("^(.+)\\((.*)\\)$");
+	
 	public CompoundNameVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
 			Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
@@ -21,19 +26,47 @@ public class CompoundNameVariable extends MultiVariable {
 	public void setName(String head, String... arguments) {
 		Variable[] vars = this.getInternalVariables();
 		((NameVariable) vars[0]).setName(head);
-		if (arguments.length > vars.length - 1)
-			throw new IllegalArgumentException(
-					"Too many arguments. Only " + (this.getInternalVariables().length - 1) + " permitted.");
-		int i = 1;
-		for (String s : arguments) {
-			((NameVariable) vars[i]).setName(s);
-			i++;
+		int argcounter = 1;
+		if (arguments != null) {
+			if (arguments.length > vars.length - 1)
+				throw new IllegalArgumentException(
+						"Too many arguments. Only " + (this.getInternalVariables().length - 1) + " permitted.");
+			for (String s : arguments) {
+				((NameVariable) vars[argcounter]).setName(s);
+				argcounter++;
+			}
+		} else {
+			argcounter = 1; // all argument variables will be set to null
 		}
-		for (int j = i; j < vars.length; j++) {
+		for (int j = argcounter; j < vars.length; j++) {
 			((NameVariable) vars[j]).setName(null);
 		}
 	}
 	
+	/**
+	 * Set the name with one String.
+	 * Name should have the format HEAD(ARG1 ARG2 ARG3 ...).
+	 * Example: 'On(mug1 table1)'
+	 * @param name Full name of the variable.
+	 */
+	public void setFullName(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException("Name must not be null");
+		}
+
+		Matcher m = namepattern.matcher(name);
+		if(m.find()) {
+			String head = m.group(1);
+			String[] args = null;
+			if(m.group(2).length() > 0) {
+				args = m.group(2).split("\\s+");
+			}
+			this.setName(head, args);
+		} else {
+			throw new IllegalArgumentException(
+					"Name does not match pattern of a predicate, e.g., 'On(mug1 table1)'.");
+		}
+	}
 
 	@Override
 	public int compareTo(Variable arg0) {
@@ -52,18 +85,40 @@ public class CompoundNameVariable extends MultiVariable {
 		// TODO Auto-generated method stub
 
 	}
-
-	@Override
-	public String toString() {
+	
+	/**
+	 * @return Full name with head and arguments, e.g., 'On(mug1 table1)'.
+	 */
+	public String getName() {
 		Variable[] internalvars = this.getInternalVariables();
 		StringBuilder ret = new StringBuilder(internalvars[0].toString());
 		ret.append("(");
-		for (int i = 1; i < internalvars.length; i++) {
-			ret.append(internalvars[i].toString());
-			ret.append(" ");
+		if (internalvars.length > 1 && internalvars[1].toString().length() > 0) {
+			ret.append(internalvars[1].toString());
+		}
+		for (int i = 2; i < internalvars.length; i++) {
+			if(internalvars[i].toString().length() > 0) {
+				ret.append(" ");
+				ret.append(internalvars[i].toString());
+			} else {
+				break;
+			}
+			
 		}
 		ret.append(")");
 		return ret.toString();
+	}
+	
+	/**
+	 * @return Only the name of the head.
+	 */
+	public String getHeadName() {
+		return ((NameVariable) getInternalVariables()[0]).getName();
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 }

@@ -37,7 +37,11 @@ public class NameDomain extends Domain {
 	}
 	
 	public String getName() {
-		return domain;
+		if (domain != null) {
+			return domain;
+		} else {
+			return "";
+		}
 	}
 	
 	public boolean isGround() {

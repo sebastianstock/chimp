@@ -9,7 +9,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
 import pfd0.PFD0MetaConstraint.markings;
-import unify.NameMatchingConstraintSolver;
+import unify.CompoundNameMatchingConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
 
@@ -32,7 +32,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, 
 			int maxFluents) {
 		ConstraintSolver[] ret = new ConstraintSolver[] { 
-				new NameMatchingConstraintSolver(), 
+				new CompoundNameMatchingConstraintSolver(), 
 				new SimpleBooleanValueConstraintSolver(origin, horizon)};
 		return ret;
 	}

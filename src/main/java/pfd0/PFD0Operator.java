@@ -33,7 +33,7 @@ public class PFD0Operator extends PlanReportroryItem {
 		if (negativeEffects != null) {
 			for (String e : negativeEffects) {
 				for (Fluent fl : openFluents) {
-					if (fl.getNameVariable().getName().equals(e)) {
+					if (fl.getCompoundNameVariable().getName().equals(e)) {
 						fl.setMarking(markings.CLOSED);
 						FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
 						closes.setFrom(taskfluent);

@@ -107,7 +107,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		
 		logger.info("getMetaValues for: " + fl);
-		if (fl.getNameVariable().getName().charAt(0) == '!') {
+		if (fl.getCompoundNameVariable().getHeadName().charAt(0) == '!') {
 			for (PFD0Operator o : operators) {
 				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
 					logger.info("Applying operator " + o);
