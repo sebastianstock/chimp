@@ -50,7 +50,11 @@ public class NameVariable extends Variable {
 	}
 	
 	public boolean isGround() {
-		return ((NameDomain) domain).isGround();
+		if(domain != null) {
+			return ((NameDomain) domain).isGround();
+		} else {
+			return true;
+		}
 	}
 
 }

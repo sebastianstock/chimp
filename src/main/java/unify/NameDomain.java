@@ -45,7 +45,11 @@ public class NameDomain extends Domain {
 	}
 	
 	public boolean isGround() {
-		return domain.indexOf('?') < 0;
+		if (domain != null) {
+			return domain.indexOf('?') < 0;
+		} else {
+			return true;
+		}
 	}
 
 }

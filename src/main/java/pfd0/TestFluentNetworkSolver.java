@@ -28,7 +28,7 @@ public class TestFluentNetworkSolver {
 		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
 		fluents[0].setName("On(mug1 counter1)");
-		fluents[1].setName("On(mug1 counter1)");
+		fluents[1].setName("On(?mug counter1)");
 		
 
 		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
