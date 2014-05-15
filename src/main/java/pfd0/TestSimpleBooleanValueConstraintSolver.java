@@ -23,10 +23,10 @@ public class TestSimpleBooleanValueConstraintSolver {
 		//logger.info("Added con0? " + solver.addConstraint(con0));
 		solver.addConstraint(con0);
 		
-		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
-		con2.setFrom(vars[1]);
-		con2.setTo(vars[1]);
-		logger.info("Added con2? " + solver.addConstraint(con2));
+//		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
+//		con2.setFrom(vars[1]);
+//		con2.setTo(vars[1]);
+//		logger.info("Added con2? " + solver.addConstraint(con2));
 		
 		SimpleBooleanValueConstraint con1 = new SimpleBooleanValueConstraint(Type.EQUALS);
 		con1.setFrom(vars[0]);

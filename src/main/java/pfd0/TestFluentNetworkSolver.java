@@ -17,46 +17,44 @@ public class TestFluentNetworkSolver {
 		Fluent[] fluents = (Fluent[]) solver.createVariables(2);
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
+		SimpleBooleanValueConstraintSolver bsolver = 
+				(SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
+//		ConstraintNetwork.draw(bsolver.getConstraintNetwork());
 		
 		SimpleBooleanValueConstraint con0 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
 		con0.setFrom(fluents[0].getSimpleBooleanValueVariable());
 		con0.setTo(fluents[0].getSimpleBooleanValueVariable());
-		
-		SimpleBooleanValueConstraintSolver bsolver = 
-				(SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
-//		ConstraintNetwork.draw(bsolver.getConstraintNetwork());
 		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
-		fluents[0].setName("On(mug1 counter1)");
-		fluents[1].setName("On(?mug counter1)");
+		fluents[0].setName("On(?mug counter1)");
+		fluents[1].setName("On(mug1 counter1)");
 		
 
-		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
-		con2.setFrom(fluents[1]);
-		con2.setTo(fluents[1]);
+//		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
+//		con2.setFrom(fluents[1]);
+//		con2.setTo(fluents[1]);
 //		logger.info("Added con2? " + bsolver.addConstraint(con2));
 		
 //		try { Thread.sleep(5000); }
 //		catch (InterruptedException e) { e.printStackTrace(); }
 		
-		SimpleBooleanValueConstraint con1 = new SimpleBooleanValueConstraint(Type.EQUALS);
-		con1.setFrom(fluents[0]);
-		con1.setTo(fluents[1]);
+//		SimpleBooleanValueConstraint con1 = new SimpleBooleanValueConstraint(Type.EQUALS);
+//		con1.setFrom(fluents[0]);
+//		con1.setTo(fluents[1]);
 //		logger.info("Added con1? " + bsolver.addConstraint(con1));
 		
-		CompoundNameMatchingConstraint ncon0 = 
-				new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.MATCHES);
-		ncon0.setFrom(fluents[0].getCompoundNameVariable());
-		ncon0.setTo(fluents[1].getCompoundNameVariable());
-		CompoundNameMatchingConstraintSolver nsolver = 
-				(CompoundNameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
+//		CompoundNameMatchingConstraint ncon0 = 
+//				new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.MATCHES);
+//		ncon0.setFrom(fluents[0].getCompoundNameVariable());
+//		ncon0.setTo(fluents[1].getCompoundNameVariable());
+//		CompoundNameMatchingConstraintSolver nsolver = 
+//				(CompoundNameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
 //		logger.info("Added ncon0? " + nsolver.addConstraint(ncon0));
 		
 		FluentConstraint fcon = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon.setFrom(fluents[0]);
 		fcon.setTo(fluents[1]);
 		logger.info("Added fcon? " + solver.addConstraint(fcon));
-
 	}
 
 }

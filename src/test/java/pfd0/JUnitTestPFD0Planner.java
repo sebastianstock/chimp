@@ -1,30 +1,41 @@
 package pfd0;
 
-import java.util.logging.Level;
+import static org.junit.Assert.assertTrue;
 
-import org.metacsp.framework.ConstraintNetwork;
+import java.util.ArrayList;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0.PFD0MetaConstraint.markings;
 
-public class TestPFD0Planner {
+public class JUnitTestPFD0Planner {
+	
+	private PFD0Planner planner;
+	private FluentNetworkSolver fluentSolver;
 
-	public static void main(String[] args) {
-		
-		PFD0Planner planner = new PFD0Planner(0,  600,  0);
-		FluentNetworkSolver groundSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		
-		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
-		
+	@Before
+	public void setUp() throws Exception {
+		planner = new PFD0Planner(0,  600,  0);
+		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+	}
+
+	@After
+	public void tearDown() throws Exception {}
+
+	@Test
+	public void test() {
 		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
 		
-		addMethods(metaConstraint, groundSolver);
+		addMethods(metaConstraint, fluentSolver);
 		addOperators(metaConstraint);
 		
 		planner.addMetaConstraint(metaConstraint);
 		
-		Fluent getmugFluent = (Fluent) groundSolver.createVariable("Robot1");
+		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(mug1)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
@@ -32,11 +43,29 @@ public class TestPFD0Planner {
 //		getmugFluent2.setName("get_mug mug1");
 //		getmugFluent2.setMarking(markings.UNPLANNED);
 		
-		createState(groundSolver);
+		createState(fluentSolver);
 		
-		ConstraintNetwork.draw(groundSolver.getConstraintNetwork(), "Constraint Network");
-		
-		System.out.println("Backtrack: " + planner.backtrack());
+		assertTrue("Backtracking should generate a plan.", planner.backtrack());
+		Variable[] vars = fluentSolver.getVariables();
+		ArrayList<String> results = new ArrayList<String>();
+		for (int i = 0; i < vars.length; i++) {
+			results.add(i, ((Fluent) vars[i]).getCompoundNameVariable().getName());
+		}
+		assertTrue(results.contains("Holding(mug1)"));
+		assertTrue(results.contains("get_mug(mug1)"));
+		assertTrue(results.contains("On(mug1 counter1)"));
+		System.out.println(results);
+		for (int i = 0; i < results.size(); i++) {
+			if (results.get(i).equals("Holding(mug1)")) {
+				assertTrue(vars[i].getMarking() == markings.OPEN);
+			}
+			if (results.get(i).equals("get_mug(mug1)")) {
+				assertTrue(vars[i].getMarking() == markings.PLANNED);
+			}
+			if (results.get(i).equals("On(mug1 counter1)")) {
+				assertTrue(vars[i].getMarking() == markings.CLOSED);
+			}
+		}
 	}
 	
 	public static void createState(FluentNetworkSolver groundSolver) {
