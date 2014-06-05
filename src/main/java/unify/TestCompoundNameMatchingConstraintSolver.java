@@ -32,7 +32,6 @@ public class TestCompoundNameMatchingConstraintSolver {
 		try {
 			Thread.sleep(sleeptime);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -45,7 +44,6 @@ public class TestCompoundNameMatchingConstraintSolver {
 		try {
 			Thread.sleep(sleeptime);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -57,7 +55,6 @@ public class TestCompoundNameMatchingConstraintSolver {
 		try {
 			Thread.sleep(sleeptime);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -69,7 +66,6 @@ public class TestCompoundNameMatchingConstraintSolver {
 		try {
 			Thread.sleep(sleeptime);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

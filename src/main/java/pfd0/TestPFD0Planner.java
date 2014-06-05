@@ -56,7 +56,7 @@ public class TestPFD0Planner {
 		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
 		before.setFrom(drive);
 		before.setTo(grasp);
-		PFD0Method getMug1Method = new PFD0Method("get_mug(mug1)", 
+		PFD0Method getMug1Method = new PFD0Method("get_mug", new String[] {"mug1"}, 
 				null, 
 				new VariablePrototype[] {drive, grasp}, 
 				new FluentConstraint[] {before});
@@ -69,14 +69,16 @@ public class TestPFD0Planner {
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive(counter1)", 
-				new String[] {"RobotAt(table1)"}, 
+		PFD0Precondition robotatPre = new PFD0Precondition("RobotAt", new String[] {"table1"});
+		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"counter1"}, 
+				new PFD0Precondition[] {robotatPre}, 
 				new String[] {"RobotAt(table1)"}, 
 				new String[] {"RobotAt(counter1)"});
 		metaConstraint.addOperator(driveCounter1Op);
 		
-		PFD0Operator graspOp = new PFD0Operator("!grasp(mug1)", 
-				new String[] {"On(mug1 counter1)"}, 
+		PFD0Precondition onPre = new PFD0Precondition("On", new String[] {"mug1", "counter1"});
+		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"mug1"}, 
+				new PFD0Precondition[] {onPre}, 
 				new String[] {"On(mug1 counter1)"}, 
 				new String[] {"Holding(mug1)"});
 		metaConstraint.addOperator(graspOp);

@@ -18,9 +18,12 @@ public class CompoundNameVariable extends MultiVariable {
 	
 	private static Pattern namepattern = Pattern.compile("^(.+)\\((.*)\\)$");
 	
+	private int argsize;
+	
 	public CompoundNameVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
 			Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
+		this.argsize = 0;
 	}
 	
 	public void setName(String head, String... arguments) {
@@ -35,6 +38,7 @@ public class CompoundNameVariable extends MultiVariable {
 				((NameVariable) vars[argcounter]).setName(s);
 				argcounter++;
 			}
+			this.argsize = arguments.length;
 		} else {
 			argcounter = 1; // all argument variables will be set to null
 		}
@@ -119,6 +123,45 @@ public class CompoundNameVariable extends MultiVariable {
 	@Override
 	public String toString() {
 		return getName();
+	}
+	
+	/**
+	 * Checks if it can be possibly be matched to another fluent.
+	 * This is the case when the type and all constant parameters are the same.
+	 * @param fluenttype
+	 * @param arguments
+	 * @return
+	 */
+	public boolean possibleMatch(String fluenttype, String[] arguments) {
+		if (fluenttype == null || (! fluenttype.equals(getHeadName()))) {
+			return false;
+		}
+		if (arguments == null) {
+			if (getArgumentsSize() == 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		if (arguments.length != getArgumentsSize()) {
+			return false;
+		}
+		
+		for (int i = 0; i < arguments.length; i++) {
+			String param = ((NameVariable) getInternalVariables()[i+1]).getName();
+			if (! arguments[i].equals(param)) {
+				if ((arguments[i].charAt(0) != '?') && (param.charAt(0) != '?')) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public int getArgumentsSize() {
+		return this.argsize;
 	}
 
 }

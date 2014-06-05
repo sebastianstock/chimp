@@ -13,8 +13,9 @@ public class PFD0Operator extends PlanReportroryItem {
 	private String[] positiveEffects;
 	private String[] negativeEffects;
 
-	public PFD0Operator(String taskname, String[] preconditions, String[] negativeEffects, String[] positiveEffects) {
-		super(taskname, preconditions);
+	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+			String[] negativeEffects, String[] positiveEffects) {
+		super(taskname, arguments, preconditions);
 		this.negativeEffects = negativeEffects;
 		this.positiveEffects = positiveEffects;
 	}

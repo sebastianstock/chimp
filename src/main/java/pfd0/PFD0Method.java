@@ -14,13 +14,15 @@ public class PFD0Method extends PlanReportroryItem {
 	private VariablePrototype[] subtaskprototypes;
 	private FluentConstraint[] constraints;
 
-	public PFD0Method(String taskname, String[] preconditions, String[] subtasks) {
-		super(taskname, preconditions);
+	public PFD0Method(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+			String[] subtasks) {
+		super(taskname, arguments, preconditions);
 		this.subtasks = subtasks;
 	}
 	
-	public PFD0Method(String taskname, String[] preconditions, VariablePrototype[] subtaskprototypes, FluentConstraint[] constraints) {
-		super(taskname, preconditions);
+	public PFD0Method(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+			VariablePrototype[] subtaskprototypes, FluentConstraint[] constraints) {
+		super(taskname, arguments, preconditions);
 		this.subtaskprototypes = subtaskprototypes;
 		this.constraints = constraints;
 	}
