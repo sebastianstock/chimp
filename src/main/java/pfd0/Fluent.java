@@ -39,8 +39,11 @@ public class Fluent extends MultiVariable {
 	}
 	
 	public void setName(String name) {
-		
 		this.getCompoundNameVariable().setFullName(name);
+	}
+	
+	public void setName(String type, String[] arguments) {
+		this.getCompoundNameVariable().setName(type, arguments);
 	}
 
 	@Override

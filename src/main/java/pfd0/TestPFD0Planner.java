@@ -51,8 +51,10 @@ public class TestPFD0Planner {
 	
 	public static void addMethods(PFD0MetaConstraint metaConstraint, 
 			FluentNetworkSolver groundSolver) {
-		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive(counter1)");
-		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp(mug1)");
+		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", 
+				"!drive", new String[] {"counter1"});
+		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", 
+				"!grasp", new String[] {"mug1"});
 		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
 		before.setFrom(drive);
 		before.setTo(grasp);

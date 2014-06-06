@@ -27,7 +27,8 @@ public class PFD0Operator extends PlanReportroryItem {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		
 		Vector<Variable> newFluents = new Vector<Variable>();
-		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
+//		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
+		Vector<FluentConstraint> newConstraints = addPreconditionPrototypes(taskfluent, groundSolver);
 		
 		// close negative effects
 		Fluent[] openFluents = groundSolver.getOpenFluents();
@@ -48,8 +49,8 @@ public class PFD0Operator extends PlanReportroryItem {
 		// add positive effects
 		if (positiveEffects != null) {
 			for(String e : positiveEffects) {
-				String composnent = "Component"; // TODO use real component
-				VariablePrototype newFluent = new VariablePrototype(groundSolver, composnent, e);
+				String component = "Component"; // TODO use real component
+				VariablePrototype newFluent = new VariablePrototype(groundSolver, component, e);
 				newFluent.setMarking(markings.OPEN);
 				newFluents.add(newFluent);
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS);

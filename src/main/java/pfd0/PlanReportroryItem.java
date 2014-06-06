@@ -4,8 +4,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.Variable;
+import org.metacsp.framework.VariablePrototype;
+
+import pfd0.PFD0MetaConstraint.markings;
 
 public abstract class PlanReportroryItem {
 	
@@ -96,6 +101,33 @@ public abstract class PlanReportroryItem {
 		} else {
 			return false;
 		}
+	}
+	
+	/** Creates prototypes for the preconditions.
+	 * For each precondition a precondition prototype will be created. This prototype will later be 
+	 * connected via NameMatchingConstraints to the open fluents.
+	 * 
+	 * @param taskfluent The task that is expanded.
+	 * @return New PRE constraints between new prototypes and taskfluent.
+	 */
+	protected Vector<FluentConstraint> addPreconditionPrototypes(Fluent taskfluent, 
+			FluentNetworkSolver groundSolver) {
+		
+		Vector<Variable> newFluents = new Vector<Variable>();
+		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
+		
+		for (PFD0Precondition pre : this.preconditions) {
+			String component = "Component"; // TODO use real component
+			VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
+					pre.getFluenttype(), pre.getArguments());
+			newFluent.setMarking(markings.UNSATISFIED);
+			newFluents.add(newFluent);
+			FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE);
+			preconstr.setFrom(newFluent);
+			preconstr.setTo(taskfluent);
+			newConstraints.add(preconstr);
+		}
+		return newConstraints;
 	}
 	
 	/**

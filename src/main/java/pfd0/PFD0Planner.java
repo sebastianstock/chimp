@@ -98,11 +98,18 @@ public class PFD0Planner extends MetaConstraintSolver {
 		for (Variable v :  metaValue.getVariables()) {
 			if (v instanceof VariablePrototype) {
 				// 	Parameters for real instantiation: the first is the component 
-				//  and the second is the symbol of the fluent
+				//  and the second is the type, the third are the arguments of the fluent
 				String component = (String)((VariablePrototype) v).getParameters()[0];
 				String symbol = (String)((VariablePrototype) v).getParameters()[1];
 				Fluent fluent = (Fluent)groundSolver.createVariable(component);
-				fluent.setName(symbol);
+				
+				if (((VariablePrototype) v).getParameters().length > 2) {
+					String[] arguments = (String[])((VariablePrototype) v).getParameters()[2];
+					fluent.setName(symbol, arguments);
+				} else {
+					fluent.setName(symbol);
+				}
+
 				fluent.setMarking(v.getMarking());
 				metaValue.addSubstitution((VariablePrototype)v, fluent);
 			}
