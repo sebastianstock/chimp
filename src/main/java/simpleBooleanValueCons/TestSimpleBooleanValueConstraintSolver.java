@@ -1,4 +1,4 @@
-package pfd0;
+package simpleBooleanValueCons;
 
 import java.util.logging.Logger;
 
@@ -6,7 +6,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0.SimpleBooleanValueConstraint.Type;
+import simpleBooleanValueCons.SimpleBooleanValueConstraint.Type;
 
 public class TestSimpleBooleanValueConstraintSolver {
 

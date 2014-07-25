@@ -1,4 +1,4 @@
-package pfd0;
+package simpleBooleanValueCons;
 
 import java.util.logging.Logger;
 
