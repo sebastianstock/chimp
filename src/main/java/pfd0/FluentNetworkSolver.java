@@ -8,7 +8,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
 import unify.CompoundNameMatchingConstraintSolver;
 

@@ -6,7 +6,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Method extends PlanReportroryItem {
 	
@@ -29,7 +29,7 @@ public class PFD0Method extends PlanReportroryItem {
 	
 
 	@Override
-	public ConstraintNetwork expand(Fluent taskfluent,
+	public ConstraintNetwork expandTail(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 

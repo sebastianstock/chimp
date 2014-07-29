@@ -10,7 +10,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 
 public abstract class PlanReportroryItem {
 	
@@ -116,19 +116,39 @@ public abstract class PlanReportroryItem {
 		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
 		
-		for (PFD0Precondition pre : this.preconditions) {
-			String component = "Component"; // TODO use real component
-			VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
-					pre.getFluenttype(), pre.getArguments());
-			newFluent.setMarking(markings.UNJUSTIFIED);
-			newFluents.add(newFluent);
-			FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
-					pre.getConnections());
-			preconstr.setFrom(newFluent);
-			preconstr.setTo(taskfluent);
-			newConstraints.add(preconstr);
+		if(this.preconditions != null) {
+			for (PFD0Precondition pre : this.preconditions) {
+				String component = "Component"; // TODO use real component
+				VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
+						pre.getFluenttype(), pre.getArguments());
+				newFluent.setMarking(markings.UNJUSTIFIED);
+				newFluents.add(newFluent);
+				FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
+						pre.getConnections());
+				preconstr.setFrom(newFluent);
+				preconstr.setTo(taskfluent);
+				newConstraints.add(preconstr);
+			}
 		}
 		return newConstraints;
+	}
+	
+	/**
+	 * Creates the dummy preconditions for a task.
+	 * @param taskfluent The task that has to be expanded.
+	 * @param groundSolver The groundSolver.
+	 * @return The resulting ConstraintNetwork witht the added dummy preconditions.
+	 */
+	public ConstraintNetwork expandPreconditions(Fluent taskfluent,
+			FluentNetworkSolver groundSolver) {
+		Vector<FluentConstraint> newConstraints = addPreconditionPrototypes(taskfluent, groundSolver);
+		
+		ConstraintNetwork ret = new ConstraintNetwork(null);
+		// add constraints to the network
+		for (FluentConstraint con : newConstraints) {
+			ret.addConstraint(con);
+		}
+		return ret;		
 	}
 	
 	/**
@@ -137,6 +157,6 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork after applying the operator/method.
 	 */
-	public abstract ConstraintNetwork expand(Fluent taskfluent, FluentNetworkSolver groundSolver);
+	public abstract ConstraintNetwork expandTail(Fluent taskfluent, FluentNetworkSolver groundSolver);
 
 }

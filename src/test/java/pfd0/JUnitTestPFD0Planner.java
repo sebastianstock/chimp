@@ -11,7 +11,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 
 public class JUnitTestPFD0Planner {
 	
@@ -29,7 +29,7 @@ public class JUnitTestPFD0Planner {
 
 	@Test
 	public void test() {
-		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
+		TaskApplicationMetaConstraint metaConstraint = new TaskApplicationMetaConstraint();
 		
 		addMethods(metaConstraint, fluentSolver);
 		addOperators(metaConstraint);
@@ -82,7 +82,7 @@ public class JUnitTestPFD0Planner {
 		on.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(PFD0MetaConstraint metaConstraint, 
+	public static void addMethods(TaskApplicationMetaConstraint metaConstraint, 
 			FluentNetworkSolver groundSolver) {
 		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive(counter1)");
 		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp(mug1)");
@@ -101,7 +101,7 @@ public class JUnitTestPFD0Planner {
 		
 	}
 	
-	public static void addOperators(PFD0MetaConstraint metaConstraint) {
+	public static void addOperators(TaskApplicationMetaConstraint metaConstraint) {
 		PFD0Precondition robotatPre = new PFD0Precondition("RobotAt", new String[] {"table1"}, null);
 		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"counter1"}, 
 				new PFD0Precondition[]{robotatPre}, 

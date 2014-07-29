@@ -6,7 +6,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Operator extends PlanReportroryItem {
 	
@@ -22,18 +22,18 @@ public class PFD0Operator extends PlanReportroryItem {
 
 	
 	@Override
-	public ConstraintNetwork expand(Fluent taskfluent,
+	public ConstraintNetwork expandTail(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		
 		Vector<Variable> newFluents = new Vector<Variable>();
-//		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-		Vector<FluentConstraint> newConstraints = addPreconditionPrototypes(taskfluent, groundSolver);
+		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
+//		Vector<FluentConstraint> newConstraints = addPreconditionPrototypes(taskfluent, groundSolver); // This is now done in expandPreconditions
 		
 		// close negative effects
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		if (negativeEffects != null) {
-			for (String e : negativeEffects) {
+			for (String e : negativeEffects) {  // TODO ensure that exactly one fluent is closed
 				for (Fluent fl : openFluents) {
 					if (fl.getCompoundNameVariable().getName().equals(e)) {
 						fl.setMarking(markings.CLOSED);

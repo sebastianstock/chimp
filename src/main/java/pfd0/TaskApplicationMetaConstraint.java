@@ -1,29 +1,22 @@
 package pfd0;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariableOrderingH;
-import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
-import simpleSTNPlanner.SimpleSTNOperator;
-import simpleSTNPlanner.SimpleSTNDomain.markings;
-
-public class PFD0MetaConstraint extends MetaConstraint {
+public class TaskApplicationMetaConstraint extends MetaConstraint {
 	
 	private Vector<PFD0Operator> operators;
 	private Vector<PFD0Method> methods;
 
-	public enum markings {UNPLANNED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED}; 
+	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED}; 
 	
-	public PFD0MetaConstraint() {
+	public TaskApplicationMetaConstraint() {
 		super(null, null);
 		operators = new Vector<PFD0Operator>();
 		methods = new Vector<PFD0Method>();
@@ -44,7 +37,8 @@ public class PFD0MetaConstraint extends MetaConstraint {
 
 	
 	/** 
-	 * @return All {@link MetaVariable}s with the marking UNPLANNED and which have no unplanned predecessors.
+	 * @return All {@link MetaVariable}s with the marking SELECTED and which have 
+	 * no unplanned or selected predecessors.
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaVariables() {
@@ -54,7 +48,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 		// a ConstraintNetwork is built.
 		// this becomes a task.
 		for (Variable var : groundSolver.getVariables()) {
-			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
+			if (var.getMarking() != null && var.getMarking().equals(markings.SELECTED)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
 					ConstraintNetwork nw = new ConstraintNetwork(null);
 					nw.addVariable(var);
@@ -80,8 +74,9 @@ public class PFD0MetaConstraint extends MetaConstraint {
 			for (Constraint c : cons) {
 				if ( (c instanceof FluentConstraint) ) {
 					FluentConstraint flc = (FluentConstraint) c;
+					Object marking = flc.getScope()[0].getMarking();
 					if (flc.getType() == FluentConstraint.Type.BEFORE 
-							&& flc.getScope()[0].getMarking() == markings.UNPLANNED) {
+							&& ( (marking == markings.UNPLANNED) || (marking == markings.SELECTED) ) ){
 						return false;
 					}	 
 				}
@@ -111,7 +106,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 			for (PFD0Operator o : operators) {
 				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
 					logger.info("Applying operator " + o);
-					ConstraintNetwork newResolver = o.expand(fl,  groundSolver);
+					ConstraintNetwork newResolver = o.expandTail(fl,  groundSolver);
 					if (newResolver != null) {
 						ret.add(newResolver);
 					}
@@ -121,7 +116,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 			for (PFD0Method m : methods) {
 				if (m.checkApplicability(fl) && m.checkPreconditions(openFluents)) {
 					logger.info("Applying method " + m);
-					ConstraintNetwork newResolver = m.expand(fl,  groundSolver);
+					ConstraintNetwork newResolver = m.expandTail(fl,  groundSolver);
 					if (newResolver != null) {
 						ret.add(newResolver);
 					}

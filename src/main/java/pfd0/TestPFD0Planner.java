@@ -7,7 +7,7 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 
 public class TestPFD0Planner {
 
@@ -18,7 +18,7 @@ public class TestPFD0Planner {
 		
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		
-		PFD0MetaConstraint metaConstraint = new PFD0MetaConstraint();
+		TaskApplicationMetaConstraint metaConstraint = new TaskApplicationMetaConstraint();
 		
 		addMethods(metaConstraint, groundSolver);
 		addOperators(metaConstraint);
@@ -57,7 +57,7 @@ public class TestPFD0Planner {
 		on.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(PFD0MetaConstraint metaConstraint, 
+	public static void addMethods(TaskApplicationMetaConstraint metaConstraint, 
 			FluentNetworkSolver groundSolver) {
 		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", 
 				"!drive", new String[] {"counter1"});
@@ -78,7 +78,7 @@ public class TestPFD0Planner {
 		
 	}
 	
-	public static void addOperators(PFD0MetaConstraint metaConstraint) {
+	public static void addOperators(TaskApplicationMetaConstraint metaConstraint) {
 		PFD0Precondition robotatPre = 
 				new PFD0Precondition("RobotAt", new String[] {"table1"}, null);
 		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"counter1"}, 

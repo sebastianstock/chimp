@@ -9,7 +9,7 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 
-import pfd0.PFD0MetaConstraint.markings;
+import pfd0.TaskApplicationMetaConstraint.markings;
 
 
 public class PFD0Planner extends MetaConstraintSolver {
@@ -34,16 +34,21 @@ public class PFD0Planner extends MetaConstraintSolver {
 
 	@Override
 	public void postBacktrack(MetaVariable mv) {
-		if (mv.getMetaConstraint() instanceof PFD0MetaConstraint) {
+		if (mv.getMetaConstraint() instanceof TaskApplicationMetaConstraint) {
 			for (Variable v : mv.getConstraintNetwork().getVariables()) {
-				v.setMarking(markings.UNPLANNED);
+				v.setMarking(markings.SELECTED);
 			}
 		}
 		else if (mv.getMetaConstraint() instanceof PreconditionMetaConstraint) {
 			for (Variable v : mv.getConstraintNetwork().getVariables()) {
 				v.setMarking(markings.UNJUSTIFIED);
 			}
-		}
+		} 
+		else if (mv.getMetaConstraint() instanceof TaskSelectionMetaConstraint) {
+			for (Variable v : mv.getConstraintNetwork().getVariables()) {
+				v.setMarking(markings.UNPLANNED);
+			}
+		} 
 	}
 
 	/**
