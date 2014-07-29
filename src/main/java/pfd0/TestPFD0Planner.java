@@ -4,6 +4,7 @@ import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0.PFD0MetaConstraint.markings;
@@ -25,7 +26,7 @@ public class TestPFD0Planner {
 		planner.addMetaConstraint(metaConstraint);
 		
 		Fluent getmugFluent = (Fluent) groundSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug(mug1)");
+		getmugFluent.setName("get_mug(mug2)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
 //		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
@@ -34,7 +35,14 @@ public class TestPFD0Planner {
 		
 		createState(groundSolver);
 		
+//		ConstraintNetwork.draw(
+//				groundSolver.getConstraintSolvers()[0].getConstraintSolvers[0].getConstraintNetwork());
+		MultiConstraintSolver compsolver = (MultiConstraintSolver) groundSolver.getConstraintSolvers()[0];
+		ConstraintNetwork.draw(compsolver.getConstraintSolvers()[0].getConstraintNetwork());
+		
 		ConstraintNetwork.draw(groundSolver.getConstraintNetwork(), "Constraint Network");
+		
+		
 		
 		System.out.println("Backtrack: " + planner.backtrack());
 	}
@@ -71,15 +79,17 @@ public class TestPFD0Planner {
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Precondition robotatPre = new PFD0Precondition("RobotAt", new String[] {"table1"});
+		PFD0Precondition robotatPre = 
+				new PFD0Precondition("RobotAt", new String[] {"table1"}, null);
 		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"counter1"}, 
 				new PFD0Precondition[] {robotatPre}, 
 				new String[] {"RobotAt(table1)"}, 
 				new String[] {"RobotAt(counter1)"});
 		metaConstraint.addOperator(driveCounter1Op);
 		
-		PFD0Precondition onPre = new PFD0Precondition("On", new String[] {"mug1", "counter1"});
-		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"mug1"}, 
+		PFD0Precondition onPre = 
+				new PFD0Precondition("On", new String[] {"?mug", "counter1"}, new int[] {0, 0});
+		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"?mug"}, 
 				new PFD0Precondition[] {onPre}, 
 				new String[] {"On(mug1 counter1)"}, 
 				new String[] {"Holding(mug1)"});

@@ -4,14 +4,10 @@ import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.meta.hybridPlanner.FluentBasedSimpleDomain;
-import org.metacsp.meta.simplePlanner.SimpleReusableResource;
-import org.metacsp.multi.activity.Activity;
 
 import pfd0.PFD0MetaConstraint.markings;
 
@@ -20,7 +16,9 @@ public class PFD0Planner extends MetaConstraintSolver {
 
 	public PFD0Planner(long origin, long horizon, long animationTime) {
 		// Currently only FluentConstraints. Other constraint should be added later.
-		super(new Class[] {FluentConstraint.class}, animationTime, new FluentNetworkSolver(origin, horizon));
+		super(new Class[] {FluentConstraint.class}, 
+				animationTime, 
+				new FluentNetworkSolver(origin, horizon));
 	}
 
 	/**
@@ -36,9 +34,16 @@ public class PFD0Planner extends MetaConstraintSolver {
 
 	@Override
 	public void postBacktrack(MetaVariable mv) {
-		if (mv.getMetaConstraint() instanceof PFD0MetaConstraint)
-			for (Variable v : mv.getConstraintNetwork().getVariables()) v.setMarking(markings.UNPLANNED);
-
+		if (mv.getMetaConstraint() instanceof PFD0MetaConstraint) {
+			for (Variable v : mv.getConstraintNetwork().getVariables()) {
+				v.setMarking(markings.UNPLANNED);
+			}
+		}
+		else if (mv.getMetaConstraint() instanceof PreconditionMetaConstraint) {
+			for (Variable v : mv.getConstraintNetwork().getVariables()) {
+				v.setMarking(markings.UNJUSTIFIED);
+			}
+		}
 	}
 
 	/**
@@ -69,7 +74,8 @@ public class PFD0Planner extends MetaConstraintSolver {
 		
 		// change CLOSED fluents back to OPEN
 		for(Constraint c : metaValue.getConstraints()) {
-			if ((c instanceof FluentConstraint) && (((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
+			if ((c instanceof FluentConstraint) && 
+					(((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
 				((FluentConstraint) c).getTo().setMarking(markings.OPEN);
 			}
 		}
@@ -121,8 +127,12 @@ public class PFD0Planner extends MetaConstraintSolver {
 			Variable[] oldScope = con.getScope();
 			Variable[] newScope = new Variable[oldScope.length];
 			for (int i = 0; i < oldScope.length; i++) {
-				if (oldScope[i] instanceof VariablePrototype) newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
-				else newScope[i] = oldScope[i];
+				if (oldScope[i] instanceof VariablePrototype) {
+					newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
+				}
+				else {
+					newScope[i] = oldScope[i];
+				}
 			}
 			clonedConstraint.setScope(newScope);
 			metaValue.removeConstraint(con);
