@@ -13,12 +13,19 @@ public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = -6660479562784201973L;
 	
-	public static enum Type {MATCHES};
+	public static enum Type {MATCHES, SUBMATCHES};
 	
 	private Type type;
+	private int[] connections;
+	
 	
 	public CompoundNameMatchingConstraint(Type type) {
 		this.type = type;
+	}
+	
+	public CompoundNameMatchingConstraint(Type type, int[] connections) {
+		this.type = type;
+		this.connections = connections;
 	}
 
 	@Override
@@ -40,8 +47,26 @@ public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
 					con.setTo(tinternals[i]);
 					constraints.add(con);
 				}
-			}
+			} 
 			return constraints.toArray(new Constraint[constraints.size()]);
+			
+		}	else if (this.type.equals(Type.SUBMATCHES)) {
+			if(connections != null && ((connections.length % 2) == 0)) {
+				int i = 0;
+				while (i < connections.length) {
+					NameMatchingConstraint con = new NameMatchingConstraint();
+					if(finternals.length > connections[i] + 1 && finternals.length > connections[i+1] + 1) {
+						if(((NameVariable) finternals[connections[i] + 1]).getName().length() > 0 
+								&& ((NameVariable) tinternals[connections[i+1] + 1]).getName().length() > 0) {
+							con.setFrom(finternals[connections[i] + 1]);
+							con.setTo(tinternals[connections[i+1] + 1]);
+							constraints.add(con);
+						}
+					}
+					i += 2;
+				}
+				return constraints.toArray(new Constraint[constraints.size()]);
+			}
 		}
 		
 		return null;

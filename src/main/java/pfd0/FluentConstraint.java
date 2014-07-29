@@ -4,6 +4,8 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 
+import simpleBooleanValueCons.SimpleBooleanValueConstraint;
+import simpleBooleanValueCons.SimpleBooleanValueVariable;
 import unify.CompoundNameMatchingConstraint;
 import unify.CompoundNameVariable;
 
@@ -17,9 +19,15 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE};
 
 	private Type type;
+	private int[] connections;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
+	}
+	
+	public FluentConstraint(Type type, int[] connections) {
+		this.type = type;
+		this.connections = connections;
 	}
 
 	@Override
@@ -40,12 +48,20 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			ncon.setFrom(nf);
 			CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
 			ncon.setTo(nt);
-
 			return new Constraint[]{scon, ncon};
+			
 		} else if (this.type.equals(Type.DC)) {
 			// TODO nothing to add here?
 		} else if (this.type.equals(Type.PRE)) {
-			// TODO nothing to add here?
+			// TODO would it be possible to directly create NameMatchingConstraints here?
+			CompoundNameMatchingConstraint ncon = 
+					new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.SUBMATCHES, 
+							connections);
+			CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
+			ncon.setFrom(nf);
+			CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
+			ncon.setTo(nt);
+			return new Constraint[]{ncon};
 		}
 
 		return null;
@@ -53,7 +69,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public Object clone() {
-		return new FluentConstraint(this.type);
+		return new FluentConstraint(type, connections);
 	}
 
 	@Override

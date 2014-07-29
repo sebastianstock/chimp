@@ -21,7 +21,7 @@ public class PFD0MetaConstraint extends MetaConstraint {
 	private Vector<PFD0Operator> operators;
 	private Vector<PFD0Method> methods;
 
-	public enum markings {UNPLANNED, PLANNED, OPEN, CLOSED, UNSATISFIED, SATISFIED}; 
+	public enum markings {UNPLANNED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED}; 
 	
 	public PFD0MetaConstraint() {
 		super(null, null);

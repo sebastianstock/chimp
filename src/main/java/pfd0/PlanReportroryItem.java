@@ -120,9 +120,10 @@ public abstract class PlanReportroryItem {
 			String component = "Component"; // TODO use real component
 			VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
 					pre.getFluenttype(), pre.getArguments());
-			newFluent.setMarking(markings.UNSATISFIED);
+			newFluent.setMarking(markings.UNJUSTIFIED);
 			newFluents.add(newFluent);
-			FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE);
+			FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
+					pre.getConnections());
 			preconstr.setFrom(newFluent);
 			preconstr.setTo(taskfluent);
 			newConstraints.add(preconstr);

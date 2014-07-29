@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 
@@ -55,6 +56,9 @@ public class JUnitTestPFD0Planner {
 		assertTrue(results.contains("get_mug(mug1)"));
 		assertTrue(results.contains("On(mug1 counter1)"));
 		System.out.println(results);
+		
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+		ConstraintNetwork.draw(groundSolver.getConstraintNetwork(), "Constraint Network");
 		for (int i = 0; i < results.size(); i++) {
 			if (results.get(i).equals("Holding(mug1)")) {
 				assertTrue(vars[i].getMarking() == markings.OPEN);
@@ -98,14 +102,14 @@ public class JUnitTestPFD0Planner {
 	}
 	
 	public static void addOperators(PFD0MetaConstraint metaConstraint) {
-		PFD0Precondition robotatPre = new PFD0Precondition("RobotAt", new String[] {"table1"});
+		PFD0Precondition robotatPre = new PFD0Precondition("RobotAt", new String[] {"table1"}, null);
 		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"counter1"}, 
 				new PFD0Precondition[]{robotatPre}, 
 				new String[] {"RobotAt(table1)"}, 
 				new String[] {"RobotAt(counter1)"});
 		metaConstraint.addOperator(driveCounter1Op);
 		
-		PFD0Precondition onPre = new PFD0Precondition("On", new String[] {"mug1", "counter1"});
+		PFD0Precondition onPre = new PFD0Precondition("On", new String[] {"mug1", "counter1"}, null);
 		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"mug1"}, 
 				new PFD0Precondition[] {onPre}, 
 				new String[] {"On(mug1 counter1)"}, 

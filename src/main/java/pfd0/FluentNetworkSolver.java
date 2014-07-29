@@ -9,6 +9,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
 import pfd0.PFD0MetaConstraint.markings;
+import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
 import unify.CompoundNameMatchingConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {

@@ -7,6 +7,7 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 
+import simpleBooleanValueCons.SimpleBooleanValueVariable;
 import unify.CompoundNameVariable;
 import unify.NameVariable;
 

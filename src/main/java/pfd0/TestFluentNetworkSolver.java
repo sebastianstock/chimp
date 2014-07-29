@@ -5,7 +5,9 @@ import java.util.logging.Logger;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0.SimpleBooleanValueConstraint.Type;
+import simpleBooleanValueCons.SimpleBooleanValueConstraint;
+import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
+import simpleBooleanValueCons.SimpleBooleanValueConstraint.Type;
 import unify.CompoundNameMatchingConstraint;
 import unify.CompoundNameMatchingConstraintSolver;
 

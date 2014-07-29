@@ -15,7 +15,9 @@ import org.junit.Test;
 import org.metacsp.booleanSAT.BooleanDomain;
 import org.metacsp.framework.Constraint;
 
-import pfd0.SimpleBooleanValueConstraint.Type;
+import simpleBooleanValueCons.SimpleBooleanValueConstraint;
+import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
+import simpleBooleanValueCons.SimpleBooleanValueConstraint.Type;
 
 public class JUnitTestFluentNetworkSolver {
 	
