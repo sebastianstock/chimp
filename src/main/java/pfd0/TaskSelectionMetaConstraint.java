@@ -103,6 +103,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		logger.info("getMetaValues for: " + fl);
 		if (fl.getCompoundNameVariable().getHeadName().charAt(0) == '!') {
 			for (PFD0Operator o : operators) {
+				// TODO Do we really want to check the preconditions here, already?
 				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
 					logger.info("Applying preconditions of operator " + o);
 					ConstraintNetwork newResolver = o.expandPreconditions(fl,  groundSolver);

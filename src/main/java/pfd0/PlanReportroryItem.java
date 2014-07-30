@@ -118,7 +118,7 @@ public abstract class PlanReportroryItem {
 		
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
-				String component = "Component"; // TODO use real component
+				String component = "PRE"; // TODO use real component
 				VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
 						pre.getFluenttype(), pre.getArguments());
 				newFluent.setMarking(markings.UNJUSTIFIED);

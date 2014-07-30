@@ -30,10 +30,7 @@ public class TestPFD0Planner1 {
 		addOperators(pfd0Constraint, taskConstraint);	
 		planner.addMetaConstraint(taskConstraint);
 		
-		
 		planner.addMetaConstraint(pfd0Constraint);
-		
-		
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(mug1)");
@@ -57,8 +54,6 @@ public class TestPFD0Planner1 {
 		}
 
 		System.out.println(results);
-		
-		
 	}
 	
 	public static void createState(FluentNetworkSolver groundSolver) {
