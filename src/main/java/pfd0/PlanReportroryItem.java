@@ -113,21 +113,10 @@ public abstract class PlanReportroryItem {
 	protected Vector<FluentConstraint> addPreconditionPrototypes(Fluent taskfluent, 
 			FluentNetworkSolver groundSolver) {
 		
-		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-		
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
-				String component = "PRE"; // TODO use real component
-				VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
-						pre.getFluenttype(), pre.getArguments());
-				newFluent.setMarking(markings.UNJUSTIFIED);
-				newFluents.add(newFluent);
-				FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
-						pre.getConnections());
-				preconstr.setFrom(newFluent);
-				preconstr.setTo(taskfluent);
-				newConstraints.add(preconstr);
+				newConstraints.add(pre.createPreconditionConstraint(taskfluent, groundSolver));
 			}
 		}
 		return newConstraints;
