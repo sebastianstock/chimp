@@ -29,12 +29,16 @@ public class JUnitTestPFD0Planner {
 
 	@Test
 	public void test() {
-		TaskApplicationMetaConstraint metaConstraint = new TaskApplicationMetaConstraint();
+		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
+		planner.addMetaConstraint(preConstraint);
 		
-		addMethods(metaConstraint, fluentSolver);
-		addOperators(metaConstraint);
+		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint();
+		TaskApplicationMetaConstraint pfd0Constraint = new TaskApplicationMetaConstraint();
+		addMethods(pfd0Constraint, taskConstraint, fluentSolver);
+		addOperators(pfd0Constraint, taskConstraint);	
+		planner.addMetaConstraint(taskConstraint);
 		
-		planner.addMetaConstraint(metaConstraint);
+		planner.addMetaConstraint(pfd0Constraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(mug1)");
@@ -67,7 +71,8 @@ public class JUnitTestPFD0Planner {
 				assertTrue(vars[i].getMarking() == markings.PLANNED);
 			}
 			if (results.get(i).equals("On(mug1 counter1)")) {
-				assertTrue(vars[i].getMarking() == markings.CLOSED);
+				assertTrue(vars[i].getMarking() == markings.CLOSED || 
+						vars[i].getMarking() == markings.JUSTIFIED);
 			}
 		}
 	}
@@ -82,7 +87,8 @@ public class JUnitTestPFD0Planner {
 		on.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(TaskApplicationMetaConstraint metaConstraint, 
+	public static void addMethods(TaskApplicationMetaConstraint pfdConstraint,
+			TaskSelectionMetaConstraint taskConstraint,
 			FluentNetworkSolver groundSolver) {
 		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive(counter1)");
 		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp(mug1)");
@@ -94,27 +100,31 @@ public class JUnitTestPFD0Planner {
 				new VariablePrototype[] {drive, grasp}, 
 				new FluentConstraint[] {before});
 //		PFD0Method getMug1Method = new PFD0Method("get_mug mug1", null, new String[] {"!drive counter1", "grasp mug1"});
-		metaConstraint.addMethod(getMug1Method);
+		pfdConstraint.addMethod(getMug1Method);
+		taskConstraint.addMethod(getMug1Method);
 		
 //		PFD0Method graspMug1Method = new PFD0Method("grasp mug1", null, new String[] {}); //new String[] {"fail"});
 //		metaConstraint.addMethod(graspMug1Method);
 		
 	}
 	
-	public static void addOperators(TaskApplicationMetaConstraint metaConstraint) {
+	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint,
+			TaskSelectionMetaConstraint taskConstraint) {
 		PFD0Precondition robotatPre = new PFD0Precondition("RobotAt", new String[] {"table1"}, null);
 		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"counter1"}, 
 				new PFD0Precondition[]{robotatPre}, 
 				new String[] {"RobotAt(table1)"}, 
 				new String[] {"RobotAt(counter1)"});
-		metaConstraint.addOperator(driveCounter1Op);
+		pfdConstraint.addOperator(driveCounter1Op);
+		taskConstraint.addOperator(driveCounter1Op);
 		
 		PFD0Precondition onPre = new PFD0Precondition("On", new String[] {"mug1", "counter1"}, null);
 		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"mug1"}, 
 				new PFD0Precondition[] {onPre}, 
 				new String[] {"On(mug1 counter1)"}, 
 				new String[] {"Holding(mug1)"});
-		metaConstraint.addOperator(graspOp);
+		pfdConstraint.addOperator(graspOp);
+		taskConstraint.addOperator(graspOp);
 	}
 
 }
