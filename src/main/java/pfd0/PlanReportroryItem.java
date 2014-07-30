@@ -7,10 +7,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-
-import pfd0.TaskApplicationMetaConstraint.markings;
 
 public abstract class PlanReportroryItem {
 	
@@ -18,7 +14,7 @@ public abstract class PlanReportroryItem {
 	
 	protected PFD0Precondition[] preconditions;
 
-	private String[] arguments;
+	protected String[] arguments;
 	
 // old
 //	public PlanReportroryItem(String taskname, String[] preconditions) {
@@ -130,12 +126,12 @@ public abstract class PlanReportroryItem {
 	 */
 	public ConstraintNetwork expandPreconditions(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
-		Vector<FluentConstraint> newConstraints = addPreconditionPrototypes(taskfluent, groundSolver);
 		
 		ConstraintNetwork ret = new ConstraintNetwork(null);
-		// add constraints to the network
-		for (FluentConstraint con : newConstraints) {
-			ret.addConstraint(con);
+		if(this.preconditions != null) {
+			for (PFD0Precondition pre : this.preconditions) {
+				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
+			}
 		}
 		return ret;		
 	}
