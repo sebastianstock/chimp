@@ -54,17 +54,38 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			// TODO nothing to add here?
 		} else if (this.type.equals(Type.PRE)) {
 			// TODO would it be possible to directly create NameMatchingConstraints here?
-			CompoundNameMatchingConstraint ncon = 
-					new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.SUBMATCHES, 
-							connections);
-			CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
-			ncon.setFrom(nf);
-			CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
-			ncon.setTo(nt);
-			return new Constraint[]{ncon};
+			if (connections != null && connections.length > 0) {
+				CompoundNameMatchingConstraint ncon = 
+						new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.SUBMATCHES, 
+								connections);
+				CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
+				ncon.setFrom(nf);
+				CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
+				ncon.setTo(nt);
+				return new Constraint[]{ncon};
+			} else {
+				return null;
+			}
+		} else if (this.type.equals(Type.OPENS)) {
+			if(connections != null) {
+				return new Constraint[]{createSubmatches(f, t)};
+			} else {
+				return null;
+			}
 		}
 
 		return null;
+	}
+	
+	private CompoundNameMatchingConstraint createSubmatches(Variable f, Variable t) {
+		CompoundNameMatchingConstraint ncon = 
+				new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.SUBMATCHES, 
+						connections);
+		CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
+		ncon.setFrom(nf);
+		CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
+		ncon.setTo(nt);
+		return ncon;
 	}
 
 	@Override
