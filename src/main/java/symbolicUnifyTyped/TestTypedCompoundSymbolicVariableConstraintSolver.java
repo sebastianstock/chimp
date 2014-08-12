@@ -7,6 +7,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint.Type;
+
 
 public class TestTypedCompoundSymbolicVariableConstraintSolver {
 
@@ -17,9 +19,14 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		String[] symbolsPlAreas = {"pl1", "pl2", "pl3", "pl4", "pl5", "pl6", "pl7", "pl8", "pl9", "pl10", "none"};
 		String[] symbolsManAreas = {"ma1", "ma2", "ma3", "ma4", "ma5", "ma6", "ma7", "ma8", "ma9", "ma10", "none"};
 		String[] symbolsPreAreas = {"pma1", "pma2", "pma3", "pma4", "pma5", "pma6", "pma7", "pma8", "pma9", "pma10", "none"};
+		String[][] symbols = new String[5][];
+		symbols[0] = symbolsPredicates;
+		symbols[1] = symbolsMugs;
+		symbols[2] = symbolsPlAreas;
+		symbols[3] = symbolsManAreas;
+		symbols[4] = symbolsPreAreas;
 		TypedCompoundSymbolicVariableConstraintSolver solver = 
-				new TypedCompoundSymbolicVariableConstraintSolver(symbolsPredicates, symbolsMugs, symbolsPlAreas,
-						symbolsManAreas, symbolsPreAreas);
+				new TypedCompoundSymbolicVariableConstraintSolver(symbols);
 		
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
@@ -56,8 +63,11 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 				(SymbolicVariableConstraintSolver) solver.getConstraintSolvers()[0];
 		ConstraintNetwork.draw(symbolicSolver.getConstraintNetwork());
 		
-
-
+		TypedCompoundSymbolicValueConstraint con01 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
+		con01.setFrom(var0);
+		con01.setTo(var1);
+//		solver.addConstraint(con01);
+		
 	}
 
 }

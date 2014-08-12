@@ -2,7 +2,6 @@ package symbolicUnifyTyped;
 
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
-import org.metacsp.multi.symbols.SymbolicValueConstraint;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 
 public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstraintSolver {
@@ -14,26 +13,27 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 	protected static int MAX_VARIABLES = 500;
 
 
-	public TypedCompoundSymbolicVariableConstraintSolver(String[] symbols0, String[] symbols1,
-			String[] symbols2, String[] symbols3, String[] symbols4) {
-		super(new Class[] {SymbolicValueConstraint.class, SymbolicValueConstraint.class}, TypedCompoundSymbolicVariable.class,
-				createConstraintSolvers(symbols0, symbols1, symbols2, symbols3, symbols4), new int[] {1, 1, 1, 1, 1});
-		// TODO Auto-generated constructor stub
+	public TypedCompoundSymbolicVariableConstraintSolver(String[][] symbols) {
+		super(new Class[] {TypedCompoundSymbolicValueConstraint.class}, TypedCompoundSymbolicVariable.class,
+				createConstraintSolvers(symbols), createInternals(symbols.length));
+	}
+	
+	private static int[] createInternals(int length) {
+		int[] internals = new int[length];
+		for (int i = 0; i < internals.length; i++) {
+			internals[i] = 1;
+		}
+		return internals;
 	}
 
-	protected static ConstraintSolver[] createConstraintSolvers(String[] symbols0, String[] symbols1,
-			String[] symbols2, String[] symbols3, String[] symbols4) {
-		ConstraintSolver[] ret = new ConstraintSolver[] {
-				new SymbolicVariableConstraintSolver(symbols0, MAX_VARIABLES), 
-				new SymbolicVariableConstraintSolver(symbols1, MAX_VARIABLES),
-				new SymbolicVariableConstraintSolver(symbols2, MAX_VARIABLES), 
-				new SymbolicVariableConstraintSolver(symbols3, MAX_VARIABLES),
-				new SymbolicVariableConstraintSolver(symbols4, MAX_VARIABLES)
-				};
+	protected static ConstraintSolver[] createConstraintSolvers(String[][] symbols) {
+		ConstraintSolver[] ret = new ConstraintSolver[symbols.length];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = new SymbolicVariableConstraintSolver(symbols[i], MAX_VARIABLES);
+			
+		}
 		return ret;
 	}
-
-
 
 	@Override
 	public boolean propagate() {
