@@ -1,5 +1,6 @@
 package symbolicUnifyTyped;
 
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +10,7 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.symbols.SymbolicVariable;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
 import unify.NameVariable;
 
@@ -21,12 +23,14 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 
 	private static Pattern namepattern = Pattern.compile("^(.+)\\((.*)\\)$");
 	
-	private int argsize;
+	private static int internalVarsCount;
+	
 	
 	public TypedCompoundSymbolicVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
 			Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
-		this.argsize = 0;
+		internalVarsCount = internalVars.length;
+		
 	}
 	
 	/**
@@ -48,27 +52,21 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		}
 	}
 	
-	// TODO: UPDATE
-//	public void setName(String head, String... arguments) {
-//		Variable[] vars = this.getInternalVariables();
-//		((NameVariable) vars[0]).setName(head);
-//		int argcounter = 1;
-//		if (arguments != null) {
-//			if (arguments.length > vars.length - 1)
-//				throw new IllegalArgumentException(
-//						"Too many arguments. Only " + (this.getInternalVariables().length - 1) + " permitted.");
-//			for (String s : arguments) {
-//				((NameVariable) vars[argcounter]).setName(s);
-//				argcounter++;
-//			}
-//			this.argsize = arguments.length;
-//		} else {
-//			argcounter = 1; // all argument variables will be set to null
-//		}
-//		for (int j = argcounter; j < vars.length; j++) {
-//			((NameVariable) vars[j]).setName(null);
-//		}
-//	}
+	
+	/**
+	 * Sets the ground name of the variable.
+	 * @param arguments Each internal variable is set to the value of the corresponding string in the array. These should be ground.
+	 * @throws IllegalArgumentException If size of argument array does not match number of internal variables.
+	 */
+	public void setName(String[] arguments) {
+		Variable[] vars = this.getInternalVariables();
+		if (arguments.length != internalVarsCount) {
+			throw new IllegalArgumentException("Number of arguments does not match number of internal variables");
+		}
+		for (int i = 0; i < internalVarsCount; i++) {
+			((SymbolicVariable) vars[i]).setDomain(arguments[i]);
+		}
+	}
 	
 	
 	// TODO: UPDATE
@@ -119,7 +117,7 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	/**
 	 * @return Full name with head and arguments, e.g., 'On(mug1 table1)'.
 	 */
-	public String getName() {  // TODO: UPDATE
+	public String getName() {
 		Variable[] internalvars = this.getInternalVariables();
 		StringBuilder ret = new StringBuilder(internalvars[0].toString());
 		ret.append("(");
@@ -190,8 +188,5 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 //		return true;
 //	}
 	
-	public int getArgumentsSize() {
-		return this.argsize;
-	}
 
 }

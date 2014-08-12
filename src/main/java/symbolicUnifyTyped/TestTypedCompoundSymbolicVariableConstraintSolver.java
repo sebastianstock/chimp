@@ -35,11 +35,7 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
     var0.setDomainAtPosition(4,  new String[] {"none"});
 		logger.info("Created var0");
 		TypedCompoundSymbolicVariable var1 = (TypedCompoundSymbolicVariable) solver.createVariable();
-		var1.setDomainAtPosition(0,  new String[] {"on"});
-		var1.setDomainAtPosition(1,  new String[] {"mug1"});
-		var1.setDomainAtPosition(2,  new String[] {"pl1"});
-    var1.setDomainAtPosition(3,  new String[] {"none"});
-    var1.setDomainAtPosition(4,  new String[] {"none"});
+    var1.setName(new String[] {"on", "mug1", "pl1", "none", "none"});
 		logger.info("Created var1");
 		
 		TypedCompoundSymbolicVariable var2 = (TypedCompoundSymbolicVariable) solver.createVariable();
@@ -50,13 +46,8 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
     var2.setDomainAtPosition(4,  new String[] {"none"});
 		logger.info("Created var2");
 		TypedCompoundSymbolicVariable var3 = (TypedCompoundSymbolicVariable) solver.createVariable();
-		var3.setDomainAtPosition(0,  new String[] {"on"});
-		var3.setDomainAtPosition(1,  new String[] {"mug1"});
-		var3.setDomainAtPosition(2,  new String[] {"none"});
-    var3.setDomainAtPosition(3,  new String[] {"none"});
-    var3.setDomainAtPosition(4,  new String[] {"none"});
+		var3.setName(new String[] {"on", "mug2", "none", "none", "none"});
 		logger.info("Created var3");
-		
 		
 		logger.info("Created internal variables");
 		
