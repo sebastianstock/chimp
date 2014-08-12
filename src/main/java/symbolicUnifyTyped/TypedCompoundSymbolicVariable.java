@@ -1,7 +1,5 @@
 package symbolicUnifyTyped;
 
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.metacsp.framework.Constraint;
@@ -10,9 +8,6 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.symbols.SymbolicVariable;
-import org.metacsp.utility.logging.MetaCSPLogging;
-
-import unify.NameVariable;
 
 public class TypedCompoundSymbolicVariable extends MultiVariable {
 
