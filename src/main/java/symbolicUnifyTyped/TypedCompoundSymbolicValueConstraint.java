@@ -5,6 +5,7 @@ import java.util.Vector;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
+import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.symbols.SymbolicValueConstraint;
 import org.metacsp.multi.symbols.SymbolicVariable;
 
@@ -45,22 +46,22 @@ public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint 
 				new Vector<SymbolicValueConstraint>(finternals.length);
 		if (this.type.equals(Type.MATCHES)) {
 			for(int i = 0; i < finternals.length; i++) {
-//				if(((SymbolicVariable) finternals[i]).getSymbols().length == 1 &&
-//						((SymbolicVariable) finternals[i].getSymbols)
-//						
-//						&& ((NameVariable) tinternals[i]).getName().length() > 0) {
 				SymbolicValueConstraint con = 
 						new SymbolicValueConstraint(SymbolicValueConstraint.Type.EQUALS);
 				con.setFrom(finternals[i]);
 				con.setTo(tinternals[i]);
+				for (int j = 0; j < finternals.length; j++) {
+					if (j != i) {
+						con.skipSolver(((MultiVariable)f).getInternalConstraintSolvers()[j]);
+					}
+				}
 				constraints.add(con);
-//				}
 			} 
-			SymbolicValueConstraint con = new SymbolicValueConstraint(SymbolicValueConstraint.Type.EQUALS);
-			con.setFrom(finternals[0]);
-			con.setTo(tinternals[0]);
-			return new Constraint[] {con};
-//			return constraints.toArray(new Constraint[constraints.size()]);
+//			SymbolicValueConstraint con = new SymbolicValueConstraint(SymbolicValueConstraint.Type.EQUALS);
+//			con.setFrom(finternals[0]);
+//			con.setTo(tinternals[0]);
+//			return new Constraint[] {con};
+			return constraints.toArray(new Constraint[constraints.size()]);
 			
 		}	
 //		else if (this.type.equals(Type.SUBMATCHES)) {
