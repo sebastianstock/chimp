@@ -30,13 +30,15 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 		
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
-		logger.setLevel(Level.FINEST);
+		//logger.setLevel(Level.FINEST);
+		
+		MetaCSPLogging.setLevel(Level.FINEST);
 		
 		logger.info("Start");
 		
 		TypedCompoundSymbolicVariable var0 = (TypedCompoundSymbolicVariable) solver.createVariable();
 		var0.setDomainAtPosition(0,  new String[] {"on", "robotat"});
-		var0.setDomainAtPosition(1,  new String[] {"mug1", "mug2"});
+		var0.setDomainAtPosition(1,  new String[] {"mug1", "mug2", "none"});
 //    var0.setDomainAtPosition(2,  new String[] {"pl1"});
 //    var0.setDomainAtPosition(3,  new String[] {"none"});
 //    var0.setDomainAtPosition(4,  new String[] {"none"});

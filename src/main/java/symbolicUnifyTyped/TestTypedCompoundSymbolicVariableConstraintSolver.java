@@ -32,6 +32,7 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		
 		logger.setLevel(Level.FINEST);
 		
+		MetaCSPLogging.setLevel(Level.FINEST);
 		logger.info("Start");
 		
 		TypedCompoundSymbolicVariable var0 = (TypedCompoundSymbolicVariable) solver.createVariable();
