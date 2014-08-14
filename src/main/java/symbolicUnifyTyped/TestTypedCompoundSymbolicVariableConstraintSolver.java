@@ -3,7 +3,10 @@ package symbolicUnifyTyped;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.metacsp.booleanSAT.BooleanVariable;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ConstraintSolver;
+import org.metacsp.framework.ConstraintSolver.OPTIONS;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
@@ -27,6 +30,13 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		symbols[4] = symbolsPreAreas;
 		TypedCompoundSymbolicVariableConstraintSolver solver = 
 				new TypedCompoundSymbolicVariableConstraintSolver(symbols);
+		
+//		for (ConstraintSolver ss: solver.getConstraintSolvers()) {
+//			
+////			ConstraintSolver bs = ((SymbolicVariableConstraintSolver) cs).getConstraintSolvers()[0];
+//			ConstraintSolver bs = ((SymbolicVariableConstraintSolver) ss).getConstraintSolvers()[0];
+//			bs.setOptions(OPTIONS.MANUAL_PROPAGATE);
+//		}
 		
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
@@ -60,6 +70,10 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		logger.info("Created internal variables");
 		
 		
+//		TypedCompoundSymbolicVariable var4 = (TypedCompoundSymbolicVariable) solver.createVariable();
+//		
+//		TypedCompoundSymbolicVariable var5 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		
 		SymbolicVariableConstraintSolver symbolicSolver = 
 				(SymbolicVariableConstraintSolver) solver.getConstraintSolvers()[0];
 		ConstraintNetwork.draw(symbolicSolver.getConstraintNetwork());
@@ -67,8 +81,9 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		TypedCompoundSymbolicValueConstraint con01 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
 		con01.setFrom(var0);
 		con01.setTo(var1);
-//		solver.addConstraint(con01);
+		solver.addConstraint(con01);
 		
+		logger.info("Finished");
 	}
 
 }
