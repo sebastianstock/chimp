@@ -8,8 +8,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
-import unify.CompoundNameVariable;
-import unify.NameVariable;
+import symbolicUnifyTyped.TypedCompoundSymbolicVariable;
 
 public class Fluent extends MultiVariable {
 
@@ -27,7 +26,7 @@ public class Fluent extends MultiVariable {
 	 * @return The {@link CompoundNameVariable} representing the temporal value 
 	 * of this {@link SimpleBooleanValueVariable}.
 	 */
-	public CompoundNameVariable getCompoundNameVariable() {
+	public TypedCompoundSymbolicVariable getCompoundNameVariable() {
 		return (CompoundNameVariable)this.getInternalVariables()[0];
 	}
 	
