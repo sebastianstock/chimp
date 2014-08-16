@@ -62,7 +62,9 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		}
 		((SymbolicVariable) vars[0]).setDomain(type);
 		for (int i = 1; i < internalVarsCount; i++) {
-			((SymbolicVariable) vars[i]).setDomain(arguments[i-1]);
+			if (arguments[i-1].charAt(0) != '?') {  // '?' indicates variables -> nothing to set
+				((SymbolicVariable) vars[i]).setDomain(arguments[i-1]);
+			}
 		}
 	}
 	
@@ -142,7 +144,6 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 //		return ((NameVariable) getInternalVariables()[0]).getName();
 //	}
 
-	// TODO: UPDATE
 	@Override
 	public String toString() {
 		return getName();
@@ -150,6 +151,12 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 
 	public String[] getPossiblePredicateNames() {
 		return ((SymbolicVariable) getInternalVariables()[0]).getSymbols();
+	}
+
+	// TODO needs to be implemented!
+	public boolean possibleMatch(String fluenttype, String[] arguments) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	
