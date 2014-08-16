@@ -50,16 +50,18 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	
 	/**
 	 * Sets the ground name of the variable.
+	 * @param type the predicate's name.
 	 * @param arguments Each internal variable is set to the value of the corresponding string in the array. These should be ground.
 	 * @throws IllegalArgumentException If size of argument array does not match number of internal variables.
 	 */
-	public void setName(String[] arguments) {
+	public void setName(String type, String ...arguments) {
 		Variable[] vars = this.getInternalVariables();
-		if (arguments.length != internalVarsCount) {
+		if ((arguments.length + 1) != internalVarsCount) {
 			throw new IllegalArgumentException("Number of arguments does not match number of internal variables");
 		}
-		for (int i = 0; i < internalVarsCount; i++) {
-			((SymbolicVariable) vars[i]).setDomain(arguments[i]);
+		((SymbolicVariable) vars[0]).setDomain(type);
+		for (int i = 1; i < internalVarsCount; i++) {
+			((SymbolicVariable) vars[i]).setDomain(arguments[i-1]);
 		}
 	}
 	
@@ -144,6 +146,10 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	public String[] getPossiblePredicateNames() {
+		return ((SymbolicVariable) getInternalVariables()[0]).getSymbols();
 	}
 	
 	

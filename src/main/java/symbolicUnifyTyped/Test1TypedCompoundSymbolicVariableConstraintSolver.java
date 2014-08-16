@@ -43,9 +43,11 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 //    var0.setDomainAtPosition(3,  new String[] {"none"});
 //    var0.setDomainAtPosition(4,  new String[] {"none"});
 		logger.info("Created var0");
+		System.out.println(var0);
 		TypedCompoundSymbolicVariable var1 = (TypedCompoundSymbolicVariable) solver.createVariable();
-    var1.setName(new String[] {"on", "none"});
+    var1.setName("on", "none");
 		logger.info("Created var1");
+		System.out.println(var1);
 		
 //		TypedCompoundSymbolicVariable var2 = (TypedCompoundSymbolicVariable) solver.createVariable();
 //		var2.setDomainAtPosition(0,  new String[] {"on", "robotat"});
@@ -69,6 +71,11 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 		con01.setFrom(var0);
 		con01.setTo(var1);
 		solver.addConstraint(con01);
+		
+		System.out.println("Var0");
+		System.out.println(var0);
+		System.out.println("Var1");
+		System.out.println(var1);
 		
 	}
 
