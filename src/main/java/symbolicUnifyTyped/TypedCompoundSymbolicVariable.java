@@ -1,5 +1,6 @@
 package symbolicUnifyTyped;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.metacsp.framework.Constraint;
@@ -66,31 +67,30 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	}
 	
 	
-	// TODO: UPDATE
-//	/**
-//	 * Set the name with one String.
-//	 * Name should have the format HEAD(ARG1 ARG2 ARG3 ...).
-//	 * Example: 'On(mug1 table1)'
-//	 * @param name Full name of the variable.
-//	 */
-//	public void setFullName(String name) { // TODO: UPDATE
-//		if (name == null) {
-//			throw new IllegalArgumentException("Name must not be null");
-//		}
-//
-//		Matcher m = namepattern.matcher(name);
-//		if(m.find()) {
-//			String head = m.group(1);
-//			String[] args = null;
-//			if(m.group(2).length() > 0) {
-//				args = m.group(2).split("\\s+");
-//			}
-//			this.setName(head, args);
-//		} else {
-//			throw new IllegalArgumentException(
-//					"Name does not match pattern of a predicate, e.g., 'On(mug1 table1)'.");
-//		}
-//	}
+	/**
+	 * Set the name with one String.
+	 * Name should have the format HEAD(ARG1 ARG2 ARG3 ...).
+	 * Example: 'On(mug1 table1)'
+	 * @param name Full name of the variable.
+	 */
+	public void setFullName(String name) { // TODO: UPDATE
+		if (name == null) {
+			throw new IllegalArgumentException("Name must not be null");
+		}
+
+		Matcher m = namepattern.matcher(name);
+		if(m.find()) {
+			String head = m.group(1);
+			String[] args = null;
+			if(m.group(2).length() > 0) {
+				args = m.group(2).split("\\s+");
+			}
+			this.setName(head, args);
+		} else {
+			throw new IllegalArgumentException(
+					"Name does not match pattern of a predicate, e.g., 'On(mug1 table1)'.");
+		}
+	}
 
 	@Override
 	public int compareTo(Variable arg0) {
