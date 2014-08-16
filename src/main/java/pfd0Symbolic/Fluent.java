@@ -23,27 +23,27 @@ public class Fluent extends MultiVariable {
 	}
 	
 	/**
-	 * @return The {@link CompoundNameVariable} representing the temporal value 
-	 * of this {@link SimpleBooleanValueVariable}.
+	 * @return The {@link TypedCompoundSymbolicVariable} representing the compound symbolic value 
+	 * of this {@link Fluent}.
 	 */
-	public TypedCompoundSymbolicVariable getCompoundNameVariable() {
-		return (CompoundNameVariable)this.getInternalVariables()[0];
+	public TypedCompoundSymbolicVariable getCompoundSymbolicVariable() {
+		return (TypedCompoundSymbolicVariable)this.getInternalVariables()[0];
 	}
 	
 	/**
-	 * @return The {@link BooleanVariable} representing the symbolic value 
-	 * of this {@link SimpleBooleanValueVariable}.
+	 * @return The {@link BooleanVariable} representing the boolean value 
+	 * of this {@link Fluent}.
 	 */
 	public SimpleBooleanValueVariable getSimpleBooleanValueVariable() {
 		return (SimpleBooleanValueVariable)this.getInternalVariables()[1];
 	}
 	
 	public void setName(String name) {
-		this.getCompoundNameVariable().setFullName(name);
+		this.getCompoundSymbolicVariable().setFullName(name);
 	}
 	
 	public void setName(String type, String[] arguments) {
-		this.getCompoundNameVariable().setName(type, arguments);
+		this.getCompoundSymbolicVariable().setName(type, arguments);
 	}
 
 	@Override

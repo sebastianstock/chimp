@@ -6,8 +6,8 @@ import org.metacsp.framework.multi.MultiBinaryConstraint;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
-import unify.CompoundNameMatchingConstraint;
-import unify.CompoundNameVariable;
+import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint;
+import symbolicUnifyTyped.TypedCompoundSymbolicVariable;
 
 public class FluentConstraint extends MultiBinaryConstraint {
 
@@ -42,11 +42,11 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
 			scon.setTo(bt);
 
-			CompoundNameMatchingConstraint ncon = 
-					new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.MATCHES);
-			CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
+			TypedCompoundSymbolicValueConstraint ncon = 
+					new TypedCompoundSymbolicValueConstraint(TypedCompoundSymbolicValueConstraint.Type.MATCHES);
+			TypedCompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
 			ncon.setFrom(nf);
-			CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
+			TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 			ncon.setTo(nt);
 			return new Constraint[]{scon, ncon};
 			
@@ -55,12 +55,12 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.PRE)) {
 			// TODO would it be possible to directly create NameMatchingConstraints here?
 			if (connections != null && connections.length > 0) {
-				CompoundNameMatchingConstraint ncon = 
-						new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.SUBMATCHES, 
+				TypedCompoundSymbolicValueConstraint ncon = 
+						new TypedCompoundSymbolicValueConstraint(TypedCompoundSymbolicValueConstraint.Type.SUBMATCHES, 
 								connections);
-				CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
+				TypedCompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
 				ncon.setFrom(nf);
-				CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
+				TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 				ncon.setTo(nt);
 				return new Constraint[]{ncon};
 			} else {
@@ -77,13 +77,13 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		return null;
 	}
 	
-	private CompoundNameMatchingConstraint createSubmatches(Variable f, Variable t) {
-		CompoundNameMatchingConstraint ncon = 
-				new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.SUBMATCHES, 
-						connections);
-		CompoundNameVariable nf = ((Fluent) f).getCompoundNameVariable();
+	private TypedCompoundSymbolicValueConstraint createSubmatches(Variable f, Variable t) {
+		TypedCompoundSymbolicValueConstraint ncon = new TypedCompoundSymbolicValueConstraint(
+				TypedCompoundSymbolicValueConstraint.Type.SUBMATCHES, 
+				connections);
+		TypedCompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
 		ncon.setFrom(nf);
-		CompoundNameVariable nt = ((Fluent) t).getCompoundNameVariable();
+		TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 		ncon.setTo(nt);
 		return ncon;
 	}

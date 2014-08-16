@@ -8,9 +8,8 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
-import pfd0.TaskApplicationMetaConstraint.markings;
 import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
-import unify.CompoundNameMatchingConstraintSolver;
+import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
 
@@ -19,9 +18,9 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	 */
 	private static final long serialVersionUID = -5831971530237352714L;
 
-	public FluentNetworkSolver(long origin, long horizon) {
+	public FluentNetworkSolver(long origin, long horizon, String[][] symbols) {
 		super(new Class[] {FluentConstraint.class}, Fluent.class, 
-				createConstraintSolvers(origin, horizon, -1), new int[] {1, 1});
+				createConstraintSolvers(origin, horizon, symbols), new int[] {1, 1});
 	}
 
 	@Override
@@ -31,9 +30,9 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	}
 
 	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, 
-			int maxFluents) {
+			String[][] symbols) {
 		ConstraintSolver[] ret = new ConstraintSolver[] { 
-				new CompoundNameMatchingConstraintSolver(), 
+				new TypedCompoundSymbolicVariableConstraintSolver(symbols), 
 				new SimpleBooleanValueConstraintSolver(origin, horizon)};
 		return ret;
 	}
@@ -44,7 +43,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	public Fluent[] getOpenFluents() {
 		ArrayList<Fluent> ret = new ArrayList<Fluent>();
 		for (Variable var: getVariables()) {
-			if (var.getMarking() == markings.OPEN) {
+			if (var.getMarking() == TaskApplicationMetaConstraint.markings.OPEN) {
 				ret.add((Fluent) var);
 			}
 		}

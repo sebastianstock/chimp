@@ -102,7 +102,8 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		
 		logger.info("getMetaValues for: " + fl);
-		if (fl.getCompoundNameVariable().getHeadName().charAt(0) == '!') {
+		// TODO Make sure getPossibePredicateNames contains exactly one element!!!
+		if (fl.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
 			for (PFD0Operator o : operators) {
 				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
 					logger.info("Applying operator " + o);
