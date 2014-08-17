@@ -38,12 +38,15 @@ public class TestTypedCompoundSymbolicVariable {
 	public void testSetName() {
 		TypedCompoundSymbolicVariable var0 = (TypedCompoundSymbolicVariable) solver.createVariable();
 		var0.setName("on", "mug1", "pl1", "none", "none");
+		TypedCompoundSymbolicVariable var1 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		var1.setName("on", "?mug", "pl1", "none", "none");
 		propagateAll();
 //		System.out.println(var0);
 		String[] possiblePredicateNames = var0.getPossiblePredicateNames();
 		assertTrue(possiblePredicateNames.length == 1);
 		assertTrue(possiblePredicateNames[0].equals("on"));
 		assertTrue(var0.toString().equals("[on]([mug1] [pl1] [none] [none])"));
+		assertTrue(var1.getName().equals("[on]([mug1, mug2, mug3, mug4, mug5, mug6, mug7, mug8, mug9, mug10, none] [pl1] [none] [none])"));
 	}
 	
 	@Test
