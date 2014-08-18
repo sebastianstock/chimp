@@ -6,7 +6,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 
-import pfd0.TaskApplicationMetaConstraint.markings;
+import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
+
 
 public class PFD0Method extends PlanReportroryItem {
 	
