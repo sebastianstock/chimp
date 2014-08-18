@@ -10,6 +10,7 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
+import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
 
 public class TaskSelectionMetaConstraint extends MetaConstraint {
@@ -101,6 +102,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		
 		logger.info("getMetaValues for: " + fl);
+		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
 		if (fl.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
 			for (PFD0Operator o : operators) {
 				// TODO Do we really want to check the preconditions here, already?
