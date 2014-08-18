@@ -71,7 +71,11 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 //		assertTrue("'mug1' should be propageted to first parameter of 'holding'.", 
 //				vars[4].getName().equals("Holding(mug1 rightarm1)"));
 		
-		// TODO test names
+		assertTrue(vars[1].getName().equals("[on]([mug1] [pl1] [none] [none])"));
+		assertTrue(vars[2].getName().equals("[get_mug]([mug1] [pl1] [none] [none])"));
+		assertTrue(vars[3].getName().equals("[grasp_mug]([mug1] [pl1] [none] [none])"));
+		assertTrue(vars[4].getName().equals("[robotat]([none] [pl1] [none] [none])"));
+		
 		
 	}
 
