@@ -149,7 +149,7 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	}
 
 	public String[] getPossiblePredicateNames() {
-		return ((SymbolicVariable) getInternalVariables()[0]).getSymbols();
+		return getSymbolsAt(0);
 	}
 
 	/**

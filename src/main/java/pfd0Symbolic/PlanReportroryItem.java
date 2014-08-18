@@ -16,11 +16,6 @@ public abstract class PlanReportroryItem {
 
 	protected String[] arguments;
 	
-// old
-//	public PlanReportroryItem(String taskname, String[] preconditions) {
-//		this.taskname = taskname;
-//		this.preconditions = preconditions;
-//	}
 	
 	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions) {
 		this.taskname = taskname;
