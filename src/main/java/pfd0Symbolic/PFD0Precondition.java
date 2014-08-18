@@ -2,7 +2,8 @@ package pfd0Symbolic;
 
 import org.metacsp.framework.VariablePrototype;
 
-import pfd0.TaskApplicationMetaConstraint.markings;
+import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
+
 
 public class PFD0Precondition {
 	

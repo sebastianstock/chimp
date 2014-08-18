@@ -40,5 +40,11 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	public void propagateAllSub() {
+		for (ConstraintSolver symbolicsolver : getConstraintSolvers()) {
+			((SymbolicVariableConstraintSolver) symbolicsolver).getConstraintSolvers()[0].propagate();
+		}
+	}
 
 }

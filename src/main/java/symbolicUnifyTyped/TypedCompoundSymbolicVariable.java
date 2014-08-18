@@ -160,34 +160,46 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	 * @return
 	 */
 	public boolean possibleMatch(String fluenttype, String[] arguments) {
-		if (fluenttype == null || (! fluenttype.equals(getSymbolsAt(0)))) {
+		if (fluenttype == null) {
 			return false;
 		}
-		if (arguments == null) {
-			if (internalVarsCount == 1) {
-				return true;
-			} else {
-				return false;
+		boolean found = false;
+		for (String symbol : getSymbolsAt(0)) {
+			if (fluenttype.equals(symbol)) {
+				found = true;
+				break;
 			}
 		}
-		
-		if ((arguments.length + 1) != internalVarsCount) {
+		if (!found) {
 			return false;
 		}
-		
-		for (int i = 0; i < arguments.length; i++) {
-			String[] symbols = getSymbolsAt(i+1);
-			boolean found = false;
-			for (String symbol : symbols) {
-				if (arguments[i].equals(symbol)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				return false;
-			}
-		}
+		// TODO useful checking of arguments to reduce branching factor
+//		if (arguments == null) {
+//			if (internalVarsCount == 1) {
+//				return true;
+//			} else {
+//				return false;
+//			}
+//		}
+//		
+//		if ((arguments.length + 1) != internalVarsCount) {
+//			return false;
+//		}
+//		
+//		for (int i = 0; i < arguments.length; i++) {
+//			if (arguments[i].equals("none"))
+//				continue;
+//			found = false;
+//			for (String symbol : getSymbolsAt(i+1)) {
+//				if (arguments[i].equals(symbol)) {
+//					found = true;
+//					break;
+//				}
+//			}
+//			if (!found) {
+//				return false;
+//			}
+//		}
 		
 		return true;
 	}
