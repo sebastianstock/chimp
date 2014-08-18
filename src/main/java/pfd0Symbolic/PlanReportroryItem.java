@@ -48,20 +48,18 @@ public abstract class PlanReportroryItem {
 		return false;
 	}
 	
-	// TODO: Might not be useful anymore
 	public Map<String, Set<Fluent>> createFluentSetMap(Fluent[] fluents) {
 		HashMap<String, Set<Fluent>> map = new HashMap<String, Set<Fluent>>();
 		if (fluents != null) {
 			for (int i = 0; i < fluents.length; i++) {
-				// TODO: THIS IS WRONG! UPDATE it. We need to check all possible head names
-				// but maybe we can make the assumption that all tasks have a ground head.
-				String headName = fluents[i].getCompoundSymbolicVariable().getPossiblePredicateNames()[0];
-				if(map.containsKey(headName)) {
-					map.get(headName).add(fluents[i]);
-				} else {
-					HashSet<Fluent> newset = new HashSet<Fluent>();
-					newset.add(fluents[i]);
-					map.put(headName, newset);
+				for (String headName : fluents[i].getCompoundSymbolicVariable().getPossiblePredicateNames()) {
+					if(map.containsKey(headName)) {
+						map.get(headName).add(fluents[i]);
+					} else {
+						HashSet<Fluent> newset = new HashSet<Fluent>();
+						newset.add(fluents[i]);
+						map.put(headName, newset);
+					}
 				}
 			}
 		}
