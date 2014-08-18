@@ -53,7 +53,6 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.DC)) {
 			// TODO nothing to add here?
 		} else if (this.type.equals(Type.PRE)) {
-			// TODO would it be possible to directly create NameMatchingConstraints here?
 			if (connections != null && connections.length > 0) {
 				TypedCompoundSymbolicValueConstraint ncon = 
 						new TypedCompoundSymbolicValueConstraint(TypedCompoundSymbolicValueConstraint.Type.SUBMATCHES, 
