@@ -24,8 +24,11 @@ public class TestFluentNetworkSolver {
 		symbols[2] = symbolsPlAreas;
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
+		logger.info("Test1");
 		FluentNetworkSolver solver = new FluentNetworkSolver(0, 500, symbols);
-		Fluent[] fluents = (Fluent[]) solver.createVariables(2);
+		logger.info("Test2");
+		Fluent[] fluents = (Fluent[]) solver.createVariables(3);
+		logger.info("Test3");
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
 		SimpleBooleanValueConstraintSolver bsolver = 
@@ -38,7 +41,8 @@ public class TestFluentNetworkSolver {
 		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
 		fluents[0].setName("on(mug1 pl1 none none)");
-		fluents[1].setName("on(mug1 none none none)");
+		fluents[1].setName("on(mug1 pl1 none none)");
+		fluents[2].setName("on(mug1 pl2 none none)");
 		
 
 //		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
@@ -62,10 +66,15 @@ public class TestFluentNetworkSolver {
 //				(CompoundNameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
 //		logger.info("Added ncon0? " + nsolver.addConstraint(ncon0));
 		
-		FluentConstraint fcon = new FluentConstraint(FluentConstraint.Type.MATCHES);
-		fcon.setFrom(fluents[0]);
-		fcon.setTo(fluents[1]);
-		logger.info("Added fcon? " + solver.addConstraint(fcon));
+		FluentConstraint fcon01 = new FluentConstraint(FluentConstraint.Type.MATCHES);
+		fcon01.setFrom(fluents[0]);
+		fcon01.setTo(fluents[1]);
+		logger.info("Added fcon01? " + solver.addConstraint(fcon01));
+		
+		FluentConstraint fcon12 = new FluentConstraint(FluentConstraint.Type.MATCHES);
+		fcon12.setFrom(fluents[1]);
+		fcon12.setTo(fluents[2]);
+		logger.info("Added fcon12? " + solver.addConstraint(fcon12));
 	}
 
 }

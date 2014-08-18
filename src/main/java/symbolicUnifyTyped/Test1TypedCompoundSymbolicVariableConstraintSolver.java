@@ -77,6 +77,23 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 		System.out.println("Var1");
 		System.out.println(var1);
 		
+		TypedCompoundSymbolicVariable var2 = (TypedCompoundSymbolicVariable) solver.createVariable();
+    var2.setName("get_mug", "mug7");
+		logger.info("Created var2");
+		System.out.println(var2);
+		
+		TypedCompoundSymbolicValueConstraint con12 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
+		con12.setFrom(var1);
+		con12.setTo(var2);
+		logger.info("Added con12 ? " + solver.addConstraint(con12));
+		
+		System.out.println("Var0");
+		System.out.println(var0);
+		System.out.println("Var1");
+		System.out.println(var1);
+		System.out.println("Var2");
+		System.out.println(var2);
+		
 	}
 
 }
