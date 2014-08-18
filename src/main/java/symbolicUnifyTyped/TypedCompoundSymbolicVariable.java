@@ -75,7 +75,7 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	 * Example: 'On(mug1 table1)'
 	 * @param name Full name of the variable.
 	 */
-	public void setFullName(String name) { // TODO: UPDATE
+	public void setFullName(String name) {
 		if (name == null) {
 			throw new IllegalArgumentException("Name must not be null");
 		}
@@ -112,7 +112,6 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 
 	}
 	
-	// TODO: UPDATE
 	/**
 	 * @return Full name with head and arguments, e.g., 'On(mug1 table1)'.
 	 */
@@ -153,48 +152,52 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		return ((SymbolicVariable) getInternalVariables()[0]).getSymbols();
 	}
 
-	// TODO needs to be implemented!
+	/**
+	 * Checks if it can be possibly be matched to another fluent.
+	 * This is the case when the type and all constant parameters are the same.
+	 * @param fluenttype
+	 * @param arguments
+	 * @return
+	 */
 	public boolean possibleMatch(String fluenttype, String[] arguments) {
-		// TODO Auto-generated method stub
-		return false;
+		if (fluenttype == null || (! fluenttype.equals(getSymbolsAt(0)))) {
+			return false;
+		}
+		if (arguments == null) {
+			if (internalVarsCount == 1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		if ((arguments.length + 1) != internalVarsCount) {
+			return false;
+		}
+		
+		for (int i = 0; i < arguments.length; i++) {
+			String[] symbols = getSymbolsAt(i+1);
+			boolean found = false;
+			for (String symbol : symbols) {
+				if (arguments[i].equals(symbol)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
-	
-	// TODO: UPDATE
-//	/**
-//	 * Checks if it can be possibly be matched to another fluent.
-//	 * This is the case when the type and all constant parameters are the same.
-//	 * @param fluenttype
-//	 * @param arguments
-//	 * @return
-//	 */
-//	public boolean possibleMatch(String fluenttype, String[] arguments) {   // TODO: UPDATE
-//		if (fluenttype == null || (! fluenttype.equals(getHeadName()))) {
-//			return false;
-//		}
-//		if (arguments == null) {
-//			if (getArgumentsSize() == 0) {
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		}
-//		
-//		if (arguments.length != getArgumentsSize()) {
-//			return false;
-//		}
-//		
-//		for (int i = 0; i < arguments.length; i++) {
-//			String param = ((NameVariable) getInternalVariables()[i+1]).getName();
-//			if (! arguments[i].equals(param)) {
-//				if ((arguments[i].charAt(0) != '?') && (param.charAt(0) != '?')) {
-//					return false;
-//				}
-//			}
-//		}
-//		
-//		return true;
-//	}
+	public String[] getSymbolsAt(int position) {
+		if (position >= internalVarsCount) {
+			throw new IllegalArgumentException();
+		}
+		return ((SymbolicVariable) getInternalVariables()[position]).getSymbols();
+	}
 	
 
 }
