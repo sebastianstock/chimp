@@ -99,7 +99,7 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		
 		TypedCompoundSymbolicVariable varFrom = var5;
 //		TypedCompoundSymbolicVariable varFrom = (TypedCompoundSymbolicVariable) solver.createVariable();
-		for (int i = 0; i < 150; i++) {
+		for (int i = 0; i < 15; i++) {
 			TypedCompoundSymbolicVariable varTo = (TypedCompoundSymbolicVariable) solver.createVariable();
 //			varTo.setName(new String[] {"on", "mug2", "none", "none", "none"});
 			TypedCompoundSymbolicValueConstraint con = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
@@ -128,6 +128,20 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 		
 		logger.info("Finished");
+		
+		TypedCompoundSymbolicVariable varA = (TypedCompoundSymbolicVariable) solver.createVariable();
+//		varA.setName("on", "mug2", "none", "?none", "?none");
+		TypedCompoundSymbolicVariable varB = (TypedCompoundSymbolicVariable) solver.createVariable();
+//		varB.setName("on", "mug2", "none", "?none", "?none");
+		TypedCompoundSymbolicValueConstraint con = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
+		con.setFrom(varA);
+		con.setTo(varB);
+		System.out.println("Add last constraint? " + solver.addConstraint(con));
+		logger.info("DONE");
+		System.out.println("VarA: ");
+		System.out.println(varA);
+		System.out.println("VarB: ");
+		System.out.println(varB);
 	}
 
 }
