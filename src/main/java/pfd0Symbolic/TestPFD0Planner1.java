@@ -44,22 +44,22 @@ public class TestPFD0Planner1 {
 		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint();
 		TaskApplicationMetaConstraint pfd0Constraint = new TaskApplicationMetaConstraint();
 		addMethods(pfd0Constraint, taskConstraint, fluentSolver);
-		addOperators(pfd0Constraint, taskConstraint);	
+		addOperators(pfd0Constraint, taskConstraint, fluentSolver);	
 		planner.addMetaConstraint(taskConstraint);
 		
 		planner.addMetaConstraint(pfd0Constraint);
 		
-//		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
-//		getmugFluent.setName("get_mug(mug1 none none none)");
-//		getmugFluent.setMarking(markings.UNPLANNED);
+		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
+		getmugFluent.setName("get_mug(mug1 ?pl none none)");
+		getmugFluent.setMarking(markings.UNPLANNED);
 		
 //		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
 //		getmugFluent2.setName("get_mug mug1");
 //		getmugFluent2.setMarking(markings.UNPLANNED);
 		
-		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
-		driveFluent.setName("!drive(none pl1 none none)");
-		driveFluent.setMarking(markings.SELECTED);
+//		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
+//		driveFluent.setName("!drive(none pl1 none none)");
+//		driveFluent.setMarking(markings.SELECTED);
 		
 		createState(fluentSolver);
 		
@@ -81,14 +81,19 @@ public class TestPFD0Planner1 {
 
 		System.out.println(results);
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), "Constraint Network");
+//		ConstraintNetwork.draw(((TypedCompoundSymbolicVariableConstraintSolver)fluentSolver.getConstraintSolvers()[0]).getConstraintNetwork(), "Constraint Network");
 		// TODO following line makes sure that symbolicvariables values are set, but may take to long if we do that always.
 		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+//		TypedCompoundSymbolicVariableConstraintSolver compoundS = ((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]);
+//		SymbolicVariableConstraintSolver ssolver = (SymbolicVariableConstraintSolver) compoundS.getConstraintSolvers()[2];
+//		ConstraintNetwork.draw(ssolver.getConstraintNetwork());
+		
 		System.out.println("Finished");
 	}
 	
 	public static void createState(FluentNetworkSolver groundSolver) {
 		Fluent robotAt = (Fluent) groundSolver.createVariable("RobotAt");
-		robotAt.setName("robotat(none pl1 none none)");
+		robotAt.setName("robotat(none pl3 none none)");
 		robotAt.setMarking(markings.OPEN);
 		
 //		Fluent on0 = (Fluent) groundSolver.createVariable("on");
@@ -104,15 +109,15 @@ public class TestPFD0Planner1 {
 			TaskSelectionMetaConstraint taskConstraint,
 			FluentNetworkSolver groundSolver) {
 		PFD0Precondition onPre = 
-				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0});
-		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive(none pl2 none none)");
-		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp(mug1 none none none)");
+				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0, 1, 1});
+		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive", new String[] {"none", "?pl", "none", "none"});
+		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp", new String[] {"?mug", "?pl", "none", "none"});
 		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
 		before.setFrom(drive);
 		before.setTo(grasp);
-		PFD0Method getMug1Method = new PFD0Method("get_mug", null, 
+		PFD0Method getMug1Method = new PFD0Method("get_mug", new String[] {"?mug", "?pl", "none", "none"}, 
 				new PFD0Precondition[] {onPre}, 
-				new VariablePrototype[] {drive, grasp}, 
+				new VariablePrototype[] {grasp, drive}, 
 				new FluentConstraint[] {before}
 		);
 		pfdConstraint.addMethod(getMug1Method);
@@ -122,24 +127,28 @@ public class TestPFD0Planner1 {
 	}
 	
 	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint) {
+			TaskSelectionMetaConstraint taskConstraint,
+			FluentNetworkSolver groundSolver) {
 		// Operator for driving:
 		PFD0Precondition robotatPre = 
 				new PFD0Precondition("robotat", new String[] {"none", "?pl", "none", "none"}, null); // TODO Add connections
-		PFD0Operator driveCounter = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
+		VariablePrototype robotatPE = new VariablePrototype(groundSolver, "Component", 
+				"robotat", new String[] {"none", "?pl" , "none",  "none"});
+		PFD0Operator driveOP = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
-				new String[][] {new String[] {"robotat", "none", "?pl" , "none",  "none"}});
-		pfdConstraint.addOperator(driveCounter);
-		taskConstraint.addOperator(driveCounter);
+				new VariablePrototype[] {robotatPE});
+		pfdConstraint.addOperator(driveOP);
+		taskConstraint.addOperator(driveOP);
 		
 		// Operator for grasping:
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug", "?pl", "none", "none"}, new int[] {0, 0});
-		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"?mug"}, 
+		VariablePrototype holdingPE = new VariablePrototype(groundSolver, "Component", "holding", new String[] {"?mug", "none", "none", "none"});
+		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"?mug", "none", "none", "none"}, 
 				new PFD0Precondition[] {onPre}, 
 				null, //new String[] {"on(mug1 pl2 none none)"}, 
-				null //new String[] {"holding(mug6 none none none)"}
+				new VariablePrototype[] {holdingPE}
 		);
 		pfdConstraint.addOperator(graspOp);
 		taskConstraint.addOperator(graspOp);

@@ -38,7 +38,9 @@ public class PFD0Method extends PlanReportroryItem {
 			sub.setMarking(markings.UNPLANNED);
 			newFluents.add(sub);
 			// create dc constraint
-			FluentConstraint dc = new FluentConstraint(FluentConstraint.Type.DC);
+			String[] arguments = (String[])((VariablePrototype) sub).getParameters()[2];
+			FluentConstraint dc = 
+					new FluentConstraint(FluentConstraint.Type.DC, createConnections(arguments));
 			dc.setFrom(taskfluent);
 			dc.setTo(sub);
 			newConstraints.add(dc);

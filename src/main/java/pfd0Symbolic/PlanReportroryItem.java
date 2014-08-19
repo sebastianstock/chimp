@@ -141,5 +141,37 @@ public abstract class PlanReportroryItem {
 	 * @return The resulting ConstraintNetwork after applying the operator/method.
 	 */
 	public abstract ConstraintNetwork expandTail(Fluent taskfluent, FluentNetworkSolver groundSolver);
+	
+	/**
+	 * Creates the connections array for the opens constraint.
+	 * 
+	 * Looks at the arguments of effects and operator to see if they should have an equal constraint.
+	 * @param args Arguments of the operator/method.
+	 * @return Array representing the connections.
+	 */
+	protected int[] createConnections(String[] args) {
+		boolean[] matches = new boolean[args.length];
+		int matchesCnt = 0;
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].startsWith("?") && args[i].equals(this.arguments[i])) {
+				matches[i] = true;
+				matchesCnt++;
+			}
+		}
+		if (matchesCnt > 0) {
+			int[] connections = new int[matchesCnt * 2];
+			int j = 0;
+			for (int i = 0; i < matches.length; i++) {
+				if (matches[i])  {
+					connections[j] = i;
+					connections[j+1] = i;
+					j += 2;
+				}
+			}
+			return connections;
+		}
+		else 
+			return null;
+	}
 
 }

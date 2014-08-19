@@ -51,17 +51,20 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			return new Constraint[]{scon, ncon};
 			
 		} else if (this.type.equals(Type.DC)) {
-			// TODO nothing to add here?
+			System.out.println("Connections: ");
+			System.out.println(this.toString());
+			if (connections != null && connections.length > 0) {
+				for (int i = 0; i < connections.length; i++)
+					System.out.print(connections[i] + " ");
+				System.out.println("++++++++++++++++++++");
+				return new Constraint[]{createSubmatches(f, t)};
+			} else {
+				System.out.println("NO CONNECTIONS");
+				return null;
+			}
 		} else if (this.type.equals(Type.PRE)) {
 			if (connections != null && connections.length > 0) {
-				TypedCompoundSymbolicValueConstraint ncon = 
-						new TypedCompoundSymbolicValueConstraint(TypedCompoundSymbolicValueConstraint.Type.SUBMATCHES, 
-								connections);
-				TypedCompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
-				ncon.setFrom(nf);
-				TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
-				ncon.setTo(nt);
-				return new Constraint[]{ncon};
+				return new Constraint[]{createSubmatches(f, t)};
 			} else {
 				return null;
 			}
