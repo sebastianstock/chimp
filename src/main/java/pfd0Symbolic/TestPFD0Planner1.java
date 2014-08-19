@@ -49,17 +49,17 @@ public class TestPFD0Planner1 {
 		
 		planner.addMetaConstraint(pfd0Constraint);
 		
-		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug(mug1 none none none)");
-		getmugFluent.setMarking(markings.UNPLANNED);
+//		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
+//		getmugFluent.setName("get_mug(mug1 none none none)");
+//		getmugFluent.setMarking(markings.UNPLANNED);
 		
 //		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
 //		getmugFluent2.setName("get_mug mug1");
 //		getmugFluent2.setMarking(markings.UNPLANNED);
 		
-//		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
-//		driveFluent.setName("!drive(none pl1 none none)");
-//		driveFluent.setMarking(markings.UNPLANNED);
+		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
+		driveFluent.setName("!drive(none pl1 none none)");
+		driveFluent.setMarking(markings.SELECTED);
 		
 		createState(fluentSolver);
 		
@@ -123,15 +123,17 @@ public class TestPFD0Planner1 {
 	
 	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint, 
 			TaskSelectionMetaConstraint taskConstraint) {
+		// Operator for driving:
 		PFD0Precondition robotatPre = 
 				new PFD0Precondition("robotat", new String[] {"none", "?pl", "none", "none"}, null); // TODO Add connections
-		PFD0Operator driveCounter1Op = new PFD0Operator("!drive", new String[] {"none", "pl2", "none", "none"}, 
+		PFD0Operator driveCounter = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
-				null);//new String[] {"robotat(none pl8 none none)"});
-		pfdConstraint.addOperator(driveCounter1Op);
-		taskConstraint.addOperator(driveCounter1Op);
+				new String[][] {new String[] {"robotat", "none", "?pl" , "none",  "none"}});
+		pfdConstraint.addOperator(driveCounter);
+		taskConstraint.addOperator(driveCounter);
 		
+		// Operator for grasping:
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug", "?pl", "none", "none"}, new int[] {0, 0});
 		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"?mug"}, 
