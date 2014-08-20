@@ -114,12 +114,11 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 	}
 
 	/**
-	 * Sets the marking of the task to DECOMPOSED (compound) or PLANNED (primitive)
+	 * Sets the marking of the variable to justified.
 	 */
 	@Override
 	public void markResolvedSub(MetaVariable metaVariable,
 			ConstraintNetwork metaValue) {
-		// TODO if it is a primitive task, set the marking to PLANNED
 		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.JUSTIFIED);
 	}
 
