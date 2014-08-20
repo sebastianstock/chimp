@@ -1,6 +1,7 @@
 package pfd0Symbolic;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
@@ -50,14 +51,29 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		return ret.toArray(new Fluent[ret.size()]);
 	}
 
-	public Constraint[] getConstraintsTo(Variable to) {
-		Vector<Constraint> ret = new Vector<Constraint>();
+	public List<Constraint> getConstraintsTo(Variable to) {
+		ArrayList<Constraint> ret = new ArrayList<Constraint>();
 		for (Constraint con : this.getConstraints()) {
 			if (con.getScope().length == 2) {
 				if (con.getScope()[1].equals(to)) ret.add(con);
 			}
 		}
-		return ret.toArray(new Constraint[ret.size()]);
+		return ret;
+	}
+	
+	
+	public List<FluentConstraint> getFluentConstraintsOfTypeTo(Variable to, FluentConstraint.Type type) {
+		ArrayList<FluentConstraint> ret = new ArrayList<FluentConstraint>(8);
+		for (Constraint con : this.getConstraints()) {
+			if (con.getScope().length == 2 && con.getScope()[1].equals(to)) {
+				if (con instanceof FluentConstraint) {
+					if(((FluentConstraint) con).getType() == type) {
+						ret.add((FluentConstraint) con);
+					}
+				}
+			}
+		}
+		return ret;
 	}
 
 

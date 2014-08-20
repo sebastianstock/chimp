@@ -5,9 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -16,12 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.metacsp.booleanSAT.BooleanDomain;
 import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.utility.logging.MetaCSPLogging;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
-import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
 import simpleBooleanValueCons.SimpleBooleanValueConstraint.Type;
+import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
 
 public class JUnitTestFluentNetworkSolver {
 	
@@ -78,24 +74,23 @@ public class JUnitTestFluentNetworkSolver {
 		fcon1.setTo(fluents[1]);
 		solver.addConstraint(fcon1);
 		
-		assertArrayEquals(solver.getConstraints(), solver.getConstraintsTo(fluents[1]));
+		assertTrue(Arrays.asList(solver.getConstraints()).equals(solver.getConstraintsTo(fluents[1])));
 		
-		assertArrayEquals(new Constraint[] {fcon1}, solver.getConstraintsTo(fluents[1]));
+		assertTrue(Arrays.asList(new Constraint[] {fcon1}).equals(solver.getConstraintsTo(fluents[1])));
 		
 		FluentConstraint fcon2 = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon2.setFrom(fluents[1]);
 		fcon2.setTo(fluents[0]);
 		solver.addConstraint(fcon2);
 		
-		assertArrayEquals(new Constraint[] {fcon1}, solver.getConstraintsTo(fluents[1]));
+		assertTrue(Arrays.asList(new Constraint[] {fcon1}).equals(solver.getConstraintsTo(fluents[1])));
 		
 		FluentConstraint fcon3 = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon3.setFrom(fluents[3]);
 		fcon3.setTo(fluents[1]);
 		solver.addConstraint(fcon3);
 		
-		Vector<Constraint> res = 
-				new Vector<Constraint>(Arrays.asList(solver.getConstraintsTo(fluents[1])));
+		List<Constraint> res = solver.getConstraintsTo(fluents[1]);
 		assertTrue(res.contains(fcon1));
 		assertTrue(res.contains(fcon3));
 		Assert.assertEquals(2,  res.size());

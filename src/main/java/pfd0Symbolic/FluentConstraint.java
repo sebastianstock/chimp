@@ -16,18 +16,24 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
 
-	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE};
+	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED};
 
 	private Type type;
 	private int[] connections;
+	private PlanReportroryItem plannedWith; // The operator or method that has been used for planning the task.
 
 	public FluentConstraint(Type type) {
 		this.type = type;
 	}
 	
 	public FluentConstraint(Type type, int[] connections) {
-		this.type = type;
+		this(type);
 		this.connections = connections;
+	}
+	
+	public FluentConstraint(Type type, PlanReportroryItem plannedWith) {
+		this(type);
+		this.plannedWith = plannedWith;
 	}
 
 	@Override
@@ -92,7 +98,9 @@ public class FluentConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public Object clone() {
-		return new FluentConstraint(type, connections);
+		FluentConstraint ret = new FluentConstraint(type, connections);
+		ret.plannedWith = this.plannedWith;
+		return ret;
 	}
 
 	@Override
@@ -109,8 +117,9 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public Type getType() {
 		return type;
 	}
-
-
-
+	
+	public PlanReportroryItem getPlannedWith() {
+		return plannedWith;
+	}
 
 }

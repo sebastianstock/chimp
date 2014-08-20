@@ -131,6 +131,12 @@ public abstract class PlanReportroryItem {
 				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
 			}
 		}
+		// Add a UNARYAPPLIED to remember which method/operator has been used.
+		FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
+				this);
+		applicationconstr.setFrom(taskfluent);
+		applicationconstr.setTo(taskfluent);
+		ret.addConstraint(applicationconstr);
 		return ret;		
 	}
 	

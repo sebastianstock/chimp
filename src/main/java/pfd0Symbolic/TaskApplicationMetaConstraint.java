@@ -62,25 +62,17 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 	}
 	
 	
-	
 	/**
 	 * Checks if a Variable has a Before with an UNPLANNED task.
 	 * @return False if the Variable has an unplanned predecessor, otherwise true.
 	 */
 	private boolean checkPredecessors(Variable var, 
 			FluentNetworkSolver groundSolver) {
-		Constraint[] cons = groundSolver.getConstraintsTo(var);
-		if (cons != null) {
-			for (Constraint c : cons) {
-				if ( (c instanceof FluentConstraint) ) {
-					FluentConstraint flc = (FluentConstraint) c;
-					Object marking = flc.getScope()[0].getMarking();
-					if (flc.getType() == FluentConstraint.Type.BEFORE 
-							&& ( (marking == markings.UNPLANNED) || (marking == markings.SELECTED) ) ){
-						return false;
-					}	 
-				}
-			}	
+		for (FluentConstraint flc : groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.BEFORE)) {
+			Object marking = flc.getScope()[0].getMarking();
+			if ( (marking == markings.UNPLANNED) || (marking == markings.SELECTED) ){
+				return false;
+			}	 
 		}
 		return true;
 	}
@@ -99,30 +91,14 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		Fluent fl = (Fluent)problematicNetwork.getVariables()[0];
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Fluent[] openFluents = groundSolver.getOpenFluents();
+//		Fluent[] openFluents = groundSolver.getOpenFluents();
 		
-		logger.info("getMetaValues for: " + fl);
-		// TODO Make sure getPossibePredicateNames contains exactly one element!!!
-		if (fl.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-			for (PFD0Operator o : operators) {
-				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
-					logger.info("Applying operator " + o);
-					ConstraintNetwork newResolver = o.expandTail(fl,  groundSolver);
-					if (newResolver != null) {
-						ret.add(newResolver);
-					}
-				}
-			}
-		} else {
-			for (PFD0Method m : methods) {
-				if (m.checkApplicability(fl) && m.checkPreconditions(openFluents)) {
-					logger.info("Applying method " + m);
-					ConstraintNetwork newResolver = m.expandTail(fl,  groundSolver);
-					if (newResolver != null) {
-						ret.add(newResolver);
-					}
-				}
-			}
+		logger.info("getMetaValues for TaskApplicationMetaConstraint: " + fl);
+		// get the used operator/method
+		PlanReportroryItem usedItem = this.getUsedPlanReportroiryItem(fl);
+		ConstraintNetwork newResolver = usedItem.expandTail(fl,  groundSolver);
+		if (newResolver != null) {
+			ret.add(newResolver);
 		}
 		
 		if (!ret.isEmpty()) 
@@ -130,6 +106,14 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		return null;
 	}
 	
+	private PlanReportroryItem getUsedPlanReportroiryItem(Fluent fl) {
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
+		for (FluentConstraint flc : groundSolver.getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.UNARYAPPLIED)) {
+			return flc.getPlannedWith();
+		}
+		return null;
+	}
+
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
 			int initial_time) {

@@ -19,21 +19,21 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	 * 
 	 */
 	private static final long serialVersionUID = 4546697317217126280L;
-	private Vector<PFD0Operator> operators;
-	private Vector<PFD0Method> methods;
+	private Vector<PlanReportroryItem> operators;
+	private Vector<PlanReportroryItem> methods;
 	
 	public TaskSelectionMetaConstraint() {
 		super(null, null);
-		operators = new Vector<PFD0Operator>();
-		methods = new Vector<PFD0Method>();
+		operators = new Vector<PlanReportroryItem>();
+		methods = new Vector<PlanReportroryItem>();
 	}
 
 	
-	public void addOperator(PFD0Operator o) {
+	public void addOperator(PlanReportroryItem o) {
 		operators.add(o);
 	}
 	
-	public void addMethod(PFD0Method m) {
+	public void addMethod(PlanReportroryItem m) {
 		methods.add(m);
 	}
 
@@ -70,17 +70,11 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	 */
 	private boolean checkPredecessors(Variable var, 
 			FluentNetworkSolver groundSolver) {
-		Constraint[] cons = groundSolver.getConstraintsTo(var);
-		if (cons != null) {
-			for (Constraint c : cons) {
-				if ( (c instanceof FluentConstraint) ) {
-					FluentConstraint flc = (FluentConstraint) c;
-					if (flc.getType() == FluentConstraint.Type.BEFORE 
-							&& flc.getScope()[0].getMarking() == markings.UNPLANNED) {
-						return false;
-					}	 
-				}
-			}	
+		for (FluentConstraint flc : groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.BEFORE)) {
+			Object marking = flc.getScope()[0].getMarking();
+			if ( (marking == markings.UNPLANNED) || (marking == markings.SELECTED) ){
+				return false;
+			}	 
 		}
 		return true;
 	}
@@ -94,42 +88,42 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
 		// possible constraint networks
-		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
+		Vector<ConstraintNetwork> ret;
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		Fluent fl = (Fluent)problematicNetwork.getVariables()[0];
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Fluent[] openFluents = groundSolver.getOpenFluents();
 		
 		logger.info("getMetaValues for: " + fl);
 		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
 		if (fl.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-			for (PFD0Operator o : operators) {
-				// TODO Do we really want to check the preconditions here, already?
-				if (o.checkApplicability(fl) && o.checkPreconditions(openFluents)) {
-					logger.info("Applying preconditions of operator " + o);
-					ConstraintNetwork newResolver = o.expandPreconditions(fl,  groundSolver);
-					if (newResolver != null) {
-						ret.add(newResolver);
-					}
-				}
-			}
+			ret = applyItems(fl, operators, groundSolver);
 		} else {
-			for (PFD0Method m : methods) {
-				if (m.checkApplicability(fl) && m.checkPreconditions(openFluents)) {
-					logger.info("Applying preconditions of method " + m);
-					ConstraintNetwork newResolver = m.expandPreconditions(fl,  groundSolver);
-					if (newResolver != null) {
-						ret.add(newResolver);
-					}
-				}
-			}
+			ret = applyItems(fl, methods, groundSolver);
 		}
 		
 		if (!ret.isEmpty()) 
 			return ret.toArray(new ConstraintNetwork[ret.size()]);
 		return null;
 	}
+	
+	private Vector<ConstraintNetwork> applyItems(Fluent fl, Vector<PlanReportroryItem> items, 
+			FluentNetworkSolver groundSolver) {
+		Fluent[] openFluents = groundSolver.getOpenFluents();
+		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
+		for (PlanReportroryItem item : items) {
+			// TODO Do we really want to check the preconditions here, already?
+			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
+				logger.info("Applying preconditions of PlanReportroryItem " + item);
+				ConstraintNetwork newResolver = item.expandPreconditions(fl,  groundSolver);
+				if (newResolver != null) {
+					ret.add(newResolver);
+				}
+			}
+		}
+		return ret;
+	}
+	
 	
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
