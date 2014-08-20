@@ -15,6 +15,11 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 	
 	
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3724438654585362157L;
+
 	public PreconditionMetaConstraint() {
 		super(null, null);
 	}
