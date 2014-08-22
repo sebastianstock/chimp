@@ -40,9 +40,9 @@ public class TestFluentNetworkSolver {
 		con0.setTo(fluents[0].getSimpleBooleanValueVariable());
 		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
-		fluents[0].setName("on(mug1 pl1 none none)");
-		fluents[1].setName("on(mug1 pl1 none none)");
-		fluents[2].setName("on(mug1 pl2 none none)");
+		fluents[0].setName("get_mug(mug1 pl1 none none)");
+		fluents[1].setName("get_mug(mug1 pl1 none none)");
+		fluents[2].setName("robotat(none ?pl none none)");
 		
 
 //		SimpleBooleanValueConstraint con2 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
@@ -71,10 +71,23 @@ public class TestFluentNetworkSolver {
 		fcon01.setTo(fluents[1]);
 		logger.info("Added fcon01? " + solver.addConstraint(fcon01));
 		
-		FluentConstraint fcon12 = new FluentConstraint(FluentConstraint.Type.MATCHES);
-		fcon12.setFrom(fluents[1]);
-		fcon12.setTo(fluents[2]);
-		logger.info("Added fcon12? " + solver.addConstraint(fcon12));
+		FluentConstraint fcon21 = new FluentConstraint(FluentConstraint.Type.PRE, new int[] {1,1, 2, 2});
+		fcon21.setFrom(fluents[2]);
+		fcon21.setTo(fluents[1]);
+		logger.info("Added fcon21? " + solver.addConstraint(fcon21));
+		
+		
+		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new PFD0Method(null, null, null, null, null));
+		fcon11.setFrom(fluents[1]);
+		fcon11.setTo(fluents[1]);
+		logger.info("Added fcon11? " + solver.addConstraint(fcon11));
+		
+		logger.info("Removing fcon11");
+		solver.removeConstraint(fcon11);
+		
+		logger.info("Removing fcon21");
+		solver.removeConstraint(fcon21);
+		
 	}
 
 }

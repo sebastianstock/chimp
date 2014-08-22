@@ -63,11 +63,18 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 		logger.info("Created internal variables");
 		
 		
-		SymbolicVariableConstraintSolver symbolicSolver = 
+		SymbolicVariableConstraintSolver symbolicSolver0 = 
 				(SymbolicVariableConstraintSolver) solver.getConstraintSolvers()[0];
-		ConstraintNetwork.draw(symbolicSolver.getConstraintNetwork());
+		ConstraintNetwork.draw(symbolicSolver0.getConstraintNetwork());
 		
-		TypedCompoundSymbolicValueConstraint con01 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
+		SymbolicVariableConstraintSolver symbolicSolver1 = 
+				(SymbolicVariableConstraintSolver) solver.getConstraintSolvers()[1];
+		ConstraintNetwork.draw(symbolicSolver1.getConstraintNetwork());
+		
+		solver.propagateAllSub();
+		
+		TypedCompoundSymbolicValueConstraint con01 = 
+				new TypedCompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0});
 		con01.setFrom(var0);
 		con01.setTo(var1);
 		solver.addConstraint(con01);
@@ -77,22 +84,27 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 		System.out.println("Var1");
 		System.out.println(var1);
 		
-		TypedCompoundSymbolicVariable var2 = (TypedCompoundSymbolicVariable) solver.createVariable();
-    var2.setName("get_mug", "mug7");
-		logger.info("Created var2");
-		System.out.println(var2);
+		System.out.println("Remove con01: ");
+		solver.removeConstraint(con01);
 		
-		TypedCompoundSymbolicValueConstraint con12 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
-		con12.setFrom(var1);
-		con12.setTo(var2);
-		logger.info("Added con12 ? " + solver.addConstraint(con12));
+		solver.removeVariable(var1);
 		
-		System.out.println("Var0");
-		System.out.println(var0);
-		System.out.println("Var1");
-		System.out.println(var1);
-		System.out.println("Var2");
-		System.out.println(var2);
+//		TypedCompoundSymbolicVariable var2 = (TypedCompoundSymbolicVariable) solver.createVariable();
+//    var2.setName("get_mug", "mug7");
+//		logger.info("Created var2");
+//		System.out.println(var2);
+//		
+//		TypedCompoundSymbolicValueConstraint con12 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
+//		con12.setFrom(var1);
+//		con12.setTo(var2);
+//		logger.info("Added con12 ? " + solver.addConstraint(con12));
+//		
+//		System.out.println("Var0");
+//		System.out.println(var0);
+//		System.out.println("Var1");
+//		System.out.println(var1);
+//		System.out.println("Var2");
+//		System.out.println(var2);
 		
 	}
 

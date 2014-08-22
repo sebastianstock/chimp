@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.metacsp.booleanSAT.BooleanConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 
+import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
 import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
@@ -20,8 +24,8 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	private static final long serialVersionUID = -5831971530237352714L;
 
 	public FluentNetworkSolver(long origin, long horizon, String[][] symbols) {
-		super(new Class[] {FluentConstraint.class}, Fluent.class, 
-				createConstraintSolvers(origin, horizon, symbols), new int[] {1, 1});
+		super(new Class[] {FluentConstraint.class, SimpleBooleanValueConstraint.class, AllenIntervalConstraint.class}, Fluent.class, 
+				createConstraintSolvers(origin, horizon, symbols), new int[] {1, 1, 1});
 	}
 
 	@Override
@@ -34,7 +38,8 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 			String[][] symbols) {
 		ConstraintSolver[] ret = new ConstraintSolver[] { 
 				new TypedCompoundSymbolicVariableConstraintSolver(symbols), 
-				new SimpleBooleanValueConstraintSolver(origin, horizon)};
+				new SimpleBooleanValueConstraintSolver(origin, horizon),
+				new AllenIntervalNetworkSolver(origin, horizon)};
 		return ret;
 	}
 
