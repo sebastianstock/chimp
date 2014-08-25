@@ -14,11 +14,21 @@ public class PFD0Precondition {
 	private String[] arguments;
 	
 	private int[] connections;
+	
+	private boolean isNegativeEffect;
 
 	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections) {
 		this.fluenttype = fluenttype;
 		this.arguments = arguments;
 		this.connections = connections;
+	}
+	
+	public void setNegativeEffect(boolean isNegativeEffect) {
+		this.isNegativeEffect = isNegativeEffect;
+	}
+	
+	public boolean isNegativeEffect() {
+		return isNegativeEffect;
 	}
 
 	public String getFluenttype() {
@@ -50,6 +60,9 @@ public class PFD0Precondition {
 				connections);
 		preconstr.setFrom(newFluent);
 		preconstr.setTo(taskfluent);
+		if (isNegativeEffect) {
+			preconstr.setNegativeEffect(true);
+		}
 		return preconstr;
 	}
 	

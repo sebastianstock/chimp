@@ -99,7 +99,7 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		
 		TypedCompoundSymbolicVariable varFrom = var5;
 //		TypedCompoundSymbolicVariable varFrom = (TypedCompoundSymbolicVariable) solver.createVariable();
-		for (int i = 0; i < 15; i++) {
+		for (int i = 0; i < 200; i++) {
 			TypedCompoundSymbolicVariable varTo = (TypedCompoundSymbolicVariable) solver.createVariable();
 //			varTo.setName(new String[] {"on", "mug2", "none", "none", "none"});
 			TypedCompoundSymbolicValueConstraint con = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
@@ -136,7 +136,10 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		TypedCompoundSymbolicValueConstraint con = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
 		con.setFrom(varA);
 		con.setTo(varB);
+		startTime = System.nanoTime();
 		System.out.println("Add last constraint? " + solver.addConstraint(con));
+		endTime = System.nanoTime();
+		System.out.println("Adding last constraint took "+((endTime - startTime) / 1000000) + " ms"); 
 		logger.info("DONE");
 		System.out.println("VarA: ");
 		System.out.println(varA);

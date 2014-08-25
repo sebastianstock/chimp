@@ -11,6 +11,8 @@ import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint;
 
@@ -149,6 +151,15 @@ public class PFD0Planner extends MetaConstraintSolver {
 			clonedConstraint.setScope(newScope);
 			metaValue.removeConstraint(con);
 			metaValue.addConstraint(clonedConstraint);
+		}
+		
+		// set marking of closed fluents to closes
+		for (Constraint con : metaValue.getConstraints()) {
+			if (con instanceof FluentConstraint) {
+				if (((FluentConstraint) con).getType() == FluentConstraint.Type.CLOSES) {
+					((FluentConstraint) con).getTo().setMarking(markings.CLOSED);
+				}
+			}
 		}
 		
 		return true;

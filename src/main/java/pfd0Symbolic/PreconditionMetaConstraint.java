@@ -106,8 +106,8 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 	private ConstraintNetwork addMatches(Fluent preFluent, Fluent matchingFluent) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		FluentConstraint con = new FluentConstraint(FluentConstraint.Type.MATCHES);
-		con.setFrom(preFluent);
-		con.setTo(matchingFluent);
+		con.setFrom(matchingFluent);
+		con.setTo(preFluent);
 		ret.addConstraint(con);
 		return ret;
 	}

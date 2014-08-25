@@ -112,9 +112,8 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
-			// TODO Do we really want to check the preconditions here, already?
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
-				logger.info("Applying preconditions of PlanReportroryItem " + item);
+				logger.fine("Applying preconditions of PlanReportroryItem " + item);
 				ConstraintNetwork newResolver = item.expandPreconditions(fl,  groundSolver);
 				if (newResolver != null) {
 					ret.add(newResolver);

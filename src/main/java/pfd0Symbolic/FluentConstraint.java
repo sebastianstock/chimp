@@ -21,6 +21,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private Type type;
 	private int[] connections;
 	private PlanReportroryItem plannedWith; // The operator or method that has been used for planning the task.
+	private boolean isNegativeEffect;
+
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -35,6 +37,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		this(type);
 		this.plannedWith = plannedWith;
 	}
+	
 
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
@@ -100,6 +103,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public Object clone() {
 		FluentConstraint ret = new FluentConstraint(type, connections);
 		ret.plannedWith = this.plannedWith;
+		ret.setNegativeEffect(isNegativeEffect);
 		return ret;
 	}
 
@@ -120,6 +124,14 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	
 	public PlanReportroryItem getPlannedWith() {
 		return plannedWith;
+	}
+	
+	public boolean isNegativeEffect() {
+		return isNegativeEffect;
+	}
+
+	public void setNegativeEffect(boolean isNegativeEffect) {
+		this.isNegativeEffect = isNegativeEffect;
 	}
 
 }
