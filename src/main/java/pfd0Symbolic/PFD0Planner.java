@@ -1,6 +1,7 @@
 package pfd0Symbolic;
 
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -8,8 +9,10 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
+import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint;
 
 
 public class PFD0Planner extends MetaConstraintSolver {
@@ -61,6 +64,11 @@ public class PFD0Planner extends MetaConstraintSolver {
 	@Override
 	protected void retractResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
+		Logger logger = MetaCSPLogging.getLogger(PFD0Planner.class);
+		logger.info("START RETRACT_RESOLVER_SUB");
+		long startTime = System.nanoTime();
+		
+		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
 		// remove added fluents
@@ -85,6 +93,8 @@ public class PFD0Planner extends MetaConstraintSolver {
 				((FluentConstraint) c).getTo().setMarking(markings.OPEN);
 			}
 		}
+		long endTime = System.nanoTime();
+		logger.info("END RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
 	}
 
 	/**
@@ -115,12 +125,8 @@ public class PFD0Planner extends MetaConstraintSolver {
 				String symbol = (String)((VariablePrototype) v).getParameters()[1];
 				Fluent fluent = (Fluent)groundSolver.createVariable(component);
 				
-				if (((VariablePrototype) v).getParameters().length > 2) {
-					String[] arguments = (String[])((VariablePrototype) v).getParameters()[2];
-					fluent.setName(symbol, arguments);
-				} else {
-					fluent.setName(symbol);
-				}
+				String[] arguments = (String[])((VariablePrototype) v).getParameters()[2];
+				fluent.setName(symbol, arguments);
 
 				fluent.setMarking(v.getMarking());
 				metaValue.addSubstitution((VariablePrototype)v, fluent);
