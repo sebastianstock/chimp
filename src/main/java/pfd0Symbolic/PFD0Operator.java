@@ -33,24 +33,8 @@ public class PFD0Operator extends PlanReportroryItem {
 		
 		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-//		Vector<FluentConstraint> newConstraints = addPreconditionPrototypes(taskfluent, groundSolver); // This is now done in expandPreconditions
 		
 		// close negative effects
-		Fluent[] openFluents = groundSolver.getOpenFluents();
-//		if (negativeEffects != null) {
-//			for (String[] e : negativeEffects) {  // TODO ensure that exactly one fluent is closed
-//				for (Fluent fl : openFluents) {
-//					if (fl.getCompoundSymbolicVariable().getName().equals(e)) {
-//						fl.setMarking(markings.CLOSED);
-//						FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-//						closes.setFrom(taskfluent);
-//						closes.setTo(fl);
-//						newConstraints.add(closes);
-//					}
-//				}
-//			}
-//		}
-		
 		for (FluentConstraint con : 
 				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
 			if (con.isNegativeEffect()) {

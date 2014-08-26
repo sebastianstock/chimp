@@ -53,7 +53,7 @@ public class TestBacktrackingPFD0Planner {
 		planner.addMetaConstraint(pfd0Constraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug(mug1 pl2 none none)");
+		getmugFluent.setName("get_mug(mug1 ?pl none none)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
 //		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
@@ -72,10 +72,11 @@ public class TestBacktrackingPFD0Planner {
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.FINEST);
 		
 		logger.info("Starting Planning");
 		long startTime = System.nanoTime();
+		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		System.out.println("Found a plan? " + planner.backtrack());
 		long endTime = System.nanoTime();
 		logger.info("Finished Planning after " + ((endTime - startTime) / 1000000) + " ms");
@@ -180,8 +181,8 @@ public class TestBacktrackingPFD0Planner {
 				new VariablePrototype[] {grasp, put0}, 
 				new FluentConstraint[] {before}
 		);
-		pfdConstraint.addMethod(getMug1Method);
-		taskConstraint.addMethod(getMug1Method);
+//		pfdConstraint.addMethod(getMug1Method);
+//		taskConstraint.addMethod(getMug1Method);
 		
 		
 	}
