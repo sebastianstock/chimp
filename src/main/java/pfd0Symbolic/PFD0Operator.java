@@ -14,13 +14,11 @@ import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 public class PFD0Operator extends PlanReportroryItem {
 	
 	private VariablePrototype[] positiveEffects;
-	private String[][] negativeEffects;
 	private Logger logger;
 
 	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
 			String[][] negativeEffects, VariablePrototype[] positiveEffects) {
 		super(taskname, arguments, preconditions);
-		this.negativeEffects = negativeEffects;
 		this.positiveEffects = positiveEffects;
 		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
 	}

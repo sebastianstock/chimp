@@ -57,9 +57,6 @@ public class TestPFD0Planner1 {
 		getmugFluent.setName("get_mug(mug1 ?pl none none)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
-//		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
-//		getmugFluent2.setName("get_mug mug1");
-//		getmugFluent2.setMarking(markings.UNPLANNED);
 		
 //		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
 //		driveFluent.setName("!drive(none pl2 none none)");
