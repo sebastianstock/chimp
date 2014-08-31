@@ -169,6 +169,8 @@ public class TestPFD0Planner1 {
 				new VariablePrototype[] {grasp, drive}, 
 				new FluentConstraint[] {before}
 		);
+		getMug1Method.setDurationBounds(new Bounds(10, 40));
+		
 		pfdConstraint.addMethod(getMug1Method);
 		taskConstraint.addMethod(getMug1Method);
 		
@@ -188,6 +190,7 @@ public class TestPFD0Planner1 {
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
 				new VariablePrototype[] {robotatPE});
+		driveOP.setDurationBounds(new Bounds(10, 40));
 		pfdConstraint.addOperator(driveOP);
 		taskConstraint.addOperator(driveOP);
 		
@@ -201,6 +204,7 @@ public class TestPFD0Planner1 {
 				null, //new String[] {"on(mug1 pl2 none none)"}, 
 				new VariablePrototype[] {holdingPE}
 		);
+		graspOp.setDurationBounds(new Bounds(10, 40));
 		pfdConstraint.addOperator(graspOp);
 		taskConstraint.addOperator(graspOp);
 	}

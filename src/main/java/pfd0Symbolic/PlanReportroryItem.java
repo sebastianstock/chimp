@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.APSPSolver;
+import org.metacsp.time.Bounds;
 
 public abstract class PlanReportroryItem {
 	
@@ -16,7 +19,12 @@ public abstract class PlanReportroryItem {
 
 	protected String[] arguments;
 	
+	/**
+	 * The bounds that will be used for the duration constraint of this task.
+	 */
+	protected Bounds durationBounds;
 	
+
 	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions) {
 		this.taskname = taskname;
 		this.arguments = arguments;
@@ -117,7 +125,7 @@ public abstract class PlanReportroryItem {
 	}
 	
 	/**
-	 * Creates the dummy preconditions for a task.
+	 * Creates the dummy preconditions for a task + Adds Duration constraint
 	 * @param taskfluent The task that has to be expanded.
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork witht the added dummy preconditions.
@@ -137,6 +145,13 @@ public abstract class PlanReportroryItem {
 		applicationconstr.setFrom(taskfluent);
 		applicationconstr.setTo(taskfluent);
 		ret.addConstraint(applicationconstr);
+		
+		if (durationBounds != null) {
+			AllenIntervalConstraint duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
+			duration.setFrom(taskfluent.getAllenInterval());
+			duration.setTo(taskfluent.getAllenInterval());
+			ret.addConstraint(duration);
+		}
 		return ret;		
 	}
 	
@@ -178,6 +193,22 @@ public abstract class PlanReportroryItem {
 		}
 		else 
 			return null;
+	}
+	
+	/**
+	 * 
+	 * @return The bounds that will be used for the duration constraint of this task.
+	 */
+	public Bounds getDurationBounds() {
+		return durationBounds;
+	}
+
+	/**
+	 * 
+	 * @param durationBounds The bounds that will be used for the duration constraint of this task.
+	 */
+	public void setDurationBounds(Bounds durationBounds) {
+		this.durationBounds = durationBounds;
 	}
 
 }
