@@ -80,8 +80,10 @@ public class Fluent extends MultiVariable {
 		ret.append(this.getID());
 		ret.append(")::<");
 		ret.append(this.getInternalVariables()[0].toString());
+//		ret.append(">U<");
+//		ret.append(this.getInternalVariables()[1].toString());
 		ret.append(">U<");
-		ret.append(this.getInternalVariables()[1].toString());
+		ret.append(this.getInternalVariables()[2].toString());
 		ret.append(">");
 		if (this.getMarking() != null) {
 			ret.append("/");

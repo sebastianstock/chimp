@@ -12,6 +12,7 @@ import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.time.Bounds;
+import org.metacsp.time.TimePoint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
@@ -58,6 +59,12 @@ public class TestPFD0Planner1 {
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
 		
+		AllenIntervalConstraint getRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10, 20));
+		getRelCon.setFrom(getmugFluent);
+		getRelCon.setTo(getmugFluent);
+		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(getRelCon));
+		
+		
 //		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
 //		driveFluent.setName("!drive(none pl2 none none)");
 //		driveFluent.setMarking(markings.UNPLANNED);
@@ -76,34 +83,42 @@ public class TestPFD0Planner1 {
 		
 		planner.draw();
 		
-		Fluent f1 = (Fluent)planner.getConstraintSolvers()[0].getVariable(0);
-		Fluent f2 = (Fluent)planner.getConstraintSolvers()[0].getVariable(1);
-		Fluent f3 = (Fluent)planner.getConstraintSolvers()[0].getVariable(2);
+//		Fluent f1 = (Fluent)planner.getConstraintSolvers()[0].getVariable(0);
+//		Fluent f2 = (Fluent)planner.getConstraintSolvers()[0].getVariable(1);
+//		Fluent f3 = (Fluent)planner.getConstraintSolvers()[0].getVariable(2);
+//		
+//
+//		//Says that end time of from (and to) is at least 10 and at most 12
+//		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(10,12));
+//
+//		//Says that start time of from (and to) is at least 10 and at most 12
+//		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10,12));
+//		release.setFrom(f1);
+//		release.setTo(f1);
+//
+//		
+//		AllenIntervalConstraint allenCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+//		allenCon.setFrom(f1);
+//		allenCon.setTo(f2);
+//
+//		AllenIntervalConstraint allenCon1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+//		allenCon1.setFrom(f2);
+//		allenCon1.setTo(f3);
+//
+//		System.out.println("Added? " + planner.getConstraintSolvers()[0].addConstraints(allenCon, allenCon1, release));
+//
+//		AllenIntervalConstraint allenCon2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+//		allenCon2.setFrom(f3);
+//		allenCon2.setTo(f1);
+//
+////		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(allenCon2));
+//		
+//		
+//		AllenIntervalConstraint preconstr = new AllenIntervalConstraint(AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
+//		preconstr.setFrom(f2);
+//		preconstr.setTo(f1);
+//		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(preconstr));
 		
-
-		//Says that end time of from (and to) is at least 10 and at most 12
-		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(10,12));
-
-		//Says that start time of from (and to) is at least 10 and at most 12
-		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10,12));
-
-		
-		AllenIntervalConstraint allenCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-		allenCon.setFrom(f1);
-		allenCon.setTo(f2);
-
-		AllenIntervalConstraint allenCon1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-		allenCon1.setFrom(f2);
-		allenCon1.setTo(f3);
-
-		System.out.println("Added? " + planner.getConstraintSolvers()[0].addConstraints(allenCon, allenCon1));
-
-		AllenIntervalConstraint allenCon2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-		allenCon2.setFrom(f3);
-		allenCon2.setTo(f1);
-
-		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(allenCon2));
-
 		System.out.println(planner.getDescription());
 		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[2].getConstraintNetwork());
 		

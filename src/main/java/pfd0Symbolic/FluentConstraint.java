@@ -1,8 +1,11 @@
 package pfd0Symbolic;
 
+import java.util.ArrayList;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
@@ -42,8 +45,14 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
 		if (!( f instanceof Fluent) || !(t instanceof Fluent)) return null;
-
+		
+		// TODO: Refactor:
+		
 		if (this.type.equals(Type.MATCHES)) {
+			AllenIntervalConstraint eq = new AllenIntervalConstraint(
+					AllenIntervalConstraint.Type.Equals);
+			eq.setFrom(((Fluent) f).getAllenInterval());
+			eq.setTo(((Fluent) t).getAllenInterval());
 			SimpleBooleanValueConstraint scon = 
 					new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
 			SimpleBooleanValueVariable bf = ((Fluent) f).getSimpleBooleanValueVariable();
@@ -57,34 +66,62 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			ncon.setFrom(nf);
 			TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 			ncon.setTo(nt);
-			return new Constraint[]{scon, ncon};
+			return new Constraint[]{scon, ncon, eq};
 			
 		} else if (this.type.equals(Type.DC)) {
-			System.out.println("Connections: ");
-			System.out.println(this.toString());
+			AllenIntervalConstraint desf = new AllenIntervalConstraint(
+					AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes, 
+					AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes.getDefaultBounds());
+			desf.setFrom(((Fluent) t).getAllenInterval());
+			desf.setTo(((Fluent) f).getAllenInterval());
 			if (connections != null && connections.length > 0) {
-				for (int i = 0; i < connections.length; i++)
-					System.out.print(connections[i] + " ");
-				System.out.println("++++++++++++++++++++");
-				return new Constraint[]{createSubmatches(f, t)};
+				return new Constraint[]{createSubmatches(f, t), desf};
 			} else {
-				System.out.println("NO CONNECTIONS");
-				return null;
+				return new Constraint[]{desf};
 			}
 		} else if (this.type.equals(Type.PRE)) {
+			AllenIntervalConstraint preAIC = 
+					new AllenIntervalConstraint(
+							AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, 
+							AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
+			preAIC.setFrom(((Fluent) t).getAllenInterval());
+			preAIC.setTo(((Fluent) f).getAllenInterval());
 			if (connections != null && connections.length > 0) {
-				return new Constraint[]{createSubmatches(f, t)};
+				return new Constraint[]{createSubmatches(f, t), preAIC};
 			} else {
-				return null;
+				return new Constraint[]{preAIC};
 			}
-		} else if (this.type.equals(Type.OPENS)) {
+		} else if (this.type.equals(Type.OPENS)) { // TODO probably need other relations, too
+			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+			befCon.setFrom(((Fluent) f).getAllenInterval());
+			befCon.setTo(((Fluent) t).getAllenInterval());
+			if(connections != null) {
+				return new Constraint[]{createSubmatches(f, t), befCon};
+			} else {
+				return new Constraint[]{befCon};
+			}
+		} else if (this.type.equals(Type.BEFORE)) {
+			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+			befCon.setFrom(((Fluent) f).getAllenInterval());
+			befCon.setTo(((Fluent) t).getAllenInterval());
+			if(connections != null) {
+				return new Constraint[]{createSubmatches(f, t), befCon};
+			} else {
+				return new Constraint[]{befCon};
+			}
+		}
+		else if (this.type.equals(Type.CLOSES)) { // TODO probably need other relations, too
+			AllenIntervalConstraint befCon = new AllenIntervalConstraint(
+					AllenIntervalConstraint.Type.Finishes,
+					AllenIntervalConstraint.Type.Finishes.getDefaultBounds());
+			befCon.setFrom(((Fluent) f).getAllenInterval());
+			befCon.setTo(((Fluent) t).getAllenInterval());
 			if(connections != null) {
 				return new Constraint[]{createSubmatches(f, t)};
 			} else {
 				return null;
 			}
 		}
-
 		return null;
 	}
 	
