@@ -111,15 +111,15 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			}
 		}
 		else if (this.type.equals(Type.CLOSES)) { // TODO probably need other relations, too
-			AllenIntervalConstraint befCon = new AllenIntervalConstraint(
-					AllenIntervalConstraint.Type.Finishes,
-					AllenIntervalConstraint.Type.Finishes.getDefaultBounds());
-			befCon.setFrom(((Fluent) f).getAllenInterval());
-			befCon.setTo(((Fluent) t).getAllenInterval());
+			AllenIntervalConstraint oiCon = new AllenIntervalConstraint(
+					AllenIntervalConstraint.Type.OverlappedBy,
+					AllenIntervalConstraint.Type.OverlappedBy.getDefaultBounds());
+			oiCon.setFrom(((Fluent) f).getAllenInterval());
+			oiCon.setTo(((Fluent) t).getAllenInterval());
 			if(connections != null) {
-				return new Constraint[]{createSubmatches(f, t)};
+				return new Constraint[]{createSubmatches(f, t), oiCon};
 			} else {
-				return null;
+				return new Constraint[]{oiCon};
 			}
 		}
 		return null;

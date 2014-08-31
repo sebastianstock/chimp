@@ -58,6 +58,10 @@ public class TestPFD0Planner1 {
 		getmugFluent.setName("get_mug(mug1 ?pl none none)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
+		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
+		deadline.setFrom(getmugFluent);
+		deadline.setTo(getmugFluent);
+		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(deadline));
 		
 		AllenIntervalConstraint getRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10, 20));
 		getRelCon.setFrom(getmugFluent);
