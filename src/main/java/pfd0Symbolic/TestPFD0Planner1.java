@@ -181,6 +181,7 @@ public class TestPFD0Planner1 {
 		// Operator for driving:
 		PFD0Precondition robotatPre = 
 				new PFD0Precondition("robotat", new String[] {"none", "?pl", "none", "none"}, null); // TODO Add connections
+		robotatPre.setNegativeEffect(true);
 		VariablePrototype robotatPE = new VariablePrototype(groundSolver, "Component", 
 				"robotat", new String[] {"none", "?pl" , "none",  "none"});
 		PFD0Operator driveOP = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
@@ -193,6 +194,7 @@ public class TestPFD0Planner1 {
 		// Operator for grasping:
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug", "?pl", "none", "none"}, new int[] {0, 0});
+		onPre.setNegativeEffect(true);
 		VariablePrototype holdingPE = new VariablePrototype(groundSolver, "Component", "holding", new String[] {"?mug", "none", "none", "none"});
 		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"?mug", "none", "none", "none"}, 
 				new PFD0Precondition[] {onPre}, 
