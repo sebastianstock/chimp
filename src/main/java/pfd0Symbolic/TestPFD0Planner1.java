@@ -55,7 +55,7 @@ public class TestPFD0Planner1 {
 		planner.addMetaConstraint(pfd0Constraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug(mug1 ?pl none none)");
+		getmugFluent.setName("get_mug(?mug ?pl none none)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
 		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
@@ -173,7 +173,7 @@ public class TestPFD0Planner1 {
 				new VariablePrototype[] {grasp, drive}, 
 				new FluentConstraint[] {before}
 		);
-		getMug1Method.setDurationBounds(new Bounds(10, 40));
+//		getMug1Method.setDurationBounds(new Bounds(10, 40));
 		
 		pfdConstraint.addMethod(getMug1Method);
 		taskConstraint.addMethod(getMug1Method);
@@ -194,7 +194,7 @@ public class TestPFD0Planner1 {
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
 				new VariablePrototype[] {robotatPE});
-		driveOP.setDurationBounds(new Bounds(10, 40));
+		driveOP.setDurationBounds(new Bounds(10, 100));
 		pfdConstraint.addOperator(driveOP);
 		taskConstraint.addOperator(driveOP);
 		
@@ -208,7 +208,7 @@ public class TestPFD0Planner1 {
 				null, //new String[] {"on(mug1 pl2 none none)"}, 
 				new VariablePrototype[] {holdingPE}
 		);
-		graspOp.setDurationBounds(new Bounds(10, 40));
+		graspOp.setDurationBounds(new Bounds(10, 100));
 		pfdConstraint.addOperator(graspOp);
 		taskConstraint.addOperator(graspOp);
 	}
