@@ -23,9 +23,9 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	 */
 	private static final long serialVersionUID = -5831971530237352714L;
 
-	public FluentNetworkSolver(long origin, long horizon, String[][] symbols) {
+	public FluentNetworkSolver(long origin, long horizon, String[][] symbols, int[] symbolicingredients) {
 		super(new Class[] {FluentConstraint.class, SimpleBooleanValueConstraint.class, AllenIntervalConstraint.class}, Fluent.class, 
-				createConstraintSolvers(origin, horizon, symbols), new int[] {1, 1, 1});
+				createConstraintSolvers(origin, horizon, symbols, symbolicingredients), new int[] {1, 1, 1});
 	}
 
 	@Override
@@ -35,9 +35,9 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	}
 
 	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, 
-			String[][] symbols) {
+			String[][] symbols, int[] symbolicingredients) {
 		ConstraintSolver[] ret = new ConstraintSolver[] { 
-				new TypedCompoundSymbolicVariableConstraintSolver(symbols), 
+				new TypedCompoundSymbolicVariableConstraintSolver(symbols, symbolicingredients), 
 				new SimpleBooleanValueConstraintSolver(origin, horizon),
 				new AllenIntervalNetworkSolver(origin, horizon)};
 		return ret;

@@ -30,7 +30,7 @@ public class TestTypedCompoundSymbolicVariableConstraintSolver {
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
 		TypedCompoundSymbolicVariableConstraintSolver solver = 
-				new TypedCompoundSymbolicVariableConstraintSolver(symbols);
+				new TypedCompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
 		
 //		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		

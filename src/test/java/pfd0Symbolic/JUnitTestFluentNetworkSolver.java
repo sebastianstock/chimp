@@ -36,7 +36,7 @@ public class JUnitTestFluentNetworkSolver {
 		symbols[2] = symbolsPlAreas;
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
-		solver = new FluentNetworkSolver(0, 500, symbols);
+		solver = new FluentNetworkSolver(0, 500, symbols, new int[] {1,1,1,1,1});
 	}
 
 	@After

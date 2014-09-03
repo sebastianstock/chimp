@@ -25,7 +25,7 @@ public class TestFluentNetworkSolver {
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
 		logger.info("Test1");
-		FluentNetworkSolver solver = new FluentNetworkSolver(0, 500, symbols);
+		FluentNetworkSolver solver = new FluentNetworkSolver(0, 500, symbols, new int[] {1,1,1,1,1});
 		logger.info("Test2");
 		Fluent[] fluents = (Fluent[]) solver.createVariables(3);
 		logger.info("Test3");

@@ -11,19 +11,15 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 	 */
 	private static final long serialVersionUID = -7769305914879144221L;
 	protected static int MAX_VARIABLES = 500;
-
-
-	public TypedCompoundSymbolicVariableConstraintSolver(String[][] symbols) {
-		super(new Class[] {TypedCompoundSymbolicValueConstraint.class}, TypedCompoundSymbolicVariable.class,
-				createConstraintSolvers(symbols), createInternals(symbols.length));
-	}
+	private int[] ingredients;
+	private int[] varIndex2solverIndex;
 	
-	private static int[] createInternals(int length) {
-		int[] internals = new int[length];
-		for (int i = 0; i < internals.length; i++) {
-			internals[i] = 1;
-		}
-		return internals;
+
+	public TypedCompoundSymbolicVariableConstraintSolver(String[][] symbols, int[] ingredients) {
+		super(new Class[] {TypedCompoundSymbolicValueConstraint.class}, TypedCompoundSymbolicVariable.class,
+				createConstraintSolvers(symbols), ingredients);
+		this.ingredients = ingredients;
+		this.createVarIndex2SolverIndex();
 	}
 
 	protected static ConstraintSolver[] createConstraintSolvers(String[][] symbols) {
@@ -33,6 +29,19 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 			
 		}
 		return ret;
+	}
+	
+	private void createVarIndex2SolverIndex() {
+		int varCount = 0;
+		for (int i = 0; i < ingredients.length; i++)
+			varCount += ingredients[i];
+		varIndex2solverIndex = new int[varCount];
+		int varIndex = 0;
+		for (int solverIndex = 0; solverIndex < ingredients.length; solverIndex++) {
+			for (int j = 0; j < ingredients[solverIndex]; j++) {
+				varIndex2solverIndex[varIndex++] = solverIndex;
+			}
+		}
 	}
 
 	@Override
@@ -47,4 +56,12 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 		}
 	}
 
+	public int[] getIngredients() {
+		return ingredients;
+	}
+
+
+	public int[] getVarIndex2solverIndex() {
+		return varIndex2solverIndex;
+	}
 }

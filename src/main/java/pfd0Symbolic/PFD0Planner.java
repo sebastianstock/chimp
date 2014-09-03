@@ -21,11 +21,11 @@ public class PFD0Planner extends MetaConstraintSolver {
 	 */
 	private static final long serialVersionUID = 8031573555691611305L;
 
-	public PFD0Planner(long origin, long horizon, long animationTime, String[][] symbols) {
+	public PFD0Planner(long origin, long horizon, long animationTime, String[][] symbols, int[] symbolicingredients) {
 		// Currently only FluentConstraints. Other constraint should be added later.
 		super(new Class[] {FluentConstraint.class}, 
 				animationTime, 
-				new FluentNetworkSolver(origin, horizon, symbols));
+				new FluentNetworkSolver(origin, horizon, symbols, symbolicingredients));
 	}
 
 

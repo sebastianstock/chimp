@@ -29,7 +29,7 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		symbols[2] = symbolsPlAreas;
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
-		solver = new TypedCompoundSymbolicVariableConstraintSolver(symbols);
+		solver = new TypedCompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
 	}
 
 
