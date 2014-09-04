@@ -28,8 +28,10 @@ public class PFD0Operator extends PlanReportroryItem {
 		this.resources = resources;
 		this.resourceUsages = resourceUsages;
 		
-		for (int i = 0; i < resourceUsages.length; i++) {
-			resourceUsageMap.put(resources[i], resourceUsages[i]);
+		if (resourceUsages != null) {
+			for (int i = 0; i < resourceUsages.length; i++) {
+				resourceUsageMap.put(resources[i], resourceUsages[i]);
+			}
 		}
 		
 		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
