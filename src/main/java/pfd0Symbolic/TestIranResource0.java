@@ -39,7 +39,7 @@ public class TestIranResource0 {
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
 		
-		planner = new PFD0Planner(0,  600,  0, symbols);
+		planner = new PFD0Planner(0,  600,  0, symbols, new int[]{1,1,1,1,1});
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		test();
