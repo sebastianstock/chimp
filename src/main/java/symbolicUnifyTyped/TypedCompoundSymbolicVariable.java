@@ -211,5 +211,14 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		return ((SymbolicVariable) getInternalVariables()[position]).getSymbols();
 	}
 	
+	public String getGroundSymbolAt(int position) {
+		String[] possibleValues = getSymbolsAt(position);
+		if (possibleValues.length == 1) {
+			return getSymbolsAt(position)[0];
+		} else {
+			return "";
+		}
+	}
+	
 
 }
