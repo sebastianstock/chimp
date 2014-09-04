@@ -9,6 +9,8 @@ import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.symbols.SymbolicValueConstraint;
 import org.metacsp.multi.symbols.SymbolicVariable;
 
+import cern.colt.Arrays;
+
 
 public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 
@@ -38,9 +40,13 @@ public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint 
 				!(t instanceof TypedCompoundSymbolicVariable)) {
 			return null;
 		}
-		
+	
 		Variable[] finternals = ((TypedCompoundSymbolicVariable) f).getInternalVariables();
 		Variable[] tinternals = ((TypedCompoundSymbolicVariable) t).getInternalVariables();
+		
+		int[] varIndex2solverIndex = 
+				((TypedCompoundSymbolicVariableConstraintSolver) f.getConstraintSolver()).getVarIndex2solverIndex();
+		
 		if (this.type.equals(Type.MATCHES)) {
 			Vector<SymbolicValueConstraint> constraints = 
 					new Vector<SymbolicValueConstraint>(finternals.length);
@@ -49,8 +55,8 @@ public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint 
 						new SymbolicValueConstraint(SymbolicValueConstraint.Type.EQUALS);
 				con.setFrom(finternals[i]);
 				con.setTo(tinternals[i]);
-				for (int j = 0; j < finternals.length; j++) {
-					if (j != i) {
+				for (int j = 0; j < ((MultiVariable)f).getInternalConstraintSolvers().length; j++) {
+					if (j != varIndex2solverIndex[i]) {
 						con.skipSolver(((MultiVariable)f).getInternalConstraintSolvers()[j]);
 					}
 				}
@@ -69,8 +75,8 @@ public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint 
 						con.setFrom(finternals[connections[i] + 1]);
 						con.setTo(tinternals[connections[i+1] + 1]);
 						
-						for (int j = 0; j < finternals.length; j++) {
-							if (j != (connections[i] + 1) && j != (connections[i+1] + 1)) {
+						for (int j = 0; j < ((MultiVariable)f).getInternalConstraintSolvers().length; j++) {
+							if (j != varIndex2solverIndex[connections[i] + 1]) {
 								con.skipSolver(((MultiVariable)f).getInternalConstraintSolvers()[j]);
 							}
 						}
