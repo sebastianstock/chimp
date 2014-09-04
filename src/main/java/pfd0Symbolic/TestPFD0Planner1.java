@@ -193,7 +193,9 @@ public class TestPFD0Planner1 {
 		PFD0Operator driveOP = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
-				new VariablePrototype[] {robotatPE});
+				new VariablePrototype[] {robotatPE},
+				new String[]{},new int[]{}
+		);
 		driveOP.setDurationBounds(new Bounds(10, 100));
 		pfdConstraint.addOperator(driveOP);
 		taskConstraint.addOperator(driveOP);
@@ -206,7 +208,8 @@ public class TestPFD0Planner1 {
 		PFD0Operator graspOp = new PFD0Operator("!grasp", new String[] {"?mug", "none", "none", "none"}, 
 				new PFD0Precondition[] {onPre}, 
 				null, //new String[] {"on(mug1 pl2 none none)"}, 
-				new VariablePrototype[] {holdingPE}
+				new VariablePrototype[] {holdingPE},
+				new String[]{},new int[]{}
 		);
 		graspOp.setDurationBounds(new Bounds(10, 100));
 		pfdConstraint.addOperator(graspOp);

@@ -6,6 +6,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
+import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
@@ -22,6 +23,7 @@ public class Fluent extends MultiVariable {
 			internalVars) {
 		super(cs, id, internalSolvers, internalVars);
 	}
+	
 	
 	/**
 	 * @return The {@link TypedCompoundSymbolicVariable} representing the compound symbolic value 

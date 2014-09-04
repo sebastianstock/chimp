@@ -9,6 +9,8 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
+import resourceFluent.SimpleReusableResourceFluent;
+
 public class TaskApplicationMetaConstraint extends MetaConstraint {
 	
 	private Vector<PFD0Operator> operators;
@@ -157,6 +159,11 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 	@Override
 	public boolean isEquivalent(Constraint c) {
 		return false;
+	}
+
+	public int getResourceUsageLevel( SimpleReusableResourceFluent simpleReusableResourceFluent, Fluent act) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

@@ -24,11 +24,11 @@ public abstract class PlanReportroryItem {
 	 */
 	protected Bounds durationBounds;
 	
-
 	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions) {
 		this.taskname = taskname;
 		this.arguments = arguments;
 		this.preconditions = preconditions;
+
 	}
 	
 	public String getName() {

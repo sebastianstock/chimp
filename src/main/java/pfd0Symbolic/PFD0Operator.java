@@ -1,5 +1,6 @@
 package pfd0Symbolic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -15,14 +16,29 @@ public class PFD0Operator extends PlanReportroryItem {
 	
 	private VariablePrototype[] positiveEffects;
 	private Logger logger;
-
+	
+	private String[] resources;
+	private int[] resourceUsages;
+	private HashMap<String, Integer> resourceUsageMap = new HashMap<String, Integer>();
+	
 	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			String[][] negativeEffects, VariablePrototype[] positiveEffects) {
+			String[][] negativeEffects, VariablePrototype[] positiveEffects, String[] resources, int[] resourceUsages) {
 		super(taskname, arguments, preconditions);
 		this.positiveEffects = positiveEffects;
+		this.resources = resources;
+		this.resourceUsages = resourceUsages;
+		
+		for (int i = 0; i < resourceUsages.length; i++) {
+			resourceUsageMap.put(resources[i], resourceUsages[i]);
+		}
+		
 		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
 	}
 
+	
+	public HashMap<String, Integer> getResourceUsage(){
+		return resourceUsageMap;
+	}
 	
 	@Override
 	public ConstraintNetwork expandTail(Fluent taskfluent,

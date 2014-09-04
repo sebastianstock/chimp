@@ -1,28 +1,33 @@
 package pfd0Symbolic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
+import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.time.Bounds;
+import org.metacsp.time.TimePoint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
+import resourceFluent.SchedulableFluent;
 import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
-public class TestBacktrackingPFD0Planner {
+public class TestIranResource0 {
 	
 	private static PFD0Planner planner;
 	private static FluentNetworkSolver fluentSolver;
-	private static Logger logger = MetaCSPLogging.getLogger(TestBacktrackingPFD0Planner.class);
 
 	public static void main(String[] args) {
-		String[] symbolsPredicates = {"on", "robotat", "holding", "get_mug", "!grasp", "!drive", "!put"};
+		String[] symbolsPredicates = {"on", "robotat", "holding", "get_mug", "!grasp", "!drive"};
 		String[] symbolsMugs = {"mug1", "mug2", "mug3", "mug4", "mug5", "mug6", "mug7", "mug8", "mug9", "mug10", "none"};
 		String[] symbolsPlAreas = {"pl1", "pl2", "pl3", "pl4", "pl5", "pl6", "pl7", "pl8", "pl9", "pl10", "none"};
 		String[] symbolsManAreas = {"ma1", "ma2", "ma3", "ma4", "ma5", "ma6", "ma7", "ma8", "ma9", "ma10", "none"};
@@ -41,10 +46,25 @@ public class TestBacktrackingPFD0Planner {
 	}
 	
 	private static void test() {
+		
+//        //#################################################################################################################
+//        //add manAreaResource
+//        FluentBasedSimpleDomain fbsd = null;
+//        for (MetaConstraint mc : simpleHybridPlanner.getMetaConstraints()) {
+//                if (mc instanceof FluentBasedSimpleDomain) fbsd = (FluentBasedSimpleDomain)mc;
+//        }
+//        SimpleReusableResource  manAreaResource = new SimpleReusableResource(varOH, valOH, 1, fbsd, "manAreaResource");
+//        fbsd.addResrouceUtilizers(manAreaResource, new HashMap<Variable, Integer>());           
+//        //fbsd.addResrouceUtilizer(manAreaResource, sf1.getActivity(), 1);
+//        fbsd.addReourceMap("manAreaResource", manAreaResource);
+//        for (Schedulable sch : fbsd.getSchedulingMetaConstraints()) simpleHybridPlanner.addMetaConstraint(sch);
+//        
+//        //#################################################################################################################
+		
 		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		planner.addMetaConstraint(preConstraint);
 		
-		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint();
+		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint(new int[] {1}, new String[] {"arm"}, "TestIran");
 		TaskApplicationMetaConstraint pfd0Constraint = new TaskApplicationMetaConstraint();
 		addMethods(pfd0Constraint, taskConstraint, fluentSolver);
 		addOperators(pfd0Constraint, taskConstraint, fluentSolver);	
@@ -53,12 +73,19 @@ public class TestBacktrackingPFD0Planner {
 		planner.addMetaConstraint(pfd0Constraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug(mug1 ?pl none none)");
+		getmugFluent.setName("get_mug(?mug ?pl none none)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
-//		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
-//		getmugFluent2.setName("get_mug mug1");
-//		getmugFluent2.setMarking(markings.UNPLANNED);
+		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
+		deadline.setFrom(getmugFluent);
+		deadline.setTo(getmugFluent);
+		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(deadline));
+		
+		AllenIntervalConstraint getRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10, 20));
+		getRelCon.setFrom(getmugFluent);
+		getRelCon.setTo(getmugFluent);
+		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(getRelCon));
+		
 		
 //		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
 //		driveFluent.setName("!drive(none pl2 none none)");
@@ -69,29 +96,37 @@ public class TestBacktrackingPFD0Planner {
 		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//		HashMap<Variable, Integer> utilizers = currentResourceUtilizers.get(resourcesMap.get(resourceNames[i]));
+//		if (problematicActIsEffect) utilizers.put(headActivity, usages[i]);
+//		else utilizers.put(problematicActivity, usages[i]);
+
+		for (SchedulableFluent sch : taskConstraint.getSchedulingMetaConstraints()) {
+			planner.addMetaConstraint(sch);
+		}
+		
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINEST);
+		MetaCSPLogging.setLevel(Level.FINE);
 		
-		logger.info("Starting Planning");
-		long startTime = System.nanoTime();
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		System.out.println("Found a plan? " + planner.backtrack());
-		long endTime = System.nanoTime();
-		logger.info("Finished Planning after " + ((endTime - startTime) / 1000000) + " ms");
+		
 		planner.draw();
 		
 //		Fluent f1 = (Fluent)planner.getConstraintSolvers()[0].getVariable(0);
 //		Fluent f2 = (Fluent)planner.getConstraintSolvers()[0].getVariable(1);
 //		Fluent f3 = (Fluent)planner.getConstraintSolvers()[0].getVariable(2);
-		
-
+//		
+//
 //		//Says that end time of from (and to) is at least 10 and at most 12
 //		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(10,12));
 //
 //		//Says that start time of from (and to) is at least 10 and at most 12
 //		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10,12));
+//		release.setFrom(f1);
+//		release.setTo(f1);
 //
 //		
 //		AllenIntervalConstraint allenCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
@@ -102,16 +137,22 @@ public class TestBacktrackingPFD0Planner {
 //		allenCon1.setFrom(f2);
 //		allenCon1.setTo(f3);
 //
-//		System.out.println("Added? " + planner.getConstraintSolvers()[0].addConstraints(allenCon, allenCon1));
+//		System.out.println("Added? " + planner.getConstraintSolvers()[0].addConstraints(allenCon, allenCon1, release));
 //
 //		AllenIntervalConstraint allenCon2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
 //		allenCon2.setFrom(f3);
 //		allenCon2.setTo(f1);
 //
-//		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(allenCon2));
-//
-//		System.out.println(planner.getDescription());
-//		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[2].getConstraintNetwork());
+////		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(allenCon2));
+//		
+//		
+//		AllenIntervalConstraint preconstr = new AllenIntervalConstraint(AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
+//		preconstr.setFrom(f2);
+//		preconstr.setTo(f1);
+//		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(preconstr));
+		
+		System.out.println(planner.getDescription());
+		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[2].getConstraintNetwork());
 		
 		Variable[] vars = fluentSolver.getVariables();
 		ArrayList<String> results = new ArrayList<String>();
@@ -148,41 +189,25 @@ public class TestBacktrackingPFD0Planner {
 	public static void addMethods(TaskApplicationMetaConstraint pfdConstraint, 
 			TaskSelectionMetaConstraint taskConstraint,
 			FluentNetworkSolver groundSolver) {
-		
-		PFD0Precondition onPre0 = 
-				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0, 1, 1});
-		VariablePrototype put0 = new VariablePrototype(groundSolver, "Component", "!put", new String[] {"?mug", "?pl", "none", "none"});
-		VariablePrototype drive0 = new VariablePrototype(groundSolver, "Component", "!drive", new String[] {"none", "?pl", "none", "none"});
-		VariablePrototype grasp0 = new VariablePrototype(groundSolver, "Component", "!grasp", new String[] {"?mug", "?pl", "none", "none"});
-		FluentConstraint before0 = new FluentConstraint(FluentConstraint.Type.BEFORE);
-		before0.setFrom(drive0);
-		before0.setTo(grasp0);
-		FluentConstraint before1 = new FluentConstraint(FluentConstraint.Type.BEFORE);
-		before1.setFrom(put0);
-		before1.setTo(drive0);
-		PFD0Method getMug1Method0 = new PFD0Method("get_mug", new String[] {"?mug", "?pl", "none", "none"}, 
-				new PFD0Precondition[] {onPre0}, 
-				new VariablePrototype[] {put0}, 
-				new FluentConstraint[] {}
-		);
-		pfdConstraint.addMethod(getMug1Method0);
-		taskConstraint.addMethod(getMug1Method0);
-		
-		
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0, 1, 1});
 		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive", new String[] {"none", "?pl", "none", "none"});
 		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp", new String[] {"?mug", "?pl", "none", "none"});
 		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
-		before.setFrom(grasp);
-		before.setTo(put0);
+		before.setFrom(drive);
+		before.setTo(grasp);
 		PFD0Method getMug1Method = new PFD0Method("get_mug", new String[] {"?mug", "?pl", "none", "none"}, 
 				new PFD0Precondition[] {onPre}, 
-				new VariablePrototype[] {grasp, put0}, 
+				new VariablePrototype[] {grasp, drive}, 
 				new FluentConstraint[] {before}
 		);
-//		pfdConstraint.addMethod(getMug1Method);
-//		taskConstraint.addMethod(getMug1Method);
+//		getMug1Method.setDurationBounds(new Bounds(10, 40));
+		
+		
+		taskConstraint.addResrouceUtilizer(taskConstraint.getResources().get("arm"), drive, 1);//iran
+		
+		pfdConstraint.addMethod(getMug1Method);
+		taskConstraint.addMethod(getMug1Method);
 		
 		
 	}
@@ -192,25 +217,17 @@ public class TestBacktrackingPFD0Planner {
 			FluentNetworkSolver groundSolver) {
 		// Operator for driving:
 		PFD0Precondition robotatPre = 
-				new PFD0Precondition("robotat", new String[] {"none", "?pl", "none", "none"}, new int[] {1,1}); // TODO Add connections
+				new PFD0Precondition("robotat", new String[] {"none", "?pl", "none", "none"}, null); // TODO Add connections
+		robotatPre.setNegativeEffect(true);
 		VariablePrototype robotatPE = new VariablePrototype(groundSolver, "Component", 
 				"robotat", new String[] {"none", "?pl" , "none",  "none"});
 		PFD0Operator driveOP = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
 				new VariablePrototype[] {robotatPE}, new String[]{},new int[]{});
+		driveOP.setDurationBounds(new Bounds(10, 100));
 		pfdConstraint.addOperator(driveOP);
 		taskConstraint.addOperator(driveOP);
-		
-	// Operator for driving:
-		PFD0Precondition robotatPre1 = 
-				new PFD0Precondition("robotat", new String[] {"none", "?pl", "none", "none"}, null); // TODO Add connections
-		PFD0Operator driveOP1 = new PFD0Operator("!drive", new String[] {"none", "?pl", "none", "none"}, 
-				new PFD0Precondition[]{robotatPre1}, 
-				null,//new String[] {"robotat(none pl7 none none)"}, 
-				new VariablePrototype[] {robotatPE}, new String[]{},new int[]{});
-		pfdConstraint.addOperator(driveOP1);
-		taskConstraint.addOperator(driveOP1);
 		
 		// Operator for grasping:
 		PFD0Precondition onPre = 
@@ -221,8 +238,9 @@ public class TestBacktrackingPFD0Planner {
 				new PFD0Precondition[] {onPre}, 
 				null, //new String[] {"on(mug1 pl2 none none)"}, 
 				new VariablePrototype[] {holdingPE},
-				new String[]{},new int[]{}
+				new String[]{"arm"},new int[]{1}
 		);
+		graspOp.setDurationBounds(new Bounds(10, 100));
 		pfdConstraint.addOperator(graspOp);
 		taskConstraint.addOperator(graspOp);
 	}

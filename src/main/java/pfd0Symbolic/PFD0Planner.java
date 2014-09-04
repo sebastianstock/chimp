@@ -7,11 +7,14 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
+
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
+import resourceFluent.SimpleReusableResourceFluent;
 
 
 public class PFD0Planner extends MetaConstraintSolver {
@@ -94,6 +97,21 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 		long endTime = System.nanoTime();
 		logger.info("END RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
+		
+		TaskSelectionMetaConstraint ts = null;
+		TaskApplicationMetaConstraint ta = null;
+		for (MetaConstraint mcon : this.metaConstraints) {
+			if (mcon instanceof TaskSelectionMetaConstraint) ts = (TaskSelectionMetaConstraint)mcon;
+			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
+		}
+
+		//Set resource usage if necessary
+		for (Variable v : varsToRemove) {
+			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
+				rr.removeUsage((Fluent)v);
+			}
+		}
+
 	}
 
 	/**
@@ -159,6 +177,22 @@ public class PFD0Planner extends MetaConstraintSolver {
 			}
 		}
 		
+		
+		TaskSelectionMetaConstraint ts = null;
+		TaskApplicationMetaConstraint ta = null;
+		for (MetaConstraint mcon : this.metaConstraints) {
+			if (mcon instanceof TaskSelectionMetaConstraint) ts = (TaskSelectionMetaConstraint)mcon;
+			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
+		}
+
+//		//Set resource usage if necessary
+//		for (Variable v : metaValue.getVariables()) {
+//			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
+//				//rr.setUsage(metaValue.getSubstitution(v));
+//				rr.setUsage((Fluent)v);
+//			}
+//		}
+				
 		return true;
 	}
 
