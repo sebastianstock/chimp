@@ -49,8 +49,8 @@ public class TestTray {
 		
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
-		addMethods(applicationConstraint, selectionConstraint, fluentSolver);
-		addOperators(applicationConstraint, selectionConstraint, fluentSolver);	
+		addMethods(selectionConstraint, fluentSolver);
+		addOperators(selectionConstraint, fluentSolver);	
 		planner.addMetaConstraint(selectionConstraint);
 		
 		planner.addMetaConstraint(applicationConstraint);
@@ -114,8 +114,8 @@ public class TestTray {
 		
 	}
 	
-	public static void addMethods(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addMethods( 
+			TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug1", "none", "?area", "none", "none"}, new int[] {0, 0});
@@ -130,15 +130,14 @@ public class TestTray {
 				new FluentConstraint[] {before}
 		);
 //		getMug1Method.setDurationBounds(new Bounds(10, 40));
-		
-		pfdConstraint.addMethod(putMugsOnTrayMethod);
-		taskConstraint.addMethod(putMugsOnTrayMethod);
+
+		selectionConstraint.addMethod(putMugsOnTrayMethod);
 		
 		
 	}
 	
-	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addOperators(
+			TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		// Operator for driving:
 //		PFD0Precondition robotatPre = 
@@ -166,8 +165,7 @@ public class TestTray {
 				null, null
 		);
 		placeOp.setDurationBounds(new Bounds(10, 100));
-		pfdConstraint.addOperator(placeOp);
-		taskConstraint.addOperator(placeOp);
+		selectionConstraint.addOperator(placeOp);
 	}
 
 }

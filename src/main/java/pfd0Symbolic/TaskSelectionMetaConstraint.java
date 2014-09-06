@@ -276,4 +276,12 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		return 0;
 	}
 
+	public void setOperators(Vector<PlanReportroryItem> operators) {
+		this.operators = operators;
+	}
+	
+	public void setMethods(Vector<PlanReportroryItem> methods) {
+		this.methods = methods;
+	}
+
 }

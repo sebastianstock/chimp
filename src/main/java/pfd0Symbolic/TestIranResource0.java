@@ -64,13 +64,13 @@ public class TestIranResource0 {
 		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		planner.addMetaConstraint(preConstraint);
 		
-		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint(new int[] {1}, new String[] {"arm"}, "TestIran");
-		TaskApplicationMetaConstraint pfd0Constraint = new TaskApplicationMetaConstraint();
-		addMethods(pfd0Constraint, taskConstraint, fluentSolver);
-		addOperators(pfd0Constraint, taskConstraint, fluentSolver);	
-		planner.addMetaConstraint(taskConstraint);
+		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint(new int[] {1}, new String[] {"arm"}, "TestIran");
+		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
+		addMethods(selectionConstraint, fluentSolver);
+		addOperators(selectionConstraint, fluentSolver);	
+		planner.addMetaConstraint(selectionConstraint);
 		
-		planner.addMetaConstraint(pfd0Constraint);
+		planner.addMetaConstraint(applicationConstraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(?mug ?pl none none)");
@@ -101,7 +101,7 @@ public class TestIranResource0 {
 //		if (problematicActIsEffect) utilizers.put(headActivity, usages[i]);
 //		else utilizers.put(problematicActivity, usages[i]);
 
-		for (SchedulableFluent sch : taskConstraint.getSchedulingMetaConstraints()) {
+		for (SchedulableFluent sch : selectionConstraint.getSchedulingMetaConstraints()) {
 			planner.addMetaConstraint(sch);
 		}
 		
@@ -186,8 +186,8 @@ public class TestIranResource0 {
 		on1.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addMethods(
+			TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0, 1, 1});
@@ -204,16 +204,15 @@ public class TestIranResource0 {
 //		getMug1Method.setDurationBounds(new Bounds(10, 40));
 		
 		
-		taskConstraint.addResrouceUtilizer(taskConstraint.getResources().get("arm"), drive, 1);//iran
-		
-		pfdConstraint.addMethod(getMug1Method);
-		taskConstraint.addMethod(getMug1Method);
+		selectionConstraint.addResrouceUtilizer(selectionConstraint.getResources().get("arm"), drive, 1);//iran
+
+		selectionConstraint.addMethod(getMug1Method);
 		
 		
 	}
 	
-	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addOperators(
+			TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		// Operator for driving:
 		PFD0Precondition robotatPre = 
@@ -226,8 +225,7 @@ public class TestIranResource0 {
 				null,//new String[] {"robotat(none pl7 none none)"}, 
 				new VariablePrototype[] {robotatPE}, new String[]{},new int[]{});
 		driveOP.setDurationBounds(new Bounds(10, 100));
-		pfdConstraint.addOperator(driveOP);
-		taskConstraint.addOperator(driveOP);
+		selectionConstraint.addOperator(driveOP);
 		
 		// Operator for grasping:
 		PFD0Precondition onPre = 
@@ -241,8 +239,7 @@ public class TestIranResource0 {
 				new String[]{"arm"},new int[]{1}
 		);
 		graspOp.setDurationBounds(new Bounds(10, 100));
-		pfdConstraint.addOperator(graspOp);
-		taskConstraint.addOperator(graspOp);
+		selectionConstraint.addOperator(graspOp);
 	}
 
 }

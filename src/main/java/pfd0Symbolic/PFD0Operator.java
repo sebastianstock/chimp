@@ -36,6 +36,11 @@ public class PFD0Operator extends PlanReportroryItem {
 		
 		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
 	}
+	
+	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+			String[][] negativeEffects, VariablePrototype[] positiveEffects) {
+		this(taskname, arguments, preconditions, negativeEffects, positiveEffects, null, null);
+	}
 
 	
 	public HashMap<String, Integer> getResourceUsage(){

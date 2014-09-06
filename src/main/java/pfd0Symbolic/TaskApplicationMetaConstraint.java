@@ -13,29 +13,17 @@ import resourceFluent.SimpleReusableResourceFluent;
 
 public class TaskApplicationMetaConstraint extends MetaConstraint {
 	
-	private Vector<PFD0Operator> operators;
-	private Vector<PFD0Method> methods;
 
 	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED}; 
 	
 	public TaskApplicationMetaConstraint() {
 		super(null, null);
-		operators = new Vector<PFD0Operator>();
-		methods = new Vector<PFD0Method>();
 	}
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6968387716912116132L;
-	
-	public void addOperator(PFD0Operator o) {
-		operators.add(o);
-	}
-	
-	public void addMethod(PFD0Method m) {
-		methods.add(m);
-	}
 
 	
 	/** 

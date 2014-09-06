@@ -44,13 +44,13 @@ public class TestBacktrackingPFD0Planner {
 		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		planner.addMetaConstraint(preConstraint);
 		
-		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint();
-		TaskApplicationMetaConstraint pfd0Constraint = new TaskApplicationMetaConstraint();
-		addMethods(pfd0Constraint, taskConstraint, fluentSolver);
-		addOperators(pfd0Constraint, taskConstraint, fluentSolver);	
-		planner.addMetaConstraint(taskConstraint);
+		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
+		TaskApplicationMetaConstraint appliactionConstraint = new TaskApplicationMetaConstraint();
+		addMethods(selectionConstraint, fluentSolver);
+		addOperators(selectionConstraint, fluentSolver);	
+		planner.addMetaConstraint(selectionConstraint);
 		
-		planner.addMetaConstraint(pfd0Constraint);
+		planner.addMetaConstraint(appliactionConstraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(mug1 ?pl none none)");
@@ -145,8 +145,8 @@ public class TestBacktrackingPFD0Planner {
 		on1.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addMethods(
+			TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		
 		PFD0Precondition onPre0 = 
@@ -165,8 +165,7 @@ public class TestBacktrackingPFD0Planner {
 				new VariablePrototype[] {put0}, 
 				new FluentConstraint[] {}
 		);
-		pfdConstraint.addMethod(getMug1Method0);
-		taskConstraint.addMethod(getMug1Method0);
+		selectionConstraint.addMethod(getMug1Method0);
 		
 		
 		PFD0Precondition onPre = 
@@ -187,8 +186,8 @@ public class TestBacktrackingPFD0Planner {
 		
 	}
 	
-	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addOperators( 
+			TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		// Operator for driving:
 		PFD0Precondition robotatPre = 
@@ -199,8 +198,7 @@ public class TestBacktrackingPFD0Planner {
 				new PFD0Precondition[]{robotatPre}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
 				new VariablePrototype[] {robotatPE}, new String[]{},new int[]{});
-		pfdConstraint.addOperator(driveOP);
-		taskConstraint.addOperator(driveOP);
+		selectionConstraint.addOperator(driveOP);
 		
 	// Operator for driving:
 		PFD0Precondition robotatPre1 = 
@@ -209,8 +207,7 @@ public class TestBacktrackingPFD0Planner {
 				new PFD0Precondition[]{robotatPre1}, 
 				null,//new String[] {"robotat(none pl7 none none)"}, 
 				new VariablePrototype[] {robotatPE}, new String[]{},new int[]{});
-		pfdConstraint.addOperator(driveOP1);
-		taskConstraint.addOperator(driveOP1);
+		selectionConstraint.addOperator(driveOP1);
 		
 		// Operator for grasping:
 		PFD0Precondition onPre = 
@@ -223,8 +220,7 @@ public class TestBacktrackingPFD0Planner {
 				new VariablePrototype[] {holdingPE},
 				new String[]{},new int[]{}
 		);
-		pfdConstraint.addOperator(graspOp);
-		taskConstraint.addOperator(graspOp);
+		selectionConstraint.addOperator(graspOp);
 	}
 
 }

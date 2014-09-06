@@ -13,6 +13,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.time.Bounds;
 import org.metacsp.time.TimePoint;
+import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
@@ -46,13 +47,13 @@ public class TestPFD0Planner1 {
 		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		planner.addMetaConstraint(preConstraint);
 		
-		TaskSelectionMetaConstraint taskConstraint = new TaskSelectionMetaConstraint();
-		TaskApplicationMetaConstraint pfd0Constraint = new TaskApplicationMetaConstraint();
-		addMethods(pfd0Constraint, taskConstraint, fluentSolver);
-		addOperators(pfd0Constraint, taskConstraint, fluentSolver);	
-		planner.addMetaConstraint(taskConstraint);
+		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
+		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
+		addMethods(selectionConstraint, fluentSolver);
+		addOperators(selectionConstraint, fluentSolver);	
+		planner.addMetaConstraint(selectionConstraint);
 		
-		planner.addMetaConstraint(pfd0Constraint);
+		planner.addMetaConstraint(applicationConstraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(?mug ?pl none none)");
@@ -83,9 +84,18 @@ public class TestPFD0Planner1 {
 		
 		MetaCSPLogging.setLevel(Level.FINE);
 		
-		System.out.println("Found a plan? " + planner.backtrack());
+//		System.out.println("Found a plan? " + planner.backtrack());
+		Callback cb = new Callback() {
+			@Override
+			public void performOperation() {
+				System.out.println("Found a plan? " + planner.backtrack());				
+//				tp.publish(false, true);
+				planner.draw();
+			}
+		};
+		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), cb);
 		
-		planner.draw();
+//		planner.draw();
 		
 //		Fluent f1 = (Fluent)planner.getConstraintSolvers()[0].getVariable(0);
 //		Fluent f2 = (Fluent)planner.getConstraintSolvers()[0].getVariable(1);
@@ -133,7 +143,7 @@ public class TestPFD0Planner1 {
 		}
 
 		System.out.println(results);
-		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), "Constraint Network");
+//		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), "Constraint Network");
 //		ConstraintNetwork.draw(((TypedCompoundSymbolicVariableConstraintSolver)fluentSolver.getConstraintSolvers()[0]).getConstraintNetwork(), "Constraint Network");
 		// TODO following line makes sure that symbolicvariables values are set, but may take to long if we do that always.
 		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
@@ -158,8 +168,7 @@ public class TestPFD0Planner1 {
 		on1.setMarking(markings.OPEN);
 	}
 	
-	public static void addMethods(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addMethods(TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		PFD0Precondition onPre = 
 				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0, 1, 1});
@@ -175,14 +184,12 @@ public class TestPFD0Planner1 {
 		);
 //		getMug1Method.setDurationBounds(new Bounds(10, 40));
 		
-		pfdConstraint.addMethod(getMug1Method);
-		taskConstraint.addMethod(getMug1Method);
+		selectionConstraint.addMethod(getMug1Method);
 		
 		
 	}
 	
-	public static void addOperators(TaskApplicationMetaConstraint pfdConstraint, 
-			TaskSelectionMetaConstraint taskConstraint,
+	public static void addOperators(TaskSelectionMetaConstraint selectionConstraint,
 			FluentNetworkSolver groundSolver) {
 		// Operator for driving:
 		PFD0Precondition robotatPre = 
@@ -197,8 +204,7 @@ public class TestPFD0Planner1 {
 				new String[]{},new int[]{}
 		);
 		driveOP.setDurationBounds(new Bounds(10, 100));
-		pfdConstraint.addOperator(driveOP);
-		taskConstraint.addOperator(driveOP);
+		selectionConstraint.addOperator(driveOP);
 		
 		// Operator for grasping:
 		PFD0Precondition onPre = 
@@ -212,8 +218,7 @@ public class TestPFD0Planner1 {
 				new String[]{},new int[]{}
 		);
 		graspOp.setDurationBounds(new Bounds(10, 100));
-		pfdConstraint.addOperator(graspOp);
-		taskConstraint.addOperator(graspOp);
+		selectionConstraint.addOperator(graspOp);
 	}
 
 }
