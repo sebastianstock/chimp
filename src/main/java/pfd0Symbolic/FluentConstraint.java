@@ -6,6 +6,8 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.APSPSolver;
+import org.metacsp.time.Bounds;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
@@ -92,7 +94,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 				return new Constraint[]{preAIC};
 			}
 		} else if (this.type.equals(Type.OPENS)) { // TODO probably need other relations, too
-			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, new Bounds(2L, 6L));
 			befCon.setFrom(((Fluent) f).getAllenInterval());
 			befCon.setTo(((Fluent) t).getAllenInterval());
 			if(connections != null) {
