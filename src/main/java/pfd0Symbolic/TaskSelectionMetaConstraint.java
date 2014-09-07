@@ -34,9 +34,10 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	private String name = "";
 
 	public TaskSelectionMetaConstraint() {
-		super(null, null);
-		operators = new Vector<PlanReportroryItem>();
-		methods = new Vector<PlanReportroryItem>();
+		this(new int[0], new String[0], "");
+//		super(null, null);
+//		operators = new Vector<PlanReportroryItem>();
+//		methods = new Vector<PlanReportroryItem>();
 	}
 	
 	public TaskSelectionMetaConstraint(int[] capacities, String[] resourceNames, String domainName) {
