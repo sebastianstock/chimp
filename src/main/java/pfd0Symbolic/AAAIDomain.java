@@ -132,8 +132,8 @@ public class AAAIDomain {
 				new String[] {N, N, N, "?mArea", N, N, N, N, N, N, N}, 
 				new int[] {3, 3});
 		PFD0Precondition connectedPlaceObj = new PFD0Precondition("Connected", 
-				new String[] {N, N, "?plA", "?mArea", N, N, N, N, N, N, N}, 
-				new int[] {});
+				new String[] {N, N, "?toArea", "?mArea", N, N, N, N, N, N, N}, 
+				new int[] {2,2, 3, 3});
 		
 		VariablePrototype onEffPlaceObj = new VariablePrototype(groundSolver, "S", 
 				"On", new String[] {"?obj", N, "?toArea", N, N, N, N, N, N, N, N});

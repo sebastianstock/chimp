@@ -1,17 +1,15 @@
 package pfd0Symbolic;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariableOrderingH;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
-
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SchedulableFluent;
@@ -50,27 +48,27 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		this.resourceNames = resourceNames;
 		currentResourceUtilizers = new HashMap<SimpleReusableResourceFluent,HashMap<Variable,Integer>>();
 		resourcesMap = new HashMap<String, SimpleReusableResourceFluent>();
-
-		for (int i = 0; i < capacities.length; i++) {
-			//Most critical conflict is the one with most activities 
-			VariableOrderingH varOH = new VariableOrderingH() {
-				@Override
-				public int compare(ConstraintNetwork arg0, ConstraintNetwork arg1) {
-					return arg1.getVariables().length - arg0.getVariables().length;
-				}
-				@Override
-				public void collectData(ConstraintNetwork[] allMetaVariables) { }
-			};
-			// no value ordering
-			ValueOrderingH valOH = new ValueOrderingH() {
-				@Override
-				public int compare(ConstraintNetwork o1, ConstraintNetwork o2) { return 0; }
-			};
-			resourcesMap.put(resourceNames[i], new SimpleReusableResourceFluent(varOH, valOH, capacities[i], this, resourceNames[i]));
-		}
-
-		// for every SRR just created, couple it with a vector of variables
-		for (SimpleReusableResourceFluent rr : resourcesMap.values()) currentResourceUtilizers.put(rr,new HashMap<Variable, Integer>());
+//
+//		for (int i = 0; i < capacities.length; i++) {
+//			//Most critical conflict is the one with most activities 
+//			VariableOrderingH varOH = new VariableOrderingH() {
+//				@Override
+//				public int compare(ConstraintNetwork arg0, ConstraintNetwork arg1) {
+//					return arg1.getVariables().length - arg0.getVariables().length;
+//				}
+//				@Override
+//				public void collectData(ConstraintNetwork[] allMetaVariables) { }
+//			};
+//			// no value ordering
+//			ValueOrderingH valOH = new ValueOrderingH() {
+//				@Override
+//				public int compare(ConstraintNetwork o1, ConstraintNetwork o2) { return 0; }
+//			};
+//			resourcesMap.put(resourceNames[i], new SimpleReusableResourceFluent(varOH, valOH, capacities[i], this, resourceNames[i]));
+//		}
+//
+//		// for every SRR just created, couple it with a vector of variables
+//		for (SimpleReusableResourceFluent rr : resourcesMap.values()) currentResourceUtilizers.put(rr,new HashMap<Variable, Integer>());
 
 	}
 
@@ -179,19 +177,18 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		// possible constraint networks
 		Vector<ConstraintNetwork> ret;
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent fl = (Fluent)problematicNetwork.getVariables()[0];
-		
+		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
-		logger.info("getMetaValues for: " + fl);
+		logger.info("getMetaValues for: " + taskFluent);
+		// TODO: following line can probably be removed for speedup:
 		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-		if (fl.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-			ret = applyItems(fl, operators, groundSolver);
+		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
+			ret = applyPlanrepoirtroryItems(taskFluent, operators, groundSolver);
 		} else {
-			ret = applyItems(fl, methods, groundSolver);
+			ret = applyPlanrepoirtroryItems(taskFluent, methods, groundSolver);
 		}
 		
 		if (!ret.isEmpty()) 
@@ -199,7 +196,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		return null;
 	}
 	
-	private Vector<ConstraintNetwork> applyItems(Fluent fl, Vector<PlanReportroryItem> items, 
+	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl, Vector<PlanReportroryItem> items, 
 			FluentNetworkSolver groundSolver) {
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
@@ -214,8 +211,8 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 //				}
 				
 				logger.fine("Applying preconditions of PlanReportroryItem " + item);
-				ConstraintNetwork newResolver = item.expandPreconditions(fl,  groundSolver);
-				if (newResolver != null) {
+				List<ConstraintNetwork> newResolvers = item.expandPreconditions(fl,  groundSolver);
+				for (ConstraintNetwork newResolver : newResolvers) {
 					ret.add(newResolver);
 				}
 			}

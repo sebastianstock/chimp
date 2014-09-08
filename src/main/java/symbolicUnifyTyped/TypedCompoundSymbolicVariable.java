@@ -151,6 +151,15 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	public String[] getPossiblePredicateNames() {
 		return getSymbolsAt(0);
 	}
+	
+	public String getPredicateName() {
+		String[] possibleValues = getSymbolsAt(0);
+		if (possibleValues.length == 1) {
+			return possibleValues[0];
+		} else {
+			throw new IllegalStateException("Predicate names should be ground!");
+		}
+	}
 
 	/**
 	 * Checks if it can be possibly be matched to another fluent.
@@ -214,7 +223,7 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	public String getGroundSymbolAt(int position) {
 		String[] possibleValues = getSymbolsAt(position);
 		if (possibleValues.length == 1) {
-			return getSymbolsAt(position)[0];
+			return possibleValues[0];
 		} else {
 			return "";
 		}

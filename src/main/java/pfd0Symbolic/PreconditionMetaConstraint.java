@@ -70,11 +70,12 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 		// possible constraint networks
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent fl = (Fluent)problematicNetwork.getVariables()[0];
-		logger.info("getMetaValues for: " + fl);
+		Fluent preFluent = (Fluent)problematicNetwork.getVariables()[0];
+		logger.info("getMetaValues for: " + preFluent);
 		
+		// creates MATCHES Fluents between dummy precondition and open state fluents which have the same predicate name
 		Fluent[] openFluents = ((FluentNetworkSolver)this.getGroundSolver()).getOpenFluents();
-		String[] headNames = fl.getCompoundSymbolicVariable().getPossiblePredicateNames();
+		String[] headNames = preFluent.getCompoundSymbolicVariable().getPossiblePredicateNames();
 		for (String headName : headNames) {
 			for (Fluent openFluent : openFluents)  {
 				String[] onames = openFluent.getCompoundSymbolicVariable().getPossiblePredicateNames();
@@ -82,7 +83,7 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 					if(headName.equals(name)) {
 						// potential match. Add matches constraint.
 						// TODO could be optimized by testing the full name.
-						ConstraintNetwork newResolver = addMatches(fl, openFluent);
+						ConstraintNetwork newResolver = addMatches(preFluent, openFluent);
 						if (newResolver != null) {
 							ret.add(newResolver);
 						}

@@ -66,21 +66,10 @@ public class PFD0Operator extends PlanReportroryItem {
 		for (FluentConstraint con : 
 				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
 			if (con.isNegativeEffect()) {
-				Fluent dummyPre = (Fluent) con.getFrom();
-				List<FluentConstraint> matches = 
-						groundSolver.getFluentConstraintsOfTypeTo(dummyPre, FluentConstraint.Type.MATCHES);
-				if (matches.size() == 1) {
-					Fluent matchingFluent = (Fluent) matches.get(0).getFrom();
-					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-					closes.setFrom(taskfluent);
-					closes.setTo(matchingFluent);
-					newConstraints.add(closes);
-				} else if (matches.size() == 0) {
-					logger.info("Trying to set negative effect but" +  dummyPre.toString() 
-							+ " has no matches.");
-				} else if (matches.size() > 1){
-					logger.info("Trying to set negative effect but found more than one matching fluents for precondition " + dummyPre.toString());
-				}
+				FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+				closes.setFrom(taskfluent);
+				closes.setTo(con.getFrom());
+				newConstraints.add(closes);
 			}
 		}
 		

@@ -53,16 +53,9 @@ public class TestBacktrackingPFD0Planner {
 		planner.addMetaConstraint(appliactionConstraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
-		getmugFluent.setName("get_mug(mug1 ?pl none none)");
+		getmugFluent.setName("get_mug(mug1 pl2 none none)");
 		getmugFluent.setMarking(markings.UNPLANNED);
 		
-//		Fluent getmugFluent2 = (Fluent) groundSolver.createVariable("Robot2");
-//		getmugFluent2.setName("get_mug mug1");
-//		getmugFluent2.setMarking(markings.UNPLANNED);
-		
-//		Fluent driveFluent = (Fluent) fluentSolver.createVariable("Robot1");
-//		driveFluent.setName("!drive(none pl2 none none)");
-//		driveFluent.setMarking(markings.UNPLANNED);
 		
 		createState(fluentSolver);
 		
@@ -82,36 +75,6 @@ public class TestBacktrackingPFD0Planner {
 		logger.info("Finished Planning after " + ((endTime - startTime) / 1000000) + " ms");
 		planner.draw();
 		
-//		Fluent f1 = (Fluent)planner.getConstraintSolvers()[0].getVariable(0);
-//		Fluent f2 = (Fluent)planner.getConstraintSolvers()[0].getVariable(1);
-//		Fluent f3 = (Fluent)planner.getConstraintSolvers()[0].getVariable(2);
-		
-
-//		//Says that end time of from (and to) is at least 10 and at most 12
-//		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(10,12));
-//
-//		//Says that start time of from (and to) is at least 10 and at most 12
-//		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(10,12));
-//
-//		
-//		AllenIntervalConstraint allenCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-//		allenCon.setFrom(f1);
-//		allenCon.setTo(f2);
-//
-//		AllenIntervalConstraint allenCon1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-//		allenCon1.setFrom(f2);
-//		allenCon1.setTo(f3);
-//
-//		System.out.println("Added? " + planner.getConstraintSolvers()[0].addConstraints(allenCon, allenCon1));
-//
-//		AllenIntervalConstraint allenCon2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-//		allenCon2.setFrom(f3);
-//		allenCon2.setTo(f1);
-//
-//		System.out.println("Added*? " + planner.getConstraintSolvers()[0].addConstraints(allenCon2));
-//
-//		System.out.println(planner.getDescription());
-//		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[2].getConstraintNetwork());
 		
 		Variable[] vars = fluentSolver.getVariables();
 		ArrayList<String> results = new ArrayList<String>();
@@ -180,8 +143,7 @@ public class TestBacktrackingPFD0Planner {
 				new VariablePrototype[] {grasp, put0}, 
 				new FluentConstraint[] {before}
 		);
-//		pfdConstraint.addMethod(getMug1Method);
-//		taskConstraint.addMethod(getMug1Method);
+		selectionConstraint.addMethod(getMug1Method);
 		
 		
 	}

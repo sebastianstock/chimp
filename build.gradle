@@ -31,4 +31,6 @@ dependencies {
   //compile 'org.metacsp:meta-csp-framework:1.0.175'
   compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
 
+  compile group: 'com.google.guava', name: 'guava', version: '18.0'
+
 }

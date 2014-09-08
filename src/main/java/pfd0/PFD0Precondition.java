@@ -32,24 +32,24 @@ public class PFD0Precondition {
 		return connections;
 	}
 	
-	/** Creates a constraint for this precondition.
-	 * A precondition prototype will be created. This prototype will later be 
-	 * connected via NameMatchingConstraints to the open fluents.
-	 * 
-	 * @param taskfluent The task that is expanded.
-	 * @param groundSolver The fluentnetworksolver acting as a ground solver.
-	 * @return New PRE constraint between new prototypes and taskfluent.
-	 */
-	public FluentConstraint createPreconditionConstraint(Fluent taskfluent, 
-			FluentNetworkSolver groundSolver) {
-		VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
-				fluenttype, arguments);
-		newFluent.setMarking(markings.UNJUSTIFIED);
-		FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
-				connections);
-		preconstr.setFrom(newFluent);
-		preconstr.setTo(taskfluent);
-		return preconstr;
-	}
+//	/** Creates a constraint for this precondition.
+//	 * A precondition prototype will be created. This prototype will later be 
+//	 * connected via NameMatchingConstraints to the open fluents.
+//	 * 
+//	 * @param taskfluent The task that is expanded.
+//	 * @param groundSolver The fluentnetworksolver acting as a ground solver.
+//	 * @return New PRE constraint between new prototypes and taskfluent.
+//	 */
+//	public FluentConstraint createPreconditionConstraint(Fluent taskfluent, 
+//			FluentNetworkSolver groundSolver) {
+//		VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
+//				fluenttype, arguments);
+//		newFluent.setMarking(markings.UNJUSTIFIED);
+//		FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
+//				connections);
+//		preconstr.setFrom(newFluent);
+//		preconstr.setTo(taskfluent);
+//		return preconstr;
+//	}
 	
 }

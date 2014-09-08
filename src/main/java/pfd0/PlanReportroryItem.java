@@ -112,7 +112,7 @@ public abstract class PlanReportroryItem {
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
-				newConstraints.add(pre.createPreconditionConstraint(taskfluent, groundSolver));
+//				newConstraints.add(pre.createPreconditionConstraint(taskfluent, groundSolver));
 			}
 		}
 		return newConstraints;
@@ -130,7 +130,7 @@ public abstract class PlanReportroryItem {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
-				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
+//				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
 			}
 		}
 		return ret;		

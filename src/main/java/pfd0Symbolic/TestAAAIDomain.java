@@ -25,6 +25,7 @@ public class TestAAAIDomain {
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		initMetaConstraints();
+//		AAAIProblems.createProblemMoveBase(fluentSolver);
 		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		test();
 	}
@@ -50,6 +51,8 @@ public class TestAAAIDomain {
 		System.out.println(planner.getDescription());
 //		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[2].getConstraintNetwork());
 		
+		
+		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		Variable[] vars = fluentSolver.getVariables();
 		ArrayList<String> results = new ArrayList<String>();
 		for (int i = 0; i < vars.length; i++) {
@@ -69,14 +72,14 @@ public class TestAAAIDomain {
 	}
 	
 	private static void initMetaConstraints() {
-		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
+//		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
 		Vector<PlanReportroryItem> operators = AAAIDomain.createOperators(fluentSolver);
 		selectionConstraint.setOperators(operators);
 		Vector<PlanReportroryItem> methods = AAAIDomain.createMethods(fluentSolver);
 		selectionConstraint.setMethods(methods);
-		planner.addMetaConstraint(preConstraint);
+//		planner.addMetaConstraint(preConstraint);
 		planner.addMetaConstraint(applicationConstraint);
 		planner.addMetaConstraint(selectionConstraint);
 	}

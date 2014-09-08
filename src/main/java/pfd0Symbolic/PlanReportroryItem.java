@@ -1,15 +1,18 @@
 package pfd0Symbolic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
+
+import com.google.common.collect.Sets;
 
 public abstract class PlanReportroryItem {
 	
@@ -130,27 +133,62 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork witht the added dummy preconditions.
 	 */
-	public ConstraintNetwork expandPreconditions(Fluent taskfluent,
+	public List<ConstraintNetwork> expandPreconditions(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
+		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
-		ConstraintNetwork ret = new ConstraintNetwork(null);
+		Fluent[] openFluents = groundSolver.getOpenFluents();
+		
+		List<Set<FluentConstraint>> constraints = new ArrayList<Set<FluentConstraint>>();
+		
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
-				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
+				String headName = pre.getFluenttype();
+//				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
+				Set<FluentConstraint> possiblePreconditions = new HashSet<FluentConstraint>() {};
+				for (Fluent openFluent : openFluents)  {
+					String oname = openFluent.getCompoundSymbolicVariable().getPredicateName();
+					if(headName.equals(oname)) {
+						// potential match. Add matches constraint.
+						// TODO could be optimized by testing the full name.
+						FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
+								pre.getConnections());
+						preconstr.setFrom(openFluent);
+						preconstr.setTo(taskfluent);
+						preconstr.setNegativeEffect(pre.isNegativeEffect());
+						possiblePreconditions.add(preconstr);
+					}
+				}
+				if (possiblePreconditions.size() > 0) {
+					constraints.add(possiblePreconditions);
+				} else {
+					return ret;  // Precondition can not be fulfilled!
+				}
 			}
 		}
-		// Add a UNARYAPPLIED to remember which method/operator has been used.
-		FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
-				this);
-		applicationconstr.setFrom(taskfluent);
-		applicationconstr.setTo(taskfluent);
-		ret.addConstraint(applicationconstr);
 		
-		if (durationBounds != null) {
-			AllenIntervalConstraint duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
-			duration.setFrom(taskfluent.getAllenInterval());
-			duration.setTo(taskfluent.getAllenInterval());
-			ret.addConstraint(duration);
+		// Create constraint networks as cartesian product of precondtion constraints
+		Set<List<FluentConstraint>> combinations = Sets.cartesianProduct(constraints);
+		for (List<FluentConstraint> comb : combinations) {
+			ConstraintNetwork cn = new ConstraintNetwork(null);
+			for (FluentConstraint con : comb) {
+				cn.addConstraint(con);
+			}
+			
+			// Add a UNARYAPPLIED to remember which method/operator has been used.
+			FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
+					this);
+			applicationconstr.setFrom(taskfluent);
+			applicationconstr.setTo(taskfluent);
+			cn.addConstraint(applicationconstr);
+			// add constraints for duration
+			if (durationBounds != null) {
+				AllenIntervalConstraint duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
+				duration.setFrom(taskfluent.getAllenInterval());
+				duration.setTo(taskfluent.getAllenInterval());
+				cn.addConstraint(duration);
+			}
+			ret.add(cn);
 		}
 		return ret;		
 	}
