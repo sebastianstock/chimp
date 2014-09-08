@@ -1,10 +1,12 @@
 package pfd0Symbolic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
@@ -55,6 +57,7 @@ public class PFD0Operator extends PlanReportroryItem {
 	}
 	
 	@Override
+	@Deprecated
 	public ConstraintNetwork expandTail(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
@@ -62,16 +65,16 @@ public class PFD0Operator extends PlanReportroryItem {
 		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
 		
-		// close negative effects
-		for (FluentConstraint con : 
-				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
-			if (con.isNegativeEffect()) {
-				FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-				closes.setFrom(taskfluent);
-				closes.setTo(con.getFrom());
-				newConstraints.add(closes);
-			}
-		}
+//		// close negative effects
+//		for (FluentConstraint con : 
+//				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
+//			if (con.isNegativeEffect()) {
+//				FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+//				closes.setFrom(taskfluent);
+//				closes.setTo(con.getFrom());
+//				newConstraints.add(closes);
+//			}
+//		}
 		
 		// add positive effects
 		if (positiveEffects != null) {
@@ -92,6 +95,26 @@ public class PFD0Operator extends PlanReportroryItem {
 			ret.addConstraint(con);
 		
 		return ret;		
+	}
+	
+	@Override
+	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+		Vector<Variable> newFluents = new Vector<Variable>();
+		List<Constraint> newConstraints = new ArrayList<Constraint>();
+
+		if (positiveEffects != null) {
+			for(VariablePrototype p : positiveEffects) {
+				p.setMarking(markings.OPEN);
+				newFluents.add(p);
+				String[] arguments = (String[])((VariablePrototype) p).getParameters()[2];
+				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 
+						createConnections(arguments));
+				opens.setFrom(taskfluent);
+				opens.setTo(p);
+				newConstraints.add(opens);
+			}
+		}
+		return newConstraints;		
 	}
 	
 

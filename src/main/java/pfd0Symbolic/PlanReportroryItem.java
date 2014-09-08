@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
@@ -138,14 +139,12 @@ public abstract class PlanReportroryItem {
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		Fluent[] openFluents = groundSolver.getOpenFluents();
-		
 		List<Set<FluentConstraint>> constraints = new ArrayList<Set<FluentConstraint>>();
 		
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
 				String headName = pre.getFluenttype();
-//				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
-				Set<FluentConstraint> possiblePreconditions = new HashSet<FluentConstraint>() {};
+				Set<FluentConstraint> possiblePreconditions = new HashSet<FluentConstraint>();
 				for (Fluent openFluent : openFluents)  {
 					String oname = openFluent.getCompoundSymbolicVariable().getPredicateName();
 					if(headName.equals(oname)) {
@@ -173,9 +172,22 @@ public abstract class PlanReportroryItem {
 			ConstraintNetwork cn = new ConstraintNetwork(null);
 			for (FluentConstraint con : comb) {
 				cn.addConstraint(con);
+				// add closes for negative effects
+				if (con.isNegativeEffect() && this instanceof PFD0Operator) {
+					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+					closes.setFrom(con.getTo());
+					closes.setTo(con.getFrom());
+					cn.addConstraint(closes);
+				}
+			}
+			
+			// add positive effects/decomposition
+			for (Constraint con : expandEffects(taskfluent, groundSolver)) {
+				cn.addConstraint(con);
 			}
 			
 			// Add a UNARYAPPLIED to remember which method/operator has been used.
+			// UNARYAPPLIED is not needed anymore.
 			FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
 					this);
 			applicationconstr.setFrom(taskfluent);
@@ -199,7 +211,17 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork after applying the operator/method.
 	 */
+	@Deprecated
 	public abstract ConstraintNetwork expandTail(Fluent taskfluent, FluentNetworkSolver groundSolver);
+	
+	/**
+	 * Applies the method or operator to one task.
+	 * @param taskfluent The task that has to be expanded.
+	 * @param groundSolver The groundSolver.
+	 * @return Constraints representing the decompositions or positive effects
+	 */
+	public abstract List<Constraint> expandEffects(Fluent taskfluent, 
+			FluentNetworkSolver groundSolver);
 	
 	/**
 	 * Creates the connections array for the opens constraint.

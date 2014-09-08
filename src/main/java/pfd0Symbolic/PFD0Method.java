@@ -1,5 +1,7 @@
 package pfd0Symbolic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
@@ -25,6 +27,7 @@ public class PFD0Method extends PlanReportroryItem {
 	
 	
 	@Override
+	@Deprecated
 	public ConstraintNetwork expandTail(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
@@ -61,6 +64,34 @@ public class PFD0Method extends PlanReportroryItem {
 			ret.addConstraint(con);
 
 		return ret;
+	}
+
+
+	@Override
+	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+		List<Variable> newFluents = new ArrayList<Variable>();
+		List<Constraint> newConstraints = new ArrayList<Constraint>();
+
+		// create prototypes and decomposition constraints
+		if (subtaskprototypes != null) {
+			for (VariablePrototype sub : subtaskprototypes) {
+				sub.setMarking(markings.UNPLANNED);
+				newFluents.add(sub);
+				// create dc constraint
+				String[] arguments = (String[])((VariablePrototype) sub).getParameters()[2];
+				FluentConstraint dc = 
+						new FluentConstraint(FluentConstraint.Type.DC, createConnections(arguments));
+				dc.setFrom(taskfluent);
+				dc.setTo(sub);
+				newConstraints.add(dc);
+			}
+		}
+		if (constraints != null) {
+			for (Constraint c : constraints) {
+				newConstraints.add(c);
+			}
+		}
+		return newConstraints;
 	}
 
 }

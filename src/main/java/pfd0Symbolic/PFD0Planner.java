@@ -10,11 +10,11 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
-
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SimpleReusableResourceFluent;
+import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
 
 public class PFD0Planner extends MetaConstraintSolver {
@@ -86,7 +86,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 			}
 		}
 		groundSolver.removeVariables(varsToRemove.toArray(new Variable[varsToRemove.size()]));
-		
+		logger.info("Removed variables: ");
 		
 		// change CLOSED fluents back to OPEN
 		for(Constraint c : metaValue.getConstraints()) {

@@ -30,22 +30,29 @@ public class TestAAAIDomain {
 		test();
 	}
 	
+	
 	private static void test() {
-		
 		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.FINEST);
 		
-		Callback cb = new Callback() {
-			@Override
-			public void performOperation() {
-				System.out.println("Found a plan? " + planner.backtrack());				
-				planner.draw();
-			}
-		};
-		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), cb);
+		
+		System.out.println("Found a plan? " + planner.backtrack());
+		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.draw();
+		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
+		
+//		Callback cb = new Callback() {
+//			@Override
+//			public void performOperation() {
+//				System.out.println("Found a plan? " + planner.backtrack());
+//				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+//				planner.draw();
+//			}
+//		};
+//		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), cb);
 		
 		
 		System.out.println(planner.getDescription());
@@ -74,13 +81,13 @@ public class TestAAAIDomain {
 	private static void initMetaConstraints() {
 //		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
-		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
+//		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
 		Vector<PlanReportroryItem> operators = AAAIDomain.createOperators(fluentSolver);
 		selectionConstraint.setOperators(operators);
 		Vector<PlanReportroryItem> methods = AAAIDomain.createMethods(fluentSolver);
 		selectionConstraint.setMethods(methods);
 //		planner.addMetaConstraint(preConstraint);
-		planner.addMetaConstraint(applicationConstraint);
+//		planner.addMetaConstraint(applicationConstraint);
 		planner.addMetaConstraint(selectionConstraint);
 	}
 

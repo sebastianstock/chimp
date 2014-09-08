@@ -44,16 +44,16 @@ public class TestPFD0Planner1 {
 	}
 	
 	private static void test() {
-		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
-		planner.addMetaConstraint(preConstraint);
+//		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
+//		planner.addMetaConstraint(preConstraint);
 		
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
-		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
+//		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
 		addMethods(selectionConstraint, fluentSolver);
 		addOperators(selectionConstraint, fluentSolver);	
 		planner.addMetaConstraint(selectionConstraint);
 		
-		planner.addMetaConstraint(applicationConstraint);
+//		planner.addMetaConstraint(applicationConstraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		getmugFluent.setName("get_mug(?mug ?pl none none)");
@@ -90,6 +90,7 @@ public class TestPFD0Planner1 {
 			public void performOperation() {
 				System.out.println("Found a plan? " + planner.backtrack());				
 //				tp.publish(false, true);
+				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 				planner.draw();
 			}
 		};

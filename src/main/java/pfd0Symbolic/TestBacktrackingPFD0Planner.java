@@ -65,7 +65,7 @@ public class TestBacktrackingPFD0Planner {
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINEST);
+		MetaCSPLogging.setLevel(Level.FINE);
 		
 		logger.info("Starting Planning");
 		long startTime = System.nanoTime();
