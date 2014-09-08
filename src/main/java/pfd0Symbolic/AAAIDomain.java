@@ -13,9 +13,9 @@ public class AAAIDomain {
 		String[][] symbols = new String[8][];
 		// predicates  
 		// index: 0
-		symbols[0] = new String[] {"On", "RobotAt", "Holding",
+		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture",
 				"Connected",
-				"!move_base", "!move_base_blind", "!place_object"};	
+				"!move_base", "!move_base_blind", "!place_object", "!move_arm_to_side"};	
 		// race:Kitchenware		
 		// index: 1, 2
 		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", N};
@@ -50,7 +50,8 @@ public class AAAIDomain {
 		symbols[6] = new String[] {"leftArm1", "rightArm1", N};
 		// race:RobotPosture
 		// index: 10, 11 
-		symbols[7] = new String[] {"armTuckedPosture", "armToSidePosture", 
+		symbols[7] = new String[] {
+				"armTuckedPosture", "armToSidePosture", "armUnnamedPosture", "armCarryPosture",
 				"torsoUpPosture", "torsoDownPosture", "torsoMiddlePosture", 
 				N};
 		return symbols;
@@ -106,10 +107,25 @@ public class AAAIDomain {
 		// !move_arms_to_carryposture
 			// hasArmposture ?arm ?armposture
 		
-		// !move_arm_to_side ?whicharm
+		//################### !move_arm_to_side ?whicharm ##########################
 			// hasArmPosture ?arm ?armposture
+		// TODO: here we could restrict the domain of the old posture to be not tucked
+		// + same for the other arm
+		PFD0Precondition oldArmPosture0 = new PFD0Precondition("HasArmPosture", 
+				new String[] {N, N, N, N, N, N, N, "?arm", N, "oldPosture", N}, 
+				new int[] {7,7});
+		oldArmPosture0.setNegativeEffect(true);
 		
-		// !pick_up_object ?object ?arm
+		VariablePrototype newArmPosture0 = new VariablePrototype(groundSolver, "S", 
+				"HasArmPosture", new String[] {N, N, N, N, N, N, N, "?arm", N, "armToSidePosture", N});
+
+		ret.add( new PFD0Operator("!move_arm_to_side", 
+				new String[] {N, N, N, N, N, N, N, "?arm", N, N, N},
+				new PFD0Precondition[]{oldArmPosture0}, 
+				new VariablePrototype[] {newArmPosture0}));
+
+
+		//################ !pick_up_object ?object ?arm #############################
 			// On ?object ?placingarea
 			// RobotAt trixi ?manipulationarea
 			// ismanipulationarea ?manipulationarea
@@ -120,10 +136,6 @@ public class AAAIDomain {
 			
 		
 		//############### !place_object ?object ?arm ?placingArea ###################
-			// robotat ?trixi ?manipulationarea
-			// Manipulationarea
-			// hasplacingarea ?manarea ?placingarea
-			// holding
 		PFD0Precondition holdingPrePlaceObj = new PFD0Precondition("Holding", 
 				new String[] {"?obj", N, N, N, N, N, N, "?arm", N, N, N}, 
 				new int[] {0,0, 7,7});

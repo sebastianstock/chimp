@@ -26,7 +26,8 @@ public class TestAAAIDomain {
 		
 		initMetaConstraints();
 //		AAAIProblems.createProblemMoveBase(fluentSolver);
-		AAAIProblems.createProblemPlaceObject(fluentSolver);
+		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
+//		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		test();
 	}
 	
@@ -39,20 +40,20 @@ public class TestAAAIDomain {
 		MetaCSPLogging.setLevel(Level.FINEST);
 		
 		
-		System.out.println("Found a plan? " + planner.backtrack());
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		planner.draw();
-		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
+//		System.out.println("Found a plan? " + planner.backtrack());
+//		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+//		planner.draw();
+//		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
 		
-//		Callback cb = new Callback() {
-//			@Override
-//			public void performOperation() {
-//				System.out.println("Found a plan? " + planner.backtrack());
-//				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-//				planner.draw();
-//			}
-//		};
-//		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), cb);
+		Callback cb = new Callback() {
+			@Override
+			public void performOperation() {
+				System.out.println("Found a plan? " + planner.backtrack());
+				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+				planner.draw();
+			}
+		};
+		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), cb);
 		
 		
 		System.out.println(planner.getDescription());

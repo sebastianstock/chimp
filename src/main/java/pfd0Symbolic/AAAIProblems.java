@@ -70,5 +70,22 @@ public class AAAIProblems {
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 	
+	public static void createProblemMoveArmToSide(FluentNetworkSolver fluentSolver) {
+		// State
+		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
+		Variable[] stateVars = fluentSolver.createVariables(2);
+		((Fluent) stateVars[0]).setName("HasArmPosture(n n n n n n n leftArm1 n armUnnamedPosture n)");
+		((Fluent) stateVars[1]).setName("HasArmPosture(n n n n n n n rightArm1 n armCarryPosture n)");
+		
+		for(Variable v : stateVars) {
+			v.setMarking(markings.OPEN);
+		}
+		
+		// task
+		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
+		taskFluent.setName("!move_arm_to_side(n n n n n n n leftArm1 n n n)");
+		taskFluent.setMarking(markings.UNPLANNED);
+	}
+
 	
 }
