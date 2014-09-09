@@ -233,8 +233,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	@Override
 	public void markResolvedSub(MetaVariable metaVariable,
 			ConstraintNetwork metaValue) {
-		// TODO if it is a primitive task, set the marking to PLANNED
-		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.SELECTED);
+		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
 	}
 
 	@Override

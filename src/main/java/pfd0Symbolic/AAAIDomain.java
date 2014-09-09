@@ -13,10 +13,15 @@ public class AAAIDomain {
 		String[][] symbols = new String[8][];
 		// predicates  
 		// index: 0
-		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture",
+		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
 				"Connected",
+				// operators
 				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
-				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms"};	
+				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
+				// methods
+				"drive", "assume_default_driving_pose",
+				"move_both_arms_to_side"
+				};	
 		// race:Kitchenware		
 		// index: 1, 2
 		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", N};
@@ -66,21 +71,58 @@ public class AAAIDomain {
 	public static Vector<PlanReportroryItem> createMethods(FluentNetworkSolver groundSolver) {
 		Vector<PlanReportroryItem> ret = new Vector<PlanReportroryItem>();
 		
-		PFD0Precondition onPre = 
-				new PFD0Precondition("on", new String[] {"?mug", "?counter", "none", "none"}, new int[] {0, 0, 1, 1});
-		VariablePrototype drive = new VariablePrototype(groundSolver, "Component", "!drive", new String[] {"none", "?pl", "none", "none"});
-		VariablePrototype grasp = new VariablePrototype(groundSolver, "Component", "!grasp", new String[] {"?mug", "?pl", "none", "none"});
-		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
-		before.setFrom(drive);
-		before.setTo(grasp);
-		PFD0Method getMug1Method = new PFD0Method("get_mug", new String[] {"?mug", "?pl", "none", "none"}, 
-				new PFD0Precondition[] {onPre}, 
-				new VariablePrototype[] {grasp, drive}, 
-				new FluentConstraint[] {before}
-		);
-//		getMug1Method.setDurationBounds(new Bounds(10, 40));
-		ret.add(getMug1Method);
 		
+		// ###################### DRIVE ##########################################################
+		
+		VariablePrototype assume_driving_pose = new VariablePrototype(groundSolver, "M", 
+				"assume_default_driving_pose", new String[] {N, N, N, N, N, N, N, N, N, N, N});
+		VariablePrototype move_base = new VariablePrototype(groundSolver, "M", 
+				"!move_base", new String[] {N, N, N, "?toArea", N, N, N, N, N, N, N});
+		
+		FluentConstraint beforeD1 = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		beforeD1.setFrom(assume_driving_pose);
+		beforeD1.setTo(move_base);
+		ret.add(new PFD0Method("drive", new String[] {N, N, N, "?toArea", N, N, N, N, N, N, N}, 
+				new PFD0Precondition[] {}, 
+				new VariablePrototype[] {move_base, assume_driving_pose}, 
+				new FluentConstraint[] {beforeD1}));
+		
+	// ###################### ASSUME_DEFAULT_DRIVING_POSE ########################################
+		
+		VariablePrototype tuck_arms_A1 = new VariablePrototype(groundSolver, "M", 
+				"!tuck_arms", new String[] {N, N, N, N, N, N, N, "leftArm1", "rightArm1", "armTuckedPosture", "armTuckedPosture"});
+		VariablePrototype move_torso_A1 = new VariablePrototype(groundSolver, "M", 
+				"!move_torso", new String[] {N, N, N, N, N, N, N, N, N, "torsoDownPosture", N});
+
+		FluentConstraint beforeA1 = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		beforeA1.setFrom(tuck_arms_A1);
+		beforeA1.setTo(move_torso_A1);
+		ret.add(new PFD0Method("assume_default_driving_pose", new String[] {N, N, N, N, N, N, N, N, N, N, N}, 
+				new PFD0Precondition[] {}, 
+				new VariablePrototype[] {tuck_arms_A1, move_torso_A1}, 
+				new FluentConstraint[] {beforeA1})); // TODO this before is not needed!
+		
+		// ###################### MOVE_BOTH_ARMS_TO_SIDE_POSE ########################################
+		VariablePrototype tuck_arms_A2 = new VariablePrototype(groundSolver, "M", 
+				"!tuck_arms", new String[] {N, N, N, N, N, N, N, "leftArm1", "rightArm1", "armUnTuckedPosture", "armUnTuckedPosture"});
+		VariablePrototype move_left_to_side_A2 = new VariablePrototype(groundSolver, "M", 
+				"!move_arm_to_side", new String[] {N, N, N, N, N, N, N, "leftArm1", N, N, N});
+		VariablePrototype move_right_to_side_A2 = new VariablePrototype(groundSolver, "M", 
+				"!move_arm_to_side", new String[] {N, N, N, N, N, N, N, "rightArm1", N, N, N});
+		
+		FluentConstraint beforeA2l = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		beforeA2l.setFrom(tuck_arms_A2);
+		beforeA2l.setTo(move_left_to_side_A2);
+		FluentConstraint beforeA2r = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		beforeA2r.setFrom(tuck_arms_A2);
+		beforeA2r.setTo(move_right_to_side_A2);
+		ret.add(new PFD0Method("move_both_arms_to_side", new String[] {N, N, N, N, N, N, N, N, N, N, N}, 
+				new PFD0Precondition[] {}, 
+				new VariablePrototype[] {tuck_arms_A2, move_left_to_side_A2, move_right_to_side_A2}, 
+				new FluentConstraint[] {beforeA2l, beforeA2r}));
+
+		
+		// #########
 		return ret;
 	}
 	
@@ -243,8 +285,19 @@ public class AAAIDomain {
 				new VariablePrototype[] {robotatEffMBB}));
 		
 		
-		// !move_torso ?torsoPostureType
-			// Torsoposture ?oldposture
+		//################# !move_torso ?torsoPostureType ###########################################
+		PFD0Precondition oldTorsoPosture0 = new PFD0Precondition("HasTorsoPosture", 
+				new String[] {N, N, N, N, N, N, N, N, N, "?oldPosture", N}, 
+				new int[] {});
+		oldTorsoPosture0.setNegativeEffect(true);
+		
+		VariablePrototype newTorsoPosture0 = new VariablePrototype(groundSolver, "S", 
+				"HasTorsoPosture", new String[] {N, N, N, N, N, N, N, N, N, "?newPosture", N});
+
+		ret.add( new PFD0Operator("!move_torso", 
+				new String[] {N, N, N, N, N, N, N, N , N, "?newPosture", N},
+				new PFD0Precondition[]{oldTorsoPosture0}, 
+				new VariablePrototype[] {newTorsoPosture0}));
 		
 		return ret;
 		
