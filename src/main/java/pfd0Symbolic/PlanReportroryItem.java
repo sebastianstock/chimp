@@ -227,32 +227,24 @@ public abstract class PlanReportroryItem {
 	 * Creates the connections array for the opens constraint.
 	 * 
 	 * Looks at the arguments of effects and operator to see if they should have an equal constraint.
-	 * @param args Arguments of the operator/method.
+	 * @param prototypeargs Arguments of the effect.
 	 * @return Array representing the connections.
 	 */
-	protected int[] createConnections(String[] args) {
-		boolean[] matches = new boolean[args.length];
-		int matchesCnt = 0;
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith("?") && args[i].equals(this.arguments[i])) {
-				matches[i] = true;
-				matchesCnt++;
-			}
-		}
-		if (matchesCnt > 0) {
-			int[] connections = new int[matchesCnt * 2];
-			int j = 0;
-			for (int i = 0; i < matches.length; i++) {
-				if (matches[i])  {
-					connections[j] = i;
-					connections[j+1] = i;
-					j += 2;
+	protected int[] createConnections(String[] prototypeargs) {
+		List<Integer> connections = new ArrayList<Integer>();
+		for (int i = 0; i < prototypeargs.length; i++) {
+			for (int j = 0; j < arguments.length; j++) {
+				if (prototypeargs[i].startsWith("?") && prototypeargs[i].equals(this.arguments[j])) {
+					connections.add(new Integer(j));
+					connections.add(new Integer(i));
 				}
 			}
-			return connections;
 		}
-		else 
-			return null;
+		int[] ret = new int[connections.size()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = connections.get(i).intValue();
+		}
+		return ret;
 	}
 	
 	/**
