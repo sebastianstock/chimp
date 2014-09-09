@@ -15,7 +15,8 @@ public class AAAIDomain {
 		// index: 0
 		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture",
 				"Connected",
-				"!move_base", "!move_base_blind", "!place_object", "!move_arm_to_side"};	
+				"!move_base", "!move_base_blind", "!place_object", 
+				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms"};	
 		// race:Kitchenware		
 		// index: 1, 2
 		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", N};
@@ -51,7 +52,7 @@ public class AAAIDomain {
 		// race:RobotPosture
 		// index: 10, 11 
 		symbols[7] = new String[] {
-				"armTuckedPosture", "armToSidePosture", "armUnnamedPosture", "armCarryPosture",
+				"armTuckedPosture", "armUnTuckedPosture", "armToSidePosture", "armUnnamedPosture", "armCarryPosture",
 				"torsoUpPosture", "torsoDownPosture", "torsoMiddlePosture", 
 				N};
 		return symbols;
@@ -101,18 +102,55 @@ public class AAAIDomain {
 	public static Vector<PlanReportroryItem> createOperators(FluentNetworkSolver groundSolver) {
 		Vector<PlanReportroryItem> ret = new Vector<PlanReportroryItem>();
 		
-		// !tuck_arms ?leftarmgoal ?rightarmgoal
-			// hasArmposture ?arm ?armposture
+		//###################### !tuck_arms ?leftarmgoal ?rightarmgoal ##############################
+		PFD0Precondition oldArmPosture3 = new PFD0Precondition("HasArmPosture", 
+				new String[] {N, N, N, N, N, N, N, "leftArm1", N, "?oldPosture1", N}, 
+				new int[] {7,7});
+		oldArmPosture3.setNegativeEffect(true);
+		PFD0Precondition oldArmPosture4 = new PFD0Precondition("HasArmPosture", 
+				new String[] {N, N, N, N, N, N, N, "rightArm1", N, "?oldPosture2", N}, 
+				new int[] {7, 8});
+		oldArmPosture4.setNegativeEffect(true);
 		
-		// !move_arms_to_carryposture
-			// hasArmposture ?arm ?armposture
+		// TODO make sure that the goal is in {ArmTuckedPosture, ArmUnTuckedPosture
+		VariablePrototype newArmPosture3 = new VariablePrototype(groundSolver, "S", 
+				"HasArmPosture", new String[] {N, N, N, N, N, N, N, "leftArm1", N, "?leftGoal", N});
+		VariablePrototype newArmPosture4 = new VariablePrototype(groundSolver, "S", 
+				"HasArmPosture", new String[] {N, N, N, N, N, N, N, "rightArm1", N, "?rightGoal", N});
+
+		ret.add( new PFD0Operator("!tuck_arms", 
+				new String[] {N, N, N, N, N, N, N, "leftArm1", "rightArm1", "?leftGoal", "?rightGoal"},
+				new PFD0Precondition[]{oldArmPosture3, oldArmPosture4}, 
+				new VariablePrototype[] {newArmPosture3, newArmPosture4}));
 		
-		//################### !move_arm_to_side ?whicharm ##########################
+		
+		//################ !move_arms_to_carryposture ################################################
+		// TODO make sure that torso is down
+		PFD0Precondition oldArmPosture1 = new PFD0Precondition("HasArmPosture", 
+				new String[] {N, N, N, N, N, N, N, "leftArm1", N, "?oldPosture1", N}, 
+				new int[] {7,7});
+		oldArmPosture1.setNegativeEffect(true);
+		PFD0Precondition oldArmPosture2 = new PFD0Precondition("HasArmPosture", 
+				new String[] {N, N, N, N, N, N, N, "rightArm1", N, "?oldPosture2", N}, 
+				new int[] {7, 8});
+		oldArmPosture2.setNegativeEffect(true);
+		
+		VariablePrototype newArmPosture1 = new VariablePrototype(groundSolver, "S", 
+				"HasArmPosture", new String[] {N, N, N, N, N, N, N, "leftArm1", N, "armCarryPosture", N});
+		VariablePrototype newArmPosture2 = new VariablePrototype(groundSolver, "S", 
+				"HasArmPosture", new String[] {N, N, N, N, N, N, N, "rightArm1", N, "armCarryPosture", N});
+
+		ret.add( new PFD0Operator("!move_arms_to_carryposture", 
+				new String[] {N, N, N, N, N, N, N, "leftArm1", "rightArm1", N, N},
+				new PFD0Precondition[]{oldArmPosture1, oldArmPosture2}, 
+				new VariablePrototype[] {newArmPosture1, newArmPosture2}));
+		
+		//################### !move_arm_to_side ?whicharm ###########################################
 			// hasArmPosture ?arm ?armposture
 		// TODO: here we could restrict the domain of the old posture to be not tucked
 		// + same for the other arm
 		PFD0Precondition oldArmPosture0 = new PFD0Precondition("HasArmPosture", 
-				new String[] {N, N, N, N, N, N, N, "?arm", N, "oldPosture", N}, 
+				new String[] {N, N, N, N, N, N, N, "?arm", N, "?oldPosture", N}, 
 				new int[] {7,7});
 		oldArmPosture0.setNegativeEffect(true);
 		
@@ -125,7 +163,7 @@ public class AAAIDomain {
 				new VariablePrototype[] {newArmPosture0}));
 
 
-		//################ !pick_up_object ?object ?arm #############################
+		//################ !pick_up_object ?object ?arm #############################################
 			// On ?object ?placingarea
 			// RobotAt trixi ?manipulationarea
 			// ismanipulationarea ?manipulationarea

@@ -26,7 +26,9 @@ public class TestAAAIDomain {
 		
 		initMetaConstraints();
 //		AAAIProblems.createProblemMoveBase(fluentSolver);
-		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
+//		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
+//		AAAIProblems.createProblemMoveArmsToCarryposture(fluentSolver);
+		AAAIProblems.createProblemTuckArms(fluentSolver);
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		test();
 	}
