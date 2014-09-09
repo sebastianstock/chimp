@@ -15,7 +15,7 @@ public class AAAIDomain {
 		// index: 0
 		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture",
 				"Connected",
-				"!move_base", "!move_base_blind", "!place_object", 
+				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms"};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -171,6 +171,26 @@ public class AAAIDomain {
 			// Holding ?arm ?object
 			// Armposture ?arm ?armtosideposture
 			// torsoposture ?torso ?torsoposture
+		// TODO: NOT HOLDING
+		PFD0Precondition onPrePickObj = new PFD0Precondition("On", 
+				new String[] {"?obj", N, "?fromArea", N, N, N, N, N, N, N, N}, 
+				new int[] {0,0, 2,2});
+		onPrePickObj.setNegativeEffect(true);
+		PFD0Precondition atPrePickObj = new PFD0Precondition("RobotAt", 
+				new String[] {N, N, N, "?mArea", N, N, N, N, N, N, N}, 
+				new int[] {3, 3});
+		PFD0Precondition connectedPickObj = new PFD0Precondition("Connected", 
+				new String[] {N, N, "?fromArea", "?mArea", N, N, N, N, N, N, N}, 
+				new int[] {2,2, 3, 3});
+		
+		VariablePrototype holdingEffPickObj = new VariablePrototype(groundSolver, "S", 
+				"Holding", new String[] {"?obj", N, N, N, N, N, N, "?arm", N, N, N});
+
+		// TODO delete old armposture and create new
+		ret.add( new PFD0Operator("!pick_up_object", 
+				new String[] {"?obj", N, "?fromArea", "?mArea?", N, N, N, "?arm", N, N, N}, // head
+				new PFD0Precondition[]{onPrePickObj, atPrePickObj, connectedPickObj}, 
+				new VariablePrototype[] {holdingEffPickObj}));
 			
 		
 		//############### !place_object ?object ?arm ?placingArea ###################

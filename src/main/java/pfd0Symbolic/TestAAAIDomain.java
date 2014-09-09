@@ -28,7 +28,8 @@ public class TestAAAIDomain {
 //		AAAIProblems.createProblemMoveBase(fluentSolver);
 //		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
 //		AAAIProblems.createProblemMoveArmsToCarryposture(fluentSolver);
-		AAAIProblems.createProblemTuckArms(fluentSolver);
+//		AAAIProblems.createProblemTuckArms(fluentSolver);
+		AAAIProblems.createProblemPickUpObject(fluentSolver);
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		test();
 	}
