@@ -44,16 +44,16 @@ public class TestTray {
 	}
 	
 	private static void test() {
-		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
-		planner.addMetaConstraint(preConstraint);
+//		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
+//		planner.addMetaConstraint(preConstraint);
 		
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
-		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
+//		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
 		addMethods(selectionConstraint, fluentSolver);
 		addOperators(selectionConstraint, fluentSolver);	
 		planner.addMetaConstraint(selectionConstraint);
 		
-		planner.addMetaConstraint(applicationConstraint);
+//		planner.addMetaConstraint(applicationConstraint);
 		
 		Fluent putTrayFluent = (Fluent) fluentSolver.createVariable("Robot1");
 		putTrayFluent.setName("put_mugs_on_tray(mug1 mug2 trayArea1 none none)");
