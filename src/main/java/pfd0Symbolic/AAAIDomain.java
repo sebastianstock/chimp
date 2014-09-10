@@ -19,8 +19,8 @@ public class AAAIDomain {
 				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
 				// methods
-				"drive", "assume_default_driving_pose",
-				"move_both_arms_to_side"
+				"drive", "assume_default_driving_pose", "assume_manipulation_pose",
+				"move_both_arms_to_side", "grasp_object_w_arm"
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -40,7 +40,7 @@ public class AAAIDomain {
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"preManipulationAreaNorthTable1", "preManipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
-				"preManipulationConstraintWestTable2", "preManipulationConstraintEastTable2",
+				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
 				"floorAreaTamsRestaurant1", 
 				"sittingAreaWestTable1", "sittingAreaEastTable1",
 				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
@@ -121,6 +121,64 @@ public class AAAIDomain {
 				new VariablePrototype[] {tuck_arms_A2, move_left_to_side_A2, move_right_to_side_A2}, 
 				new FluentConstraint[] {beforeA2l, beforeA2r}));
 
+		
+	// ###################### ASSUME_MANIPULATION_POSE ########################################
+		PFD0Precondition atM1 = new PFD0Precondition("RobotAt", 
+				new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N}, 
+				new int[] {3, 4});
+		PFD0Precondition connectedM1 = new PFD0Precondition("Connected", 
+				new String[] {N, N, "?plArea", "?manArea", "?preArea", N, N, N, N, N, N}, 
+				new int[] {3, 3, 4, 4});
+		
+		VariablePrototype move_torso_M1 = new VariablePrototype(groundSolver, "M", 
+				"!move_torso", new String[] {N, N, N, N, N, N, N, N, N, "torsoUpPosture", N});
+		VariablePrototype move_both_M1 = new VariablePrototype(groundSolver, "M", 
+				"move_both_arms_to_side", new String[] {N, N, N, N, N, N, N, N, N, N, N});
+		VariablePrototype move_blind_M1 = new VariablePrototype(groundSolver, "M", 
+				"!move_base_blind", new String[] {N, N, N, "?manArea", N, N, N, N, N, N, N});
+
+		FluentConstraint beforeM1a = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		beforeM1a.setFrom(move_torso_M1);
+		beforeM1a.setTo(move_blind_M1);
+		FluentConstraint beforeM1b = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		beforeM1b.setFrom(move_both_M1);
+		beforeM1b.setTo(move_blind_M1);
+		
+		ret.add(new PFD0Method("assume_manipulation_pose", new String[] {N, N, N, "?manArea", "?preArea", N, N, N, N, N, N}, 
+				new PFD0Precondition[] {},//atM1, connectedM1}, 
+				new VariablePrototype[] {move_torso_M1, move_both_M1, move_blind_M1}, 
+				new FluentConstraint[] {beforeM1a, beforeM1b}));
+		
+	// ###################### GRASP_OBJECT ########################################
+			PFD0Precondition atG1 = new PFD0Precondition("RobotAt", 
+					new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N}, 
+					new int[] {3, 4});
+			PFD0Precondition connectedG1 = new PFD0Precondition("Connected", 
+					new String[] {N, N, "?plArea", "?manArea", "?preArea", N, N, N, N, N, N}, 
+					new int[] {2,2, 3,3, 4,4});
+			PFD0Precondition onG1 = new PFD0Precondition("On", 
+					new String[] {"?obj", N, "?plArea", N, N, N, N, N, N, N, N}, 
+					new int[] {0,0, 2,2});
+			
+			VariablePrototype assume_G1 = new VariablePrototype(groundSolver, "M", 
+					"assume_manipulation_pose", new String[] {N, N, N, "?manArea", "?preArea", N, N, N, N, N, N});
+			VariablePrototype pick_L1 = new VariablePrototype(groundSolver, "M", 
+					"!pick_up_object", new String[] {"?obj", N, "?plArea", "?manArea", N, N, N, "?arm", N, N, N});
+			VariablePrototype move_blind_L1 = new VariablePrototype(groundSolver, "M", 
+					"!move_base_blind", new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N});
+
+			FluentConstraint beforeL1a = new FluentConstraint(FluentConstraint.Type.BEFORE);
+			beforeL1a.setFrom(assume_G1);
+			beforeL1a.setTo(pick_L1);
+			FluentConstraint beforeL1b = new FluentConstraint(FluentConstraint.Type.BEFORE);
+			beforeL1b.setFrom(pick_L1);
+			beforeL1b.setTo(move_blind_L1);
+			
+			ret.add(new PFD0Method("grasp_object_w_arm", new String[] {"?obj", N, "?plArea", "?manArea", "?preArea", N, N, "?arm", N, N, N}, 
+					new PFD0Precondition[] {atG1, connectedG1, onG1}, 
+					new VariablePrototype[] {assume_G1, pick_L1},//, move_blind_L1}, 
+					new FluentConstraint[] {beforeL1a}//, beforeL1b}
+			));
 		
 		// #########
 		return ret;
@@ -206,13 +264,6 @@ public class AAAIDomain {
 
 
 		//################ !pick_up_object ?object ?arm #############################################
-			// On ?object ?placingarea
-			// RobotAt trixi ?manipulationarea
-			// ismanipulationarea ?manipulationarea
-			// hasplacingarea ?manarea ?placingarea
-			// Holding ?arm ?object
-			// Armposture ?arm ?armtosideposture
-			// torsoposture ?torso ?torsoposture
 		// TODO: NOT HOLDING
 		PFD0Precondition onPrePickObj = new PFD0Precondition("On", 
 				new String[] {"?obj", N, "?fromArea", N, N, N, N, N, N, N, N}, 
@@ -222,7 +273,7 @@ public class AAAIDomain {
 				new String[] {N, N, N, "?mArea", N, N, N, N, N, N, N}, 
 				new int[] {3, 3});
 		PFD0Precondition connectedPickObj = new PFD0Precondition("Connected", 
-				new String[] {N, N, "?fromArea", "?mArea", N, N, N, N, N, N, N}, 
+				new String[] {N, N, "?fromArea", "?mArea", "?preArea", N, N, N, N, N, N}, 
 				new int[] {2,2, 3, 3});
 		
 		VariablePrototype holdingEffPickObj = new VariablePrototype(groundSolver, "S", 
@@ -244,7 +295,7 @@ public class AAAIDomain {
 				new String[] {N, N, N, "?mArea", N, N, N, N, N, N, N}, 
 				new int[] {3, 3});
 		PFD0Precondition connectedPlaceObj = new PFD0Precondition("Connected", 
-				new String[] {N, N, "?toArea", "?mArea", N, N, N, N, N, N, N}, 
+				new String[] {N, N, "?toArea", "?mArea", "?preArea", N, N, N, N, N, N}, 
 				new int[] {2,2, 3, 3});
 		
 		VariablePrototype onEffPlaceObj = new VariablePrototype(groundSolver, "S", 
@@ -275,6 +326,9 @@ public class AAAIDomain {
 				new String[] {N, N, N, "?formArea", N, N, N, N, N, N, N}, 
 				new int[] {});
 		atPreMBB.setNegativeEffect(true);
+		
+		// TODO: check if they are connected
+		// this is only possible if we can have binding constraints between preconditions and effects
 		
 		VariablePrototype robotatEffMBB = new VariablePrototype(groundSolver, "S", 
 				"RobotAt", new String[] {N, N, N, "?toArea", N, N, N, N, N, N, N});

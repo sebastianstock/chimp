@@ -47,15 +47,15 @@ public class AAAIProblems {
 		
 		((Fluent) stateVars[1]).setName("RobotAt(n n n manipulationAreaSouthTable1 n n n n n n n)");
 		
-		((Fluent) stateVars[2]).setName("Connected(n n placingAreaEastRightCounter1 manipulationAreaEastCounter1 n n n n n n n)");
-		((Fluent) stateVars[3]).setName("Connected(n n placingAreaWestLeftTable1 manipulationAreaNorthTable1 n n n n n n n)");
-		((Fluent) stateVars[4]).setName("Connected(n n placingAreaEastLeftTable1 manipulationAreaSouthTable1 n n n n n n n)");
-		((Fluent) stateVars[5]).setName("Connected(n n placingAreaWestRightTable1 manipulationAreaSouthTable1 n n n n n n n)");
-		((Fluent) stateVars[6]).setName("Connected(n n placingAreaEastRightTable1 manipulationAreaNorthTable1 n n n n n n n)");
-		((Fluent) stateVars[7]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2 n n n n n n n)");
-		((Fluent) stateVars[8]).setName("Connected(n n placingAreaNorthRightTable2 manipulationAreaWestTable2 n n n n n n n)");
-		((Fluent) stateVars[9]).setName("Connected(n n placingAreaSouthLeftTable2 manipulationAreaWestTable2 n n n n n n n)");
-		((Fluent) stateVars[10]).setName("Connected(n n placingAreaSouthRightTable2 manipulationAreaEastTable2 n n n n n n n)");
+		((Fluent) stateVars[2]).setName("Connected(n n placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1 n n n n n n)");
+		((Fluent) stateVars[3]).setName("Connected(n n placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
+		((Fluent) stateVars[4]).setName("Connected(n n placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
+		((Fluent) stateVars[5]).setName("Connected(n n placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
+		((Fluent) stateVars[6]).setName("Connected(n n placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
+		((Fluent) stateVars[7]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2 n n n n n)");
+		((Fluent) stateVars[8]).setName("Connected(n n placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
+		((Fluent) stateVars[9]).setName("Connected(n n placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
+		((Fluent) stateVars[10]).setName("Connected(n n placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2 n n n n n n)");
 
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
@@ -74,16 +74,15 @@ public class AAAIProblems {
 		
 		((Fluent) stateVars[1]).setName("RobotAt(n n n manipulationAreaSouthTable1 n n n n n n n)");
 		
-		((Fluent) stateVars[2]).setName("Connected(n n placingAreaEastRightCounter1 manipulationAreaEastCounter1 n n n n n n n)");
-		((Fluent) stateVars[3]).setName("Connected(n n placingAreaWestLeftTable1 manipulationAreaNorthTable1 n n n n n n n)");
-		((Fluent) stateVars[4]).setName("Connected(n n placingAreaEastLeftTable1 manipulationAreaSouthTable1 n n n n n n n)");
-		((Fluent) stateVars[5]).setName("Connected(n n placingAreaWestRightTable1 manipulationAreaSouthTable1 n n n n n n n)");
-		((Fluent) stateVars[6]).setName("Connected(n n placingAreaEastRightTable1 manipulationAreaNorthTable1 n n n n n n n)");
-		((Fluent) stateVars[7]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2 n n n n n n n)");
-		((Fluent) stateVars[8]).setName("Connected(n n placingAreaNorthRightTable2 manipulationAreaWestTable2 n n n n n n n)");
-		((Fluent) stateVars[9]).setName("Connected(n n placingAreaSouthLeftTable2 manipulationAreaWestTable2 n n n n n n n)");
-		((Fluent) stateVars[10]).setName("Connected(n n placingAreaSouthRightTable2 manipulationAreaEastTable2 n n n n n n n)");
-
+		((Fluent) stateVars[2]).setName("Connected(n n placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1 n n n n n n)");
+		((Fluent) stateVars[3]).setName("Connected(n n placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
+		((Fluent) stateVars[4]).setName("Connected(n n placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
+		((Fluent) stateVars[5]).setName("Connected(n n placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
+		((Fluent) stateVars[6]).setName("Connected(n n placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
+		((Fluent) stateVars[7]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2 n n n n n n)");
+		((Fluent) stateVars[8]).setName("Connected(n n placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
+		((Fluent) stateVars[9]).setName("Connected(n n placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
+		((Fluent) stateVars[10]).setName("Connected(n n placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2 n n n n n n)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
 		// task
@@ -172,18 +171,36 @@ public class AAAIProblems {
 	public static void createProblemGraspM(FluentNetworkSolver fluentSolver) {
 		// State
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
-		Variable[] stateVars = fluentSolver.createVariables(4);
+		createStaticKnowledge(fluentSolver);
+		
+		Variable[] stateVars = fluentSolver.createVariables(5);
 		((Fluent) stateVars[0]).setName("RobotAt(n n n preManipulationAreaSouthTable1 n n n n n n n)");
 		((Fluent) stateVars[1]).setName("HasTorsoPosture(n n n n n n n n n torsoDownPosture n)");
 		((Fluent) stateVars[2]).setName("HasArmPosture(n n n n n n n leftArm1 n armTuckedPosture n)");
 		((Fluent) stateVars[3]).setName("HasArmPosture(n n n n n n n rightArm1 n armTuckedPosture n)");
-		
+		((Fluent) stateVars[4]).setName("On(mug1 n placingAreaWestRightTable1 n n n n n n n n)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
 		// task
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
-		taskFluent.setName("move_both_arms_to_side(n n n n n n n n n n n)");
+		taskFluent.setName("grasp_object_w_arm(mug1 n placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n leftArm1 n n n)");
+		// the following alternative takes forever
+//		taskFluent.setName("assume_manipulation_pose(n n n manipulationAreaSouthTable1 ?preManipulationAreaSouthTable1 n n n n n n)");
 		taskFluent.setMarking(markings.UNPLANNED);
+	}
+	
+	public static void createStaticKnowledge(FluentNetworkSolver fluentSolver) {
+		Variable[] stateVars = fluentSolver.createVariables(9);
+		((Fluent) stateVars[0]).setName("Connected(n n placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1 n n n n n n)");
+		((Fluent) stateVars[1]).setName("Connected(n n placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
+		((Fluent) stateVars[2]).setName("Connected(n n placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
+		((Fluent) stateVars[3]).setName("Connected(n n placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
+		((Fluent) stateVars[4]).setName("Connected(n n placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
+		((Fluent) stateVars[5]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2 n n n n n n)");
+		((Fluent) stateVars[6]).setName("Connected(n n placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
+		((Fluent) stateVars[7]).setName("Connected(n n placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
+		((Fluent) stateVars[8]).setName("Connected(n n placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2 n n n n n n)");
+		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 	}
 
 	

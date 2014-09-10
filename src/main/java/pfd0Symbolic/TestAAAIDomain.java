@@ -44,7 +44,7 @@ public class TestAAAIDomain {
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINEST);
+		MetaCSPLogging.setLevel(Level.FINE);
 		
 		
 //		System.out.println("Found a plan? " + planner.backtrack());
@@ -55,8 +55,11 @@ public class TestAAAIDomain {
 		Callback cb = new Callback() {
 			@Override
 			public void performOperation() {
+				long startTime = System.nanoTime();
 				System.out.println("Found a plan? " + planner.backtrack());
-				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+				long endTime = System.nanoTime();
+				System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
+//				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 				planner.draw();
 			}
 		};
@@ -67,19 +70,22 @@ public class TestAAAIDomain {
 //		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[2].getConstraintNetwork());
 		
 		
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		Variable[] vars = fluentSolver.getVariables();
-		ArrayList<String> results = new ArrayList<String>();
-		for (int i = 0; i < vars.length; i++) {
-			results.add(i, ((Fluent) vars[i]).getCompoundSymbolicVariable().getName());
-		}
-
-		System.out.println(results);
+//		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+//		Variable[] vars = fluentSolver.getVariables();
+//		ArrayList<String> results = new ArrayList<String>();
+//		for (int i = 0; i < vars.length; i++) {
+//			results.add(i, ((Fluent) vars[i]).getCompoundSymbolicVariable().getName());
+//		}
+//
+//		System.out.println(results);
+		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), "Constraint Network");
 //		ConstraintNetwork.draw(((TypedCompoundSymbolicVariableConstraintSolver)fluentSolver.getConstraintSolvers()[0]).getConstraintNetwork(), "Constraint Network");
 		// TODO following line makes sure that symbolicvariables values are set, but may take to long if we do that always.
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-//		TypedCompoundSymbolicVariableConstraintSolver compoundS = ((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]);
+		
+//		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+
+		//		TypedCompoundSymbolicVariableConstraintSolver compoundS = ((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]);
 //		SymbolicVariableConstraintSolver ssolver = (SymbolicVariableConstraintSolver) compoundS.getConstraintSolvers()[2];
 //		ConstraintNetwork.draw(ssolver.getConstraintNetwork());
 		
