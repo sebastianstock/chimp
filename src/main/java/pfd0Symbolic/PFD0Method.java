@@ -1,7 +1,9 @@
 package pfd0Symbolic;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
@@ -71,7 +73,13 @@ public class PFD0Method extends PlanReportroryItem {
 	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		List<Variable> newFluents = new ArrayList<Variable>();
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
+		
+		// before constraints from that goal task to another task at the same level.
+		List<FluentConstraint> tasksBeforeConstrs = 
+				groundSolver.getFluentConstraintsOfTypeFrom(taskfluent, FluentConstraint.Type.BEFORE);
 
+		Set<Variable> subtasksWithoutSuccessor = new HashSet<Variable>();
+		
 		// create prototypes and decomposition constraints
 		if (subtaskprototypes != null) {
 			for (VariablePrototype sub : subtaskprototypes) {
@@ -84,14 +92,33 @@ public class PFD0Method extends PlanReportroryItem {
 				dc.setFrom(taskfluent);
 				dc.setTo(sub);
 				newConstraints.add(dc);
+				
+				subtasksWithoutSuccessor.add(sub);
 			}
 		}
 		if (constraints != null) {
 			for (Constraint c : constraints) {
 				newConstraints.add(c);
+				
+				if(c instanceof FluentConstraint 
+						&& ((FluentConstraint) c).getType() == FluentConstraint.Type.BEFORE) {
+					subtasksWithoutSuccessor.remove(c.getScope()[0]);
+				}
 			}
 		}
+		
+		for (Variable v : subtasksWithoutSuccessor) {
+			for (FluentConstraint c : tasksBeforeConstrs) {
+				FluentConstraint bc = 
+						new FluentConstraint(FluentConstraint.Type.BEFORE);
+				bc.setFrom(v);
+				bc.setTo(c.getScope()[1]);
+				newConstraints.add(bc);
+			}
+		}
+
 		return newConstraints;
 	}
+	
 
 }

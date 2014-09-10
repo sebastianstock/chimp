@@ -80,6 +80,20 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		}
 		return ret;
 	}
+	
+	public List<FluentConstraint> getFluentConstraintsOfTypeFrom(Variable from, FluentConstraint.Type type) {
+		ArrayList<FluentConstraint> ret = new ArrayList<FluentConstraint>(8);
+		for (Constraint con : this.getConstraints()) {
+			if (con.getScope().length == 2 && con.getScope()[0].equals(from)) {
+				if (con instanceof FluentConstraint) {
+					if(((FluentConstraint) con).getType() == type) {
+						ret.add((FluentConstraint) con);
+					}
+				}
+			}
+		}
+		return ret;
+	}
 
 
 }

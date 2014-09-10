@@ -129,13 +129,12 @@ public abstract class PlanReportroryItem {
 	}
 	
 	/**
-	 * Creates the dummy preconditions for a task + Adds Duration constraint
+	 * Expands preconditions and effects of a task + Adds Duration constraint
 	 * @param taskfluent The task that has to be expanded.
 	 * @param groundSolver The groundSolver.
-	 * @return The resulting ConstraintNetwork witht the added dummy preconditions.
+	 * @return The resulting ConstraintNetwork.
 	 */
-	public List<ConstraintNetwork> expandPreconditions(Fluent taskfluent,
-			FluentNetworkSolver groundSolver) {
+	public List<ConstraintNetwork> expand(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		Fluent[] openFluents = groundSolver.getOpenFluents();

@@ -211,7 +211,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 //				}
 				
 				logger.fine("Applying preconditions of PlanReportroryItem " + item);
-				List<ConstraintNetwork> newResolvers = item.expandPreconditions(fl,  groundSolver);
+				List<ConstraintNetwork> newResolvers = item.expand(fl,  groundSolver);
 				for (ConstraintNetwork newResolver : newResolvers) {
 					ret.add(newResolver);
 				}
