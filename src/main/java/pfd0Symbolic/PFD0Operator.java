@@ -57,24 +57,34 @@ public class PFD0Operator extends PlanReportroryItem {
 	}
 	
 	@Override
-	@Deprecated
-	public ConstraintNetwork expandTail(Fluent taskfluent,
+	public ConstraintNetwork expandOnlyTail(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		
 		Vector<Variable> newFluents = new Vector<Variable>();
 		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
 		
-//		// close negative effects
-//		for (FluentConstraint con : 
-//				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
-//			if (con.isNegativeEffect()) {
-//				FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-//				closes.setFrom(taskfluent);
-//				closes.setTo(con.getFrom());
-//				newConstraints.add(closes);
-//			}
-//		}
+		// close negative effects
+		for (FluentConstraint con : 
+				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
+			if (con.isNegativeEffect()) {
+				Fluent dummyPre = (Fluent) con.getFrom();
+				List<FluentConstraint> matches = 
+						groundSolver.getFluentConstraintsOfTypeTo(dummyPre, FluentConstraint.Type.MATCHES);
+				if (matches.size() == 1) {
+					Fluent matchingFluent = (Fluent) matches.get(0).getFrom();
+					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+					closes.setFrom(taskfluent);
+					closes.setTo(matchingFluent);
+					newConstraints.add(closes);
+				} else if (matches.size() == 0) {
+					logger.info("Trying to set negative effect but" +  dummyPre.toString() 
+							+ " has no matches.");
+				} else if (matches.size() > 1){
+					logger.info("Trying to set negative effect but found more than one matching fluents for precondition " + dummyPre.toString());
+				}
+			}
+		}
 		
 		// add positive effects
 		if (positiveEffects != null) {
@@ -98,7 +108,7 @@ public class PFD0Operator extends PlanReportroryItem {
 	}
 	
 	@Override
-	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<Constraint> expandEffectsOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		Vector<Variable> newFluents = new Vector<Variable>();
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 

@@ -64,7 +64,7 @@ public class TestIranResource0 {
 		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		planner.addMetaConstraint(preConstraint);
 		
-		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint(new int[] {1}, new String[] {"arm"}, "TestIran");
+		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint(new int[] {1}, new String[] {"arm"}, "TestIran", true);
 		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
 		addMethods(selectionConstraint, fluentSolver);
 		addOperators(selectionConstraint, fluentSolver);	

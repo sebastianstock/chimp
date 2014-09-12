@@ -29,40 +29,10 @@ public class PFD0Method extends PlanReportroryItem {
 	
 	
 	@Override
-	@Deprecated
-	public ConstraintNetwork expandTail(Fluent taskfluent,
-			FluentNetworkSolver groundSolver) {
+	public ConstraintNetwork expandOnlyTail(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
-
-		Vector<Variable> newFluents = new Vector<Variable>();
-		Vector<Constraint> newConstraints = new Vector<Constraint>();
-
-		// create prototypes and decomposition constraints
-		if (subtaskprototypes == null)
-			return ret;
-		for (VariablePrototype sub : subtaskprototypes) {
-			sub.setMarking(markings.UNPLANNED);
-			newFluents.add(sub);
-			// create dc constraint
-			String[] arguments = (String[])((VariablePrototype) sub).getParameters()[2];
-			FluentConstraint dc = 
-					new FluentConstraint(FluentConstraint.Type.DC, createConnections(arguments));
-			dc.setFrom(taskfluent);
-			dc.setTo(sub);
-			newConstraints.add(dc);
-		}
-		if (constraints != null) {
-			for (Constraint c : constraints) {
-				newConstraints.add(c);
-			}
-		}
 		
-
-		// TODO add fluents for the preconditions
-		// TODO add constraints for the preconditions
-
-		// add constraints to the network
-		for (Constraint con : newConstraints)
+		for (Constraint con : this.expandEffectsOneShot(taskfluent, groundSolver))
 			ret.addConstraint(con);
 
 		return ret;
@@ -70,14 +40,13 @@ public class PFD0Method extends PlanReportroryItem {
 
 
 	@Override
-	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<Constraint> expandEffectsOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		List<Variable> newFluents = new ArrayList<Variable>();
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 		
 		// before constraints from that goal task to another task at the same level.
 		List<FluentConstraint> tasksBeforeConstrs = 
 				groundSolver.getFluentConstraintsOfTypeFrom(taskfluent, FluentConstraint.Type.BEFORE);
-
 		Set<Variable> subtasksWithoutSuccessor = new HashSet<Variable>();
 		
 		// create prototypes and decomposition constraints

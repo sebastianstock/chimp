@@ -129,12 +129,43 @@ public abstract class PlanReportroryItem {
 	}
 	
 	/**
+	 * Creates the dummy preconditions for a task + Adds Duration constraint
+	 * @param taskfluent The task that has to be expanded.
+	 * @param groundSolver The groundSolver.
+	 * @return The resulting ConstraintNetwork witht the added dummy preconditions.
+	 */
+	public ConstraintNetwork expandPreconditions(Fluent taskfluent,
+			FluentNetworkSolver groundSolver) {
+		
+		ConstraintNetwork ret = new ConstraintNetwork(null);
+		if(this.preconditions != null) {
+			for (PFD0Precondition pre : this.preconditions) {
+				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
+			}
+		}
+		// Add a UNARYAPPLIED to remember which method/operator has been used.
+		FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
+				this);
+		applicationconstr.setFrom(taskfluent);
+		applicationconstr.setTo(taskfluent);
+		ret.addConstraint(applicationconstr);
+		
+		if (durationBounds != null) {
+			AllenIntervalConstraint duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
+			duration.setFrom(taskfluent.getAllenInterval());
+			duration.setTo(taskfluent.getAllenInterval());
+			ret.addConstraint(duration);
+		}
+		return ret;		
+	}
+	
+	/**
 	 * Expands preconditions and effects of a task + Adds Duration constraint
 	 * @param taskfluent The task that has to be expanded.
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork.
 	 */
-	public List<ConstraintNetwork> expand(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<ConstraintNetwork> expandOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		Fluent[] openFluents = groundSolver.getOpenFluents();
@@ -181,7 +212,7 @@ public abstract class PlanReportroryItem {
 			}
 			
 			// add positive effects/decomposition
-			for (Constraint con : expandEffects(taskfluent, groundSolver)) {
+			for (Constraint con : expandEffectsOneShot(taskfluent, groundSolver)) {
 				cn.addConstraint(con);
 			}
 			
@@ -211,7 +242,7 @@ public abstract class PlanReportroryItem {
 	 * @return The resulting ConstraintNetwork after applying the operator/method.
 	 */
 	@Deprecated
-	public abstract ConstraintNetwork expandTail(Fluent taskfluent, FluentNetworkSolver groundSolver);
+	public abstract ConstraintNetwork expandOnlyTail(Fluent taskfluent, FluentNetworkSolver groundSolver);
 	
 	/**
 	 * Applies the method or operator to one task.
@@ -219,7 +250,7 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return Constraints representing the decompositions or positive effects
 	 */
-	public abstract List<Constraint> expandEffects(Fluent taskfluent, 
+	public abstract List<Constraint> expandEffectsOneShot(Fluent taskfluent, 
 			FluentNetworkSolver groundSolver);
 	
 	/**

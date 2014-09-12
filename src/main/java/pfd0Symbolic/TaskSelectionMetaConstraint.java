@@ -30,16 +30,24 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	protected HashMap<SimpleReusableResourceFluent,HashMap<Variable,Integer>> currentResourceUtilizers;
 
 	private String name = "";
+	//false if we split up HTN algorithm into 3 meta constraints, 
+	// true if we apply preonditions and effects at the same time.
+	private boolean oneShot; 
 
 	public TaskSelectionMetaConstraint() {
-		this(new int[0], new String[0], "");
+		this(true);
+	}
+	
+	public TaskSelectionMetaConstraint(boolean oneShot) {
+		this(new int[0], new String[0], "", oneShot);
 //		super(null, null);
 //		operators = new Vector<PlanReportroryItem>();
 //		methods = new Vector<PlanReportroryItem>();
 	}
 	
-	public TaskSelectionMetaConstraint(int[] capacities, String[] resourceNames, String domainName) {
+	public TaskSelectionMetaConstraint(int[] capacities, String[] resourceNames, String domainName, boolean oneShot) {
 		super(null, null);
+		this.oneShot = oneShot;
 		operators = new Vector<PlanReportroryItem>();
 		methods = new Vector<PlanReportroryItem>();
 		
@@ -211,10 +219,15 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 //				}
 				
 				logger.fine("Applying preconditions of PlanReportroryItem " + item);
-				List<ConstraintNetwork> newResolvers = item.expand(fl,  groundSolver);
-				for (ConstraintNetwork newResolver : newResolvers) {
-					ret.add(newResolver);
+				if (this.oneShot) {
+					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl,  groundSolver);
+					for (ConstraintNetwork newResolver : newResolvers) {
+						ret.add(newResolver);
+					}
+				} else {
+					ret.add(item.expandPreconditions(fl, groundSolver));
 				}
+				
 			}
 		}
 		return ret;
@@ -231,9 +244,12 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	 * Sets the marking of the task to SELECTED
 	 */
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable,
-			ConstraintNetwork metaValue) {
-		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
+	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
+		if(this.oneShot) {
+			metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
+		} else {
+			metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.SELECTED);
+		}
 	}
 
 	@Override

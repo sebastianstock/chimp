@@ -74,7 +74,10 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 		logger.info("getMetaValues for: " + preFluent);
 		
 		// creates MATCHES Fluents between dummy precondition and open state fluents which have the same predicate name
-		Fluent[] openFluents = ((FluentNetworkSolver)this.getGroundSolver()).getOpenFluents();
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
+		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
+		Fluent[] openFluents = groundSolver.getOpenFluents();
 		String[] headNames = preFluent.getCompoundSymbolicVariable().getPossiblePredicateNames();
 		for (String headName : headNames) {
 			for (Fluent openFluent : openFluents)  {

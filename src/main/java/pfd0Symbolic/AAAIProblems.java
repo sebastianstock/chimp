@@ -52,7 +52,7 @@ public class AAAIProblems {
 		((Fluent) stateVars[4]).setName("Connected(n n placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
 		((Fluent) stateVars[5]).setName("Connected(n n placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1 n n n n n n)");
 		((Fluent) stateVars[6]).setName("Connected(n n placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1 n n n n n n)");
-		((Fluent) stateVars[7]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2 n n n n n)");
+		((Fluent) stateVars[7]).setName("Connected(n n placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2 n n n n n n)");
 		((Fluent) stateVars[8]).setName("Connected(n n placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
 		((Fluent) stateVars[9]).setName("Connected(n n placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2 n n n n n n)");
 		((Fluent) stateVars[10]).setName("Connected(n n placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2 n n n n n n)");

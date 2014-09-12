@@ -86,7 +86,6 @@ public class PFD0Planner extends MetaConstraintSolver {
 			}
 		}
 		groundSolver.removeVariables(varsToRemove.toArray(new Variable[varsToRemove.size()]));
-		logger.info("Removed variables: ");
 		
 		// change CLOSED fluents back to OPEN
 		for(Constraint c : metaValue.getConstraints()) {

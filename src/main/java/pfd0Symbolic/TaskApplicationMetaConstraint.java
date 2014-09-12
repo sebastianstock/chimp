@@ -10,6 +10,7 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import resourceFluent.SimpleReusableResourceFluent;
+import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
 public class TaskApplicationMetaConstraint extends MetaConstraint {
 	
@@ -81,12 +82,13 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		Fluent fl = (Fluent)problematicNetwork.getVariables()[0];
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-//		Fluent[] openFluents = groundSolver.getOpenFluents();
+//		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
+//		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		
 		logger.info("getMetaValues for TaskApplicationMetaConstraint: " + fl);
 		// get the used operator/method
 		PlanReportroryItem usedItem = this.getUsedPlanReportroiryItem(fl);
-		ConstraintNetwork newResolver = usedItem.expandTail(fl,  groundSolver);
+		ConstraintNetwork newResolver = usedItem.expandOnlyTail(fl,  groundSolver);
 		if (newResolver != null) {
 			ret.add(newResolver);
 		}

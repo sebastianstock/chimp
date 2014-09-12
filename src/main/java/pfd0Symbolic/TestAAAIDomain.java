@@ -1,15 +1,12 @@
 package pfd0Symbolic;
 
-import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
 public class TestAAAIDomain {
