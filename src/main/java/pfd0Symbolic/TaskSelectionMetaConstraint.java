@@ -183,8 +183,8 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
 		logger.info("getMetaValues for: " + taskFluent);
-		// TODO: following line can probably be removed for speedup:
 		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
 			ret = applyPlanrepoirtroryItems(taskFluent, operators, groundSolver);
 		} else {

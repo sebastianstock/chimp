@@ -1,5 +1,6 @@
 package symbolicUnifyTyped;
 
+import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
@@ -55,6 +56,20 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 			((SymbolicVariableConstraintSolver) symbolicsolver).getConstraintSolvers()[0].propagate();
 		}
 	}
+	
+	public void propagateAllSubFull() {
+		for (ConstraintSolver symbolicsolver : getConstraintSolvers()) {
+			((BooleanSatisfiabilitySolver) ((SymbolicVariableConstraintSolver) symbolicsolver).getConstraintSolvers()[0]).propagateFull();
+		}
+	}
+	
+	public void propagatePredicateNames() {
+		BooleanSatisfiabilitySolver bs = (BooleanSatisfiabilitySolver) ((SymbolicVariableConstraintSolver) getConstraintSolvers()[0]).getConstraintSolvers()[0];
+		bs.propagateFull();
+	}
+	
+	
+	
 
 	public int[] getIngredients() {
 		return ingredients;

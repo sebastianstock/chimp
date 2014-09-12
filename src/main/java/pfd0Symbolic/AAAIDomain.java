@@ -20,7 +20,7 @@ public class AAAIDomain {
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
 				// methods
 				"drive", "assume_default_driving_pose", "assume_manipulation_pose",
-				"move_both_arms_to_side", "grasp_object_w_arm"
+				"move_both_arms_to_side", "grasp_object_w_arm", "get_object_w_arm"
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -149,7 +149,7 @@ public class AAAIDomain {
 				new VariablePrototype[] {move_torso_M1, move_both_M1, move_blind_M1}, 
 				new FluentConstraint[] {beforeM1a, beforeM1b}));
 		
-	// ###################### GRASP_OBJECT ########################################
+	// ###################### GRASP_OBJECT_W_ARM ########################################
 			PFD0Precondition atG1 = new PFD0Precondition("RobotAt", 
 					new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N}, 
 					new int[] {3, 4});
@@ -162,23 +162,52 @@ public class AAAIDomain {
 			
 			VariablePrototype assume_G1 = new VariablePrototype(groundSolver, "M", 
 					"assume_manipulation_pose", new String[] {N, N, N, "?manArea", "?preArea", N, N, N, N, N, N});
-			VariablePrototype pick_L1 = new VariablePrototype(groundSolver, "M", 
+			VariablePrototype pick_G1 = new VariablePrototype(groundSolver, "M", 
 					"!pick_up_object", new String[] {"?obj", N, "?plArea", "?manArea", N, N, N, "?arm", N, N, N});
-			VariablePrototype move_blind_L1 = new VariablePrototype(groundSolver, "M", 
+			VariablePrototype move_blind_G1 = new VariablePrototype(groundSolver, "M", 
 					"!move_base_blind", new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N});
 
-			FluentConstraint beforeL1a = new FluentConstraint(FluentConstraint.Type.BEFORE);
-			beforeL1a.setFrom(assume_G1);
-			beforeL1a.setTo(pick_L1);
-			FluentConstraint beforeL1b = new FluentConstraint(FluentConstraint.Type.BEFORE);
-			beforeL1b.setFrom(pick_L1);
-			beforeL1b.setTo(move_blind_L1);
+			FluentConstraint beforeG1a = new FluentConstraint(FluentConstraint.Type.BEFORE);
+			beforeG1a.setFrom(assume_G1);
+			beforeG1a.setTo(pick_G1);
+			FluentConstraint beforeG1b = new FluentConstraint(FluentConstraint.Type.BEFORE);
+			beforeG1b.setFrom(pick_G1);
+			beforeG1b.setTo(move_blind_G1);
 			
-			ret.add(new PFD0Method("grasp_object_w_arm", new String[] {"?obj", N, "?plArea", "?manArea", "?preArea", N, N, "?arm", N, N, N}, 
+			ret.add(new PFD0Method("grasp_object_w_arm", 
+					new String[] {"?obj", N, "?plArea", "?manArea", "?preArea", N, N, "?arm", N, N, N}, 
 					new PFD0Precondition[] {atG1, connectedG1, onG1}, 
-					new VariablePrototype[] {assume_G1, pick_L1},//, move_blind_L1}, 
-					new FluentConstraint[] {beforeL1a}//, beforeL1b}
+					new VariablePrototype[] {assume_G1, pick_G1, move_blind_G1}, 
+					new FluentConstraint[] {beforeG1a, beforeG1b}
 			));
+			
+		// ###################### GET_OBJECT_W_ARM ########################################
+			// TODO check if driving is necessary					
+//			PFD0Precondition atG2 = new PFD0Precondition("RobotAt", 
+//					new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N}, 
+//					new int[] {3, 4});
+			PFD0Precondition onG2 = new PFD0Precondition("On", 
+					new String[] {"?obj", N, "?plArea", N, N, N, N, N, N, N, N}, 
+					new int[] {0,0, 2,2});
+			PFD0Precondition connectedG2 = new PFD0Precondition("Connected", 
+					new String[] {N, N, "?plArea", "?manArea", "?preArea", N, N, N, N, N, N}, 
+					new int[] {2,2, 4,4});
+
+			VariablePrototype drive_G2 = new VariablePrototype(groundSolver, "M", 
+					"drive", new String[] {N, N, N, "?preArea", N, N, N, N, N, N, N});
+			VariablePrototype grasp_G2 = new VariablePrototype(groundSolver, "M", 
+					"grasp_object_w_arm", new String[] {"?obj", N, "?plArea", "?manArea", "?preArea", N, N, "?arm", N, N, N});
+
+			FluentConstraint beforeG2 = new FluentConstraint(FluentConstraint.Type.BEFORE);
+			beforeG2.setFrom(drive_G2);
+			beforeG2.setTo(grasp_G2);
+
+			ret.add(new PFD0Method("get_object_w_arm", 
+					new String[] {"?obj", N, "?plArea", N, "?preArea", N, N, "?arm", N, N, N}, 
+					new PFD0Precondition[] {onG2, connectedG2}, 
+					new VariablePrototype[] {drive_G2, grasp_G2},
+					new FluentConstraint[] {beforeG2}
+					));
 		
 		// #########
 		return ret;

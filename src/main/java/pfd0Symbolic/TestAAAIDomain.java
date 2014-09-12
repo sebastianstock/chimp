@@ -34,7 +34,8 @@ public class TestAAAIDomain {
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		
 //		AAAIProblems.createProblemDriveM(fluentSolver);
-		AAAIProblems.createProblemGraspM(fluentSolver);
+//		AAAIProblems.createProblemGraspM(fluentSolver);
+		AAAIProblems.createProblemGetObjectWithArmM(fluentSolver);
 		test();
 	}
 	
@@ -57,9 +58,10 @@ public class TestAAAIDomain {
 			public void performOperation() {
 				long startTime = System.nanoTime();
 				System.out.println("Found a plan? " + planner.backtrack());
+				
+				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSubFull();
 				long endTime = System.nanoTime();
 				System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
-//				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 				planner.draw();
 			}
 		};
