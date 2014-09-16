@@ -9,11 +9,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.metacsp.framework.ConstraintNetwork;
 
-import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint.Type;
+import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
 
 public class JunitTestCompoundNameMatchingConstraintSolver {
 	
-	private TypedCompoundSymbolicVariableConstraintSolver solver;
+	private CompoundSymbolicVariableConstraintSolver solver;
 
 
 	@Before
@@ -29,35 +29,35 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		symbols[2] = symbolsPlAreas;
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
-		solver = new TypedCompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
+		solver = new CompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
 	}
 
 
 	@Test
 	public void test() {
-		TypedCompoundSymbolicVariable[] vars = (TypedCompoundSymbolicVariable[]) solver.createVariables(5);
+		CompoundSymbolicVariable[] vars = (CompoundSymbolicVariable[]) solver.createVariables(5);
 		vars[0].setName("on", "mug1", "pl1", "none", "none"); // "on" in world state
 		vars[1].setName("on", "?mug", "?pl", "none", "none"); // "on" as precondition
 		vars[2].setName("get_mug",  "?mug", "?pl", "none", "none");     // "get_mug" task
 		vars[3].setName("grasp_mug", "?mug", "pl1", "none", "none");      // "grasp_mug" task
 		vars[4].setName("robotat", "none", "pl1", "none", "none");
 		
-		TypedCompoundSymbolicValueConstraint mc01 = new TypedCompoundSymbolicValueConstraint(Type.MATCHES);
+		CompoundSymbolicValueConstraint mc01 = new CompoundSymbolicValueConstraint(Type.MATCHES);
 		mc01.setFrom(vars[0]);
 		mc01.setTo(vars[1]);
 		
-		TypedCompoundSymbolicValueConstraint sc12 = 
-				new TypedCompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0, 1, 1});
+		CompoundSymbolicValueConstraint sc12 = 
+				new CompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0, 1, 1});
 		sc12.setFrom(vars[1]);
 		sc12.setTo(vars[2]);
 		
-		TypedCompoundSymbolicValueConstraint sc32 = 
-				new TypedCompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0, 1, 1});
+		CompoundSymbolicValueConstraint sc32 = 
+				new CompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0, 1, 1});
 		sc32.setFrom(vars[3]);
 		sc32.setTo(vars[2]);
 		
-		TypedCompoundSymbolicValueConstraint sc34 = 
-				new TypedCompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {1, 1});
+		CompoundSymbolicValueConstraint sc34 = 
+				new CompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {1, 1});
 		sc34.setFrom(vars[3]);
 		sc34.setTo(vars[4]);
 		

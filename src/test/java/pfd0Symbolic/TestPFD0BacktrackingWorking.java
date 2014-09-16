@@ -13,7 +13,7 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class TestPFD0BacktrackingWorking {
 	
@@ -80,13 +80,13 @@ public class TestPFD0BacktrackingWorking {
 		
 		createState(fluentSolver);
 		
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
 		logger.info("Starting Planning");
 		long startTime = System.nanoTime();
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue("Found a plan? ",  planner.backtrack());
 		long endTime = System.nanoTime();
 		long time = (endTime - startTime) / 1000000;
@@ -104,7 +104,7 @@ public class TestPFD0BacktrackingWorking {
 
 		System.out.println(results);
 		if (DRAW)
-			((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+			((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		System.out.println("Finished");
 	}
 	

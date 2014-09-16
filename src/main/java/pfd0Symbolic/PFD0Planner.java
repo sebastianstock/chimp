@@ -14,7 +14,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SimpleReusableResourceFluent;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
 
 
 public class PFD0Planner extends MetaConstraintSolver {

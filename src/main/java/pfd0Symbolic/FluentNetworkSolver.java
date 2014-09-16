@@ -2,9 +2,7 @@ package pfd0Symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
-import org.metacsp.booleanSAT.BooleanConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
@@ -14,7 +12,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
 
@@ -37,7 +35,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, 
 			String[][] symbols, int[] symbolicingredients) {
 		ConstraintSolver[] ret = new ConstraintSolver[] { 
-				new TypedCompoundSymbolicVariableConstraintSolver(symbols, symbolicingredients), 
+				new CompoundSymbolicVariableConstraintSolver(symbols, symbolicingredients), 
 				new SimpleBooleanValueConstraintSolver(origin, horizon),
 				new AllenIntervalNetworkSolver(origin, horizon)};
 		return ret;

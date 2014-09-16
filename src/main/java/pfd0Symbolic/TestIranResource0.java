@@ -19,7 +19,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SchedulableFluent;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class TestIranResource0 {
 	
@@ -93,7 +93,7 @@ public class TestIranResource0 {
 		
 		createState(fluentSolver);
 		
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		
 		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,7 +164,7 @@ public class TestIranResource0 {
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), "Constraint Network");
 //		ConstraintNetwork.draw(((TypedCompoundSymbolicVariableConstraintSolver)fluentSolver.getConstraintSolvers()[0]).getConstraintNetwork(), "Constraint Network");
 		// TODO following line makes sure that symbolicvariables values are set, but may take to long if we do that always.
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 //		TypedCompoundSymbolicVariableConstraintSolver compoundS = ((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]);
 //		SymbolicVariableConstraintSolver ssolver = (SymbolicVariableConstraintSolver) compoundS.getConstraintSolvers()[2];
 //		ConstraintNetwork.draw(ssolver.getConstraintNetwork());

@@ -13,7 +13,7 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class TestBacktrackingPFD0Planner {
 	
@@ -59,7 +59,7 @@ public class TestBacktrackingPFD0Planner {
 		
 		createState(fluentSolver);
 		
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		
 		
@@ -69,7 +69,7 @@ public class TestBacktrackingPFD0Planner {
 		
 		logger.info("Starting Planning");
 		long startTime = System.nanoTime();
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		System.out.println("Found a plan? " + planner.backtrack());
 		long endTime = System.nanoTime();
 		logger.info("Finished Planning after " + ((endTime - startTime) / 1000000) + " ms");
@@ -86,7 +86,7 @@ public class TestBacktrackingPFD0Planner {
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(), "Constraint Network");
 //		ConstraintNetwork.draw(((TypedCompoundSymbolicVariableConstraintSolver)fluentSolver.getConstraintSolvers()[0]).getConstraintNetwork(), "Constraint Network");
 		// TODO following line makes sure that symbolicvariables values are set, but may take to long if we do that always.
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 //		TypedCompoundSymbolicVariableConstraintSolver compoundS = ((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]);
 //		SymbolicVariableConstraintSolver ssolver = (SymbolicVariableConstraintSolver) compoundS.getConstraintSolvers()[2];
 //		ConstraintNetwork.draw(ssolver.getConstraintNetwork());

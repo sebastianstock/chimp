@@ -1,18 +1,15 @@
 package pfd0Symbolic;
 
-import java.util.ArrayList;
-
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
-import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariable;
+import symbolicUnifyTyped.CompoundSymbolicValueConstraint;
+import symbolicUnifyTyped.CompoundSymbolicVariable;
 
 public class FluentConstraint extends MultiBinaryConstraint {
 
@@ -62,11 +59,11 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
 			scon.setTo(bt);
 
-			TypedCompoundSymbolicValueConstraint ncon = 
-					new TypedCompoundSymbolicValueConstraint(TypedCompoundSymbolicValueConstraint.Type.MATCHES);
-			TypedCompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
+			CompoundSymbolicValueConstraint ncon = 
+					new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
+			CompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
 			ncon.setFrom(nf);
-			TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
+			CompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 			ncon.setTo(nt);
 			return new Constraint[]{scon, ncon, eq};
 			
@@ -128,13 +125,13 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		return null;
 	}
 	
-	private TypedCompoundSymbolicValueConstraint createSubmatches(Variable f, Variable t) {
-		TypedCompoundSymbolicValueConstraint ncon = new TypedCompoundSymbolicValueConstraint(
-				TypedCompoundSymbolicValueConstraint.Type.SUBMATCHES, 
+	private CompoundSymbolicValueConstraint createSubmatches(Variable f, Variable t) {
+		CompoundSymbolicValueConstraint ncon = new CompoundSymbolicValueConstraint(
+				CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
 				connections);
-		TypedCompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
+		CompoundSymbolicVariable nf = ((Fluent) f).getCompoundSymbolicVariable();
 		ncon.setFrom(nf);
-		TypedCompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
+		CompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 		ncon.setTo(nt);
 		return ncon;
 	}

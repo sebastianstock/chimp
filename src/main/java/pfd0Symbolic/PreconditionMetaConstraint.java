@@ -10,7 +10,7 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class PreconditionMetaConstraint extends MetaConstraint {
 	
@@ -36,7 +36,7 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
 	// TODO this may take too long, added this only for debugging!!!
-		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		// for every variable that has the marking UNJUSTIFIEDD and that has no unplanned predecessors 
@@ -75,8 +75,8 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 		
 		// creates MATCHES Fluents between dummy precondition and open state fluents which have the same predicate name
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-		((TypedCompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
+		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		String[] headNames = preFluent.getCompoundSymbolicVariable().getPossiblePredicateNames();
 		for (String headName : headNames) {

@@ -7,7 +7,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import symbolicUnifyTyped.TypedCompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAAAIDomain {
 	
@@ -38,7 +38,7 @@ public class TestAAAIDomain {
 	
 	
 	private static void test() {
-		((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
@@ -56,7 +56,7 @@ public class TestAAAIDomain {
 				long startTime = System.nanoTime();
 				System.out.println("Found a plan? " + planner.backtrack());
 				
-				((TypedCompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSubFull();
+				((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSubFull();
 				long endTime = System.nanoTime();
 				System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 				planner.draw();

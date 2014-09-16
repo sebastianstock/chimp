@@ -8,7 +8,7 @@ import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
 
 
-public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
+public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 
 	/**
 	 * 
@@ -21,27 +21,27 @@ public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
 	private int[] connections;
 	
 	
-	public CompoundNameMatchingConstraint(Type type) {
+	public CompoundSymbolicValueConstraint(Type type) {
 		this.type = type;
 	}
 	
-	public CompoundNameMatchingConstraint(Type type, int[] connections) {
+	public CompoundSymbolicValueConstraint(Type type, int[] connections) {
 		this.type = type;
 		this.connections = connections;
 	}
 
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
-		if (!( f instanceof CompoundNameVariable) || 
-				!(t instanceof CompoundNameVariable)) {
+		if (!( f instanceof CompoundSymbolicVariable) || 
+				!(t instanceof CompoundSymbolicVariable)) {
 			return null;
 		}
 	
-		Variable[] finternals = ((CompoundNameVariable) f).getInternalVariables();
-		Variable[] tinternals = ((CompoundNameVariable) t).getInternalVariables();
+		Variable[] finternals = ((CompoundSymbolicVariable) f).getInternalVariables();
+		Variable[] tinternals = ((CompoundSymbolicVariable) t).getInternalVariables();
 		
 		int[] varIndex2solverIndex = 
-				((CompoundNameMatchingConstraintSolver) f.getConstraintSolver()).getVarIndex2solverIndex();
+				((CompoundSymbolicVariableConstraintSolver) f.getConstraintSolver()).getVarIndex2solverIndex();
 		
 		if (this.type.equals(Type.MATCHES)) {
 			Vector<NameMatchingConstraint> constraints = 
@@ -90,7 +90,7 @@ public class CompoundNameMatchingConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public Object clone() {
-		return new CompoundNameMatchingConstraint(this.type, connections);
+		return new CompoundSymbolicValueConstraint(this.type, connections);
 		
 	}
 

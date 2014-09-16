@@ -7,7 +7,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint.Type;
+import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
 
 
 public class Test1TypedCompoundSymbolicVariableConstraintSolver {
@@ -25,8 +25,8 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 //		symbols[2] = symbolsPlAreas;
 //		symbols[3] = symbolsManAreas;
 //		symbols[4] = symbolsPreAreas;
-		TypedCompoundSymbolicVariableConstraintSolver solver = 
-				new TypedCompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
+		CompoundSymbolicVariableConstraintSolver solver = 
+				new CompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
 		
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
@@ -36,7 +36,7 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 		
 		logger.info("Start");
 		
-		TypedCompoundSymbolicVariable var0 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		CompoundSymbolicVariable var0 = (CompoundSymbolicVariable) solver.createVariable();
 		var0.setDomainAtPosition(0,  new String[] {"on", "robotat"});
 		var0.setDomainAtPosition(1,  new String[] {"mug1", "mug2", "none"});
 //    var0.setDomainAtPosition(2,  new String[] {"pl1"});
@@ -44,7 +44,7 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 //    var0.setDomainAtPosition(4,  new String[] {"none"});
 		logger.info("Created var0");
 		System.out.println(var0);
-		TypedCompoundSymbolicVariable var1 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		CompoundSymbolicVariable var1 = (CompoundSymbolicVariable) solver.createVariable();
 //    var1.setName("on", "none");
 		logger.info("Created var1");
 		System.out.println(var1);
@@ -71,15 +71,15 @@ public class Test1TypedCompoundSymbolicVariableConstraintSolver {
 				(SymbolicVariableConstraintSolver) solver.getConstraintSolvers()[1];
 		ConstraintNetwork.draw(symbolicSolver1.getConstraintNetwork());
 		
-		TypedCompoundSymbolicVariable var2 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		CompoundSymbolicVariable var2 = (CompoundSymbolicVariable) solver.createVariable();
 		logger.info("Created var2");
 		solver.removeVariable(var2);
 		logger.info("Removed var2");
 		
 		solver.propagateAllSub();
 		
-		TypedCompoundSymbolicValueConstraint con01 = 
-				new TypedCompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0});
+		CompoundSymbolicValueConstraint con01 = 
+				new CompoundSymbolicValueConstraint(Type.SUBMATCHES, new int[] {0, 0});
 		con01.setFrom(var0);
 		con01.setTo(var1);
 		solver.addConstraint(con01);

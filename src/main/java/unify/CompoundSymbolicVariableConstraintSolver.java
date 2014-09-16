@@ -3,7 +3,7 @@ package unify;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
-public class CompoundNameMatchingConstraintSolver extends MultiConstraintSolver {
+public class CompoundSymbolicVariableConstraintSolver extends MultiConstraintSolver {
 	
 	/**
 	 * 
@@ -12,8 +12,8 @@ public class CompoundNameMatchingConstraintSolver extends MultiConstraintSolver 
 	private int[] varIndex2solverIndex;
 
 
-	public CompoundNameMatchingConstraintSolver(String[][] symbols, int[] ingredients) {
-		super(new Class[] {CompoundNameMatchingConstraint.class}, CompoundNameVariable.class,
+	public CompoundSymbolicVariableConstraintSolver(String[][] symbols, int[] ingredients) {
+		super(new Class[] {CompoundSymbolicValueConstraint.class}, CompoundSymbolicVariable.class,
 				createConstraintSolvers(symbols), ingredients);
 		this.ingredients = ingredients;
 		this.createVarIndex2SolverIndex();

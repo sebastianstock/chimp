@@ -10,12 +10,12 @@ import org.junit.Test;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 
-import symbolicUnifyTyped.TypedCompoundSymbolicValueConstraint.Type;
+import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
 
 public class TestTypedCompoundSymbolicVariable {
 
-	private static TypedCompoundSymbolicVariableConstraintSolver solver;
-	private static TypedCompoundSymbolicVariable[] vars;
+	private static CompoundSymbolicVariableConstraintSolver solver;
+	private static CompoundSymbolicVariable[] vars;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -30,15 +30,15 @@ public class TestTypedCompoundSymbolicVariable {
 		symbols[2] = symbolsPlAreas;
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
-		solver = new TypedCompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
+		solver = new CompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
 	}
 
 
 	@Test
 	public void testSetName() {
-		TypedCompoundSymbolicVariable var0 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		CompoundSymbolicVariable var0 = (CompoundSymbolicVariable) solver.createVariable();
 		var0.setName("on", "mug1", "pl1", "none", "none");
-		TypedCompoundSymbolicVariable var1 = (TypedCompoundSymbolicVariable) solver.createVariable();
+		CompoundSymbolicVariable var1 = (CompoundSymbolicVariable) solver.createVariable();
 		var1.setName("on", "?mug", "pl1", "none", "none");
 		propagateAll();
 //		System.out.println(var0);
@@ -51,7 +51,7 @@ public class TestTypedCompoundSymbolicVariable {
 	
 	@Test
 	public void testSetFullName() {
-		TypedCompoundSymbolicVariable var = (TypedCompoundSymbolicVariable) solver.createVariable();
+		CompoundSymbolicVariable var = (CompoundSymbolicVariable) solver.createVariable();
 		var.setFullName("on(mug1 pl1 none none)");
 		propagateAll();
 //		System.out.println(var);

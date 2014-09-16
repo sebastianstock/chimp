@@ -12,7 +12,7 @@ import org.metacsp.multi.symbols.SymbolicVariable;
 import cern.colt.Arrays;
 
 
-public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint {
+public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 
 	/**
 	 * 
@@ -25,27 +25,27 @@ public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint 
 	private int[] connections;
 	
 	
-	public TypedCompoundSymbolicValueConstraint(Type type) {
+	public CompoundSymbolicValueConstraint(Type type) {
 		this.type = type;
 	}
 	
-	public TypedCompoundSymbolicValueConstraint(Type type, int[] connections) {
+	public CompoundSymbolicValueConstraint(Type type, int[] connections) {
 		this.type = type;
 		this.connections = connections;
 	}
 
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
-		if (!( f instanceof TypedCompoundSymbolicVariable) || 
-				!(t instanceof TypedCompoundSymbolicVariable)) {
+		if (!( f instanceof CompoundSymbolicVariable) || 
+				!(t instanceof CompoundSymbolicVariable)) {
 			return null;
 		}
 	
-		Variable[] finternals = ((TypedCompoundSymbolicVariable) f).getInternalVariables();
-		Variable[] tinternals = ((TypedCompoundSymbolicVariable) t).getInternalVariables();
+		Variable[] finternals = ((CompoundSymbolicVariable) f).getInternalVariables();
+		Variable[] tinternals = ((CompoundSymbolicVariable) t).getInternalVariables();
 		
 		int[] varIndex2solverIndex = 
-				((TypedCompoundSymbolicVariableConstraintSolver) f.getConstraintSolver()).getVarIndex2solverIndex();
+				((CompoundSymbolicVariableConstraintSolver) f.getConstraintSolver()).getVarIndex2solverIndex();
 		
 		if (this.type.equals(Type.MATCHES)) {
 			Vector<SymbolicValueConstraint> constraints = 
@@ -94,7 +94,7 @@ public class TypedCompoundSymbolicValueConstraint extends MultiBinaryConstraint 
 
 	@Override
 	public Object clone() {
-		return new TypedCompoundSymbolicValueConstraint(this.type);   // TODO: ADD CONNECTIONS ????
+		return new CompoundSymbolicValueConstraint(this.type);   // TODO: ADD CONNECTIONS ????
 	}
 
 	@Override

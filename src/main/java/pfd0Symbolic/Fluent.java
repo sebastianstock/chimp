@@ -6,11 +6,10 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
-import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
-import symbolicUnifyTyped.TypedCompoundSymbolicVariable;
+import symbolicUnifyTyped.CompoundSymbolicVariable;
 
 public class Fluent extends MultiVariable {
 
@@ -26,11 +25,11 @@ public class Fluent extends MultiVariable {
 	
 	
 	/**
-	 * @return The {@link TypedCompoundSymbolicVariable} representing the compound symbolic value 
+	 * @return The {@link CompoundSymbolicVariable} representing the compound symbolic value 
 	 * of this {@link Fluent}.
 	 */
-	public TypedCompoundSymbolicVariable getCompoundSymbolicVariable() {
-		return (TypedCompoundSymbolicVariable)this.getInternalVariables()[0];
+	public CompoundSymbolicVariable getCompoundSymbolicVariable() {
+		return (CompoundSymbolicVariable)this.getInternalVariables()[0];
 	}
 	
 	/**

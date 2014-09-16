@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import unify.CompoundNameMatchingConstraint.Type;
+import unify.CompoundSymbolicValueConstraint.Type;
 
 public class TestCompoundNameMatchingConstraintSolver {
 
@@ -24,14 +24,14 @@ public class TestCompoundNameMatchingConstraintSolver {
 		symbols[2] = symbolsPlAreas;
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
-		CompoundNameMatchingConstraintSolver solver = new CompoundNameMatchingConstraintSolver(symbols, new int[] {1,1,1,1,1});
+		CompoundSymbolicVariableConstraintSolver solver = new CompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
 		
 		
 		logger.info("Start");
 		
 		long startTimeFull = System.nanoTime();
 		
-		CompoundNameVariable var0 = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable var0 = (CompoundSymbolicVariable) solver.createVariable();
 		var0.setName("on",  "mug1", "pl1", "none", "none");
 //		var0.setDomainAtPosition(0,  new String[] {"on", "robotat"});
 //		var0.setDomainAtPosition(1,  new String[] {"mug1", "mug2"});
@@ -39,7 +39,7 @@ public class TestCompoundNameMatchingConstraintSolver {
 //    var0.setDomainAtPosition(3,  new String[] {"none"});
 //    var0.setDomainAtPosition(4,  new String[] {"none"});
 		logger.info("Created var0");
-		CompoundNameVariable var1 = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable var1 = (CompoundSymbolicVariable) solver.createVariable();
     var1.setName("on", "mug1", "pl1", "none", "none");
 		logger.info("Created var1");
 		
@@ -50,44 +50,44 @@ public class TestCompoundNameMatchingConstraintSolver {
 //    var2.setDomainAtPosition(3,  new String[] {"none"});
 //    var2.setDomainAtPosition(4,  new String[] {"none"});
 //		logger.info("Created var2");
-		CompoundNameVariable var3 = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable var3 = (CompoundSymbolicVariable) solver.createVariable();
 		var3.setName("on", "mug2", "none", "none", "none");
 		logger.info("Created var3");
 		
 		logger.info("Created internal variables");
 		
 		
-		CompoundNameVariable var4 = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable var4 = (CompoundSymbolicVariable) solver.createVariable();
 		
-		CompoundNameVariable var5 = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable var5 = (CompoundSymbolicVariable) solver.createVariable();
 		
 		NameMatchingConstraintSolver symbolicSolver = 
 				(NameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
 //		ConstraintNetwork.draw(symbolicSolver.getConstraintNetwork());
 		
-		CompoundNameMatchingConstraint con01 = new CompoundNameMatchingConstraint(Type.MATCHES);
+		CompoundSymbolicValueConstraint con01 = new CompoundSymbolicValueConstraint(Type.MATCHES);
 		con01.setFrom(var0);
 		con01.setTo(var1);
 		
-		CompoundNameMatchingConstraint con34 = new CompoundNameMatchingConstraint(Type.MATCHES);
+		CompoundSymbolicValueConstraint con34 = new CompoundSymbolicValueConstraint(Type.MATCHES);
 		con34.setFrom(var3);
 		con34.setTo(var4);
 		
-		CompoundNameMatchingConstraint con45 = new CompoundNameMatchingConstraint(Type.MATCHES);
+		CompoundSymbolicValueConstraint con45 = new CompoundSymbolicValueConstraint(Type.MATCHES);
 		con45.setFrom(var4);
 		con45.setTo(var5);
 		
-		Vector<CompoundNameMatchingConstraint> cons = new Vector<CompoundNameMatchingConstraint>();
+		Vector<CompoundSymbolicValueConstraint> cons = new Vector<CompoundSymbolicValueConstraint>();
 		cons.add(con01);
 		cons.add(con34);
 		cons.add(con45);
 		
-		CompoundNameVariable varFrom = var5;
+		CompoundSymbolicVariable varFrom = var5;
 //		CompoundNameVariable varFrom = (CompoundNameVariable) solver.createVariable();
 		for (int i = 0; i < 200; i++) {
-			CompoundNameVariable varTo = (CompoundNameVariable) solver.createVariable();
+			CompoundSymbolicVariable varTo = (CompoundSymbolicVariable) solver.createVariable();
 //			varTo.setName(new String[] {"on", "mug2", "none", "none", "none"});
-			CompoundNameMatchingConstraint con = new CompoundNameMatchingConstraint(Type.MATCHES);
+			CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(Type.MATCHES);
 			con.setFrom(varFrom);
 			con.setTo(varTo);
 			cons.add(con);
@@ -95,7 +95,7 @@ public class TestCompoundNameMatchingConstraintSolver {
 		}
 		
 		long startTime = System.nanoTime();
-		solver.addConstraints(cons.toArray(new CompoundNameMatchingConstraint[cons.size()]));
+		solver.addConstraints(cons.toArray(new CompoundSymbolicValueConstraint[cons.size()]));
 		long endTime = System.nanoTime();
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 		System.out.println("Everything Took "+((endTime - startTimeFull) / 1000000) + " ms"); 
@@ -108,17 +108,17 @@ public class TestCompoundNameMatchingConstraintSolver {
 //		con02.setTo(var2);
 //		cons.add(con02);
 		startTime = System.nanoTime();
-		solver.addConstraints(cons.toArray(new CompoundNameMatchingConstraint[cons.size()]));
+		solver.addConstraints(cons.toArray(new CompoundSymbolicValueConstraint[cons.size()]));
 		endTime = System.nanoTime();
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 		
 		logger.info("Finished");
 		
-		CompoundNameVariable varA = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable varA = (CompoundSymbolicVariable) solver.createVariable();
 //		varA.setName("on", "mug2", "none", "?none", "?none");
-		CompoundNameVariable varB = (CompoundNameVariable) solver.createVariable();
+		CompoundSymbolicVariable varB = (CompoundSymbolicVariable) solver.createVariable();
 //		varB.setName("on", "mug2", "none", "?none", "?none");
-		CompoundNameMatchingConstraint con = new CompoundNameMatchingConstraint(Type.MATCHES);
+		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(Type.MATCHES);
 		con.setFrom(varA);
 		con.setTo(varB);
 		startTime = System.nanoTime();

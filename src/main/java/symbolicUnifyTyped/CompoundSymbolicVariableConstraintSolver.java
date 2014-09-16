@@ -5,7 +5,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 
-public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstraintSolver {
+public class CompoundSymbolicVariableConstraintSolver extends MultiConstraintSolver {
 	
 	/**
 	 * 
@@ -16,8 +16,8 @@ public class TypedCompoundSymbolicVariableConstraintSolver extends MultiConstrai
 	private int[] varIndex2solverIndex;
 	
 
-	public TypedCompoundSymbolicVariableConstraintSolver(String[][] symbols, int[] ingredients) {
-		super(new Class[] {TypedCompoundSymbolicValueConstraint.class}, TypedCompoundSymbolicVariable.class,
+	public CompoundSymbolicVariableConstraintSolver(String[][] symbols, int[] ingredients) {
+		super(new Class[] {CompoundSymbolicValueConstraint.class}, CompoundSymbolicVariable.class,
 				createConstraintSolvers(symbols), ingredients);
 		this.ingredients = ingredients;
 		this.createVarIndex2SolverIndex();

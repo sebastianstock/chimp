@@ -9,7 +9,7 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 
-public class CompoundNameVariable extends MultiVariable {
+public class CompoundSymbolicVariable extends MultiVariable {
 
 	/**
 	 * 
@@ -21,7 +21,7 @@ public class CompoundNameVariable extends MultiVariable {
 	private static int internalVarsCount;
 	
 	
-	public CompoundNameVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
+	public CompoundSymbolicVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
 			Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
 		internalVarsCount = internalVars.length;
