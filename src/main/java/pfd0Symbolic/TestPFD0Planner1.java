@@ -4,20 +4,16 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.time.Bounds;
-import org.metacsp.time.TimePoint;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestPFD0Planner1 {
 	

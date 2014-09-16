@@ -7,13 +7,10 @@ import java.util.logging.Logger;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.multi.MultiConstraintSolver;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestBacktrackingPFD0Planner {
 	

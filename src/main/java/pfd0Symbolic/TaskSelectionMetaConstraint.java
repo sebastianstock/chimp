@@ -14,7 +14,7 @@ import org.metacsp.framework.meta.MetaVariable;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SchedulableFluent;
 import resourceFluent.SimpleReusableResourceFluent;
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 
 public class TaskSelectionMetaConstraint extends MetaConstraint {
@@ -192,7 +192,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		
 		logger.info("getMetaValues for: " + taskFluent);
 		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
+//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
 			ret = applyPlanrepoirtroryItems(taskFluent, operators, groundSolver);
 		} else {

@@ -10,7 +10,7 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class PreconditionMetaConstraint extends MetaConstraint {
 	
@@ -76,7 +76,7 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 		// creates MATCHES Fluents between dummy precondition and open state fluents which have the same predicate name
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
+//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		String[] headNames = preFluent.getCompoundSymbolicVariable().getPossiblePredicateNames();
 		for (String headName : headNames) {

@@ -8,8 +8,8 @@ import org.metacsp.time.Bounds;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
-import symbolicUnifyTyped.CompoundSymbolicValueConstraint;
-import symbolicUnifyTyped.CompoundSymbolicVariable;
+import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariable;
 
 public class FluentConstraint extends MultiBinaryConstraint {
 

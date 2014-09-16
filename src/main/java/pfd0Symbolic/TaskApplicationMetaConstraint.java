@@ -10,7 +10,6 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import resourceFluent.SimpleReusableResourceFluent;
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
 
 public class TaskApplicationMetaConstraint extends MetaConstraint {
 	

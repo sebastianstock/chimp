@@ -12,7 +12,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 
 import simpleBooleanValueCons.SimpleBooleanValueConstraint;
 import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
 

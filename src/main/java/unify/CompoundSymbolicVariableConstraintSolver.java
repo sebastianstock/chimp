@@ -57,4 +57,11 @@ public class CompoundSymbolicVariableConstraintSolver extends MultiConstraintSol
 		return varIndex2solverIndex;
 	}
 
+	/** Only needed to be compatible to equivalent in symbolicUnifyTyped
+	 * 
+	 */
+	public void propagateAllSubFull() {
+		this.propagateAllSub();
+	}
+
 }

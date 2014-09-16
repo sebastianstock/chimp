@@ -9,7 +9,7 @@ import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
 import simpleBooleanValueCons.SimpleBooleanValueVariable;
-import symbolicUnifyTyped.CompoundSymbolicVariable;
+import unify.CompoundSymbolicVariable;
 
 public class Fluent extends MultiVariable {
 

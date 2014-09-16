@@ -7,7 +7,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import symbolicUnifyTyped.CompoundSymbolicVariableConstraintSolver;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAAAIDomain {
 	
@@ -42,7 +42,7 @@ public class TestAAAIDomain {
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.FINEST);
 		
 		
 //		System.out.println("Found a plan? " + planner.backtrack());
