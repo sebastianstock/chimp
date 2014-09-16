@@ -1,4 +1,4 @@
-package unify;
+package symbolicUnifyTyped;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,44 +8,66 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
+import org.metacsp.multi.symbols.SymbolicVariable;
 
-public class CompoundNameVariable extends MultiVariable {
+public class TypedCompoundSymbolicVariable extends MultiVariable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1194147485131064251L;
-	
+	private static final long serialVersionUID = 3187043494226482779L;
+
 	private static Pattern namepattern = Pattern.compile("^(.+)\\((.*)\\)$");
 	
-	private int argsize;
+	private static int internalVarsCount;
 	
-	public CompoundNameVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
+	
+	public TypedCompoundSymbolicVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
 			Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
-		this.argsize = 0;
+		internalVarsCount = internalVars.length;
+		
 	}
 	
-	public void setName(String head, String... arguments) {
-		Variable[] vars = this.getInternalVariables();
-		((NameVariable) vars[0]).setName(head);
-		int argcounter = 1;
-		if (arguments != null) {
-			if (arguments.length > vars.length - 1)
-				throw new IllegalArgumentException(
-						"Too many arguments. Only " + (this.getInternalVariables().length - 1) + " permitted.");
-			for (String s : arguments) {
-				((NameVariable) vars[argcounter]).setName(s);
-				argcounter++;
-			}
-			this.argsize = arguments.length;
-		} else {
-			argcounter = 1; // all argument variables will be set to null
-		}
-		for (int j = argcounter; j < vars.length; j++) {
-			((NameVariable) vars[j]).setName(null);
+	/**
+	 * Sets the Domain of the internal variable at position.
+	 * @param position Index of internal variable to set.
+	 * @param symbols Domain to which the internal variable will be set.
+	 */
+	public void setDomainAtPosition(int position, String... symbols) {
+		((SymbolicVariable)this.getInternalVariables()[position]).setDomain(symbols);
+	}
+	
+	/**
+	 * Sets domain of all internal variables.
+	 * @param symbols Array of symbols for the domain of each internal variable.
+	 */
+	public void setDomain(String[][] symbols) {
+		for(int i = 0; i < symbols.length; i++) {
+			this.setDomainAtPosition(i, symbols[i]);
 		}
 	}
+	
+	
+	/**
+	 * Sets the ground name of the variable.
+	 * @param type the predicate's name.
+	 * @param arguments Each internal variable is set to the value of the corresponding string in the array. These should be ground.
+	 * @throws IllegalArgumentException If size of argument array does not match number of internal variables.
+	 */
+	public void setName(String type, String ...arguments) {
+		Variable[] vars = this.getInternalVariables();
+		if ((arguments.length + 1) != internalVarsCount) {
+			throw new IllegalArgumentException("Number of arguments does not match number of internal variables");
+		}
+		((SymbolicVariable) vars[0]).setDomain(type);
+		for (int i = 1; i < internalVarsCount; i++) {
+			if (arguments[i-1].charAt(0) != '?') {  // '?' indicates variables -> nothing to set
+				((SymbolicVariable) vars[i]).setDomain(arguments[i-1]);
+			}
+		}
+	}
+	
 	
 	/**
 	 * Set the name with one String.
@@ -113,18 +135,32 @@ public class CompoundNameVariable extends MultiVariable {
 		return ret.toString();
 	}
 	
-	/**
-	 * @return Only the name of the head.
-	 */
-	public String getHeadName() {
-		return ((NameVariable) getInternalVariables()[0]).getName();
-	}
+	// TODO: UPDATE
+//	/**
+//	 * @return Only the name of the head.
+//	 */
+//	public String getHeadName() {  
+//		return ((NameVariable) getInternalVariables()[0]).getName();
+//	}
 
 	@Override
 	public String toString() {
 		return getName();
 	}
+
+	public String[] getPossiblePredicateNames() {
+		return getSymbolsAt(0);
+	}
 	
+	public String getPredicateName() {
+		String[] possibleValues = getSymbolsAt(0);
+		if (possibleValues.length == 1) {
+			return possibleValues[0];
+		} else {
+			throw new IllegalStateException("Predicate names should be ground!");
+		}
+	}
+
 	/**
 	 * Checks if it can be possibly be matched to another fluent.
 	 * This is the case when the type and all constant parameters are the same.
@@ -133,35 +169,65 @@ public class CompoundNameVariable extends MultiVariable {
 	 * @return
 	 */
 	public boolean possibleMatch(String fluenttype, String[] arguments) {
-		if (fluenttype == null || (! fluenttype.equals(getHeadName()))) {
+		if (fluenttype == null) {
 			return false;
 		}
-		if (arguments == null) {
-			if (getArgumentsSize() == 0) {
-				return true;
-			} else {
-				return false;
+		boolean found = false;
+		for (String symbol : getSymbolsAt(0)) {
+			if (fluenttype.equals(symbol)) {
+				found = true;
+				break;
 			}
 		}
-		
-		if (arguments.length != getArgumentsSize()) {
+		if (!found) {
 			return false;
 		}
-		
-		for (int i = 0; i < arguments.length; i++) {
-			String param = ((NameVariable) getInternalVariables()[i+1]).getName();
-			if (! arguments[i].equals(param)) {
-				if ((arguments[i].charAt(0) != '?') && (param.charAt(0) != '?')) {
-					return false;
-				}
-			}
-		}
+		// TODO useful checking of arguments to reduce branching factor
+//		if (arguments == null) {
+//			if (internalVarsCount == 1) {
+//				return true;
+//			} else {
+//				return false;
+//			}
+//		}
+//		
+//		if ((arguments.length + 1) != internalVarsCount) {
+//			return false;
+//		}
+//		
+//		for (int i = 0; i < arguments.length; i++) {
+//			if (arguments[i].equals("none"))
+//				continue;
+//			found = false;
+//			for (String symbol : getSymbolsAt(i+1)) {
+//				if (arguments[i].equals(symbol)) {
+//					found = true;
+//					break;
+//				}
+//			}
+//			if (!found) {
+//				return false;
+//			}
+//		}
 		
 		return true;
 	}
 	
-	public int getArgumentsSize() {
-		return this.argsize;
+	public String[] getSymbolsAt(int position) {
+		if (position >= internalVarsCount) {
+			throw new IllegalArgumentException();
+		}
+		return ((SymbolicVariable) getInternalVariables()[position]).getSymbols();
 	}
+	
+	public String getGroundSymbolAt(int position) {
+		String[] possibleValues = getSymbolsAt(position);
+		if (possibleValues.length == 1) {
+			return possibleValues[0];
+		} else {
+			return "";
+		}
+	}
+	
 
 }

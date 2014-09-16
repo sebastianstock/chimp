@@ -7,38 +7,59 @@ import org.junit.Before;
 import org.junit.Test;
 import org.metacsp.framework.Constraint;
 
+import unify.NameMatchingConstraint.Type;
+
 public class JUnitTestNameMatchingConstraintSolver {
 	
 	private NameMatchingConstraintSolver solver;
-	private NameVariable[] vars;
+	private static String[] symbols = new String[] {"mug1", "mug2", "mug3"};
 
 	@Before
 	public void setUp() throws Exception {
-		solver = new NameMatchingConstraintSolver();
-		vars = (NameVariable[]) solver.createVariables(4);
+		solver = new NameMatchingConstraintSolver(symbols);
 	}
 
 	@Test
-	public void test() {
-		NameMatchingConstraint con0 = new NameMatchingConstraint();
-		vars[0].setName("mug1");
-		vars[1].setName("?m1");
-		vars[2].setName("?m2");
-		vars[3].setName("mug2");
-		con0.setFrom(vars[0]);
-		con0.setTo(vars[1]);
-		assertTrue("Add constraint between 'mug1' and '?m1' should succeed", 
-				solver.addConstraint(con0));
-		assertTrue("Name of previous '?m1' should be changed to 'mug1",
-				vars[1].getName().equals("mug1"));
+	public void testUnaryConstraints() {
+		NameVariable[] vars = (NameVariable[]) solver.createVariables(1);
+		NameMatchingConstraint con11 = new NameMatchingConstraint(Type.UNARYEQUALS);
+		con11.setFrom(vars[0]);
+		con11.setTo(vars[0]);
+		con11.setUnaryValues(new int[] {1});
+		assertTrue(solver.addConstraint(con11));
+		System.out.println(vars[0]);
+		assertTrue(vars[0].isGround());
+		assertTrue(vars[0].getPossibleSymbols()[0].equals("mug2"));
 		
-		NameMatchingConstraint con1 = new NameMatchingConstraint();
-		con1.setFrom(vars[1]);
-		con1.setTo(vars[2]);
-		NameMatchingConstraint con2 = new NameMatchingConstraint();
-		con2.setFrom(vars[2]);
-		con2.setTo(vars[3]);
-		assertFalse(solver.addConstraints(new Constraint[] {con1, con2}));
+		NameMatchingConstraint con11Diff = new NameMatchingConstraint(Type.UNARYDIFFERENT);
+		con11Diff.setFrom(vars[0]);
+		con11Diff.setTo(vars[0]);
+		con11Diff.setUnaryValues(new int[] {1});
+		assertFalse(solver.addConstraint(con11Diff));
+	}
+	
+	@Test
+	public void test() {
+		NameVariable[] vars = (NameVariable[]) solver.createVariables(4);
+		vars[0].setConstant("mug1");
+		vars[3].setConstant("mug2");
+		NameMatchingConstraint con01 = new NameMatchingConstraint(Type.EQUALS);
+		con01.setFrom(vars[0]);
+		con01.setTo(vars[1]);
+		assertTrue("Add constraint between 'vars[0]' and 'vars[1]' should succeed", 
+				solver.addConstraint(con01));
+		assertTrue("Domain of previous 'vars[1]' should be changed to 'mug1",
+				vars[1].getPossibleSymbols().length == 1);
+		assertTrue("Domain of previous 'vars[1]' should be changed to 'mug1",
+				vars[1].getPossibleSymbols()[0].equals("mug1"));
+		
+		NameMatchingConstraint con12 = new NameMatchingConstraint(Type.EQUALS);
+		con12.setFrom(vars[1]);
+		con12.setTo(vars[2]);
+		NameMatchingConstraint con23 = new NameMatchingConstraint(Type.EQUALS);
+		con23.setFrom(vars[2]);
+		con23.setTo(vars[3]);
+		assertFalse(solver.addConstraints(new Constraint[] {con12, con23}));
 		
 	}
 

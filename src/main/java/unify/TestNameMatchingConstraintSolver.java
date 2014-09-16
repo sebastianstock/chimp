@@ -3,53 +3,47 @@ package unify;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 
+import unify.NameMatchingConstraint.Type;
+
 public class TestNameMatchingConstraintSolver {
 
 	public static void main(String[] args) {
-		NameMatchingConstraintSolver solver = new NameMatchingConstraintSolver();
+		String[] symbols = new String[] {"mug1", "mug2", "mug3"};
+		NameMatchingConstraintSolver solver = new NameMatchingConstraintSolver(symbols);
 		
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
 		NameVariable[] vars = (NameVariable[]) solver.createVariables(4);
 		
 		
-		vars[0].setName("mug1");
-		vars[1].setName("?m1");
-//		vars[1].setName("On mug1 counter1");
-		vars[2].setName("?m2");
-		vars[3].setName("mug2");
+		vars[0].setConstant("mug1");
+//		vars[3].setConstant("mug2");
 		
+		NameMatchingConstraint con01 = new NameMatchingConstraint(Type.EQUALS);
+		con01.setFrom(vars[0]);
+		con01.setTo(vars[1]);
 		
-		
-		NameMatchingConstraint con0 = new NameMatchingConstraint();
-		con0.setFrom(vars[0]);
-		con0.setTo(vars[1]);
-		
-		NameMatchingConstraint con1 = new NameMatchingConstraint();
-		con1.setFrom(vars[1]);
-		con1.setTo(vars[2]);
-		
-		NameMatchingConstraint con2 = new NameMatchingConstraint();
-		con2.setFrom(vars[2]);
-		con2.setTo(vars[3]);
-		
-		System.out.println("Scope: " + con0.toString());
-		
-		
+
 		System.out.println("n0: " + vars[0]);
 		System.out.println("n1 ground? " + vars[1]+ vars[1].isGround());
 		System.out.println("n2 ground? " + vars[2] + vars[2].isGround());
 		
-		Constraint[] cons = new Constraint[]{con0, con1};
-//		System.out.println("Cons: " + cons + " Length: " + cons.length);
-		System.out.println("Add con0 + con1: " + solver.addConstraints(cons));
+		System.out.println("Add con01: " + solver.addConstraint(con01));
 		
-//		System.out.println("Add con1: " + solver.addConstraint(con1));
 		
-		System.out.println("Add con2: " + solver.addConstraint(con2));
-		
-//		System.out.println("Cons: " + solver.getConstraints().length);
+		NameMatchingConstraint con12 = new NameMatchingConstraint(Type.EQUALS);
+		con12.setFrom(vars[1]);
+		con12.setTo(vars[2]);
+//		NameMatchingConstraint con23Equals = new NameMatchingConstraint(Type.EQUALS);
+//		con23Equals.setFrom(vars[2]);
+//		con23Equals.setTo(vars[3]);
+//		System.out.println("Add con12 + con23?" + solver.addConstraints(new Constraint[] {con12, con23Equals}));
 
+		
+		NameMatchingConstraint con23Different = new NameMatchingConstraint(Type.DIFFERENT);
+		con23Different.setFrom(vars[2]);
+		con23Different.setTo(vars[3]);
+		System.out.println("Add con12 + con23?" + solver.addConstraints(new Constraint[] {con12, con23Different}));
 	}
 
 }

@@ -1,21 +1,20 @@
 package unify;
 
+import java.util.Arrays;
+
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 
+
 public class NameVariable extends Variable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7855257305948524604L;
-	
+	private static final long serialVersionUID = -7696577558183026849L;
 	private NameDomain domain;
 	
-	protected NameVariable(ConstraintSolver cs, int id) {
+	protected NameVariable(ConstraintSolver cs, int id, int symbolcount) {
 		super(cs, id);
-		domain = new NameDomain(this);
+		domain = new NameDomain(this, symbolcount);
 	}
 
 	@Override
@@ -30,31 +29,49 @@ public class NameVariable extends Variable {
 
 	@Override
 	public void setDomain(Domain arg0) {
-		this.domain = (NameDomain)arg0;
+		if (arg0 != null) {
+			this.domain = (NameDomain)arg0;
+		} else {
+			throw new IllegalArgumentException("Domain must be != null");
+		}
+	}
+	
+	/** Makes the variable ground and sets the domain to only that symbol.
+	 * 
+	 * @param name New ground value of the variable.
+	 */
+	public void setConstant(String symbol) {
+		this.domain.setConstantValue(
+				((NameMatchingConstraintSolver) this.getConstraintSolver()).getIndexOfSymbol(symbol));
+	}
 
-	}
-	
-	public void setName(String name) {
-		if(this.domain != null)
-			this.domain.setName(name);
-	}
-	
-	public String getName() {
-		return ((NameDomain)domain).getName();
+	public String[] getPossibleSymbols() {
+		int[] indizes = ((NameDomain)domain).getPossibleIndizes();
+		String[] ret = new String[indizes.length];
+		String[] symbols = ((NameMatchingConstraintSolver) this.getConstraintSolver()).getSymbols();
+		for (int i = 0; i < indizes.length; i++) {
+			ret[i] = symbols[indizes[i]];
+		}
+		return ret;
 	}
 
 	@Override
 	public String toString() {
 //		return this.getClass().getSimpleName() + " " + this.id + " " + this.getDomain();
-		return getName();
+		String[] possibleSymbols = getPossibleSymbols();
+		if (possibleSymbols.length == 1) {
+			return possibleSymbols[0];
+		} else {
+			return Arrays.toString(possibleSymbols);
+		}
 	}
 	
 	public boolean isGround() {
-		if(domain != null) {
-			return ((NameDomain) domain).isGround();
-		} else {
-			return true;
-		}
+		return ((NameDomain) domain).isGround();
+	}
+	
+	public boolean hasModel() {
+		return domain.hasModel();
 	}
 
 }
