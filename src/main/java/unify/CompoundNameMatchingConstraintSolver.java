@@ -4,27 +4,57 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 
 public class CompoundNameMatchingConstraintSolver extends MultiConstraintSolver {
-
-	public CompoundNameMatchingConstraintSolver() {
-		super(new Class[] {CompoundNameMatchingConstraint.class}, CompoundNameVariable.class,
-				createConstraintSolvers(), new int[] {10});
-		// TODO Auto-generated constructor stub
-	}
-
-	private static ConstraintSolver[] createConstraintSolvers() {
-		ConstraintSolver[] ret = new ConstraintSolver[] {new NameMatchingConstraintSolver()};
-		return ret;
-	}
-
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1675831566052143377L;
+	private int[] varIndex2solverIndex;
+
+
+	public CompoundNameMatchingConstraintSolver(String[][] symbols, int[] ingredients) {
+		super(new Class[] {CompoundNameMatchingConstraint.class}, CompoundNameVariable.class,
+				createConstraintSolvers(symbols), ingredients);
+		this.ingredients = ingredients;
+		this.createVarIndex2SolverIndex();
+	}
+
+	private static ConstraintSolver[] createConstraintSolvers(String[][] symbols) {
+		ConstraintSolver[] ret = new ConstraintSolver[symbols.length];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = new NameMatchingConstraintSolver(symbols[i]);
+		}
+		return ret;
+	}
+	
+	private void createVarIndex2SolverIndex() {
+		int varCount = 0;
+		for (int i = 0; i < ingredients.length; i++)
+			varCount += ingredients[i];
+		varIndex2solverIndex = new int[varCount];
+		int varIndex = 0;
+		for (int solverIndex = 0; solverIndex < ingredients.length; solverIndex++) {
+			for (int j = 0; j < ingredients[solverIndex]; j++) {
+				varIndex2solverIndex[varIndex++] = solverIndex;
+			}
+		}
+	}
+
 
 	@Override
 	public boolean propagate() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public void propagateAllSub() {
+		for (ConstraintSolver solver : getConstraintSolvers()) {
+			solver.propagate();
+		}
+	}
+	
+	public int[] getVarIndex2solverIndex() {
+		return varIndex2solverIndex;
 	}
 
 }

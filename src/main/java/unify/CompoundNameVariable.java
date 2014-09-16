@@ -1,4 +1,4 @@
-package symbolicUnifyTyped;
+package unify;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,45 +8,44 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
-import org.metacsp.multi.symbols.SymbolicVariable;
 
-public class TypedCompoundSymbolicVariable extends MultiVariable {
+public class CompoundNameVariable extends MultiVariable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3187043494226482779L;
+	private static final long serialVersionUID = 8181652775095849182L;
 
 	private static Pattern namepattern = Pattern.compile("^(.+)\\((.*)\\)$");
 	
 	private static int internalVarsCount;
 	
 	
-	public TypedCompoundSymbolicVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
+	public CompoundNameVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
 			Variable[] internalVars) {
 		super(cs, id, internalSolvers, internalVars);
 		internalVarsCount = internalVars.length;
 		
 	}
 	
-	/**
-	 * Sets the Domain of the internal variable at position.
-	 * @param position Index of internal variable to set.
-	 * @param symbols Domain to which the internal variable will be set.
-	 */
-	public void setDomainAtPosition(int position, String... symbols) {
-		((SymbolicVariable)this.getInternalVariables()[position]).setDomain(symbols);
-	}
+//	/**
+//	 * Sets the Domain of the internal variable at position.
+//	 * @param position Index of internal variable to set.
+//	 * @param symbols Domain to which the internal variable will be set.
+//	 */
+//	public void setDomainAtPosition(int position, String... symbols) {
+//		((NameVariable)this.getInternalVariables()[position]).setDomain(symbols);
+//	}
 	
-	/**
-	 * Sets domain of all internal variables.
-	 * @param symbols Array of symbols for the domain of each internal variable.
-	 */
-	public void setDomain(String[][] symbols) {
-		for(int i = 0; i < symbols.length; i++) {
-			this.setDomainAtPosition(i, symbols[i]);
-		}
-	}
+//	/**
+//	 * Sets domain of all internal variables.
+//	 * @param symbols Array of symbols for the domain of each internal variable.
+//	 */
+//	public void setDomain(String[][] symbols) {
+//		for(int i = 0; i < symbols.length; i++) {
+//			this.setDomainAtPosition(i, symbols[i]);
+//		}
+//	}
 	
 	
 	/**
@@ -60,10 +59,10 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		if ((arguments.length + 1) != internalVarsCount) {
 			throw new IllegalArgumentException("Number of arguments does not match number of internal variables");
 		}
-		((SymbolicVariable) vars[0]).setDomain(type);
+		((NameVariable) vars[0]).setConstant(type);
 		for (int i = 1; i < internalVarsCount; i++) {
 			if (arguments[i-1].charAt(0) != '?') {  // '?' indicates variables -> nothing to set
-				((SymbolicVariable) vars[i]).setDomain(arguments[i-1]);
+				((NameVariable) vars[i]).setConstant(arguments[i-1]);
 			}
 		}
 	}
@@ -109,7 +108,6 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 	@Override
 	public void setDomain(Domain d) {
 		// TODO Auto-generated method stub
-
 	}
 	
 	/**
@@ -182,34 +180,8 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		if (!found) {
 			return false;
 		}
-		// TODO useful checking of arguments to reduce branching factor
-//		if (arguments == null) {
-//			if (internalVarsCount == 1) {
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		}
-//		
-//		if ((arguments.length + 1) != internalVarsCount) {
-//			return false;
-//		}
-//		
-//		for (int i = 0; i < arguments.length; i++) {
-//			if (arguments[i].equals("none"))
-//				continue;
-//			found = false;
-//			for (String symbol : getSymbolsAt(i+1)) {
-//				if (arguments[i].equals(symbol)) {
-//					found = true;
-//					break;
-//				}
-//			}
-//			if (!found) {
-//				return false;
-//			}
-//		}
-		
+		// TODO use full checking of arguments to reduce branching factor
+
 		return true;
 	}
 	
@@ -217,7 +189,7 @@ public class TypedCompoundSymbolicVariable extends MultiVariable {
 		if (position >= internalVarsCount) {
 			throw new IllegalArgumentException();
 		}
-		return ((SymbolicVariable) getInternalVariables()[position]).getSymbols();
+		return ((NameVariable) getInternalVariables()[position]).getPossibleSymbols();
 	}
 	
 	public String getGroundSymbolAt(int position) {
