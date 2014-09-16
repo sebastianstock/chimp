@@ -12,12 +12,8 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.metacsp.booleanSAT.BooleanDomain;
 import org.metacsp.framework.Constraint;
 
-import simpleBooleanValueCons.SimpleBooleanValueConstraint;
-import simpleBooleanValueCons.SimpleBooleanValueConstraint.Type;
-import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
 
 public class JUnitTestFluentNetworkSolver {
 	
@@ -61,13 +57,6 @@ public class JUnitTestFluentNetworkSolver {
 		fluents[0].setName("on(mug1 pl1 none none)");
 		fluents[1].setName("on(?mug pl1 none none)");
 		fluents[2].setName("on(mug1 pl2 none none)");
-		SimpleBooleanValueConstraintSolver bsolver = 
-				(SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
-		
-		SimpleBooleanValueConstraint con00 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
-		con00.setFrom(fluents[1].getSimpleBooleanValueVariable());
-		con00.setTo(fluents[1].getSimpleBooleanValueVariable());
-		bsolver.addConstraint(con00);
 	
 		FluentConstraint fcon1 = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon1.setFrom(fluents[0]);
@@ -102,18 +91,6 @@ public class JUnitTestFluentNetworkSolver {
 		Fluent[] fluents = (Fluent[]) solver.createVariables(3);
 		
 //		MetaCSPLogging.setLevel(Level.FINEST);
-		SimpleBooleanValueConstraintSolver bsolver = 
-				(SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
-		
-		SimpleBooleanValueConstraint con00 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
-		con00.setFrom(fluents[0].getSimpleBooleanValueVariable());
-		con00.setTo(fluents[0].getSimpleBooleanValueVariable());
-		assertTrue(bsolver.addConstraint(con00));
-		
-		BooleanDomain bdomainf0 = 
-				(BooleanDomain) fluents[0].getSimpleBooleanValueVariable().getBooleanVariable().getDomain();
-		assertTrue(bdomainf0.canBeTrue());
-		assertFalse(bdomainf0.canBeFalse());
 		
 		fluents[0].setName("on(mug1 pl1 none none)");
 		fluents[1].setName("on(?mug pl1 none none)");
@@ -124,12 +101,6 @@ public class JUnitTestFluentNetworkSolver {
 		fcon01.setFrom(fluents[0]);
 		fcon01.setTo(fluents[1]);
 		assertTrue(solver.addConstraint(fcon01));
-		
-		// boolean value of fluents[1] should be changed to true
-		BooleanDomain bdomainf1 = 
-				(BooleanDomain) fluents[1].getSimpleBooleanValueVariable().getBooleanVariable().getDomain();
-		assertTrue(bdomainf1.canBeTrue());
-		assertFalse(bdomainf1.canBeFalse());
 		
 		// name of '?mug' should be changed to 'mug1'
 		assertTrue("Name of '?mug' should be changed to 'mug1'",

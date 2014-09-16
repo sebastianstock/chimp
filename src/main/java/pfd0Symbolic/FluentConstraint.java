@@ -6,8 +6,6 @@ import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
-import simpleBooleanValueCons.SimpleBooleanValueConstraint;
-import simpleBooleanValueCons.SimpleBooleanValueVariable;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
@@ -52,12 +50,6 @@ public class FluentConstraint extends MultiBinaryConstraint {
 					AllenIntervalConstraint.Type.Equals);
 			eq.setFrom(((Fluent) f).getAllenInterval());
 			eq.setTo(((Fluent) t).getAllenInterval());
-			SimpleBooleanValueConstraint scon = 
-					new SimpleBooleanValueConstraint(SimpleBooleanValueConstraint.Type.EQUALS);
-			SimpleBooleanValueVariable bf = ((Fluent) f).getSimpleBooleanValueVariable();
-			scon.setFrom(bf);
-			SimpleBooleanValueVariable bt = ((Fluent) t).getSimpleBooleanValueVariable();
-			scon.setTo(bt);
 
 			CompoundSymbolicValueConstraint ncon = 
 					new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
@@ -65,7 +57,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			ncon.setFrom(nf);
 			CompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 			ncon.setTo(nt);
-			return new Constraint[]{scon, ncon, eq};
+			return new Constraint[]{ncon, eq};
 			
 		} else if (this.type.equals(Type.DC)) {
 			AllenIntervalConstraint desf = new AllenIntervalConstraint(

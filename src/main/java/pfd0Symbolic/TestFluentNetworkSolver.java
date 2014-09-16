@@ -5,10 +5,6 @@ import java.util.logging.Logger;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import simpleBooleanValueCons.SimpleBooleanValueConstraint;
-import simpleBooleanValueCons.SimpleBooleanValueConstraintSolver;
-import simpleBooleanValueCons.SimpleBooleanValueConstraint.Type;
-
 public class TestFluentNetworkSolver {
 
 	public static void main(String[] args) {
@@ -30,15 +26,6 @@ public class TestFluentNetworkSolver {
 		Fluent[] fluents = (Fluent[]) solver.createVariables(3);
 		logger.info("Test3");
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
-		
-		SimpleBooleanValueConstraintSolver bsolver = 
-				(SimpleBooleanValueConstraintSolver) solver.getConstraintSolvers()[1];
-//		ConstraintNetwork.draw(bsolver.getConstraintNetwork());
-		
-		SimpleBooleanValueConstraint con0 = new SimpleBooleanValueConstraint(Type.UNARYTRUE);
-		con0.setFrom(fluents[0].getSimpleBooleanValueVariable());
-		con0.setTo(fluents[0].getSimpleBooleanValueVariable());
-		logger.info("Added con0? " + bsolver.addConstraint(con0));
 		
 		fluents[0].setName("get_mug(mug1 pl1 none none)");
 		fluents[1].setName("get_mug(mug1 pl1 none none)");
