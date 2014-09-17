@@ -4,19 +4,18 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import unify.CompoundSymbolicVariableConstraintSolver;
 
-public class TestAAAIDomain {
+public class TestAAAIDomainSingle {
 	
 	private static PFD0Planner planner;
 	private static FluentNetworkSolver fluentSolver;
 
 	public static void main(String[] args) {
-		String[][] symbols = AAAIDomain.createSymbols();
-		int[] ingredients = AAAIDomain.createIngredients();
+		String[][] symbols = AAAIDomainSingle.createSymbols();
+		int[] ingredients = AAAIDomainSingle.createIngredients();
 		
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
@@ -32,7 +31,7 @@ public class TestAAAIDomain {
 		
 //		AAAIProblems.createProblemDriveM(fluentSolver);
 //		AAAIProblems.createProblemGraspM(fluentSolver);
-		AAAIProblems.createProblemGetObjectWithArmM(fluentSolver);
+		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
 		test();
 	}
 	
@@ -99,9 +98,9 @@ public class TestAAAIDomain {
 //		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 //		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
-		Vector<PlanReportroryItem> operators = AAAIDomain.createOperators(fluentSolver);
+		Vector<PlanReportroryItem> operators = AAAIDomainSingle.createOperators(fluentSolver);
 		selectionConstraint.setOperators(operators);
-		Vector<PlanReportroryItem> methods = AAAIDomain.createMethods(fluentSolver);
+		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
 		selectionConstraint.setMethods(methods);
 //		planner.addMetaConstraint(preConstraint);
 //		planner.addMetaConstraint(applicationConstraint);
