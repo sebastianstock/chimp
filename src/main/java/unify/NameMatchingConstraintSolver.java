@@ -60,6 +60,7 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 
 	@Override
 	public boolean propagate() {
+		long startTime = System.nanoTime();
 		// create backup of old domains
 		NameDomain[] backUpDomains = new NameDomain[this.getVariables().length];
 		for (int i = 0; i < this.getVariables().length; i++) {
@@ -72,6 +73,8 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 				d.getVariable().setDomain(d);
 			}
 		}
+		long endTime = System.nanoTime();
+		logger.fine("Propagation took "+((endTime - startTime) / 1000000) + " ms"); 
 		return success;
 	}
 	
