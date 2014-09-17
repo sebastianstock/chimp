@@ -9,6 +9,8 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 
+import cern.colt.Arrays;
+
 public class CompoundSymbolicVariable extends MultiVariable {
 
 	/**
@@ -19,6 +21,8 @@ public class CompoundSymbolicVariable extends MultiVariable {
 	private static Pattern namepattern = Pattern.compile("^(.+)\\((.*)\\)$");
 	
 	private static int internalVarsCount;
+	
+	private static final String NONESYMBOL = "n";
 	
 	
 	public CompoundSymbolicVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
@@ -56,14 +60,17 @@ public class CompoundSymbolicVariable extends MultiVariable {
 	 */
 	public void setName(String type, String ...arguments) {
 		Variable[] vars = this.getInternalVariables();
-		if ((arguments.length + 1) != internalVarsCount) {
-			throw new IllegalArgumentException("Number of arguments does not match number of internal variables");
+		if ((arguments.length + 1) > internalVarsCount) {
+			throw new IllegalArgumentException("Number of arguments is bigger than number of internal variables:" + type + Arrays.toString(arguments));
 		}
 		((NameVariable) vars[0]).setConstant(type);
-		for (int i = 1; i < internalVarsCount; i++) {
-			if (arguments[i-1].charAt(0) != '?') {  // '?' indicates variables -> nothing to set
-				((NameVariable) vars[i]).setConstant(arguments[i-1]);
+		for (int i = 0; i < arguments.length; i++) {
+			if (arguments[i].charAt(0) != '?') {  // '?' indicates variables -> nothing to set
+				((NameVariable) vars[i+1]).setConstant(arguments[i]);
 			}
+		}
+		for (int i = arguments.length + 1; i < internalVarsCount; i++) {
+			((NameVariable) vars[i]).setConstant(NONESYMBOL);
 		}
 	}
 	
