@@ -26,6 +26,8 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 	public static final int MAX_VARS = 1000000;
 	private String[] symbols;
 	private Map<String, Integer> symbols2Index;
+	
+	private long propagationTime = 0;
 
 	// TODO check if really needed:
 	private HashMap<Integer, String> getVaribaleById = new HashMap<Integer, String>();
@@ -74,7 +76,9 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 			}
 		}
 		long endTime = System.nanoTime();
-		logger.fine("Propagation took "+((endTime - startTime) / 1000000) + " ms"); 
+		propagationTime += endTime - startTime;
+		logger.fine("Propagation took "+((endTime - startTime) / 1000000) + " ms");
+		logger.fine("Propagation took in sum "+((propagationTime) / 1000000) + " ms");
 		return success;
 	}
 	

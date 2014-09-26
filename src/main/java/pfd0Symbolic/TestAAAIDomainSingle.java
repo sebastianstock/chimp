@@ -21,7 +21,7 @@ public class TestAAAIDomainSingle {
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		initMetaConstraints();
-//		AAAIProblems.createProblemMoveBase(fluentSolver);
+		AAAIProblemsSingle.createProblemMoveBase(fluentSolver);
 //		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
 //		AAAIProblems.createProblemMoveArmsToCarryposture(fluentSolver);
 //		AAAIProblems.createProblemTuckArms(fluentSolver);
@@ -29,9 +29,11 @@ public class TestAAAIDomainSingle {
 //		AAAIProblems.createProblemMoveTorso(fluentSolver);
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		
-//		AAAIProblems.createProblemDriveM(fluentSolver);
-//		AAAIProblems.createProblemGraspM(fluentSolver);
-		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
+//		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
+//		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
+//		AAAIProblemsSingle.createProblemAssumeManipulationPoseM(fluentSolver);
+//		AAAIProblemsSingle.createProblemGraspM(fluentSolver);
+//		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
 		test();
 	}
 	
@@ -50,6 +52,7 @@ public class TestAAAIDomainSingle {
 //		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
+		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 		
 //		Callback cb = new Callback() {
 //			@Override

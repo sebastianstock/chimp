@@ -59,6 +59,9 @@ public class CompoundSymbolicVariable extends MultiVariable {
 	 * @throws IllegalArgumentException If size of argument array does not match number of internal variables.
 	 */
 	public void setName(String type, String ...arguments) {
+		if (arguments == null) {
+			arguments = new String[0];
+		}
 		Variable[] vars = this.getInternalVariables();
 		if ((arguments.length + 1) > internalVarsCount) {
 			throw new IllegalArgumentException("Number of arguments is bigger than number of internal variables:" + type + Arrays.toString(arguments));
@@ -73,7 +76,6 @@ public class CompoundSymbolicVariable extends MultiVariable {
 			((NameVariable) vars[i]).setConstant(NONESYMBOL);
 		}
 	}
-	
 	
 	/**
 	 * Set the name with one String.

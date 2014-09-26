@@ -42,7 +42,7 @@ public class TestAAAIDomain {
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINEST);
+//		MetaCSPLogging.setLevel(Level.FINEST);
 		
 		long startTime = System.nanoTime();
 		System.out.println("Found a plan? " + planner.backtrack());

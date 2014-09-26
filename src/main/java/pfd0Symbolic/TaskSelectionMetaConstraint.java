@@ -156,7 +156,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 				}
 			}
 		}
-		System.out.println("MetaVariables: " + ret);
+		logger.finest("MetaVariables: " + ret);
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
 	
 	}
@@ -190,7 +190,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
-		logger.info("getMetaValues for: " + taskFluent);
+		logger.fine("getMetaValues for: " + taskFluent);
 		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
 //		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {

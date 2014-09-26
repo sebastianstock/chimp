@@ -3,6 +3,7 @@ package pfd0Symbolic;
 import java.util.Vector;
 
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.time.Bounds;
 
 public class AAAIDomainSingle {
 	
@@ -84,7 +85,7 @@ public class AAAIDomainSingle {
 		ret.add(new PFD0Method("assume_default_driving_pose", new String[] {N, N, N, N, N}, 
 				new PFD0Precondition[] {}, 
 				new VariablePrototype[] {tuck_arms_A1, move_torso_A1}, 
-				new FluentConstraint[] {beforeA1})); // TODO this before is not needed!
+				new FluentConstraint[] {beforeA1}));
 		
 		// ###################### MOVE_BOTH_ARMS_TO_SIDE_POSE ########################################
 		VariablePrototype tuck_arms_A2 = new VariablePrototype(groundSolver, "M", 
@@ -231,10 +232,12 @@ public class AAAIDomainSingle {
 		VariablePrototype newArmPosture4 = new VariablePrototype(groundSolver, "S", 
 				"HasArmPosture", new String[] {"rightArm1", "?rightGoal", N, N, N});
 
-		ret.add( new PFD0Operator("!tuck_arms", 
+		PFD0Operator tuck_op = new PFD0Operator("!tuck_arms", 
 				new String[] {"leftArm1", "rightArm1", "?leftGoal", "?rightGoal", N},
 				new PFD0Precondition[]{oldArmPosture3, oldArmPosture4}, 
-				new VariablePrototype[] {newArmPosture3, newArmPosture4}));
+				new VariablePrototype[] {newArmPosture3, newArmPosture4});
+		tuck_op.setDurationBounds(new Bounds(20, 20));
+		ret.add(tuck_op);
 		
 		
 		//################ !move_arms_to_carryposture ################################################
@@ -361,11 +364,12 @@ public class AAAIDomainSingle {
 		VariablePrototype newTorsoPosture0 = new VariablePrototype(groundSolver, "S", 
 				"HasTorsoPosture", new String[] {"?newPosture", N, N, N, N});
 
-		ret.add( new PFD0Operator("!move_torso", 
+		PFD0Operator moveTorsoOP =  new PFD0Operator("!move_torso", 
 				new String[] {"?newPosture", N, N, N, N},
 				new PFD0Precondition[]{oldTorsoPosture0}, 
-				new VariablePrototype[] {newTorsoPosture0}));
-		
+				new VariablePrototype[] {newTorsoPosture0});
+		moveTorsoOP.setDurationBounds(new Bounds(10, 10));
+		ret.add(moveTorsoOP);
 		return ret;
 		
 		

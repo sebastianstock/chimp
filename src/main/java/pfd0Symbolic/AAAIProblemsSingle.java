@@ -1,6 +1,8 @@
 package pfd0Symbolic;
 
 import org.metacsp.framework.Variable;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.Bounds;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
@@ -21,22 +23,44 @@ public class AAAIProblemsSingle {
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 	
-	public static void createProblemMoveBase(FluentNetworkSolver groundSolver) {
+	public static void createProblemMoveBase(FluentNetworkSolver fluentSolver) {
 		// State
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
-		Variable[] stateVars = groundSolver.createVariables(1);
+		Variable[] stateVars = fluentSolver.createVariables(1);
 		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaEastCounter1)");
 		stateVars[0].setMarking(markings.OPEN);
 		
 		// task
-		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
-		taskFluent.setName("!move_base(preManipulationAreaSouthTable1)");
-		taskFluent.setMarking(markings.UNPLANNED);
+		Fluent mbFluent = (Fluent) fluentSolver.createVariable("Task1");
+		mbFluent.setName("!move_base(preManipulationAreaSouthTable1)");
+		mbFluent.setMarking(markings.UNPLANNED);
 		
 		// task
-		Fluent mbbFluent = (Fluent) groundSolver.createVariable("Task2");
+		Fluent mbbFluent = (Fluent) fluentSolver.createVariable("Task2");
 		mbbFluent.setName("!move_base_blind(manipulationAreaSouthTable1)");
 		mbbFluent.setMarking(markings.UNPLANNED);
+		
+		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(1,1));
+		release.setFrom(mbFluent);
+		release.setTo(mbFluent);
+		fluentSolver.addConstraint(release);
+		AllenIntervalConstraint mbDuration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		mbDuration.setFrom(mbFluent);
+		mbDuration.setTo(mbFluent);
+		fluentSolver.addConstraint(mbDuration);
+//		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(100,100));
+//		deadline.setFrom(mbFluent);
+//		deadline.setTo(mbFluent);
+//		fluentSolver.addConstraint(deadline);
+		AllenIntervalConstraint mbbDuration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,10));
+		mbbDuration.setFrom(mbbFluent);
+		mbbDuration.setTo(mbbFluent);
+		fluentSolver.addConstraint(mbbDuration);
+		
+		FluentConstraint before = new FluentConstraint(FluentConstraint.Type.BEFORE);
+		before.setFrom(mbFluent);
+		before.setTo(mbbFluent);
+		fluentSolver.addConstraint(before);
 	}
 	
 	public static void createProblemPlaceObject(FluentNetworkSolver groundSolver) {
@@ -165,6 +189,54 @@ public class AAAIProblemsSingle {
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
 		taskFluent.setName("drive(preManipulationAreaSouthTable1)");
 //		taskFluent.setName("assume_default_driving_pose()");
+		taskFluent.setMarking(markings.UNPLANNED);
+	}
+	
+	public static void createProblemAssumeDefaultDrivingPoseM(FluentNetworkSolver fluentSolver) {
+		// State
+		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
+		Variable[] stateVars = fluentSolver.createVariables(4);
+		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaEastCounter1)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoUpPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armToSidePosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armToSidePosture)");
+		
+		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+		
+		// task
+		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
+		taskFluent.setName("assume_default_driving_pose()");
+		//		taskFluent.setName("assume_default_driving_pose()");
+		//Says that start time of from (and to) is at least 10 and at most 12
+		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(0,0));
+		release.setFrom(taskFluent);
+		release.setTo(taskFluent);
+		fluentSolver.addConstraint(release);
+		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(100,100));
+		deadline.setFrom(taskFluent);
+		deadline.setTo(taskFluent);
+		fluentSolver.addConstraint(deadline);
+		taskFluent.setMarking(markings.UNPLANNED);
+	}
+	
+	public static void createProblemAssumeManipulationPoseM(FluentNetworkSolver fluentSolver) {
+		// State
+		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
+		createStaticKnowledge(fluentSolver);
+		
+		Variable[] stateVars = fluentSolver.createVariables(5);
+		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaSouthTable1)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoDownPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armTuckedPosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armTuckedPosture)");
+		((Fluent) stateVars[4]).setName("On(mug1 placingAreaWestRightTable1)");
+		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+		
+		// task
+		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
+		taskFluent.setName("assume_manipulation_pose(manipulationAreaSouthTable1 preManipulationAreaSouthTable1)");
+		// the following alternative takes forever
+//		taskFluent.setName("assume_manipulation_pose(manipulationAreaSouthTable1 ?preManipulationAreaSouthTable1)");
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 	

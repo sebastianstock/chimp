@@ -66,7 +66,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 	protected void retractResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
 		Logger logger = MetaCSPLogging.getLogger(PFD0Planner.class);
-		logger.info("START RETRACT_RESOLVER_SUB");
+		logger.finest("START RETRACT_RESOLVER_SUB");
 		long startTime = System.nanoTime();
 		
 		
@@ -94,7 +94,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 			}
 		}
 		long endTime = System.nanoTime();
-		logger.info("END RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
+		logger.finest("END RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
 		
 		TaskSelectionMetaConstraint ts = null;
 		TaskApplicationMetaConstraint ta = null;
@@ -126,10 +126,10 @@ public class PFD0Planner extends MetaConstraintSolver {
 			ConstraintNetwork metaValue) {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
-		System.out.println("addResolverSub Constraints: ");
-		for(Constraint c : metaValue.getConstraints()) {
-			System.out.println(c);
-		}
+//		System.out.println("addResolverSub Constraints: ");
+//		for(Constraint c : metaValue.getConstraints()) {
+//			System.out.println(c);
+//		}
 		
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
