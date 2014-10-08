@@ -57,16 +57,16 @@ public class CompoundSymbolicVariableConstraintSolver extends MultiConstraintSol
 		}
 	}
 	
-	public void propagateAllSubFull() {
-		for (ConstraintSolver symbolicsolver : getConstraintSolvers()) {
-			((BooleanSatisfiabilitySolver) ((SymbolicVariableConstraintSolver) symbolicsolver).getConstraintSolvers()[0]).propagateFull();
-		}
-	}
-	
-	public void propagatePredicateNames() {
-		BooleanSatisfiabilitySolver bs = (BooleanSatisfiabilitySolver) ((SymbolicVariableConstraintSolver) getConstraintSolvers()[0]).getConstraintSolvers()[0];
-		bs.propagateFull();
-	}
+//	public void propagateAllSubFull() {
+//		for (ConstraintSolver symbolicsolver : getConstraintSolvers()) {
+//			((BooleanSatisfiabilitySolver) ((SymbolicVariableConstraintSolver) symbolicsolver).getConstraintSolvers()[0]).propagateFull();
+//		}
+//	}
+//	
+//	public void propagatePredicateNames() {
+//		BooleanSatisfiabilitySolver bs = (BooleanSatisfiabilitySolver) ((SymbolicVariableConstraintSolver) getConstraintSolvers()[0]).getConstraintSolvers()[0];
+//		bs.propagateFull();
+//	}
 	
 	
 	
