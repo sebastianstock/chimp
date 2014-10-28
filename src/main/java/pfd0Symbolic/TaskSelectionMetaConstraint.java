@@ -233,12 +233,6 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		return ret;
 	}
 	
-	
-	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
-			int initial_time) {
-		return getMetaValues(metaVariable);
-	}
 
 	/**
 	 * Sets the marking of the task to SELECTED

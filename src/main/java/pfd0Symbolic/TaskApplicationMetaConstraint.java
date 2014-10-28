@@ -105,12 +105,6 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		return null;
 	}
 
-	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
-			int initial_time) {
-		return getMetaValues(metaVariable);
-	}
-
 	/**
 	 * Sets the marking of the task to DECOMPOSED (compound) or PLANNED (primitive)
 	 */

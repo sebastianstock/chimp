@@ -93,13 +93,6 @@ public class SimpleReusableResourceFluent extends SchedulableFluent {
 
 
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable,
-			int initial_time) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean isConflicting(Activity[] arg0) {
 		// TODO Auto-generated method stub
 		return false;
