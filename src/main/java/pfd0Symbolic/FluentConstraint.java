@@ -84,7 +84,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			}
 		} else if (this.type.equals(Type.OPENS)) { // TODO probably need other relations, too
 //			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
-			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, new Bounds(2L, 6L));
+//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, new Bounds(2L, 6L));
+			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, AllenIntervalConstraint.Type.Overlaps.getDefaultBounds());
 			befCon.setFrom(((Fluent) f).getAllenInterval());
 			befCon.setTo(((Fluent) t).getAllenInterval());
 			if(connections != null) {
