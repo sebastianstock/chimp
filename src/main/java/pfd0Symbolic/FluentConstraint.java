@@ -4,7 +4,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
 
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
