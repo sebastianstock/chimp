@@ -15,7 +15,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
 
-	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED};
+	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED, MOVEDURATION};
 
 	private Type type;
 	private int[] connections;

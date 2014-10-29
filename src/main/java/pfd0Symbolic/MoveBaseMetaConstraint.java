@@ -65,19 +65,9 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 
 	// Checks if a duration has been set to a variable
 	private boolean checkDuration(Variable var, FluentNetworkSolver groundSolver) {
-		// can I use var here or do I need the internal variables?
-		AllenInterval ai = ((Fluent) var).getAllenInterval();
-		Constraint[] allenCons = groundSolver.getConstraintSolvers()[1].getConstraints(ai, ai);
-		for (Constraint con : allenCons) {
-			if (con instanceof AllenIntervalConstraint) {
-				AllenIntervalConstraint.Type[] aitypes = ((AllenIntervalConstraint) con).getTypes();
-				if(Arrays.asList(((AllenIntervalConstraint) con).getTypes()).contains(AllenIntervalConstraint.Type.Duration)) {
-					System.out.println(((AllenIntervalConstraint) con).getBounds());
-					return true;
-				}
-			}
-		}
-		return false;
+		List<FluentConstraint> durationCons = 
+				groundSolver.getFluentConstraintsOfTypeFrom((Fluent) var, FluentConstraint.Type.MOVEDURATION);
+		return !durationCons.isEmpty();
 	}
 
 	
