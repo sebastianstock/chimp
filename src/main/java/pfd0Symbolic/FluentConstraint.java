@@ -40,10 +40,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	}
 	
 	public FluentConstraint(Type type, Bounds bounds) {
-//		this(type);
-		this.type = type;
-//		this.bounds = bounds;
-		this.bounds = new Bounds(1,23);
+		this(type);
+		this.bounds = bounds;
 	}
 	
 

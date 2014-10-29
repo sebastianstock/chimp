@@ -19,10 +19,13 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	 */
 	private static final long serialVersionUID = 2789371087819357936L;
 	private static final String MOVE_BASE_NAME = "!move_base";
+	
+	private MoveBaseDurationEstimator durationEstimator;
 
 
-	public MoveBaseMetaConstraint() {
+	public MoveBaseMetaConstraint(MoveBaseDurationEstimator durationEstimator) {
 		super(null, null);
+		this.durationEstimator = durationEstimator;
 	}
 
 	
@@ -74,20 +77,26 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 		
 		logger.fine("getMetaValues for: " + taskFluent);
 		
-		
-		return new ConstraintNetwork[] {estimateDuration(taskFluent)};
+		ConstraintNetwork cn = estimateDuration(taskFluent);
+		if (cn != null) {
+			return new ConstraintNetwork[] {cn};
+		} else {
+			return new ConstraintNetwork[]{};
+		}
 	}
 	
 	private ConstraintNetwork estimateDuration(Fluent taskFluent) {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
-		FluentConstraint duration = new FluentConstraint(
-				FluentConstraint.Type.MOVEDURATION, 
-				new Bounds(7, 99));
-		duration.setFrom(taskFluent);
-		duration.setTo(taskFluent);
-		ret.addConstraint(duration);
-		
+		Bounds bounds = durationEstimator.estimateDuration("floorAreaTamsRestaurant1", "preManipulationAreaEastCounter1");
+		if (bounds != null) {
+			FluentConstraint duration = new FluentConstraint(FluentConstraint.Type.MOVEDURATION, bounds);
+			duration.setFrom(taskFluent);
+			duration.setTo(taskFluent);
+			ret.addConstraint(duration);
 		return ret;
+		} else {
+			return null;
+		}
 	}
 	
 	

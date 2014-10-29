@@ -37,7 +37,8 @@ public class TestMoveBaseMetaConstraint {
 	}
 	
 	private static void test() {
-		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint();
+		LookUpTableDurationEstimator durationEstimator = new LookUpTableDurationEstimator();
+		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(durationEstimator);
 		planner.addMetaConstraint(mbConstraint);
 		
 		Fluent getmugFluent = (Fluent) fluentSolver.createVariable("Robot1");
