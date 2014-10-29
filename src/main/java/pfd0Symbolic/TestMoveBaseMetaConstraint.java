@@ -5,10 +5,7 @@ import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.multi.MultiConstraintSolver;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
@@ -66,7 +63,7 @@ public class TestMoveBaseMetaConstraint {
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.FINEST);
 		
 //		System.out.println("Found a plan? " + planner.backtrack());
 		Callback cb = new Callback() {
@@ -82,7 +79,7 @@ public class TestMoveBaseMetaConstraint {
 		
 		
 		System.out.println(planner.getDescription());
-//		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[1].getConstraintNetwork());
+		ConstraintNetwork.draw(((MultiConstraintSolver)planner.getConstraintSolvers()[0]).getConstraintSolvers()[1].getConstraintNetwork());
 		
 		Variable[] vars = fluentSolver.getVariables();
 		ArrayList<String> results = new ArrayList<String>();

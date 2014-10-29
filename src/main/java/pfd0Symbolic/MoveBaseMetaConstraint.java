@@ -1,8 +1,5 @@
 package pfd0Symbolic;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -12,13 +9,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import resourceFluent.SchedulableFluent;
-import resourceFluent.SimpleReusableResourceFluent;
-import unify.CompoundSymbolicVariableConstraintSolver;
+import org.metacsp.time.Bounds;
 
 
 public class MoveBaseMetaConstraint extends MetaConstraint {
@@ -78,70 +69,31 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		Vector<ConstraintNetwork> ret;
-		
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
-		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
 		logger.fine("getMetaValues for: " + taskFluent);
-		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-//		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-//			ret = applyPlanrepoirtroryItems(taskFluent, operators, groundSolver);
-//		} else {
-//			ret = applyPlanrepoirtroryItems(taskFluent, methods, groundSolver);
-//		}
 		
-		ret = new Vector<ConstraintNetwork>();
 		
-		if (!ret.isEmpty()) 
-			return ret.toArray(new ConstraintNetwork[ret.size()]);
-		return null;
+		return new ConstraintNetwork[] {estimateDuration(taskFluent)};
+	}
+	
+	private ConstraintNetwork estimateDuration(Fluent taskFluent) {
+		ConstraintNetwork ret = new ConstraintNetwork(null);
+		FluentConstraint duration = new FluentConstraint(
+				FluentConstraint.Type.MOVEDURATION, 
+				new Bounds(7, 99));
+		duration.setFrom(taskFluent);
+		duration.setTo(taskFluent);
+		ret.addConstraint(duration);
+		
+		return ret;
 	}
 	
 	
-	// TODO OBSOLETE
-//	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl, Vector<PlanReportroryItem> items, 
-//			FluentNetworkSolver groundSolver) {
-//		Fluent[] openFluents = groundSolver.getOpenFluents();
-//		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-//		for (PlanReportroryItem item : items) {
-//			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
-//				
-//				
-////				HashMap<String, Integer> usages = ((PFD0Operator)item).getResourceUsage();
-////				for (String resname : usages.keySet()) {
-////					HashMap<Variable, Integer> utilizers = currentResourceUtilizers.get(resourcesMap.get(resname));
-////					utilizers.put(fl, usages.get(resname));
-////				}
-//				
-//				logger.fine("Applying preconditions of PlanReportroryItem " + item);
-//				if (this.oneShot) {
-//					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl,  groundSolver);
-//					for (ConstraintNetwork newResolver : newResolvers) {
-//						ret.add(newResolver);
-//					}
-//				} else {
-//					ret.add(item.expandPreconditions(fl, groundSolver));
-//				}
-//				
-//			}
-//		}
-//		return ret;
-//	}
-	
-
-	/**
-	 * Sets the marking of the task to SELECTED
-	 */
 	@Override
 	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-//		if(this.oneShot) {
-//			metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
-//		} else {
-//			metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.SELECTED);
-//		}
-		// NOTHING TO DO HERE?
+		// nothing to do here
 	}
 
 	@Override

@@ -3,7 +3,9 @@ package pfd0Symbolic;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
+import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.Bounds;
 
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
@@ -21,7 +23,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private int[] connections;
 	private PlanReportroryItem plannedWith; // The operator or method that has been used for planning the task.
 	private boolean isNegativeEffect;
-
+	private Bounds bounds;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -35,6 +37,13 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public FluentConstraint(Type type, PlanReportroryItem plannedWith) {
 		this(type);
 		this.plannedWith = plannedWith;
+	}
+	
+	public FluentConstraint(Type type, Bounds bounds) {
+//		this(type);
+		this.type = type;
+//		this.bounds = bounds;
+		this.bounds = new Bounds(1,23);
 	}
 	
 
@@ -101,8 +110,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			} else {
 				return new Constraint[]{befCon};
 			}
-		}
-		else if (this.type.equals(Type.CLOSES)) { // TODO probably need other relations, too
+		} else if (this.type.equals(Type.CLOSES)) { // TODO probably need other relations, too
 			AllenIntervalConstraint oiCon = new AllenIntervalConstraint(
 					AllenIntervalConstraint.Type.OverlappedBy,
 					AllenIntervalConstraint.Type.OverlappedBy.getDefaultBounds());
@@ -113,6 +121,15 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			} else {
 				return new Constraint[]{oiCon};
 			}
+		} else if (this.type.equals(Type.MOVEDURATION)) {
+			AllenIntervalConstraint durationCon = new AllenIntervalConstraint(
+					AllenIntervalConstraint.Type.Duration, this.bounds
+//					new Bounds(10, 100)
+					);
+			AllenInterval ai = ((Fluent) f).getAllenInterval();
+			durationCon.setFrom(ai);
+			durationCon.setTo(ai);
+			return new Constraint[]{durationCon};	
 		}
 		return null;
 	}
@@ -130,7 +147,9 @@ public class FluentConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public Object clone() {
-		FluentConstraint ret = new FluentConstraint(type, connections);
+		FluentConstraint ret = new FluentConstraint(type);
+		ret.connections = this.connections;
+		ret.bounds = this.bounds;
 		ret.plannedWith = this.plannedWith;
 		ret.setNegativeEffect(isNegativeEffect);
 		return ret;
