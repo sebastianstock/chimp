@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package externalPahtPlanning;
 
 import org.metacsp.time.Bounds;
 

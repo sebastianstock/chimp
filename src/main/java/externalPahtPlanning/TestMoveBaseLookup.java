@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package externalPahtPlanning;
 
 import java.util.Vector;
 import java.util.logging.Level;
@@ -7,6 +7,12 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import pfd0Symbolic.AAAIDomain;
+import pfd0Symbolic.AAAIProblems;
+import pfd0Symbolic.FluentNetworkSolver;
+import pfd0Symbolic.PFD0Planner;
+import pfd0Symbolic.PlanReportroryItem;
+import pfd0Symbolic.TaskSelectionMetaConstraint;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestMoveBaseLookup {

@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package externalPahtPlanning;
 
 import java.util.List;
 import java.util.Vector;
@@ -11,6 +11,10 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.time.Bounds;
 
+import pfd0Symbolic.Fluent;
+import pfd0Symbolic.FluentConstraint;
+import pfd0Symbolic.FluentNetworkSolver;
+import pfd0Symbolic.FluentConstraint.Type;
 import unify.CompoundSymbolicVariable;
 
 

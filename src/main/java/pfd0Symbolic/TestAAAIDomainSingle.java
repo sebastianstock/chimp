@@ -21,7 +21,7 @@ public class TestAAAIDomainSingle {
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		initMetaConstraints();
-		AAAIProblemsSingle.createProblemMoveBase(fluentSolver);
+//		AAAIProblemsSingle.createProblemMoveBase(fluentSolver);
 //		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
 //		AAAIProblems.createProblemMoveArmsToCarryposture(fluentSolver);
 //		AAAIProblems.createProblemTuckArms(fluentSolver);
@@ -33,7 +33,7 @@ public class TestAAAIDomainSingle {
 //		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
 //		AAAIProblemsSingle.createProblemAssumeManipulationPoseM(fluentSolver);
 //		AAAIProblemsSingle.createProblemGraspM(fluentSolver);
-//		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
+		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
 		test();
 	}
 	
