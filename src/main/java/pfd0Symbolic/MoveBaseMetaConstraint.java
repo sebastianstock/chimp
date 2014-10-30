@@ -11,6 +11,9 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.time.Bounds;
 
+import unify.CompoundSymbolicVariable;
+
+
 
 public class MoveBaseMetaConstraint extends MetaConstraint {
 
@@ -19,6 +22,9 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	 */
 	private static final long serialVersionUID = 2789371087819357936L;
 	private static final String MOVE_BASE_NAME = "!move_base";
+	private static final String ROBOTAT_NAME = "RobotAt";
+	private static final int FROM_AREA_INDEX = 4;
+	private static final int TO_AREA_INDEX = 4;
 	
 	private MoveBaseDurationEstimator durationEstimator;
 
@@ -77,26 +83,61 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 		
 		logger.fine("getMetaValues for: " + taskFluent);
 		
-		ConstraintNetwork cn = estimateDuration(taskFluent);
-		if (cn != null) {
-			return new ConstraintNetwork[] {cn};
-		} else {
-			return new ConstraintNetwork[]{};
-		}
+		return estimateDuration(taskFluent);
 	}
 	
-	private ConstraintNetwork estimateDuration(Fluent taskFluent) {
-		ConstraintNetwork ret = new ConstraintNetwork(null);
-		Bounds bounds = durationEstimator.estimateDuration("floorAreaTamsRestaurant1", "preManipulationAreaEastCounter1");
+	private ConstraintNetwork[] estimateDuration(Fluent taskFluent) {
+		Bounds bounds = null;
+		String fromArea = getFromArea(taskFluent);
+		if (fromArea != null && fromArea.length() > 0) {
+			String toArea = getToArea(taskFluent);
+			if (toArea != null && toArea.length() > 0) {
+				bounds = durationEstimator.estimateDuration(fromArea, toArea);
+			} else {
+				logger.severe("No unique toArea found!");
+			}
+		} else {
+			logger.severe("No fromArea found!");
+		}
+		
 		if (bounds != null) {
 			FluentConstraint duration = new FluentConstraint(FluentConstraint.Type.MOVEDURATION, bounds);
 			duration.setFrom(taskFluent);
 			duration.setTo(taskFluent);
+			ConstraintNetwork ret = new ConstraintNetwork(null);
 			ret.addConstraint(duration);
-		return ret;
+			return new ConstraintNetwork[] {ret};
 		} else {
-			return null;
+			return new ConstraintNetwork[] {};
 		}
+	}
+	
+	private String getToArea(Fluent taskFluent) {
+		String[] possibleToAreas = taskFluent.getCompoundSymbolicVariable().getSymbolsAt(TO_AREA_INDEX);
+		if (possibleToAreas.length != 1) {
+			throw new IllegalStateException("FromArea is not ground");
+		} else {
+			return possibleToAreas[0];
+		}
+	}
+	
+	private String getFromArea(Fluent taskFluent) {
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
+		List<FluentConstraint> preCons = 
+				groundSolver.getFluentConstraintsOfTypeTo(taskFluent, FluentConstraint.Type.PRE);
+		for (FluentConstraint con : preCons) {
+			CompoundSymbolicVariable from = ((Fluent) con.getFrom()).getCompoundSymbolicVariable();
+			if (from.getPredicateName().equals(ROBOTAT_NAME)) {
+				String[] possibleFromAreas = from.getSymbolsAt(FROM_AREA_INDEX);
+				
+				if (possibleFromAreas.length != 1) {
+					throw new IllegalStateException("FromArea is not ground");
+				} else {
+					return possibleFromAreas[0];
+				}
+			}
+		}
+		throw new IllegalStateException("No RobotAt precondition found");
 	}
 	
 	
