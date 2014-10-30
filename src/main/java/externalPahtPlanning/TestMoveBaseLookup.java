@@ -7,8 +7,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.AAAIDomain;
-import pfd0Symbolic.AAAIProblems;
+import domains.AAAIDomain;
+import domains.AAAIProblems;
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PlanReportroryItem;

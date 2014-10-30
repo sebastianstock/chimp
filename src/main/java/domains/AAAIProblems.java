@@ -1,7 +1,9 @@
-package pfd0Symbolic;
+package domains;
 
 import org.metacsp.framework.Variable;
 
+import pfd0Symbolic.Fluent;
+import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class AAAIProblems {

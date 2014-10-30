@@ -1,27 +1,32 @@
-package pfd0Symbolic;
+package domains;
 
 import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import pfd0Symbolic.FluentNetworkSolver;
+import pfd0Symbolic.PFD0Planner;
+import pfd0Symbolic.PlanReportroryItem;
+import pfd0Symbolic.TaskSelectionMetaConstraint;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
-public class TestAAAIDomainSingle {
+public class TestAAAIDomain {
 	
 	private static PFD0Planner planner;
 	private static FluentNetworkSolver fluentSolver;
 
 	public static void main(String[] args) {
-		String[][] symbols = AAAIDomainSingle.createSymbols();
-		int[] ingredients = AAAIDomainSingle.createIngredients();
+		String[][] symbols = AAAIDomain.createSymbols();
+		int[] ingredients = AAAIDomain.createIngredients();
 		
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		initMetaConstraints();
-//		AAAIProblemsSingle.createProblemMoveBase(fluentSolver);
+//		AAAIProblems.createProblemMoveBase(fluentSolver);
 //		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
 //		AAAIProblems.createProblemMoveArmsToCarryposture(fluentSolver);
 //		AAAIProblems.createProblemTuckArms(fluentSolver);
@@ -29,11 +34,9 @@ public class TestAAAIDomainSingle {
 //		AAAIProblems.createProblemMoveTorso(fluentSolver);
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		
-//		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
-//		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
-//		AAAIProblemsSingle.createProblemAssumeManipulationPoseM(fluentSolver);
-//		AAAIProblemsSingle.createProblemGraspM(fluentSolver);
-		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
+//		AAAIProblems.createProblemDriveM(fluentSolver);
+//		AAAIProblems.createProblemGraspM(fluentSolver);
+		AAAIProblems.createProblemGetObjectWithArmM(fluentSolver);
 		test();
 	}
 	
@@ -43,7 +46,7 @@ public class TestAAAIDomainSingle {
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINE);
+//		MetaCSPLogging.setLevel(Level.FINEST);
 		
 		long startTime = System.nanoTime();
 		System.out.println("Found a plan? " + planner.backtrack());
@@ -52,7 +55,6 @@ public class TestAAAIDomainSingle {
 //		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 		
 //		Callback cb = new Callback() {
 //			@Override
@@ -101,9 +103,9 @@ public class TestAAAIDomainSingle {
 //		PreconditionMetaConstraint preConstraint = new PreconditionMetaConstraint();
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 //		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
-		Vector<PlanReportroryItem> operators = AAAIDomainSingle.createOperators(fluentSolver);
+		Vector<PlanReportroryItem> operators = AAAIDomain.createOperators(fluentSolver);
 		selectionConstraint.setOperators(operators);
-		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
+		Vector<PlanReportroryItem> methods = AAAIDomain.createMethods(fluentSolver);
 		selectionConstraint.setMethods(methods);
 //		planner.addMetaConstraint(preConstraint);
 //		planner.addMetaConstraint(applicationConstraint);
