@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -108,26 +107,9 @@ public abstract class PlanReportroryItem {
 			return false;
 		}
 	}
+
 	
-	/** Creates prototypes for the preconditions.
-	 * For each precondition a precondition prototype will be created. This prototype will later be 
-	 * connected via NameMatchingConstraints to the open fluents.
-	 * 
-	 * @param taskfluent The task that is expanded.
-	 * @return New PRE constraints between new prototypes and taskfluent.
-	 */
-	protected Vector<FluentConstraint> addPreconditionPrototypes(Fluent taskfluent, 
-			FluentNetworkSolver groundSolver) {
-		
-		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-		if(this.preconditions != null) {
-			for (PFD0Precondition pre : this.preconditions) {
-				newConstraints.add(pre.createPreconditionConstraint(taskfluent, groundSolver));
-			}
-		}
-		return newConstraints;
-	}
-	
+	@Deprecated // only used when we have three meta-constraints by TaskSelectionMetaConstraint
 	/**
 	 * Creates the dummy preconditions for a task + Adds Duration constraint
 	 * @param taskfluent The task that has to be expanded.
@@ -161,47 +143,57 @@ public abstract class PlanReportroryItem {
 	
 	/**
 	 * Expands preconditions and effects of a task + Adds Duration constraint
-	 * @param taskfluent The task that has to be expanded.
+	 * @param taskFluent The task that has to be expanded.
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork.
 	 */
-	public List<ConstraintNetwork> expandOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, FluentNetworkSolver groundSolver) {
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		Fluent[] openFluents = groundSolver.getOpenFluents();
-		List<Set<FluentConstraint>> constraints = new ArrayList<Set<FluentConstraint>>();
+		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
 		
+		HashMap<FluentConstraint, PFD0Precondition> constraintToPreconditionMap = 
+				new HashMap<FluentConstraint, PFD0Precondition>();
+		
+		// Create set of potential precondition constraints.
 		if(this.preconditions != null) {
 			for (PFD0Precondition pre : this.preconditions) {
-				String headName = pre.getFluenttype();
+				String preName = pre.getFluenttype();
 				Set<FluentConstraint> possiblePreconditions = new HashSet<FluentConstraint>();
 				for (Fluent openFluent : openFluents)  {
-					String oname = openFluent.getCompoundSymbolicVariable().getPredicateName();
-					if(headName.equals(oname)) {
-						// potential match. Add matches constraint.
+					String oName = openFluent.getCompoundSymbolicVariable().getPredicateName();
+					if(preName.equals(oName)) {
+						// potential match. Add PRE constraint.
 						// TODO could be optimized by testing the full name.
-						FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
+						FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE, 
 								pre.getConnections());
-						preconstr.setFrom(openFluent);
-						preconstr.setTo(taskfluent);
-						preconstr.setNegativeEffect(pre.isNegativeEffect());
-						possiblePreconditions.add(preconstr);
+						preCon.setFrom(openFluent);
+						preCon.setTo(taskFluent);
+						preCon.setNegativeEffect(pre.isNegativeEffect());
+						possiblePreconditions.add(preCon);
+						constraintToPreconditionMap.put(preCon, pre);
 					}
 				}
 				if (possiblePreconditions.size() > 0) {
-					constraints.add(possiblePreconditions);
+					fluentConstraints.add(possiblePreconditions);
 				} else {
-					return ret;  // Precondition can not be fulfilled!
+					return ret;  // Precondition cannot be fulfilled!
 				}
 			}
 		}
 		
-		// Create constraint networks as cartesian product of precondtion constraints
-		Set<List<FluentConstraint>> combinations = Sets.cartesianProduct(constraints);
+		// Create constraint networks as cartesian product of precondition constraints
+		Set<List<FluentConstraint>> combinations = Sets.cartesianProduct(fluentConstraints);
+		
+		// Create Constraint networks
 		for (List<FluentConstraint> comb : combinations) {
 			ConstraintNetwork cn = new ConstraintNetwork(null);
+			
+			// Add PRE and CLOSES constraints
 			for (FluentConstraint con : comb) {
 				cn.addConstraint(con);
+				
 				// add closes for negative effects
 				if (con.isNegativeEffect() && this instanceof PFD0Operator) {
 					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
@@ -212,7 +204,7 @@ public abstract class PlanReportroryItem {
 			}
 			
 			// add positive effects/decomposition
-			for (Constraint con : expandEffectsOneShot(taskfluent, groundSolver)) {
+			for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
 				cn.addConstraint(con);
 			}
 			
@@ -220,14 +212,14 @@ public abstract class PlanReportroryItem {
 			// UNARYAPPLIED is not needed anymore.
 			FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
 					this);
-			applicationconstr.setFrom(taskfluent);
-			applicationconstr.setTo(taskfluent);
+			applicationconstr.setFrom(taskFluent);
+			applicationconstr.setTo(taskFluent);
 			cn.addConstraint(applicationconstr);
 			// add constraints for duration
 			if (durationBounds != null) {
 				AllenIntervalConstraint duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
-				duration.setFrom(taskfluent.getAllenInterval());
-				duration.setTo(taskfluent.getAllenInterval());
+				duration.setFrom(taskFluent.getAllenInterval());
+				duration.setTo(taskFluent.getAllenInterval());
 				cn.addConstraint(duration);
 			}
 			ret.add(cn);

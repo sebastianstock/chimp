@@ -56,6 +56,8 @@ public class PFD0Operator extends PlanReportroryItem {
 		return resourceUsageMap;
 	}
 	
+	// Only used by TaskApplicationMetaConstraint when we have three different meta-constraints.
+	@Deprecated
 	@Override
 	public ConstraintNetwork expandOnlyTail(Fluent taskfluent,
 			FluentNetworkSolver groundSolver) {

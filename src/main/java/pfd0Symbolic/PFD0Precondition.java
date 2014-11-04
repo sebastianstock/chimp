@@ -55,6 +55,7 @@ public class PFD0Precondition {
 		return connections;
 	}
 	
+	@Deprecated // Only used when using three variables
 	/** Creates a constraint for this precondition.
 	 * A precondition prototype will be created. This prototype will later be 
 	 * connected via NameMatchingConstraints to the open fluents.
