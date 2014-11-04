@@ -23,6 +23,18 @@ public class PFD0Precondition {
 		this.connections = connections;
 	}
 	
+	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections, int maxargs, String emptyStr) {
+		this.fluenttype = fluenttype;
+		this.arguments = new String[maxargs];
+		for (int i = 0; i < arguments.length; i++) {
+			this.arguments[i] = arguments[i];
+		}
+		for (int i = arguments.length; i < maxargs; i++) {
+			this.arguments[i] = emptyStr;
+		}
+		this.connections = connections;
+	}
+	
 	public void setNegativeEffect(boolean isNegativeEffect) {
 		this.isNegativeEffect = isNegativeEffect;
 	}
