@@ -218,37 +218,34 @@ public abstract class PlanReportroryItem {
 			}
 			
 			// add binding constraints between preconditions and preconditions
-//			if (variableOccurrencesMap != null) {
-//				for (HashMap<String, Integer> occurrence : variableOccurrencesMap.values()) {
-//					String[] preKeys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
-//					for (int i = 0; i < preKeys.length; i++) {
-//						if (preKeys[i].equals("head")) {
-//							continue;
-//						}
-//						for (int j = i + 1; j < preKeys.length; j++) {
-//							if (preKeys[j].equals("head")) {
-//								continue;
-//							}
-//							// Create binding constraint
-//							int connections[] = new int[] {occurrence.get(preKeys[i]).intValue(),
-//									occurrence.get(preKeys[j]).intValue()};
-//							CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
-//									CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
-//									connections);
-//							
-//							Fluent from = (Fluent) preconditionToConstraint.get(preKeys[i]).getFrom();
-//							Fluent to = (Fluent) preconditionToConstraint.get(preKeys[j]).getFrom();
-//							
-//							// TODO: DO I need the compoundsymbolicvarible or can I use the fluent?
-//							CompoundSymbolicVariable nf = from.getCompoundSymbolicVariable();
-//							bcon.setFrom(nf);
-//							CompoundSymbolicVariable nt = to.getCompoundSymbolicVariable();
-//							bcon.setTo(nt);
-//							cn.addConstraint(bcon);
-//						}
-//					}
-//				}
-//			}
+			if (variableOccurrencesMap != null) {
+				for (HashMap<String, Integer> occurrence : variableOccurrencesMap.values()) {
+					String[] preKeys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
+					for (int i = 0; i < preKeys.length; i++) {
+						if (preKeys[i].equals("head")) {
+							continue;
+						}
+						for (int j = i + 1; j < preKeys.length; j++) {
+							if (preKeys[j].equals("head")) {
+								continue;
+							}
+							// Create binding constraint
+							int connections[] = new int[] {occurrence.get(preKeys[i]).intValue(),
+									occurrence.get(preKeys[j]).intValue()};
+							CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
+									CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
+									connections);
+							
+							Fluent from = (Fluent) preconditionToConstraint.get(preKeys[i]).getFrom();
+							Fluent to = (Fluent) preconditionToConstraint.get(preKeys[j]).getFrom();
+							
+							bcon.setFrom(from.getCompoundSymbolicVariable());
+							bcon.setTo(to.getCompoundSymbolicVariable());
+							cn.addConstraint(bcon);
+						}
+					}
+				}
+			}
 			
 			// add positive effects/decomposition
 			for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
