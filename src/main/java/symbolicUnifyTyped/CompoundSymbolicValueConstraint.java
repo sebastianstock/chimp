@@ -7,9 +7,6 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.symbols.SymbolicValueConstraint;
-import org.metacsp.multi.symbols.SymbolicVariable;
-
-import cern.colt.Arrays;
 
 
 public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
