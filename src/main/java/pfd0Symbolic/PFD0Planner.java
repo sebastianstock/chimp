@@ -14,6 +14,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SimpleReusableResourceFluent;
+import unify.CompoundSymbolicValueConstraint;
 
 
 public class PFD0Planner extends MetaConstraintSolver {
@@ -155,7 +156,11 @@ public class PFD0Planner extends MetaConstraintSolver {
 			Variable[] newScope = new Variable[oldScope.length];
 			for (int i = 0; i < oldScope.length; i++) {
 				if (oldScope[i] instanceof VariablePrototype) {
-					newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
+					if (con instanceof CompoundSymbolicValueConstraint){
+						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getCompoundSymbolicVariable();
+					} else {	
+						newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
+					}
 				}
 				else {
 					newScope[i] = oldScope[i];

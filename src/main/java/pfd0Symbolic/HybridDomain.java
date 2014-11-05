@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -70,7 +71,7 @@ public class HybridDomain{
 			FluentNetworkSolver groundSolver) {
 		HashMap<String,String> preconditionsMap = new HashMap<String, String>();
 		ArrayList<String> negativeEffectsKeyList = new ArrayList<String>();
-		HashMap<String,String> effectsMap = new HashMap<String, String>();
+		HashMap<String,String> effectsStringsMap = new HashMap<String, String>();
 		Vector<AllenIntervalConstraint> constraints = new Vector<AllenIntervalConstraint>();
 		Vector<String> froms = new Vector<String>();  // TODO Are these necessary???
 		Vector<String> tos = new Vector<String>();
@@ -92,7 +93,7 @@ public class HybridDomain{
 		for (String effElement : effElements) {
 			String effKey = effElement.substring(0,effElement.indexOf(" ")).trim();
 			String effFluent = effElement.substring(effElement.indexOf(" ")).trim();
-			effectsMap.put(effKey, effFluent);
+			effectsStringsMap.put(effKey, effFluent);
 		}
 		
 		// Parse negative effects
@@ -231,7 +232,7 @@ public class HybridDomain{
 		System.out.println("HEAD: \n" + head);
 		System.out.println("Preconditions: \n" + preconditionsMap);
 
-		System.out.println("Effects: \n" + effectsMap);
+		System.out.println("Effects: \n" + effectsStringsMap);
 
 		System.out.println("Constraints: \n" + constraints);
 
@@ -252,17 +253,15 @@ public class HybridDomain{
 				variableOccurrencesMap, negativeEffectsKeyList);
 		
 		// Create positive effects
-		VariablePrototype[] effects = new VariablePrototype[effectsMap.size()];
-		int i = 0;
-		for (Entry<String, String> e : effectsMap.entrySet()) {
+		Map<String, VariablePrototype> effectsMap = new HashMap<String, VariablePrototype>();
+		for (Entry<String, String> e : effectsStringsMap.entrySet()) {
 			String effKey = e.getKey();
-			effects[i++] = createEffect(effKey, e.getValue(), maxargs, variableOccurrencesMap, groundSolver);
+			effectsMap.put(effKey, createEffect(effKey, e.getValue(), maxargs, variableOccurrencesMap, groundSolver));
 		}
 		
 		System.out.println("VarMap after parsing effects " + variableOccurrencesMap);
 		
-		
-		PFD0Operator ret =  new PFD0Operator(headname, argStrings, preconditions, effects);
+		PFD0Operator ret =  new PFD0Operator(headname, argStrings, preconditions, effectsMap);
 		ret.setVariableOccurrencesMap(variableOccurrencesMap);
 		System.out.println("Created Operator: " + ret);
 		return ret;
@@ -292,25 +291,18 @@ public class HybridDomain{
 			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap,
 			String[] argStrings, String key) {
 		for (int i = 0; i < argStrings.length;  i++) {
-			HashMap<String, Integer> occ = variableOccurrencesMap.get(argStrings[i]);
-			if (occ == null) {
-				occ = new HashMap<String, Integer>();
-				variableOccurrencesMap.put(argStrings[i], occ);
+			if (argStrings[i].startsWith(VARIABLE_INDICATOR)) {
+				HashMap<String, Integer> occ = variableOccurrencesMap.get(argStrings[i]);
+				if (occ == null) {
+					occ = new HashMap<String, Integer>();
+					variableOccurrencesMap.put(argStrings[i], occ);
+				}
+				occ.put(key, new Integer(i));
 			}
-			occ.put(key, new Integer(i));
 		}
 
 	}
 	
-//	private static ArrayList<String> filterVariables(String[] argStrings) {
-//		ArrayList<String> ret = new ArrayList<String>();
-//		for (String str : argStrings) {
-//			if (str.startsWith(VARIABLE_INDICATOR)) {
-//				ret.add(str);
-//			}
-//		}
-//		return ret;
-//	}
 	
 	private static String extractName(String str) {
 		return str.substring(str.indexOf("::")+1,str.indexOf("(")).trim();
@@ -331,19 +323,7 @@ public class HybridDomain{
 		String[] args = extractArgs(effString);
 		System.out.println("EffArgs: " + Arrays.toString(args));
 		
-		// find bindings to head
-//		ArrayList<Integer> connectionsList = new ArrayList<Integer>();
-/*		addVariableOccurrences(variableOccurrencesMap, args, effKey); */
-//		for (int i = 0; i < args.length; i++) {
-//			if (args[i].startsWith(VARIABLE_INDICATOR)) {
-//				Integer headId = variableOccurrencesMap.get(args[i]).get("head");
-//				if (headId != null) {
-//					connectionsList.add(i);
-//					connectionsList.add(headId);
-//				}
-//			}
-//		}
-//		System.out.println("Connections: " + connectionsList.toString());
+		addVariableOccurrences(variableOccurrencesMap, args, effKey); 
 
 		// fill arguments array up to maxargs
 		String[] filledArgs = new String[maxargs];

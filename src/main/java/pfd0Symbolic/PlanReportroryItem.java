@@ -6,14 +6,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
 import unify.CompoundSymbolicValueConstraint;
-import unify.CompoundSymbolicVariable;
 
 import com.google.common.collect.Sets;
 
@@ -24,8 +26,11 @@ public abstract class PlanReportroryItem {
 	protected PFD0Precondition[] preconditions;
 
 	protected String[] arguments;
+	protected Map<String, VariablePrototype> effectsMap;
 	
 	protected HashMap<String, HashMap<String, Integer>> variableOccurrencesMap;
+	
+	Logger logger = MetaCSPLogging.getLogger(PlanReportroryItem.class);
 	
 	/**
 	 * The bounds that will be used for the duration constraint of this task.
@@ -217,30 +222,46 @@ public abstract class PlanReportroryItem {
 				}
 			}
 			
-			// add binding constraints between preconditions and preconditions
+			// add binding constraints between preconditions or effects
 			if (variableOccurrencesMap != null) {
 				for (HashMap<String, Integer> occurrence : variableOccurrencesMap.values()) {
-					String[] preKeys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
-					for (int i = 0; i < preKeys.length; i++) {
-						if (preKeys[i].equals("head")) {
+					String[] keys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
+					for (int i = 0; i < keys.length; i++) {
+						if (keys[i].equals("head")) {
 							continue;
 						}
-						for (int j = i + 1; j < preKeys.length; j++) {
-							if (preKeys[j].equals("head")) {
+						for (int j = i + 1; j < keys.length; j++) {
+							if (keys[j].equals("head")) {
 								continue;
 							}
 							// Create binding constraint
-							int connections[] = new int[] {occurrence.get(preKeys[i]).intValue(),
-									occurrence.get(preKeys[j]).intValue()};
+							int connections[] = new int[] {occurrence.get(keys[i]).intValue(),
+									occurrence.get(keys[j]).intValue()};
 							CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
 									CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
 									connections);
 							
-							Fluent from = (Fluent) preconditionToConstraint.get(preKeys[i]).getFrom();
-							Fluent to = (Fluent) preconditionToConstraint.get(preKeys[j]).getFrom();
+							if (preconditionToConstraint.containsKey(keys[i])) {
+								Fluent from = (Fluent) preconditionToConstraint.get(keys[i]).getFrom();
+								bcon.setFrom(from.getCompoundSymbolicVariable());
+							} else if (effectsMap != null && effectsMap.containsKey(keys[i])){
+								bcon.setFrom(effectsMap.get(keys[i]));
+							} else {
+								logger.fine("No effect found for key " + keys[i]);
+								continue;
+							}
 							
-							bcon.setFrom(from.getCompoundSymbolicVariable());
-							bcon.setTo(to.getCompoundSymbolicVariable());
+							if (preconditionToConstraint.containsKey(keys[j])) {
+								Fluent to = (Fluent) preconditionToConstraint.get(keys[j]).getFrom();
+								bcon.setTo(to.getCompoundSymbolicVariable());
+							} else if (effectsMap != null && effectsMap.containsKey(keys[j])){
+								bcon.setTo(effectsMap.get(keys[j]));
+							} else {
+								logger.fine("No effect found for key " + keys[j]);
+								continue;
+							}
+							System.out.println("FROM: " +keys[i]);
+							System.out.println("TO: " +keys[j]);
 							cn.addConstraint(bcon);
 						}
 					}

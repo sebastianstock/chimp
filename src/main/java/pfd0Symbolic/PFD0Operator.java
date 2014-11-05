@@ -3,6 +3,7 @@ package pfd0Symbolic;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -39,16 +40,24 @@ public class PFD0Operator extends PlanReportroryItem {
 		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
 	}
 	
+	
+	
 	@Deprecated
 	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
 			String[][] negativeEffects, VariablePrototype[] positiveEffects) {
 		this(taskname, arguments, preconditions, negativeEffects, positiveEffects, null, null);
 	}
 	
-
+	@Deprecated
 	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
 			VariablePrototype[] positiveEffects) {
 		this(taskname, arguments, preconditions, null, positiveEffects, null, null);
+	}
+	
+	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+			Map<String, VariablePrototype> effectsMap) {
+		this(taskname, arguments, preconditions, null, effectsMap.values().toArray(new VariablePrototype[effectsMap.size()]), null, null);
+		super.effectsMap = effectsMap;
 	}
 
 	
