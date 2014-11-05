@@ -7,10 +7,18 @@ import org.metacsp.time.Bounds;
 import pfd0Symbolic.Fluent;
 import pfd0Symbolic.FluentConstraint;
 import pfd0Symbolic.FluentNetworkSolver;
-import pfd0Symbolic.FluentConstraint.Type;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class AAAIProblemsSingle {
+	
+	public static void setRelease(Variable[] vars, FluentNetworkSolver solver, long min, long max) {
+		for (Variable var : vars) {
+			AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(min, max));
+			release.setFrom(var);
+			release.setTo(var);
+			solver.addConstraint(release);
+		}
+	}
 	
 	public static void createProblem(FluentNetworkSolver groundSolver) {
 		// State
@@ -112,6 +120,7 @@ public class AAAIProblemsSingle {
 		((Fluent) stateVars[9]).setName("Connected(placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
 		((Fluent) stateVars[10]).setName("Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+		setRelease(stateVars, groundSolver, 0, 0);
 		
 		// task
 		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
@@ -157,6 +166,7 @@ public class AAAIProblemsSingle {
 		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 armToSidePosture)");
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+		setRelease(stateVars, fluentSolver, 0, 0);
 		
 		// task
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
@@ -169,6 +179,10 @@ public class AAAIProblemsSingle {
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
 		Variable[] stateVars = fluentSolver.createVariables(1);
 		((Fluent) stateVars[0]).setName("HasTorsoPosture(torsoUpPosture)");
+		AllenIntervalConstraint torsoRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(0, 0));
+		torsoRelCon.setFrom(stateVars[0]);
+		torsoRelCon.setTo(stateVars[0]);
+		fluentSolver.addConstraint(torsoRelCon);
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -176,6 +190,10 @@ public class AAAIProblemsSingle {
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
 		taskFluent.setName("!move_torso(torsoDownPosture)");
 		taskFluent.setMarking(markings.UNPLANNED);
+		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
+		deadline.setFrom(taskFluent);
+		deadline.setTo(taskFluent);
+		fluentSolver.addConstraint(deadline);
 	}
 	
 	public static void createProblemDriveM(FluentNetworkSolver fluentSolver) {

@@ -162,10 +162,9 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork.
 	 */
-	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, FluentNetworkSolver groundSolver) {
+	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
-		Fluent[] openFluents = groundSolver.getOpenFluents();
 		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
 		
 		Map<FluentConstraint, String> constraintToPrecondition = 
