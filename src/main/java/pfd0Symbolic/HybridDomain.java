@@ -25,8 +25,8 @@ import com.google.common.primitives.Ints;
 
 public class HybridDomain{
 
-	private Vector<PFD0Operator> operators;
-	private Vector<PFD0Method> methods;
+	private Vector<PlanReportroryItem> operators;
+	private Vector<PlanReportroryItem> methods;
 	private String name;
 	
 	private static final String DOMAIN_KEYWORD = "HybridHTNDomain";
@@ -43,9 +43,21 @@ public class HybridDomain{
 	
 	public HybridDomain(String name) {
 		this.name = name;
+		this.operators = new Vector<PlanReportroryItem>();
+	}
+	
+	public void addOperator(PFD0Operator op) {
+		operators.add(op);
+	}
+	
+	public Vector<PlanReportroryItem> getOperators() {
+		return operators;
 	}
 
-	
+	public Vector<PlanReportroryItem> getMethods() {
+		return methods;
+	}
+
 	/**
 	 * Creates a {@link SimpleOperator} from a textual specification (used by the
 	 * domain parser).
@@ -251,6 +263,7 @@ public class HybridDomain{
 		
 		
 		PFD0Operator ret =  new PFD0Operator(headname, argStrings, preconditions, effects);
+		ret.setVariableOccurrencesMap(variableOccurrencesMap);
 		System.out.println("Created Operator: " + ret);
 		return ret;
 	}
@@ -320,7 +333,7 @@ public class HybridDomain{
 		
 		// find bindings to head
 //		ArrayList<Integer> connectionsList = new ArrayList<Integer>();
-		addVariableOccurrences(variableOccurrencesMap, args, effKey);
+/*		addVariableOccurrences(variableOccurrencesMap, args, effKey); */
 //		for (int i = 0; i < args.length; i++) {
 //			if (args[i].startsWith(VARIABLE_INDICATOR)) {
 //				Integer headId = variableOccurrencesMap.get(args[i]).get("head");
@@ -372,7 +385,8 @@ public class HybridDomain{
 		PFD0Precondition ret = new PFD0Precondition(name, args, 
 				Ints.toArray(connectionsList),
 				maxargs,
-				EMPTYSTRING);
+				EMPTYSTRING,
+				preKey);
 		System.out.println("PFD0Precondition " + ret);
 		return ret;
 	}
@@ -425,13 +439,13 @@ public class HybridDomain{
 
 				HybridDomain dom = new HybridDomain(name);
 
+				ArrayList<PFD0Operator> operators = new ArrayList<PFD0Operator>();
 				for (String operatorstr : planningOperators) {
 					System.out.println("OPERATORSTRING: {");
 					System.out.println(operatorstr);
 					System.out.println("}\n");
-					HybridDomain.parseOperator(operatorstr, maxargs, 
-							(FluentNetworkSolver) sp.getConstraintSolvers()[0]);
-/*					dom.addOperator(HybridDomain.parseOperator(operatorstr));*/
+					dom.addOperator(HybridDomain.parseOperator(operatorstr, maxargs, 
+							(FluentNetworkSolver) sp.getConstraintSolvers()[0]));
 				}
 
 				return dom;

@@ -16,6 +16,8 @@ public class PFD0Precondition {
 	private int[] connections;
 	
 	private boolean isNegativeEffect;
+	
+	private String key;
 
 	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections) {
 		this.fluenttype = fluenttype;
@@ -23,7 +25,8 @@ public class PFD0Precondition {
 		this.connections = connections;
 	}
 	
-	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections, int maxargs, String emptyStr) {
+	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections, 
+			int maxargs, String emptyStr, String key) {
 		this.fluenttype = fluenttype;
 		this.arguments = new String[maxargs];
 		for (int i = 0; i < arguments.length; i++) {
@@ -33,6 +36,7 @@ public class PFD0Precondition {
 			this.arguments[i] = emptyStr;
 		}
 		this.connections = connections;
+		this.key = key;
 	}
 	
 	public void setNegativeEffect(boolean isNegativeEffect) {
@@ -53,6 +57,10 @@ public class PFD0Precondition {
 	
 	public int[] getConnections() {
 		return connections;
+	}
+	
+	public String getKey() {
+		return key;
 	}
 	
 	@Deprecated // Only used when using three variables

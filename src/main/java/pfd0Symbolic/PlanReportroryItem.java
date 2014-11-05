@@ -12,6 +12,9 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariable;
+
 import com.google.common.collect.Sets;
 
 public abstract class PlanReportroryItem {
@@ -22,6 +25,8 @@ public abstract class PlanReportroryItem {
 
 	protected String[] arguments;
 	
+	protected HashMap<String, HashMap<String, Integer>> variableOccurrencesMap;
+	
 	/**
 	 * The bounds that will be used for the duration constraint of this task.
 	 */
@@ -31,7 +36,6 @@ public abstract class PlanReportroryItem {
 		this.taskname = taskname;
 		this.arguments = arguments;
 		this.preconditions = preconditions;
-
 	}
 	
 	public String getName() {
@@ -41,7 +45,13 @@ public abstract class PlanReportroryItem {
 	public String toString() {
 		return getName();
 	}
+
 	
+	public void setVariableOccurrencesMap(
+			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap) {
+		this.variableOccurrencesMap = variableOccurrencesMap;
+	}
+
 	/**
 	 * Checks if a PlanreportroryItem is applicable to a given task. Currently, this only checks if the taskname is the same.
 	 * 
@@ -153,8 +163,8 @@ public abstract class PlanReportroryItem {
 		Fluent[] openFluents = groundSolver.getOpenFluents();
 		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
 		
-		HashMap<FluentConstraint, PFD0Precondition> constraintToPreconditionMap = 
-				new HashMap<FluentConstraint, PFD0Precondition>();
+		Map<FluentConstraint, String> constraintToPrecondition = 
+				new HashMap<FluentConstraint, String>();
 		
 		// Create set of potential precondition constraints.
 		if(this.preconditions != null) {
@@ -172,7 +182,7 @@ public abstract class PlanReportroryItem {
 						preCon.setTo(taskFluent);
 						preCon.setNegativeEffect(pre.isNegativeEffect());
 						possiblePreconditions.add(preCon);
-						constraintToPreconditionMap.put(preCon, pre);
+						constraintToPrecondition.put(preCon, pre.getKey());
 					}
 				}
 				if (possiblePreconditions.size() > 0) {
@@ -190,9 +200,13 @@ public abstract class PlanReportroryItem {
 		for (List<FluentConstraint> comb : combinations) {
 			ConstraintNetwork cn = new ConstraintNetwork(null);
 			
+			Map<String, FluentConstraint> preconditionToConstraint = 
+					new HashMap<String, FluentConstraint>();
+			
 			// Add PRE and CLOSES constraints
 			for (FluentConstraint con : comb) {
 				cn.addConstraint(con);
+				preconditionToConstraint.put(constraintToPrecondition.get(con), con);
 				
 				// add closes for negative effects
 				if (con.isNegativeEffect() && this instanceof PFD0Operator) {
@@ -202,6 +216,39 @@ public abstract class PlanReportroryItem {
 					cn.addConstraint(closes);
 				}
 			}
+			
+			// add binding constraints between preconditions and preconditions
+//			if (variableOccurrencesMap != null) {
+//				for (HashMap<String, Integer> occurrence : variableOccurrencesMap.values()) {
+//					String[] preKeys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
+//					for (int i = 0; i < preKeys.length; i++) {
+//						if (preKeys[i].equals("head")) {
+//							continue;
+//						}
+//						for (int j = i + 1; j < preKeys.length; j++) {
+//							if (preKeys[j].equals("head")) {
+//								continue;
+//							}
+//							// Create binding constraint
+//							int connections[] = new int[] {occurrence.get(preKeys[i]).intValue(),
+//									occurrence.get(preKeys[j]).intValue()};
+//							CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
+//									CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
+//									connections);
+//							
+//							Fluent from = (Fluent) preconditionToConstraint.get(preKeys[i]).getFrom();
+//							Fluent to = (Fluent) preconditionToConstraint.get(preKeys[j]).getFrom();
+//							
+//							// TODO: DO I need the compoundsymbolicvarible or can I use the fluent?
+//							CompoundSymbolicVariable nf = from.getCompoundSymbolicVariable();
+//							bcon.setFrom(nf);
+//							CompoundSymbolicVariable nt = to.getCompoundSymbolicVariable();
+//							bcon.setTo(nt);
+//							cn.addConstraint(bcon);
+//						}
+//					}
+//				}
+//			}
 			
 			// add positive effects/decomposition
 			for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
