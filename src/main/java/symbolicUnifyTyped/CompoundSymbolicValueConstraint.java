@@ -94,7 +94,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 
 	@Override
 	public Object clone() {
-		return new CompoundSymbolicValueConstraint(this.type);   // TODO: ADD CONNECTIONS ????
+		return new CompoundSymbolicValueConstraint(this.type, this.connections);
 	}
 
 	@Override
