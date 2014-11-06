@@ -13,11 +13,28 @@ public class AAAIProblemsSingle {
 	
 	public static void setRelease(Variable[] vars, FluentNetworkSolver solver, long min, long max) {
 		for (Variable var : vars) {
-			AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(min, max));
-			release.setFrom(var);
-			release.setTo(var);
-			solver.addConstraint(release);
+			setRelease(var, solver, min, max);
 		}
+	}
+	
+	public static void setRelease(Variable var, FluentNetworkSolver solver, long min, long max) {
+		AllenIntervalConstraint release = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(min, max));
+		release.setFrom(var);
+		release.setTo(var);
+		solver.addConstraint(release);
+	}
+	
+	public static void setDeadline(Variable[] vars, FluentNetworkSolver solver, long min, long max) {
+		for (Variable var : vars) {
+			setDeadline(var, solver, min, max);
+		}
+	}
+	
+	public static void setDeadline(Variable var, FluentNetworkSolver solver, long min, long max) {
+		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(min, max));
+		deadline.setFrom(var);
+		deadline.setTo(var);
+		solver.addConstraint(deadline);
 	}
 	
 	public static void createProblem(FluentNetworkSolver groundSolver) {
@@ -172,6 +189,8 @@ public class AAAIProblemsSingle {
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
 		taskFluent.setName("!tuck_arms(leftArm1 rightArm1 armTuckedPosture armUnTuckedPosture)");
 		taskFluent.setMarking(markings.UNPLANNED);
+		
+		
 	}
 	
 	public static void createProblemMoveTorso(FluentNetworkSolver fluentSolver) {
