@@ -16,21 +16,45 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 	private CompoundSymbolicVariableConstraintSolver solver;
 	private CompoundSymbolicVariable[] vars;
 	private NameMatchingConstraintSolver nameSolver;
+	
+	private static String N = "n";
 
 	@Before
 	public void setUp() throws Exception {
-		String[] symbolsPredicates = {"on", "robotat", "get_mug"};
-		String[] symbolsMugs = {"mug1", "mug2", "mug3", "mug4", "mug5", "mug6", "mug7", "mug8", "mug9", "mug10", "none"};
-		String[] symbolsPlAreas = {"pl1", "pl2", "pl3", "pl4", "pl5", "pl6", "pl7", "pl8", "pl9", "pl10", "none"};
-		String[] symbolsManAreas = {"ma1", "ma2", "ma3", "ma4", "ma5", "ma6", "ma7", "ma8", "ma9", "ma10", "none"};
-		String[] symbolsPreAreas = {"pma1", "pma2", "pma3", "pma4", "pma5", "pma6", "pma7", "pma8", "pma9", "pma10", "none"};
-		String[][] symbols = new String[5][];
-		symbols[0] = symbolsPredicates;
-		symbols[1] = symbolsMugs;
-		symbols[2] = symbolsPlAreas;
-		symbols[3] = symbolsManAreas;
-		symbols[4] = symbolsPreAreas;
-		CompoundSymbolicVariableConstraintSolver solver = new CompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,1,1,1,1});
+		String[][] symbols = new String[2][];
+		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
+				"Connected",
+				// operators
+				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
+				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
+				// methods
+				"drive", "assume_default_driving_pose", "assume_manipulation_pose",
+				"move_both_arms_to_side", "grasp_object_w_arm", "get_object_w_arm"
+				};	
+		// race:Kitchenware		
+		// index: 1, 2
+		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", "placingAreaEastRightCounter1",
+				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
+				"placingAreaEastLeftTable1", "placingAreaEastRightTable1",
+				"placingAreaNorthLeftTable2", "placingAreaNorthRightTable2",
+				"placingAreaSouthLeftTable2", "placingAreaSouthRightTable2",
+				"trayArea1", 
+				"manipulationAreaEastCounter1", "preManipulationAreaEastCounter1",
+				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
+				"preManipulationAreaNorthTable1", "preManipulationAreaSouthTable1",
+				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
+				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
+				"floorAreaTamsRestaurant1", 
+				"sittingAreaWestTable1", "sittingAreaEastTable1",
+				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
+				"table1", "table2", "counter1", 
+				"guest1", "guest2",
+				"leftArm1", "rightArm1", 
+				"armTuckedPosture", "armUnTuckedPosture", "armToSidePosture", "armUnnamedPosture", "armCarryPosture",
+				"torsoUpPosture", "torsoDownPosture", "torsoMiddlePosture", 
+				N};
+
+		solver = new CompoundSymbolicVariableConstraintSolver(symbols, new int[] {1,2});
 		vars = (CompoundSymbolicVariable[]) solver.createVariables(5);
 		
 		nameSolver = (NameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
@@ -39,11 +63,11 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 
 	@Test
 	public void testMatches() {
-		vars[0].setName("On", "mug1", "table1"); // "On" in world state
-		vars[1].setName("On", "?mug", "?table"); // "On" as precondition
-		vars[2].setName("get_mug",  "?mug");     // "get_mug" task
-		vars[3].setName("get_mug", "?mug");      // "grap_mug" task
-		vars[4].setName("Holding", "?mug", "rightarm1"); // "holding" effect
+		vars[0].setName("On", "mug1", "placingAreaWestRightTable1"); // "On" in world state
+		vars[1].setName("On", "?mug", "?area"); // "On" as precondition  (old htn version)
+		vars[2].setName("!pick_up_object",  "?mug", N);     
+		vars[3].setName("!pick_up_object", "?mug", N);      
+		vars[4].setName("Holding", "?mug", "rightArm1"); // "holding" effect
 		
 		CompoundSymbolicValueConstraint cc01 = new CompoundSymbolicValueConstraint(Type.MATCHES);
 		cc01.setFrom(vars[0]);
@@ -67,15 +91,16 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		assertTrue(nameSolver.addConstraint(nc342));
 		System.out.println(vars[4].getName());
 		assertTrue("'mug1' should be propageted to first parameter of 'holding'.", 
-				vars[4].getName().equals("Holding(mug1 rightarm1)"));
+				vars[4].getName().equals("Holding(mug1 rightArm1)"));
 	}
 	
 	@Test
 	public void testSubmatches() {
-		vars[0].setName("On", "mug1", "table1"); 
-		vars[1].setName("get_mug", "?mug", "?table");
-		vars[2].setName("get_mug",  "mug2"); 
-		vars[3].setName("get_mug", "?mug");
+		vars[0].setName("On", "mug1", "placingAreaWestRightTable1"); // "On" in world state
+		vars[1].setName("On", "?mug", "?area"); // "On" as precondition  (old htn version)
+		vars[2].setName("!pick_up_object",  "?mug", N);     
+		vars[3].setName("!pick_up_object", "?mug", N);      
+		vars[4].setName("Holding", "?mug", "rightArm1"); // "holding" effect
 		
 		CompoundSymbolicValueConstraint cc01 = new CompoundSymbolicValueConstraint(Type.SUBMATCHES, 
 				new int[] {0, 0, 1, 1});
@@ -83,10 +108,10 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		cc01.setTo(vars[1]);
 		assertTrue(solver.addConstraint(cc01));
 		System.out.println("Var1: " + vars[1].getName());
-		assertTrue(vars[1].getName().equals("get_mug(mug1 table1)"));
+		assertTrue(vars[1].getName().equals("On(mug1 placingAreaWestRightTable1)"));
 		
 		CompoundSymbolicValueConstraint cc02 = new CompoundSymbolicValueConstraint(Type.SUBMATCHES, 
-				new int[] {0, 0});
+				new int[] {0, 1});
 		cc02.setFrom(vars[0]);
 		cc02.setTo(vars[2]);
 		assertFalse(solver.addConstraint(cc02));
@@ -97,7 +122,7 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		cc03.setTo(vars[3]);
 		assertTrue(solver.addConstraint(cc03));
 		System.out.println("Var3: " + vars[3].getName());
-		assertTrue(vars[3].getName().equals("get_mug(mug1)"));
+		assertTrue(vars[3].getName().equals("!pick_up_object(mug1 n)"));
 
 	}
 
