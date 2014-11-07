@@ -103,8 +103,9 @@ public class JUnitTestFluentNetworkSolver {
 		assertTrue(solver.addConstraint(fcon01));
 		
 		// name of '?mug' should be changed to 'mug1'
+		System.out.println(fluents[1].getCompoundSymbolicVariable().getName());
 		assertTrue("Name of '?mug' should be changed to 'mug1'",
-				fluents[1].getCompoundSymbolicVariable().getName().equals("[on]([mug1] [pl1] [none] [none])"));
+				fluents[1].getCompoundSymbolicVariable().getName().equals("on(mug1 pl1 none none)"));
 		
 		FluentConstraint fcon02 = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon02.setFrom(fluents[0]);
