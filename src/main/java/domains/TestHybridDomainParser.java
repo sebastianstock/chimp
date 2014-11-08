@@ -26,7 +26,7 @@ public class TestHybridDomainParser {
 		int[] ingredients = AAAIDomainSingle.createIngredients();
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
 
-		HybridDomain dom = HybridDomain.parseDomain(planner, "domains/testPrimitiveHybridPlanningDomain.ddl");
+		HybridDomain dom = new HybridDomain(planner, "domains/testPrimitiveHybridPlanningDomain.ddl");
 		
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();

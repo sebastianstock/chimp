@@ -14,10 +14,7 @@ import java.util.Vector;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaConstraintSolver;
-import org.metacsp.meta.simplePlanner.PlanningOperator;
-import org.metacsp.meta.simplePlanner.SimpleOperator;
 import org.metacsp.meta.simplePlanner.SimplePlanner;
-import org.metacsp.meta.simplePlanner.SimpleReusableResource;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
@@ -26,9 +23,16 @@ import com.google.common.primitives.Ints;
 
 public class HybridDomain{
 
-	private Vector<PlanReportroryItem> operators;
-	private Vector<PlanReportroryItem> methods;
+	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
+	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();
 	private String name;
+
+	
+	// Additional
+	private final MetaConstraintSolver solver;
+	private final FluentNetworkSolver groundSolver;
+	private final String fileName;
+	private int maxArgs; // Maximum number of arguments of a fluent.
 	
 	private static final String DOMAIN_KEYWORD = "HybridHTNDomain";
 	private static final String MAXARGS_KEYWORD = "MaxArgs";
@@ -42,13 +46,11 @@ public class HybridDomain{
 	private static final String EMPTYSTRING = "n";
 	private static final String VARIABLE_INDICATOR = "?";
 	
-	public HybridDomain(String name) {
-		this.name = name;
-		this.operators = new Vector<PlanReportroryItem>();
-	}
-	
-	public void addOperator(PFD0Operator op) {
-		operators.add(op);
+	public HybridDomain(MetaConstraintSolver solver, String filename) {
+		this.solver = solver;
+		this.groundSolver = (FluentNetworkSolver) solver.getConstraintSolvers()[0];
+		this.fileName = filename;
+		parseDomain();
 	}
 	
 	public Vector<PlanReportroryItem> getOperators() {
@@ -60,15 +62,11 @@ public class HybridDomain{
 	}
 
 	/**
-	 * Creates a {@link SimpleOperator} from a textual specification (used by the
+	 * Creates a {@link PFD0Operator} from a textual specification (used by the
 	 * domain parser).
 	 * @param textualSpecification A textual specification of an operator
-	 * @param resources The resources (identifiers of {@link SimpleReusableResource}s) used in this operator.
-	 * @param planningOp Whether this is a {@link PlanningOperator} or a {@link SimpleOperator}.
-	 * @return A {@link SimpleOperator} build according to the textual specification.
 	 */
-	private static PFD0Operator parseOperator(String textualSpecification, int maxargs, 
-			FluentNetworkSolver groundSolver) {
+	private void addOperator(String textualSpecification) {
 		HashMap<String,String> preconditionsMap = new HashMap<String, String>();
 		ArrayList<String> negativeEffectsKeyList = new ArrayList<String>();
 		HashMap<String,String> effectsStringsMap = new HashMap<String, String>();
@@ -249,26 +247,25 @@ public class HybridDomain{
 		addVariableOccurrences(variableOccurrencesMap, argStrings, "head");
 		
 		// Create preconditions
-		PFD0Precondition[] preconditions = createPreconditions(preconditionsMap, maxargs, 
+		PFD0Precondition[] preconditions = createPreconditions(preconditionsMap,
 				variableOccurrencesMap, negativeEffectsKeyList);
 		
 		// Create positive effects
 		Map<String, VariablePrototype> effectsMap = new HashMap<String, VariablePrototype>();
 		for (Entry<String, String> e : effectsStringsMap.entrySet()) {
 			String effKey = e.getKey();
-			effectsMap.put(effKey, createEffect(effKey, e.getValue(), maxargs, variableOccurrencesMap, groundSolver));
+			effectsMap.put(effKey, createEffect(effKey, e.getValue(), variableOccurrencesMap));
 		}
 		
 		System.out.println("VarMap after parsing effects " + variableOccurrencesMap);
 		
-		PFD0Operator ret =  new PFD0Operator(headname, argStrings, preconditions, effectsMap);
-		ret.setVariableOccurrencesMap(variableOccurrencesMap);
-		System.out.println("Created Operator: " + ret);
-		return ret;
+		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effectsMap);
+		op.setVariableOccurrencesMap(variableOccurrencesMap);
+		System.out.println("Created Operator: " + op);
+		this.operators.addElement(op);
 	}
 	
-	private static PFD0Precondition[] createPreconditions(HashMap<String,String> preconditionsMap, 
-			int maxargs, 
+	private PFD0Precondition[] createPreconditions(HashMap<String,String> preconditionsMap, 
 			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap,
 			ArrayList<String> negativeEffectsKeyList) {
 		//Create preconditions
@@ -276,9 +273,8 @@ public class HybridDomain{
 		int i = 0;
 		for (Entry<String, String> e : preconditionsMap.entrySet()) {
 			String preKey = e.getKey();
-			PFD0Precondition pre = createPrecondition(preKey, e.getValue(), maxargs, variableOccurrencesMap);
+			PFD0Precondition pre = createPrecondition(preKey, e.getValue(), variableOccurrencesMap);
 			// Set negative effects
-			System.out.println("NEG KEY LIST " + negativeEffectsKeyList.toString());
 			if (negativeEffectsKeyList.contains(preKey)) {
 				pre.setNegativeEffect(true);
 			}
@@ -300,7 +296,6 @@ public class HybridDomain{
 				occ.put(key, new Integer(i));
 			}
 		}
-
 	}
 	
 	
@@ -312,12 +307,10 @@ public class HybridDomain{
 		return str.substring(str.indexOf("(")+1,str.indexOf(")")).trim().split(" ");
 	}
 	
-	private static VariablePrototype createEffect(
+	private VariablePrototype createEffect(
 			String effKey, 
 			String effString, 
-			int maxargs, 
-			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap,
-			FluentNetworkSolver groundSolver) {
+			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap) {
 		String name = extractName(effString);
 		System.out.println("EffName " + name);
 		String[] args = extractArgs(effString);
@@ -326,11 +319,11 @@ public class HybridDomain{
 		addVariableOccurrences(variableOccurrencesMap, args, effKey); 
 
 		// fill arguments array up to maxargs
-		String[] filledArgs = new String[maxargs];
+		String[] filledArgs = new String[maxArgs];
 		for (int i = 0; i < args.length; i++) {
 			filledArgs[i] = args[i];
 		}
-		for (int i = args.length; i < maxargs; i++) {
+		for (int i = args.length; i < maxArgs; i++) {
 			filledArgs[i] = EMPTYSTRING;
 		}
 		VariablePrototype ret = new VariablePrototype(groundSolver, "S", name, filledArgs);
@@ -338,10 +331,9 @@ public class HybridDomain{
 		return ret;
 	}
 	
-	private static PFD0Precondition createPrecondition(
+	private PFD0Precondition createPrecondition(
 			String preKey, 
 			String preString, 
-			int maxargs, 
 			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap) {
 		String name = extractName(preString);
 		System.out.println("PreName " + name);
@@ -364,7 +356,7 @@ public class HybridDomain{
 		
 		PFD0Precondition ret = new PFD0Precondition(name, args, 
 				Ints.toArray(connectionsList),
-				maxargs,
+				maxArgs,
 				EMPTYSTRING,
 				preKey);
 		System.out.println("PFD0Precondition " + ret);
@@ -375,12 +367,12 @@ public class HybridDomain{
 	 * Parses a domain file (see domains/testDomain.ddl for an example), instantiates
 	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link SimplePlanner}.
 	 * @param sp The {@link SimplePlanner} that will use this domain.
-	 * @param filename Text file containing the domain definition. 
+	 * @param fileName Text file containing the domain definition. 
 	 */
-	public static HybridDomain parseDomain(MetaConstraintSolver sp, String filename) {
+	private void parseDomain() {
 		String everything = null;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(filename));
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			try {
 				StringBuilder sb = new StringBuilder();
 				String line = br.readLine();
@@ -392,15 +384,16 @@ public class HybridDomain{
 					line = br.readLine();
 				}
 				everything = sb.toString();
-				String name = parseKeyword(DOMAIN_KEYWORD, everything)[0];
+				name = parseKeyword(DOMAIN_KEYWORD, everything)[0];
 				
-				int maxargs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, everything)[0]);
-				System.out.println("MaxArgs " + maxargs);
+				maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, everything)[0]);
+				System.out.println("MaxArgs " + maxArgs);
 				
 				// RESOURCES: skipped for the moment	
 //				String[] resourceElements = parseKeyword("Resource", everything);
 //				HashMap<String,Integer> resources = processResources(resourceElements);
 //				String[] simpleOperators = parseKeyword("SimpleOperator", everything);
+				System.out.println(everything);
 				String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, everything);
 //				String[] sensors = parseKeyword("Sensor", everything);
 //				String[] actuators = parseKeyword("Actuator", everything);
@@ -417,24 +410,17 @@ public class HybridDomain{
 //					resourceCounter++;
 //				}
 
-				HybridDomain dom = new HybridDomain(name);
-
-				ArrayList<PFD0Operator> operators = new ArrayList<PFD0Operator>();
 				for (String operatorstr : planningOperators) {
 					System.out.println("OPERATORSTRING: {");
 					System.out.println(operatorstr);
 					System.out.println("}\n");
-					dom.addOperator(HybridDomain.parseOperator(operatorstr, maxargs, 
-							(FluentNetworkSolver) sp.getConstraintSolvers()[0]));
+					addOperator(operatorstr);
 				}
-
-				return dom;
 			}
 			finally { br.close(); }
 		}
 		catch (FileNotFoundException e) { e.printStackTrace(); }
 		catch (IOException e) { e.printStackTrace(); }
-		return null;
 	}
 	
 	protected static String[] parseKeyword(String keyword, String everything) {

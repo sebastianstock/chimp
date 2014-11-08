@@ -58,6 +58,7 @@
  (Del p2)
  (Add e1 HasArmPosture(leftArm1 ?leftGoal))
  (Add e2 HasArmPosture(rightArm1 ?rightGoal))
+# (Type ?oldLeft ArmPosture)
 )
 
 (:operator
