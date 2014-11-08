@@ -256,4 +256,12 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 			throw new IllegalArgumentException("Symbol " + symbol + "does not exist");
 		}
 	}
+	
+	public int[] getIndexArrayOfSymbols(String[] symbols) {
+		int[] ret = new int[symbols.length];
+		for (int i = 0; i < symbols.length; i++) {
+			ret[i] = getIndexOfSymbol(symbols[i]);
+		}
+		return ret;
+	}
 }

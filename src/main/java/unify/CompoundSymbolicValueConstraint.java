@@ -3,6 +3,7 @@ package unify;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
+import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
@@ -18,10 +19,12 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 1697594290767658650L;
 
-	public static enum Type {MATCHES, SUBMATCHES};
+	public static enum Type {MATCHES, SUBMATCHES, VALUERESTRICTION};
 	
 	private Type type;
 	private int[] connections;
+	private int[] restrictionIndices;
+	private String[][] restrictions;
 	
 	
 	public CompoundSymbolicValueConstraint(Type type) {
@@ -31,6 +34,12 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	public CompoundSymbolicValueConstraint(Type type, int[] connections) {
 		this.type = type;
 		this.connections = connections;
+	}
+	
+	public CompoundSymbolicValueConstraint(Type type, int[] indices, String[][] restrictions) {
+		this.type = type;
+		this.restrictionIndices = indices;
+		this.restrictions =  restrictions;
 	}
 
 	@Override
@@ -42,6 +51,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	
 		Variable[] finternals = ((CompoundSymbolicVariable) f).getInternalVariables();
 		Variable[] tinternals = ((CompoundSymbolicVariable) t).getInternalVariables();
+		ConstraintSolver[] finternalSolvers = ((MultiVariable)f).getInternalConstraintSolvers();
 		
 		int[] varIndex2solverIndex = 
 				((CompoundSymbolicVariableConstraintSolver) f.getConstraintSolver()).getVarIndex2solverIndex();
@@ -54,11 +64,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 						new NameMatchingConstraint(NameMatchingConstraint.Type.EQUALS);
 				con.setFrom(finternals[i]);
 				con.setTo(tinternals[i]);
-				for (int j = 0; j < ((MultiVariable)f).getInternalConstraintSolvers().length; j++) {
-					if (j != varIndex2solverIndex[i]) {
-						con.skipSolver(((MultiVariable)f).getInternalConstraintSolvers()[j]);
-					}
-				}
+				skipIrrelevantSolvers(con, finternalSolvers, varIndex2solverIndex[i]);
 				constraints.add(con);
 			} 
 			return constraints.toArray(new Constraint[constraints.size()]);	
@@ -73,28 +79,55 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 					if(finternals.length > connections[i] + 1 && tinternals.length > connections[i+1] + 1) {
 						con.setFrom(finternals[connections[i] + 1]);
 						con.setTo(tinternals[connections[i+1] + 1]);
-						
-						for (int j = 0; j < ((MultiVariable)f).getInternalConstraintSolvers().length; j++) {
-							if (j != varIndex2solverIndex[connections[i] + 1]) {
-								con.skipSolver(((MultiVariable)f).getInternalConstraintSolvers()[j]);
-							}
-						}
-						
+						skipIrrelevantSolvers(con, finternalSolvers, varIndex2solverIndex[connections[i] + 1]);
 						constraints.add(con);
 					}
 					i += 2;
 				}
 				return constraints.toArray(new Constraint[constraints.size()]);
 			}
+		} else if (this.type.equals(Type.VALUERESTRICTION)) {
+			if (restrictionIndices != null 
+					&& restrictions != null 
+					&& restrictionIndices.length == restrictions.length) {
+				Constraint[] constraints = new Constraint[restrictionIndices.length];
+				for (int i = 0; i < restrictionIndices.length; i++) {
+					NameMatchingConstraint con = 
+							new NameMatchingConstraint(NameMatchingConstraint.Type.UNARYEQUALS);
+					con.setFrom(finternals[restrictionIndices[i] + 1]);
+					con.setTo(finternals[restrictionIndices[i] + 1]);
+					int solverIndex = varIndex2solverIndex[restrictionIndices[i] + 1];
+					int[] unaryValues = 
+							((NameMatchingConstraintSolver) finternalSolvers[solverIndex]).getIndexArrayOfSymbols(restrictions[i]);
+					con.setUnaryValues(unaryValues);
+					
+					skipIrrelevantSolvers(con, finternalSolvers, solverIndex);
+					constraints[i] = con;
+				}
+				return constraints;
+			}
 		}
 		
 		return null;
 	}
+	
+	private static void skipIrrelevantSolvers(Constraint con, ConstraintSolver[] internalSolvers, int solverIndex) {
+		for (int j = 0; j < internalSolvers.length; j++) {
+			if (j != solverIndex) {
+				con.skipSolver(internalSolvers[j]);
+			}
+		}
+	}
 
 	@Override
 	public Object clone() {
-		return new CompoundSymbolicValueConstraint(this.type, connections);
-		
+		if (this.connections != null) {
+			return new CompoundSymbolicValueConstraint(this.type, connections);
+		} else {
+			return new CompoundSymbolicValueConstraint(this.type, 
+					this.restrictionIndices, 
+					this.restrictions);
+		}
 	}
 
 	@Override

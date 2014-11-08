@@ -125,6 +125,23 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		assertTrue(vars[3].getName().equals("!pick_up_object(mug1 n)"));
 
 	}
+	
+	@Test
+	public void testSymbolicRestriction() {
+		vars[1].setName("On", "?mug", "?area"); // "On" as precondition  (old htn version)
+		
+		CompoundSymbolicValueConstraint cc11 = new CompoundSymbolicValueConstraint(
+				Type.VALUERESTRICTION,
+				new int[] {0, 1}, new String[][] {{"mug1", "mug2"}, {"placingAreaWestLeftTable1", "placingAreaWestRightTable1"}});
+		cc11.setFrom(vars[1]);
+		cc11.setTo(vars[1]);
+		assertTrue(solver.addConstraint(cc11));
+		System.out.println("Var1: " + vars[1].getName());
+		assertTrue(vars[1].getName().equals("On([mug1, mug2] [placingAreaWestLeftTable1, placingAreaWestRightTable1])"));
+
+	}
+	
+	
 
 
 }

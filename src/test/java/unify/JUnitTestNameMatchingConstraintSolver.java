@@ -62,5 +62,7 @@ public class JUnitTestNameMatchingConstraintSolver {
 		assertFalse(solver.addConstraints(new Constraint[] {con12, con23}));
 		
 	}
+	
+	
 
 }
