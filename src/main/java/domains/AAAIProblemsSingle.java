@@ -160,7 +160,7 @@ public class AAAIProblemsSingle {
 		
 		// task
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
-		taskFluent.setName("!tuck_arms(leftArm1 rightArm1 armTuckedPosture armUnTuckedPosture)");
+		taskFluent.setName("!tuck_arms(armTuckedPosture armUnTuckedPosture n n)");
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 	

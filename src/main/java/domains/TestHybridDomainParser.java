@@ -37,7 +37,7 @@ public class TestHybridDomainParser {
 		
 //		createProblemMoveBase(fluentSolver);
 //		createProblemPickUpObject(fluentSolver);
-		AAAIProblemsSingle.createProblemMoveTorso(fluentSolver);
+//		AAAIProblemsSingle.createProblemMoveTorso(fluentSolver);
 		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
 		
 		test();

@@ -1,13 +1,16 @@
 package unify;
 
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
+import pfd0Symbolic.PlanReportroryItem;
 import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
 import cern.colt.Arrays;
 
@@ -25,6 +28,8 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	private int[] connections;
 	private int[] restrictionIndices;
 	private String[][] restrictions;
+	
+	private static final Logger logger = MetaCSPLogging.getLogger(CompoundSymbolicValueConstraint.class);
 	
 	
 	public CompoundSymbolicValueConstraint(Type type) {
@@ -70,6 +75,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 			return constraints.toArray(new Constraint[constraints.size()]);	
 		}	
 		else if (this.type.equals(Type.SUBMATCHES)) {
+			logger.fine("CREATING SUBMATCHES INTERNAL CONSTRAINTS");
 			if(connections != null && ((connections.length % 2) == 0)) {
 				Vector<NameMatchingConstraint> constraints = 
 						new Vector<NameMatchingConstraint>(connections.length / 2);
@@ -87,6 +93,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 				return constraints.toArray(new Constraint[constraints.size()]);
 			}
 		} else if (this.type.equals(Type.VALUERESTRICTION)) {
+			logger.fine("CREATING VALUERESTRICTION INTERNAL CONSTRAINTS");
 			if (restrictionIndices != null 
 					&& restrictions != null 
 					&& restrictionIndices.length == restrictions.length) {

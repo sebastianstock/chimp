@@ -52,13 +52,15 @@
 
 (:operator
  (Head !tuck_arms(?leftGoal ?rightGoal))
- (Pre p1 HasArmPosture(leftArm1 ?oldLeft))
- (Pre p2 HasArmPosture(rightArm1 ?oldRight))
+ (Pre p1 HasArmPosture(?leftArm ?oldLeft))
+ (Pre p2 HasArmPosture(?rightArm ?oldRight))
  (Del p1)
  (Del p2)
- (Add e1 HasArmPosture(leftArm1 ?leftGoal))
- (Add e2 HasArmPosture(rightArm1 ?rightGoal))
+ (Add e1 HasArmPosture(?leftArm ?leftGoal))
+ (Add e2 HasArmPosture(?rightArm ?rightGoal))
 # (Type ?oldLeft ArmPosture)
+ (Values ?leftArm leftArm1)
+ (Values ?rightArm rightArm1)
 )
 
 (:operator

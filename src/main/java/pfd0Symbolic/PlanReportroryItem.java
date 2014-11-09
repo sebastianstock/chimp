@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -16,19 +17,21 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariable;
 
 import com.google.common.collect.Sets;
 
 public abstract class PlanReportroryItem {
 	
-	protected String taskname;
+	protected final String taskname;
 	
-	protected PFD0Precondition[] preconditions;
+	protected final PFD0Precondition[] preconditions;
 
-	protected String[] arguments;
+	protected final String[] arguments;
 	protected Map<String, VariablePrototype> effectsMap;
 	
-	protected HashMap<String, HashMap<String, Integer>> variableOccurrencesMap;
+	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
+	protected Map<String,String[]> variablesPossibleValuesMap;
 	
 	Logger logger = MetaCSPLogging.getLogger(PlanReportroryItem.class);
 	
@@ -53,8 +56,14 @@ public abstract class PlanReportroryItem {
 
 	
 	public void setVariableOccurrencesMap(
-			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap) {
+			Map<String, Map<String, Integer>> variableOccurrencesMap) {
 		this.variableOccurrencesMap = variableOccurrencesMap;
+		System.out.println("VARIABLEOCCURRENCESMAP:\n" + variableOccurrencesMap);
+	}
+	
+	public void setVariablesPossibleValuesMap(Map<String,String[]> map) {
+		this.variablesPossibleValuesMap = map;
+		System.out.println("VARIABLESPOSSIBLEVALUESMAP:\n" + variablesPossibleValuesMap);
 	}
 
 	/**
@@ -224,7 +233,7 @@ public abstract class PlanReportroryItem {
 			
 			// add binding constraints between preconditions or effects
 			if (variableOccurrencesMap != null) {
-				for (HashMap<String, Integer> occurrence : variableOccurrencesMap.values()) {
+				for (Map<String, Integer> occurrence : variableOccurrencesMap.values()) {
 					String[] keys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
 					for (int i = 0; i < keys.length; i++) {
 						if (keys[i].equals("head")) {
@@ -271,6 +280,35 @@ public abstract class PlanReportroryItem {
 			// add positive effects/decomposition
 			for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
 				cn.addConstraint(con);
+			}
+			
+			// add VALUERESTRICTION constraints
+			if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
+				for (Entry<String, Map<String, Integer>> occ : variableOccurrencesMap.entrySet()) {
+					String[] possibleValues = variablesPossibleValuesMap.get(occ.getKey());
+					if (possibleValues != null) {
+						for (Entry<String, Integer> e : occ.getValue().entrySet()) {
+							String preconditionID = e.getKey();
+							FluentConstraint preCon = preconditionToConstraint.get(preconditionID);
+							if (preCon != null) {
+								int[] indices = new int[] {e.getValue().intValue()};
+								String[][] restrictions = new String[][] {possibleValues};
+								// TODO merge multiple constraints into one.
+								CompoundSymbolicValueConstraint rcon = 
+										new CompoundSymbolicValueConstraint(
+												CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
+												indices, 
+												restrictions);
+								CompoundSymbolicVariable var = 
+										((Fluent) preCon.getFrom()).getCompoundSymbolicVariable();
+								rcon.setFrom(var);
+								rcon.setTo(var);
+								cn.addConstraint(rcon);
+								logger.fine("ADDED VALUERESTRICTION");
+							}
+						}
+					}
+				}
 			}
 			
 			// Add a UNARYAPPLIED to remember which method/operator has been used.

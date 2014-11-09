@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
@@ -42,6 +43,8 @@ public class HybridDomain{
 	private static final String EFFECT_KEYWORD = "Add";
 	private static final String NEGATIVE_EFFECT_KEYWORD = "Del";
 	private static final String CONSTRAINT_KEYWORD = "Constraint";
+	private static final String TYPE_KEYWORD = "Type";
+	private static final String VARIABLE_RESTRICTION_KEYWORD = "Values";
 	
 	private static final String EMPTYSTRING = "n";
 	private static final String VARIABLE_INDICATOR = "?";
@@ -67,9 +70,10 @@ public class HybridDomain{
 	 * @param textualSpecification A textual specification of an operator
 	 */
 	private void addOperator(String textualSpecification) {
-		HashMap<String,String> preconditionsMap = new HashMap<String, String>();
-		ArrayList<String> negativeEffectsKeyList = new ArrayList<String>();
-		HashMap<String,String> effectsStringsMap = new HashMap<String, String>();
+		Map<String,String> preconditionsMap = new HashMap<String, String>();
+		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
+		List<String> negativeEffectsKeyList = new ArrayList<String>();
+		Map<String,String> effectsStringsMap = new HashMap<String, String>();
 		Vector<AllenIntervalConstraint> constraints = new Vector<AllenIntervalConstraint>();
 		Vector<String> froms = new Vector<String>();  // TODO Are these necessary???
 		Vector<String> tos = new Vector<String>();
@@ -77,6 +81,22 @@ public class HybridDomain{
 
 		// Parse Head
 		String head = parseKeyword(HEAD_KEYWORD, textualSpecification)[0].trim();
+		
+		// Parse type definitions
+//		String[] typeElements = parseKeyword(TYPE_KEYWORD, textualSpecification);
+//		for (String typeElement : typeElements) {
+//			String varName = typeElement.substring(0,typeElement.indexOf(" ")).trim();
+//			String type = typeElement.substring(typeElement.indexOf(" ")).trim();
+//	     // TODO
+//		}
+		
+		// Parse variable definitions
+		String[] varElements = parseKeyword(VARIABLE_RESTRICTION_KEYWORD, textualSpecification);
+		for (String varElement : varElements) {
+			String varName = varElement.substring(0, varElement.indexOf(" ")).trim();
+			String[] values = varElement.substring(varElement.indexOf(" ")).trim().split(" ");
+			variablesPossibleValuesMap.put(varName, values);
+		}
 
 		// Parse Preconditions
 		String[] preElements = parseKeyword(PRECONDITION_KEYWORD, textualSpecification);
@@ -233,6 +253,8 @@ public class HybridDomain{
 		System.out.println("Effects: \n" + effectsStringsMap);
 
 		System.out.println("Constraints: \n" + constraints);
+		
+		System.out.println("Variables: \n" + variablesPossibleValuesMap);
 
 		System.out.println("Froms: \n" + froms);
 
@@ -243,7 +265,7 @@ public class HybridDomain{
 		String[] argStrings = extractArgs(head);
 		System.out.println("argStrings" + Arrays.toString(argStrings));
 		
-		HashMap<String, HashMap<String, Integer>> variableOccurrencesMap = new HashMap<String, HashMap<String, Integer>>();
+		Map<String, Map<String, Integer>> variableOccurrencesMap = new HashMap<String, Map<String, Integer>>();
 		addVariableOccurrences(variableOccurrencesMap, argStrings, "head");
 		
 		// Create preconditions
@@ -261,13 +283,14 @@ public class HybridDomain{
 		
 		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effectsMap);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
+		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		System.out.println("Created Operator: " + op);
 		this.operators.addElement(op);
 	}
 	
-	private PFD0Precondition[] createPreconditions(HashMap<String,String> preconditionsMap, 
-			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap,
-			ArrayList<String> negativeEffectsKeyList) {
+	private PFD0Precondition[] createPreconditions(Map<String,String> preconditionsMap, 
+			Map<String, Map<String, Integer>> variableOccurrencesMap,
+			List<String> negativeEffectsKeyList) {
 		//Create preconditions
 		PFD0Precondition[] preconditions = new PFD0Precondition[preconditionsMap.size()];
 		int i = 0;
@@ -284,11 +307,11 @@ public class HybridDomain{
 	}
 	
 	private static void addVariableOccurrences(
-			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap,
+			Map<String, Map<String, Integer>> variableOccurrencesMap,
 			String[] argStrings, String key) {
 		for (int i = 0; i < argStrings.length;  i++) {
 			if (argStrings[i].startsWith(VARIABLE_INDICATOR)) {
-				HashMap<String, Integer> occ = variableOccurrencesMap.get(argStrings[i]);
+				Map<String, Integer> occ = variableOccurrencesMap.get(argStrings[i]);
 				if (occ == null) {
 					occ = new HashMap<String, Integer>();
 					variableOccurrencesMap.put(argStrings[i], occ);
@@ -310,7 +333,7 @@ public class HybridDomain{
 	private VariablePrototype createEffect(
 			String effKey, 
 			String effString, 
-			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap) {
+			Map<String, Map<String, Integer>> variableOccurrencesMap) {
 		String name = extractName(effString);
 		System.out.println("EffName " + name);
 		String[] args = extractArgs(effString);
@@ -334,7 +357,7 @@ public class HybridDomain{
 	private PFD0Precondition createPrecondition(
 			String preKey, 
 			String preString, 
-			HashMap<String, HashMap<String, Integer>> variableOccurrencesMap) {
+			Map<String, Map<String, Integer>> variableOccurrencesMap) {
 		String name = extractName(preString);
 		System.out.println("PreName " + name);
 		String[] args = extractArgs(preString);
