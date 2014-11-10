@@ -10,11 +10,13 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
+import org.metacsp.multi.allenInterval.AllenInterval;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SchedulableFluent;
 import resourceFluent.SimpleReusableResourceFluent;
 import unify.CompoundSymbolicVariableConstraintSolver;
+import cern.colt.Arrays;
 
 
 public class TaskSelectionMetaConstraint extends MetaConstraint {
@@ -206,7 +208,8 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl, Vector<PlanReportroryItem> items, 
 			FluentNetworkSolver groundSolver) {
-		Fluent[] openFluents = groundSolver.getOpenFluents();
+		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
+		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
@@ -220,7 +223,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 				
 				logger.fine("Applying preconditions of PlanReportroryItem " + item);
 				if (this.oneShot) {
-					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl,  groundSolver);
+					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, groundSolver, openFluents);
 					for (ConstraintNetwork newResolver : newResolvers) {
 						ret.add(newResolver);
 					}

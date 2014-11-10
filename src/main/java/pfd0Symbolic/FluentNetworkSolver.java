@@ -7,6 +7,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiConstraintSolver;
+import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 
@@ -45,6 +46,24 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		ArrayList<Fluent> ret = new ArrayList<Fluent>();
 		for (Variable var: getVariables()) {
 			if (var.getMarking() == TaskApplicationMetaConstraint.markings.OPEN) {
+				ret.add((Fluent) var);
+			}
+		}
+		return ret.toArray(new Fluent[ret.size()]);
+	}
+	
+	/**
+	 * @param taskLST The latest start time of the task.
+	 * @return All Fluents that are active in a given interval.
+	 */
+	public Fluent[] getOpenFluents(AllenInterval taskInterval) {
+		long taskEST = taskInterval.getEST();
+		long taskLST = taskInterval.getLST();
+		ArrayList<Fluent> ret = new ArrayList<Fluent>();
+		for (Variable var: getVariables()) {
+			AllenInterval varInterval = ((Fluent) var).getAllenInterval();
+			if (varInterval.getEST() < taskLST && 
+					varInterval.getLET() >= taskEST) {
 				ret.add((Fluent) var);
 			}
 		}
