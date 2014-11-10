@@ -1,6 +1,7 @@
 package pfd0Symbolic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -277,17 +278,59 @@ public abstract class PlanReportroryItem {
 				}
 			}
 			
+			// Analyze if values can possibly match
+			// by calculating the intersection of possible values of involved head and preconditions.
+			boolean feasibleCN = true;
+			if (variableOccurrencesMap != null) {
+				for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
+					Set<String> possibleValues = null;
+					
+					if (variablesPossibleValuesMap != null) {
+						String[] restrictedValues = variablesPossibleValuesMap.get(occs.getKey());
+						if (restrictedValues != null) {
+							possibleValues = new HashSet<String>(Arrays.asList(restrictedValues));
+						}
+					}
+					
+					for (Entry<String, Integer> occ : occs.getValue().entrySet()) {
+						String id = occ.getKey();
+						FluentConstraint preCon = preconditionToConstraint.get(id);
+						Fluent fl = null;
+						if (preCon != null) {
+							fl = (Fluent) preCon.getFrom();
+						} else if (id.equals("head")){
+							fl = taskFluent;
+						}
+						if (fl != null) {
+							List<String> varSymbolsList = Arrays.asList(
+									fl.getCompoundSymbolicVariable().getSymbolsAt(occ.getValue().intValue() + 1));
+							if (possibleValues == null) {
+								possibleValues = new HashSet<String>(varSymbolsList);
+							} else {   // remove objects that are no possible symbols of fl
+								possibleValues.retainAll(varSymbolsList);
+							}
+						}
+					}
+					if (possibleValues != null) {
+						if (possibleValues.isEmpty()) {
+							feasibleCN = false;
+						}
+					}
+				}
+			}
+			
+			
 			// add positive effects/decomposition
 			for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
 				cn.addConstraint(con);
 			}
 			
-			// add VALUERESTRICTION constraints
+			// add VALUERESTRICTION constraints for preconditions
 			if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
-				for (Entry<String, Map<String, Integer>> occ : variableOccurrencesMap.entrySet()) {
-					String[] possibleValues = variablesPossibleValuesMap.get(occ.getKey());
+				for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
+					String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey());
 					if (possibleValues != null) {
-						for (Entry<String, Integer> e : occ.getValue().entrySet()) {
+						for (Entry<String, Integer> e : occs.getValue().entrySet()) {
 							String preconditionID = e.getKey();
 							FluentConstraint preCon = preconditionToConstraint.get(preconditionID);
 							if (preCon != null) {
@@ -325,7 +368,11 @@ public abstract class PlanReportroryItem {
 				duration.setTo(taskFluent.getAllenInterval());
 				cn.addConstraint(duration);
 			}
-			ret.add(cn);
+			if (feasibleCN) {  // TODO can be aborted earlier if false!
+				ret.add(cn);
+			} else {
+				logger.fine("Ommitting non-feasible CN");
+			}
 		}
 		return ret;		
 	}
