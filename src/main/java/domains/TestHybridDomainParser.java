@@ -36,7 +36,7 @@ public class TestHybridDomainParser {
 		planner.addMetaConstraint(selectionConstraint);
 		
 //		createProblemMoveBase(fluentSolver);
-//		createProblemPickUpObject(fluentSolver);
+		createProblemPickUpObject(fluentSolver);
 //		AAAIProblemsSingle.createProblemMoveTorso(fluentSolver);
 		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
 		

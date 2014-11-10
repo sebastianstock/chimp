@@ -17,13 +17,15 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
 
-	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED, MOVEDURATION};
+	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED, MOVEDURATION, 
+		AXIOM};
 
 	private Type type;
 	private int[] connections;
 	private PlanReportroryItem plannedWith; // The operator or method that has been used for planning the task.
 	private boolean isNegativeEffect;
 	private Bounds bounds;
+	private String axiom;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -42,6 +44,11 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public FluentConstraint(Type type, Bounds bounds) {
 		this(type);
 		this.bounds = bounds;
+	}
+	
+	public FluentConstraint(Type type, String axiom) {
+		this(type);
+		this.axiom = axiom;
 	}
 	
 
@@ -150,6 +157,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		ret.bounds = this.bounds;
 		ret.plannedWith = this.plannedWith;
 		ret.setNegativeEffect(isNegativeEffect);
+		ret.axiom = this.axiom;
 		return ret;
 	}
 
@@ -178,6 +186,10 @@ public class FluentConstraint extends MultiBinaryConstraint {
 
 	public void setNegativeEffect(boolean isNegativeEffect) {
 		this.isNegativeEffect = isNegativeEffect;
+	}
+	
+	public String getAxiom() {
+		return axiom;
 	}
 
 }
