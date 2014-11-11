@@ -47,9 +47,6 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	public ConstraintNetwork[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors 
-		// a ConstraintNetwork is built.
-		// this becomes a task.
 		for (Variable var : groundSolver.getVariables()) {
 			if (((Fluent) var).getCompoundSymbolicVariable().getPredicateName().equals(MOVE_BASE_NAME)) {
 				//			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
