@@ -11,7 +11,6 @@ import pfd0Symbolic.PFD0Method;
 import pfd0Symbolic.PFD0Operator;
 import pfd0Symbolic.PFD0Precondition;
 import pfd0Symbolic.PlanReportroryItem;
-import pfd0Symbolic.FluentConstraint.Type;
 
 public class AAAIDomainSingle {
 	
