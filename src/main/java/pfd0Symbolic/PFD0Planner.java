@@ -188,13 +188,13 @@ public class PFD0Planner extends MetaConstraintSolver {
 			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
 		}
 
-//		//Set resource usage if necessary
-//		for (Variable v : metaValue.getVariables()) {
-//			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
-//				//rr.setUsage(metaValue.getSubstitution(v));
-//				rr.setUsage((Fluent)v);
-//			}
-//		}
+		//Set resource usage if necessary
+		for (Variable v : metaValue.getVariables()) {
+			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
+				//rr.setUsage(metaValue.getSubstitution(v));
+				rr.setUsage((Fluent)v);
+			}
+		}
 				
 		return true;
 	}

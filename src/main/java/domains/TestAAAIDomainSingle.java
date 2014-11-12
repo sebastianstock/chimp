@@ -29,7 +29,7 @@ public class TestAAAIDomainSingle {
 //		AAAIProblems.createProblemMoveArmToSide(fluentSolver);
 //		AAAIProblems.createProblemMoveArmsToCarryposture(fluentSolver);
 //		AAAIProblems.createProblemTuckArms(fluentSolver);
-//		AAAIProblems.createProblemPickUpObject(fluentSolver);
+		AAAIProblemsSingle.createProblemPickUpObject(fluentSolver);
 //		AAAIProblems.createProblemMoveTorso(fluentSolver);
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		
@@ -37,7 +37,7 @@ public class TestAAAIDomainSingle {
 //		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
 //		AAAIProblemsSingle.createProblemAssumeManipulationPoseM(fluentSolver);
 //		AAAIProblemsSingle.createProblemGraspM(fluentSolver);
-		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
+//		AAAIProblemsSingle.createProblemGetObjectWithArmM(fluentSolver);
 		test();
 	}
 	

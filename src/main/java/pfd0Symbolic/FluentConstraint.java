@@ -18,7 +18,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private static final long serialVersionUID = 137380711080409334L;
 
 	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED, MOVEDURATION, 
-		AXIOM};
+		AXIOM, RESOURCEUSAGE};
 
 	private Type type;
 	private int[] connections;
@@ -26,6 +26,9 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private boolean isNegativeEffect;
 	private Bounds bounds;
 	private String axiom;
+	private String resourceType;
+	private int resourcePosition;  // indicates which of namevariables is the resource
+	private int resourceUsageLevel;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -50,7 +53,6 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		this(type);
 		this.axiom = axiom;
 	}
-	
 
 	@Override
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
@@ -158,6 +160,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		ret.plannedWith = this.plannedWith;
 		ret.setNegativeEffect(isNegativeEffect);
 		ret.axiom = this.axiom;
+		ret.resourceType = this.resourceType;
 		return ret;
 	}
 
@@ -190,6 +193,24 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	
 	public String getAxiom() {
 		return axiom;
+	}
+	
+	public String getResourceType() {
+		return resourceType;
+	}
+
+	public int getResourcePosition() {
+		return this.resourcePosition;
+	}
+	
+	public int getResourceUsageLevel() {
+		return resourceUsageLevel;
+	}
+	
+	public void setResourceUsage(String resourceType, int resourcePosition, int resourceUsageLevel) {
+		this.resourceType = resourceType;
+		this.resourcePosition = resourcePosition;
+		this.resourceUsageLevel = resourceUsageLevel;
 	}
 
 }

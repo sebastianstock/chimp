@@ -7,10 +7,11 @@ import java.util.Vector;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
+import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
+import org.metacsp.framework.VariableOrderingH;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.multi.allenInterval.AllenInterval;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.SchedulableFluent;
@@ -58,27 +59,27 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		this.resourceNames = resourceNames;
 		currentResourceUtilizers = new HashMap<SimpleReusableResourceFluent,HashMap<Variable,Integer>>();
 		resourcesMap = new HashMap<String, SimpleReusableResourceFluent>();
-//
-//		for (int i = 0; i < capacities.length; i++) {
-//			//Most critical conflict is the one with most activities 
-//			VariableOrderingH varOH = new VariableOrderingH() {
-//				@Override
-//				public int compare(ConstraintNetwork arg0, ConstraintNetwork arg1) {
-//					return arg1.getVariables().length - arg0.getVariables().length;
-//				}
-//				@Override
-//				public void collectData(ConstraintNetwork[] allMetaVariables) { }
-//			};
-//			// no value ordering
-//			ValueOrderingH valOH = new ValueOrderingH() {
-//				@Override
-//				public int compare(ConstraintNetwork o1, ConstraintNetwork o2) { return 0; }
-//			};
-//			resourcesMap.put(resourceNames[i], new SimpleReusableResourceFluent(varOH, valOH, capacities[i], this, resourceNames[i]));
-//		}
-//
-//		// for every SRR just created, couple it with a vector of variables
-//		for (SimpleReusableResourceFluent rr : resourcesMap.values()) currentResourceUtilizers.put(rr,new HashMap<Variable, Integer>());
+
+		for (int i = 0; i < capacities.length; i++) {
+			//Most critical conflict is the one with most activities 
+			VariableOrderingH varOH = new VariableOrderingH() {
+				@Override
+				public int compare(ConstraintNetwork arg0, ConstraintNetwork arg1) {
+					return arg1.getVariables().length - arg0.getVariables().length;
+				}
+				@Override
+				public void collectData(ConstraintNetwork[] allMetaVariables) { }
+			};
+			// no value ordering
+			ValueOrderingH valOH = new ValueOrderingH() {
+				@Override
+				public int compare(ConstraintNetwork o1, ConstraintNetwork o2) { return 0; }
+			};
+			resourcesMap.put(resourceNames[i], new SimpleReusableResourceFluent(varOH, valOH, capacities[i], this, resourceNames[i]));
+		}
+
+		// for every SRR just created, couple it with a vector of variables
+		for (SimpleReusableResourceFluent rr : resourcesMap.values()) currentResourceUtilizers.put(rr,new HashMap<Variable, Integer>());
 
 	}
 
@@ -214,12 +215,12 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
 				
-				
-//				HashMap<String, Integer> usages = ((PFD0Operator)item).getResourceUsage();
-//				for (String resname : usages.keySet()) {
-//					HashMap<Variable, Integer> utilizers = currentResourceUtilizers.get(resourcesMap.get(resname));
-//					utilizers.put(fl, usages.get(resname));
-//				}
+				// IRAN
+				HashMap<String, Integer> usages = ((PFD0Operator)item).getResourceUsage();
+				for (String resname : usages.keySet()) {
+					HashMap<Variable, Integer> utilizers = currentResourceUtilizers.get(resourcesMap.get(resname));
+					utilizers.put(fl, usages.get(resname));
+				}
 				
 				logger.fine("Applying preconditions of PlanReportroryItem " + item);
 				if (this.oneShot) {
