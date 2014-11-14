@@ -12,7 +12,6 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import resourceFluent.SchedulableFluent;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestIranResource0 {

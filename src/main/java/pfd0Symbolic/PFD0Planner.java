@@ -13,7 +13,6 @@ import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import resourceFluent.SimpleReusableResourceFluent;
 import unify.CompoundSymbolicValueConstraint;
 
 
@@ -105,11 +104,12 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 
 		//Set resource usage if necessary
-		for (Variable v : varsToRemove) {
-			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
-				rr.removeUsage((Fluent)v);
-			}
-		}
+		// TODO
+//		for (Variable v : varsToRemove) {
+//			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
+//				rr.removeUsage((Fluent)v);
+//			}
+//		}
 
 	}
 
@@ -189,12 +189,12 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 
 		//Set resource usage if necessary
-		for (Variable v : metaValue.getVariables()) {
-			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
-				//rr.setUsage(metaValue.getSubstitution(v));
-				rr.setUsage((Fluent)v);
-			}
-		}
+//		for (Variable v : metaValue.getVariables()) {
+//			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
+//				//rr.setUsage(metaValue.getSubstitution(v));
+//				rr.setUsage((Fluent)v);
+//			}
+//		}
 				
 		return true;
 	}

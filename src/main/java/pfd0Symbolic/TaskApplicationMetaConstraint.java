@@ -9,8 +9,6 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
-import resourceFluent.SimpleReusableResourceFluent;
-
 public class TaskApplicationMetaConstraint extends MetaConstraint {
 	
 
@@ -144,9 +142,5 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		return false;
 	}
 
-	public int getResourceUsageLevel( SimpleReusableResourceFluent simpleReusableResourceFluent, Fluent act) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 }
