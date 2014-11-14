@@ -5,11 +5,12 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
+import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
 import unify.CompoundSymbolicVariable;
 
-public class Fluent extends MultiVariable {
+public class Fluent extends MultiVariable implements Activity{
 
 	/**
 	 * 
@@ -79,6 +80,18 @@ public class Fluent extends MultiVariable {
 			ret.append(this.getMarking());
 		}
 		return ret.toString();
+	}
+
+
+	@Override
+	public AllenInterval getTemporalVariable() {
+		return getAllenInterval();
+	}
+
+
+	@Override
+	public Variable getVariable() {
+		return this;
 	}
 
 }
