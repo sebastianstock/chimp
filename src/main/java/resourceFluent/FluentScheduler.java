@@ -5,14 +5,10 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.VariableOrderingH;
-import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.meta.symbolsAndTime.Schedulable;
-import org.metacsp.meta.symbolsAndTime.Schedulable.PEAKCOLLECTION;
 import org.metacsp.multi.activity.Activity;
 
-import cern.colt.Arrays;
 import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentNetworkSolver;
 import unify.CompoundSymbolicValueConstraint;
 
 public class FluentScheduler extends Schedulable {
@@ -39,8 +35,9 @@ public class FluentScheduler extends Schedulable {
 		if (f1.getCompoundSymbolicVariable().getConstraintSolver().addConstraint(con)) {
 			f1.getCompoundSymbolicVariable().getConstraintSolver().removeConstraint(con);
 			return false;
+		} else {
+			return true;
 		}
-		return true;
 	}
 
 	@Override
