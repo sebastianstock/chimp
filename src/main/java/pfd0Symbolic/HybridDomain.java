@@ -19,6 +19,8 @@ import org.metacsp.meta.simplePlanner.SimplePlanner;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import resourceFluent.FluentScheduler;
+
 import com.google.common.primitives.Ints;
 
 
@@ -26,6 +28,7 @@ public class HybridDomain{
 
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
 	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();
+	private final Vector<FluentScheduler> fluentSchedulers = new Vector<FluentScheduler>();
 	private String name;
 
 	
@@ -45,6 +48,7 @@ public class HybridDomain{
 	private static final String CONSTRAINT_KEYWORD = "Constraint";
 	private static final String TYPE_KEYWORD = "Type";
 	private static final String VARIABLE_RESTRICTION_KEYWORD = "Values";
+	private static final String STATE_VARIBALE_KEYWORD = "StateVariable";
 	
 	private static final String EMPTYSTRING = "n";
 	private static final String VARIABLE_INDICATOR = "?";
@@ -62,6 +66,10 @@ public class HybridDomain{
 
 	public Vector<PlanReportroryItem> getMethods() {
 		return methods;
+	}
+	
+	public Vector<FluentScheduler> getFluentSchedulers() {
+		return fluentSchedulers;
 	}
 
 	/**
@@ -385,6 +393,17 @@ public class HybridDomain{
 		System.out.println("PFD0Precondition " + ret);
 		return ret;
 	}
+	
+	private void createFluentSchedulers(String stateStr) {
+		// Parse Head	
+		String[] elements = stateStr.split(" ");
+		String head = elements[0];
+		int field = Integer.parseInt(elements[1]);
+		String[] fieldValues = Arrays.copyOfRange(elements, 2, elements.length-1);
+		for (String fieldValue : fieldValues) {
+			this.fluentSchedulers.add(new FluentScheduler(null, null, head, field, fieldValue));
+		}
+	}
 
 	/**
 	 * Parses a domain file (see domains/testDomain.ddl for an example), instantiates
@@ -439,13 +458,23 @@ public class HybridDomain{
 					System.out.println("}\n");
 					addOperator(operatorstr);
 				}
+				
+				// Parse state variables:
+				String[] stateVariableElements = parseKeyword(STATE_VARIBALE_KEYWORD, everything);
+				for (String stateStr : stateVariableElements) {
+					System.out.println("STATESTRING: {");
+					System.out.println(stateStr);
+					System.out.println("}\n");
+					createFluentSchedulers(stateStr);
+				}
 			}
 			finally { br.close(); }
 		}
 		catch (FileNotFoundException e) { e.printStackTrace(); }
 		catch (IOException e) { e.printStackTrace(); }
 	}
-	
+
+
 	protected static String[] parseKeyword(String keyword, String everything) {
 		Vector<String> elements = new Vector<String>();
 		int lastElement = everything.lastIndexOf(keyword);

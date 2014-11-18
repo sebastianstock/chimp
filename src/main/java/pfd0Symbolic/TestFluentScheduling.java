@@ -58,8 +58,8 @@ public class TestFluentScheduling {
 		
 		fluentSolver.addConstraints(con1,con2,con3);
 		
-		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", new int[] {1}, new String[] {"mug1"});
-		fs.setUsage(fluents);		
+		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", 1, "mug1");
+//		fs.setUsage(fluents);		
 		planner.addMetaConstraint(fs);
 
 	}

@@ -18,14 +18,14 @@ import unify.CompoundSymbolicVariable;
 public class FluentScheduler extends Schedulable {
 	
 	private final String predicateName;
-	private final int[] fields;
-	private final String[] fieldValues;
+	private final int field;
+	private final String fieldValues;
 
 	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName, 
-			int[] fields, String[] fieldValues) {
+			int field, String fieldValues) {
 		super(varOH, valOH);
 		this.predicateName = predicateName;
-		this.fields = fields;
+		this.field = field;
 		this.fieldValues = fieldValues;
 		this.setPeakCollectionStrategy(PEAKCOLLECTION.BINARY);
 	}
@@ -51,11 +51,9 @@ public class FluentScheduler extends Schedulable {
 		for (Variable var : this.getGroundSolver().getVariables()) {
 			CompoundSymbolicVariable comp = ((Fluent) var).getCompoundSymbolicVariable();
 			if (comp.getPredicateName().equals(predicateName)) {
-				for (int i = 0; i < fields.length; i++) {
-					String[] symbols = comp.getSymbolsAt(fields[i]);
-					if (symbols.length == 1 && symbols[0].equals(fieldValues[i])) {
-						activities.add(((Fluent) var));
-					}
+				String[] symbols = comp.getSymbolsAt(field);
+				if (symbols.length == 1 && symbols[0].equals(fieldValues)) {
+					activities.add(((Fluent) var));
 				}
 			}
 		}

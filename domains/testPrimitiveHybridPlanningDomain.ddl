@@ -17,6 +17,9 @@
 ##   '[' and ']' should be used only for constraint bounds       #
 ##   '(' and ')' are used for parsing                            #
 #                                                               #
+#
+#   StateVariable
+#   Args
 #################################################################
 
 (HybridHTNDomain TestDomain)
@@ -38,6 +41,8 @@
 
 #(Resource arm 1)
 
+(StateVariable On 1 mug1 mug2 mug3)
+(StateVariable HasArmPosture 1 rightArm1 leftArm1)
 
 (:operator
  (Head !move_base(?toArea))

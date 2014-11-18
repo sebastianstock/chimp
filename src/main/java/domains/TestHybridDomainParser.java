@@ -14,6 +14,7 @@ import pfd0Symbolic.HybridDomain;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import pfd0Symbolic.TaskSelectionMetaConstraint;
+import resourceFluent.FluentScheduler;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestHybridDomainParser {
@@ -34,6 +35,10 @@ public class TestHybridDomainParser {
 //		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
 //		selectionConstraint.setMethods(methods);
 		planner.addMetaConstraint(selectionConstraint);
+		
+		for (FluentScheduler fs : dom.getFluentSchedulers()) {
+			planner.addMetaConstraint(fs);
+		}
 		
 //		createProblemMoveBase(fluentSolver);
 		createProblemPickUpObject(fluentSolver);
