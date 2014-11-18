@@ -41,8 +41,8 @@ public class TestFluentScheduling {
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork(),cb);
 		
 		fluents[0].setName("get_mug(mug1 pl1 none none)");
-		fluents[1].setName("get_mug(mug1 pl1 none none)");
-		fluents[2].setName("robotat(none ?pl none none)");
+		fluents[1].setName("get_mug(mug1 pl2 none none)");
+		fluents[2].setName("robotat(none pl2 none none)");
 		
 		AllenIntervalConstraint con1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
 		con1.setFrom(fluents[0]);
@@ -58,7 +58,7 @@ public class TestFluentScheduling {
 		
 		fluentSolver.addConstraints(con1,con2,con3);
 		
-		FluentScheduler fs = new FluentScheduler(null, null);
+		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", new int[] {1}, new String[] {"mug1"});
 		fs.setUsage(fluents);		
 		planner.addMetaConstraint(fs);
 

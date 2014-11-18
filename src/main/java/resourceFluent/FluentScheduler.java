@@ -1,20 +1,32 @@
 package resourceFluent;
 
+import java.util.Vector;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
+import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariableOrderingH;
 import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.activity.Activity;
 
 import pfd0Symbolic.Fluent;
 import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariable;
 
 public class FluentScheduler extends Schedulable {
+	
+	private final String predicateName;
+	private final int[] fields;
+	private final String[] fieldValues;
 
-	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH) {
+	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName, 
+			int[] fields, String[] fieldValues) {
 		super(varOH, valOH);
+		this.predicateName = predicateName;
+		this.fields = fields;
+		this.fieldValues = fieldValues;
 		this.setPeakCollectionStrategy(PEAKCOLLECTION.BINARY);
 	}
 
@@ -22,6 +34,33 @@ public class FluentScheduler extends Schedulable {
 	 * 
 	 */
 	private static final long serialVersionUID = -2767348254309353956L;
+	
+	
+	@Override
+	public ConstraintNetwork[] getMetaVariables() {
+		updateUsage();
+		return super.getMetaVariables();
+	}
+
+	public void updateUsage() {
+		// TODO test if this is fast enough
+		if (activities == null) activities = new Vector<Activity>();
+		else activities.clear();
+		ConstraintSolver s = this.getGroundSolver();
+		s.getClass();
+		for (Variable var : this.getGroundSolver().getVariables()) {
+			CompoundSymbolicVariable comp = ((Fluent) var).getCompoundSymbolicVariable();
+			if (comp.getPredicateName().equals(predicateName)) {
+				for (int i = 0; i < fields.length; i++) {
+					String[] symbols = comp.getSymbolsAt(fields[i]);
+					if (symbols.length == 1 && symbols[0].equals(fieldValues[i])) {
+						activities.add(((Fluent) var));
+					}
+				}
+			}
+		}
+	}
+	
 
 	@Override
 	public boolean isConflicting(Activity[] peak) {
@@ -48,8 +87,7 @@ public class FluentScheduler extends Schedulable {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.metaCS.getConstraintSolvers()[0];
 	}
 
 	@Override
