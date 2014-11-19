@@ -27,7 +27,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private Bounds bounds;
 	private String axiom;
 	private String resourceType;
-	private int resourcePosition;  // indicates which of namevariables is the resource
+	private int[] resourceRequirementPositions;
+	private String[] resourceRequirements;
 	private int resourceUsageLevel;
 
 	public FluentConstraint(Type type) {
@@ -161,6 +162,9 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		ret.setNegativeEffect(isNegativeEffect);
 		ret.axiom = this.axiom;
 		ret.resourceType = this.resourceType;
+		ret.resourceRequirementPositions = this.resourceRequirementPositions;
+		ret.resourceRequirements = this.resourceRequirements;
+		ret.resourceUsageLevel = this.resourceUsageLevel;
 		return ret;
 	}
 
@@ -195,21 +199,36 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		return axiom;
 	}
 	
+	public boolean isUsingResource(String resource) {
+		if (resourceType.equals(resource)) {
+			CompoundSymbolicVariable cv = ((Fluent) this.getFrom()).getCompoundSymbolicVariable();
+			for (int i = 0; i < this.resourceRequirementPositions.length; i++) {
+				String[] symbols = cv.getSymbolsAt(resourceRequirementPositions[i]);
+				if (symbols.length != 1 || !symbols[0].equals(resourceRequirements[i])) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public String getResourceType() {
 		return resourceType;
-	}
-
-	public int getResourcePosition() {
-		return this.resourcePosition;
 	}
 	
 	public int getResourceUsageLevel() {
 		return resourceUsageLevel;
 	}
 	
-	public void setResourceUsage(String resourceType, int resourcePosition, int resourceUsageLevel) {
+	public void setResourceUsage(String resourceType, 
+			int[] resourcePositions,
+			String[] resourceRequirements,
+			int resourceUsageLevel) {
 		this.resourceType = resourceType;
-		this.resourcePosition = resourcePosition;
+		this.resourceRequirementPositions = resourcePositions;
+		this.resourceRequirements = resourceRequirements;
 		this.resourceUsageLevel = resourceUsageLevel;
 	}
 

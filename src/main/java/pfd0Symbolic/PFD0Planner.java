@@ -189,6 +189,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 
 		//Set resource usage if necessary
+		// OBSOLETE
 //		for (Variable v : metaValue.getVariables()) {
 //			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
 //				//rr.setUsage(metaValue.getSubstitution(v));

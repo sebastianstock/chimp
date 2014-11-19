@@ -19,7 +19,8 @@
 #                                                               #
 #
 #   StateVariable
-#   Args
+#   FluentResourceUsage
+#   Param
 #################################################################
 
 (HybridHTNDomain TestDomain)
@@ -43,6 +44,10 @@
 
 (StateVariable On 1 mug1 mug2 mug3)
 (StateVariable HasArmPosture 1 rightArm1 leftArm1)
+
+(FluentResourceUsage Holding leftArm1
+    (Param 2 leftArm1)
+)
 
 (:operator
  (Head !move_base(?toArea))
