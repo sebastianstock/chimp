@@ -181,12 +181,12 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 		
 		
-		TaskSelectionMetaConstraint ts = null;
-		TaskApplicationMetaConstraint ta = null;
-		for (MetaConstraint mcon : this.metaConstraints) {
-			if (mcon instanceof TaskSelectionMetaConstraint) ts = (TaskSelectionMetaConstraint)mcon;
-			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
-		}
+//		TaskSelectionMetaConstraint ts = null;
+//		TaskApplicationMetaConstraint ta = null;
+//		for (MetaConstraint mcon : this.metaConstraints) {
+//			if (mcon instanceof TaskSelectionMetaConstraint) ts = (TaskSelectionMetaConstraint)mcon;
+//			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
+//		}
 
 		//Set resource usage if necessary
 		// OBSOLETE
@@ -196,6 +196,8 @@ public class PFD0Planner extends MetaConstraintSolver {
 //				rr.setUsage((Fluent)v);
 //			}
 //		}
+		
+		// Add resource constraints
 				
 		return true;
 	}

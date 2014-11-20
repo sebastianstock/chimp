@@ -93,6 +93,11 @@
 # (Constraint OverlappedBy(Head,req1))
 # (Constraint Duration[5,INF](Head))
  (Del p1)
+ 
+ (ResourceUsage leftArm1 
+    (Param 2 leftArm1))
+ (ResourceUsage rightArm1
+    (Param 2 rightArm1))
 )
 
 

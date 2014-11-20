@@ -105,7 +105,7 @@ public abstract class ResourceFluentManager extends Schedulable {
 		for (Constraint con : this.getGroundSolver().getConstraints()) {
 			if (con instanceof FluentConstraint) {
 				if(((FluentConstraint) con).getType() == FluentConstraint.Type.RESOURCEUSAGE) {
-					if (this.resourceType.equals(((FluentConstraint) con).getResourceType())) {
+					if (this.resourceType.equals(((FluentConstraint) con).getResourceName())) {
 						ret.add((FluentConstraint) con);
 					}
 				}

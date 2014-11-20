@@ -1,20 +1,21 @@
 package pfd0Symbolic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariableOrderingH;
+import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import resourceFluent.FluentResourceUsageScheduler;
+import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 import cern.colt.Arrays;
 
@@ -27,9 +28,11 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	private static final long serialVersionUID = 4546697317217126280L;
 	private Vector<PlanReportroryItem> operators;
 	private Vector<PlanReportroryItem> methods;
-	protected String[] resourceNames;
-	protected HashMap<String, FluentResourceUsageScheduler> resourcesMap;
-	protected HashMap<FluentResourceUsageScheduler,HashMap<Variable,Integer>> currentResourceUtilizers;
+//	protected String[] resourceNames;
+//	protected HashMap<String, FluentResourceUsageScheduler> resourcesMap;
+//	protected HashMap<FluentResourceUsageScheduler,HashMap<Variable,Integer>> currentResourceUtilizers;
+	private final Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap = 
+			new HashMap<String, List<ResourceUsageTemplate>>();  //resource name -> templates
 
 	private String name = "";
 	//false if we split up HTN algorithm into 3 meta constraints, 
@@ -46,6 +49,17 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		this.oneShot = oneShot;
 //		operators = new Vector<PlanReportroryItem>();
 //		methods = new Vector<PlanReportroryItem>();
+	}
+	
+	public void setResourceUsages(List<ResourceUsageTemplate> resourceTemplates) {
+		for (ResourceUsageTemplate rt : resourceTemplates){
+			List<ResourceUsageTemplate> l = resourcesTemplatesMap.get(rt.getResourceName());
+			if (l == null) {
+				l = new ArrayList<ResourceUsageTemplate>();
+				resourcesTemplatesMap.put(rt.getResourceName(), l);
+			}
+			l.add(rt);
+		}
 	}
 	
 	
@@ -218,24 +232,38 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
 				
 				// IRAN
-				HashMap<String, Integer> usages = ((PFD0Operator)item).getResourceUsage();
-				for (String resname : usages.keySet()) {
-					HashMap<Variable, Integer> utilizers = currentResourceUtilizers.get(resourcesMap.get(resname));
-					utilizers.put(fl, usages.get(resname));
-				}
+//				HashMap<String, Integer> usages = ((PFD0Operator)item).getResourceUsage();
+//				for (String resname : usages.keySet()) {
+//					HashMap<Variable, Integer> utilizers = currentResourceUtilizers.get(resourcesMap.get(resname));
+//					utilizers.put(fl, usages.get(resname));
+//				}
 				
 				logger.fine("Applying preconditions of PlanReportroryItem " + item);
 				if (this.oneShot) {
 					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, groundSolver, openFluents);
-					for (ConstraintNetwork newResolver : newResolvers) {
-						ret.add(newResolver);
-					}
+					ret.addAll(newResolvers);
 				} else {
 					ret.add(item.expandPreconditions(fl, groundSolver));
 				}
-				
 			}
 		}
+		
+		// Add FluentResourceConstraints
+		for (ConstraintNetwork cn :ret) {
+			for (Variable v : cn.getVariables()) {
+				if (v instanceof VariablePrototype) {
+					String symbol = (String)((VariablePrototype) v).getParameters()[1];
+					for (ResourceUsageTemplate rt : resourcesTemplatesMap.get(symbol)) {
+						FluentConstraint resourceCon = 
+								new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+						resourceCon.setFrom(v);
+						resourceCon.setTo(v);
+						cn.addConstraint(resourceCon);
+					}
+				}
+			}
+		}
+		
 		return ret;
 	}
 	

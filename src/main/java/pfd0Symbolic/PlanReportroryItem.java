@@ -17,6 +17,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
@@ -41,10 +42,17 @@ public abstract class PlanReportroryItem {
 	 */
 	protected Bounds durationBounds;
 	
+	protected final List<ResourceUsageTemplate> resourceUsageIndicators = 
+			new ArrayList<ResourceUsageTemplate>();
+	
 	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions) {
 		this.taskname = taskname;
 		this.arguments = arguments;
 		this.preconditions = preconditions;
+	}
+	
+	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
+		resourceUsageIndicators.add(rt);
 	}
 	
 	public String getName() {
@@ -318,56 +326,68 @@ public abstract class PlanReportroryItem {
 				}
 			}
 			
-			
-			// add positive effects/decomposition
-			for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
-				cn.addConstraint(con);
-			}
-			
-			// add VALUERESTRICTION constraints for preconditions
-			if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
-				for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
-					String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey());
-					if (possibleValues != null) {
-						for (Entry<String, Integer> e : occs.getValue().entrySet()) {
-							String preconditionID = e.getKey();
-							FluentConstraint preCon = preconditionToConstraint.get(preconditionID);
-							if (preCon != null) {
-								int[] indices = new int[] {e.getValue().intValue()};
-								String[][] restrictions = new String[][] {possibleValues};
-								// TODO merge multiple constraints into one.
-								CompoundSymbolicValueConstraint rcon = 
-										new CompoundSymbolicValueConstraint(
-												CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
-												indices, 
-												restrictions);
-								CompoundSymbolicVariable var = 
-										((Fluent) preCon.getFrom()).getCompoundSymbolicVariable();
-								rcon.setFrom(var);
-								rcon.setTo(var);
-								cn.addConstraint(rcon);
-								logger.fine("ADDED VALUERESTRICTION");
+			if (feasibleCN) {
+
+				// add positive effects/decomposition
+				for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
+					cn.addConstraint(con);
+				}
+
+				// add VALUERESTRICTION constraints for preconditions
+				if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
+					for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
+						String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey());
+						if (possibleValues != null) {
+							for (Entry<String, Integer> e : occs.getValue().entrySet()) {
+								String preconditionID = e.getKey();
+								FluentConstraint preCon = preconditionToConstraint.get(preconditionID);
+								if (preCon != null) {
+									int[] indices = new int[] {e.getValue().intValue()};
+									String[][] restrictions = new String[][] {possibleValues};
+									// TODO merge multiple constraints into one.
+									CompoundSymbolicValueConstraint rcon = 
+											new CompoundSymbolicValueConstraint(
+													CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
+													indices, 
+													restrictions);
+									CompoundSymbolicVariable var = 
+											((Fluent) preCon.getFrom()).getCompoundSymbolicVariable();
+									rcon.setFrom(var);
+									rcon.setTo(var);
+									cn.addConstraint(rcon);
+									logger.fine("ADDED VALUERESTRICTION");
+								}
 							}
 						}
 					}
 				}
-			}
-			
-			// Add a UNARYAPPLIED to remember which method/operator has been used.
-			// UNARYAPPLIED is not needed anymore.
-			FluentConstraint applicationconstr = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, 
-					this);
-			applicationconstr.setFrom(taskFluent);
-			applicationconstr.setTo(taskFluent);
-			cn.addConstraint(applicationconstr);
-			// add constraints for duration
-			if (durationBounds != null) {
-				AllenIntervalConstraint duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
-				duration.setFrom(taskFluent.getAllenInterval());
-				duration.setTo(taskFluent.getAllenInterval());
-				cn.addConstraint(duration);
-			}
-			if (feasibleCN) {  // TODO can be aborted earlier if false!
+
+				// Add a UNARYAPPLIED to remember which method/operator has been used.
+				// UNARYAPPLIED is not needed anymore.
+				FluentConstraint applicationCon = 
+						new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, this);
+				applicationCon.setFrom(taskFluent);
+				applicationCon.setTo(taskFluent);
+				cn.addConstraint(applicationCon);
+
+				// Add constraints for DURATION
+				if (durationBounds != null) {
+					AllenIntervalConstraint durationCon = 
+							new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
+					durationCon.setFrom(taskFluent.getAllenInterval());
+					durationCon.setTo(taskFluent.getAllenInterval());
+					cn.addConstraint(durationCon);
+				}
+
+				// Add Constraints for RESOURCES
+				for (ResourceUsageTemplate rt : this.resourceUsageIndicators) {
+					FluentConstraint resourceCon = 
+							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+					resourceCon.setFrom(taskFluent);
+					resourceCon.setTo(taskFluent);
+					cn.addConstraint(resourceCon);
+				}
+
 				ret.add(cn);
 			} else {
 				logger.fine("Ommitting non-feasible CN");

@@ -61,13 +61,12 @@ public class TestResourceUsageScheduler {
 		
 		fluentSolver.addConstraints(con1,con2,con3);
 		
-		FluentConstraint rcon1 = new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE);
-		rcon1.setResourceUsage("resourceName", new int[] {1}, new String[] {"mug1"}, 1);
+		ResourceUsageTemplate rt = new ResourceUsageTemplate("resourceName", new int[] {1}, new String[] {"mug1"}, 1);
+		FluentConstraint rcon1 = new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
 		rcon1.setFrom(fluents[0]);
 		rcon1.setTo(fluents[0]);
 		
-		FluentConstraint rcon2 = new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE);
-		rcon2.setResourceUsage("resourceName", new int[] {1}, new String[] {"mug1"}, 1);
+		FluentConstraint rcon2 = new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
 		rcon2.setFrom(fluents[1]);
 		rcon2.setTo(fluents[1]);
 		

@@ -7,6 +7,7 @@ import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
@@ -26,10 +27,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private boolean isNegativeEffect;
 	private Bounds bounds;
 	private String axiom;
-	private String resourceType;
-	private int[] resourceRequirementPositions;
-	private String[] resourceRequirements;
-	private int resourceUsageLevel;
+	private ResourceUsageTemplate resourceIndicator;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -53,6 +51,11 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public FluentConstraint(Type type, String axiom) {
 		this(type);
 		this.axiom = axiom;
+	}
+	
+	public FluentConstraint(Type type, ResourceUsageTemplate resourceIndicator) {
+		this(type);
+		this.resourceIndicator = resourceIndicator;
 	}
 
 	@Override
@@ -161,10 +164,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		ret.plannedWith = this.plannedWith;
 		ret.setNegativeEffect(isNegativeEffect);
 		ret.axiom = this.axiom;
-		ret.resourceType = this.resourceType;
-		ret.resourceRequirementPositions = this.resourceRequirementPositions;
-		ret.resourceRequirements = this.resourceRequirements;
-		ret.resourceUsageLevel = this.resourceUsageLevel;
+		ret.resourceIndicator = this.resourceIndicator;
 		return ret;
 	}
 
@@ -200,11 +200,13 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	}
 	
 	public boolean isUsingResource(String resource) {
-		if (resourceType.equals(resource)) {
+		if (resourceIndicator.getResourceName().equals(resource)) {
 			CompoundSymbolicVariable cv = ((Fluent) this.getFrom()).getCompoundSymbolicVariable();
-			for (int i = 0; i < this.resourceRequirementPositions.length; i++) {
+			int[] resourceRequirementPositions = resourceIndicator.getResourceRequirementPositions();
+			for (int i = 0; i < resourceRequirementPositions.length; i++) {
 				String[] symbols = cv.getSymbolsAt(resourceRequirementPositions[i]);
-				if (symbols.length != 1 || !symbols[0].equals(resourceRequirements[i])) {
+				if (symbols.length != 1 || 
+						!symbols[0].equals(resourceIndicator.getResourceRequirements()[i])) {
 					return false;
 				}
 			}
@@ -214,22 +216,12 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		}
 	}
 	
-	public String getResourceType() {
-		return resourceType;
+	public String getResourceName() {
+		return resourceIndicator.getResourceName();
 	}
 	
 	public int getResourceUsageLevel() {
-		return resourceUsageLevel;
-	}
-	
-	public void setResourceUsage(String resourceType, 
-			int[] resourcePositions,
-			String[] resourceRequirements,
-			int resourceUsageLevel) {
-		this.resourceType = resourceType;
-		this.resourceRequirementPositions = resourcePositions;
-		this.resourceRequirements = resourceRequirements;
-		this.resourceUsageLevel = resourceUsageLevel;
+		return resourceIndicator.getResourceUsageLevel();
 	}
 
 }
