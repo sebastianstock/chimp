@@ -20,6 +20,7 @@ import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import pfd0Symbolic.TaskSelectionMetaConstraint;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
+import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestHybridDomainParser {
@@ -47,6 +48,11 @@ public class TestHybridDomainParser {
 		selectionConstraint.addOperators(dom.getOperators());
 //		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
 //		selectionConstraint.setMethods(methods);
+		
+		// Add resource usages
+		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
+		System.out.println("FluentResourceUsages: " + fluentResourceUsages.toString());
+		selectionConstraint.setResourceUsages(fluentResourceUsages);
 		
 		planner.addMetaConstraint(selectionConstraint);
 		
@@ -195,7 +201,7 @@ public class TestHybridDomainParser {
 		
 		// task
 		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
-		taskFluent.setName("!pick_up_object(mug1 ?arm)");
+		taskFluent.setName("!pick_up_object(mug1 leftArm1)");
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 

@@ -54,4 +54,15 @@ public class ResourceUsageTemplate {
 	public int getResourceUsageLevel() {
 		return resourceUsageLevel;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		ret.append(resourceName);
+		ret.append(" : ");
+		ret.append(resourceUsageLevel);
+		return ret.toString();
+	}
+	
+	
 }

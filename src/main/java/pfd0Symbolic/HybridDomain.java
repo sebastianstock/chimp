@@ -64,8 +64,6 @@ public class HybridDomain{
 	private static final String RESOURCE_KEYWORD ="Resource";
 	private static final String FLUENT_KEYWORD = "Fluent";
 	
-	
-	
 	private static final String EMPTYSTRING = "n";
 	private static final String VARIABLE_INDICATOR = "?";
 	
@@ -90,6 +88,10 @@ public class HybridDomain{
 	
 	public Vector<FluentResourceUsageScheduler> getResourceSchedulers() {
 		return resourceSchedulers;
+	}
+	
+	public Vector<ResourceUsageTemplate> getFluentResourceUsages() {
+		return fluentResourceUsages;
 	}
 
 	/**

@@ -42,6 +42,8 @@
 
 (Resource leftArm1 1)
 (Resource rightArm1 1)
+(Resource leftArm1ManCapacity 1)
+(Resource rightArm1ManCapacity 1)
 
 
 (StateVariable On 1 mug1 mug2 mug3)
@@ -105,10 +107,10 @@
  (Del p1)
  
  (ResourceUsage 
-    (Usage leftArm1 1)
+    (Usage leftArm1ManCapacity 1)
     (Param 2 leftArm1))
  (ResourceUsage 
-    (Usage rightArm1 1)
+    (Usage rightArm1ManCapacity 1)
     (Param 2 rightArm1))
 )
 
