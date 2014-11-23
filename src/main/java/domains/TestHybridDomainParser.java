@@ -1,5 +1,7 @@
 package domains;
 
+import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
@@ -8,12 +10,15 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import pfd0Symbolic.DomainParsingException;
 import pfd0Symbolic.Fluent;
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.HybridDomain;
 import pfd0Symbolic.PFD0Planner;
+import pfd0Symbolic.PlanReportroryItem;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import pfd0Symbolic.TaskSelectionMetaConstraint;
+import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
@@ -27,23 +32,41 @@ public class TestHybridDomainParser {
 		int[] ingredients = AAAIDomainSingle.createIngredients();
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
 
-		HybridDomain dom = new HybridDomain(planner, "domains/testPrimitiveHybridPlanningDomain.ddl");
+		HybridDomain dom;
+		try {
+			dom = new HybridDomain(planner, "domains/testPrimitiveHybridPlanningDomain.ddl");
+		} catch (DomainParsingException e) {
+			System.out.println("Error while parsing domain: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
 		
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
+		Vector<PlanReportroryItem> ops = dom.getOperators();
 		selectionConstraint.setOperators(dom.getOperators());
 //		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
 //		selectionConstraint.setMethods(methods);
+		
 		planner.addMetaConstraint(selectionConstraint);
 		
 		for (FluentScheduler fs : dom.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);
 		}
 		
+		List<FluentResourceUsageScheduler> rsList = dom.getResourceSchedulers();
+		System.out.println(rsList);
+		for (FluentResourceUsageScheduler rs : dom.getResourceSchedulers()) {
+			planner.addMetaConstraint(rs);
+		}
+		System.out.println(planner.getMetaConstraints());
+		System.out.println("Number of metaConstraints: " + planner.getMetaConstraints().length);
+		System.out.println("END");
+		
 //		createProblemMoveBase(fluentSolver);
 		createProblemPickUpObject(fluentSolver);
 //		AAAIProblemsSingle.createProblemMoveTorso(fluentSolver);
-		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
+//		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
 		
 		test();
 	}
@@ -53,7 +76,7 @@ public class TestHybridDomainParser {
 
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
-		MetaCSPLogging.setLevel(Level.FINEST);
+		MetaCSPLogging.setLevel(Level.FINE);
 		
 		long startTime = System.nanoTime();
 		System.out.println("Found a plan? " + planner.backtrack());
@@ -172,7 +195,7 @@ public class TestHybridDomainParser {
 		
 		// task
 		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
-		taskFluent.setName("!pick_up_object(mug1 ?area ?manArea leftArm1)");
+		taskFluent.setName("!pick_up_object(mug1 ?arm)");
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 

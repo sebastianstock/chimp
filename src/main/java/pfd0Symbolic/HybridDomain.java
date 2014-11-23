@@ -19,7 +19,9 @@ import org.metacsp.meta.simplePlanner.SimplePlanner;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
+import resourceFluent.ResourceUsageTemplate;
 
 import com.google.common.primitives.Ints;
 
@@ -30,6 +32,12 @@ public class HybridDomain{
 	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();
 	private final Vector<FluentScheduler> fluentSchedulers = new Vector<FluentScheduler>();
 	private String name;
+	private final Vector<FluentResourceUsageScheduler> resourceSchedulers = 
+			new Vector<FluentResourceUsageScheduler>();
+	private final Vector<ResourceUsageTemplate> fluentResourceUsages = 
+			new Vector<ResourceUsageTemplate>();
+	
+//	private final Vector<Resource> resources = new Vector<Resource>();
 
 	
 	// Additional
@@ -49,11 +57,19 @@ public class HybridDomain{
 	private static final String TYPE_KEYWORD = "Type";
 	private static final String VARIABLE_RESTRICTION_KEYWORD = "Values";
 	private static final String STATE_VARIBALE_KEYWORD = "StateVariable";
+	private static final String FLUENT_RESOURCE_KEYWORD = "FluentResourceUsage";
+	private static final String PARAM_KEYWORD = "Param";
+	private static final String ACTION_RESOURCE_KEYWORD = "ResourceUsage";
+	private static final String USAGE_KEYWORD = "Usage";
+	private static final String RESOURCE_KEYWORD ="Resource";
+	private static final String FLUENT_KEYWORD = "Fluent";
+	
+	
 	
 	private static final String EMPTYSTRING = "n";
 	private static final String VARIABLE_INDICATOR = "?";
 	
-	public HybridDomain(MetaConstraintSolver solver, String filename) {
+	public HybridDomain(MetaConstraintSolver solver, String filename) throws DomainParsingException {
 		this.solver = solver;
 		this.groundSolver = (FluentNetworkSolver) solver.getConstraintSolvers()[0];
 		this.fileName = filename;
@@ -70,6 +86,10 @@ public class HybridDomain{
 	
 	public Vector<FluentScheduler> getFluentSchedulers() {
 		return fluentSchedulers;
+	}
+	
+	public Vector<FluentResourceUsageScheduler> getResourceSchedulers() {
+		return resourceSchedulers;
 	}
 
 	/**
@@ -177,17 +197,13 @@ public class HybridDomain{
 			tos.add(to);
 		}
 
-		// Parse Resources // TODO LEFT OUT FOR NOW
-//		String[] resourceElements = parseKeyword("RequiredResource", textualSpecification);
-//		for (String resElement : resourceElements) {
-//			String requiredResource = resElement.substring(0,resElement.indexOf("(")).trim();
-//			int requiredAmount = Integer.parseInt(resElement.substring(resElement.indexOf("(")+1,resElement.indexOf(")")).trim());
-//			for (int k = 0; k < resources.length; k++) {
-//				if (resources[k].equals(requiredResource)) {
-//					resourceRequirements[k] = requiredAmount;
-//				}
-//			}
-//		}
+		// Parse Resources
+		List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
+		String[] resourceElements = parseKeyword(ACTION_RESOURCE_KEYWORD, textualSpecification);
+		for (String resElement : resourceElements) {
+			ResourceUsageTemplate rt = parseResourceUsage(resElement, false);
+			rtList.add(rt);
+		}
 
 //		class AdditionalConstraint {
 //			AllenIntervalConstraint con;
@@ -292,6 +308,7 @@ public class HybridDomain{
 		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effectsMap);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
 		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
+		op.addResourceUsageTemplates(rtList);
 		System.out.println("Created Operator: " + op);
 		this.operators.addElement(op);
 	}
@@ -410,8 +427,9 @@ public class HybridDomain{
 	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link SimplePlanner}.
 	 * @param sp The {@link SimplePlanner} that will use this domain.
 	 * @param fileName Text file containing the domain definition. 
+	 * @throws DomainParsingException 
 	 */
-	private void parseDomain() {
+	private void parseDomain() throws DomainParsingException {
 		String everything = null;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -431,9 +449,29 @@ public class HybridDomain{
 				maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, everything)[0]);
 				System.out.println("MaxArgs " + maxArgs);
 				
-				// RESOURCES: skipped for the moment	
-//				String[] resourceElements = parseKeyword("Resource", everything);
-//				HashMap<String,Integer> resources = processResources(resourceElements);
+				// Parse Resources and create ResourceSchedulers
+				String[] resourceElements = parseKeyword(RESOURCE_KEYWORD, everything);
+				Map<String,Integer> resources = processResources(resourceElements);
+				resourceSchedulers.clear();
+				for (Entry<String, Integer> entry : resources.entrySet()) {
+					FluentResourceUsageScheduler rs = new FluentResourceUsageScheduler(null, null, entry.getKey(), 
+							entry.getValue().intValue());
+					
+//					resourceSchedulers.add(new FluentResourceUsageScheduler(null, null, entry.getKey(), 
+//							entry.getValue().intValue()));
+					resourceSchedulers.add(rs);
+				}
+				
+				// Parse FluentResourceUsages
+				String[] usageElements = parseKeyword(FLUENT_RESOURCE_KEYWORD, everything);
+				processFluentResourceUsages(usageElements);
+				// test if all resources are listed:
+				for (ResourceUsageTemplate rt : fluentResourceUsages) {
+					if (!resources.containsKey(rt.getResourceName())) {
+						throw new DomainParsingException("Resource " + rt.getResourceName() + " is not defined");
+					}
+				}
+				
 //				String[] simpleOperators = parseKeyword("SimpleOperator", everything);
 				System.out.println(everything);
 				String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, everything);
@@ -482,41 +520,83 @@ public class HybridDomain{
 			int bw = lastElement;
 			int fw = lastElement;
 			boolean skip = false;
-			while (everything.charAt(--bw) != '(') { 
-				if (everything.charAt(bw) != ' ' && everything.charAt(bw) != '(') {
-					everything = everything.substring(0,bw);
-					lastElement = everything.lastIndexOf(keyword);
-					skip = true;
-					break;
+			
+			// test if keyword fully matches (ends)
+			if (!Character.isLetterOrDigit(everything.charAt(lastElement + keyword.length()))) {
+				while (everything.charAt(--bw) != '(') { 
+					if (everything.charAt(bw) != ' ' && everything.charAt(bw) != '(') {
+						skip = true;
+						break;
+					}
+				}
+				if (!skip) {
+					int parcounter = 1;
+					while (parcounter != 0) {  // run to closing ')'
+						if (everything.charAt(fw) == '(') parcounter++;
+						else if (everything.charAt(fw) == ')') parcounter--;
+						fw++;
+					}
+					String element = everything.substring(bw,fw).trim();
+					element = element.substring(element.indexOf(keyword)+keyword.length(),element.lastIndexOf(")")).trim();
+					if (!element.startsWith(",") && !element.trim().equals("")) elements.add(element);
 				}
 			}
-			if (!skip) {
-				int parcounter = 1;
-				while (parcounter != 0) {
-					if (everything.charAt(fw) == '(') parcounter++;
-					else if (everything.charAt(fw) == ')') parcounter--;
-					fw++;
-				}
-				String element = everything.substring(bw,fw).trim();
-				element = element.substring(element.indexOf(keyword)+keyword.length(),element.lastIndexOf(")")).trim();
-				if (!element.startsWith(",") && !element.trim().equals("")) elements.add(element);
-				everything = everything.substring(0,bw);
-				lastElement = everything.lastIndexOf(keyword);
-			}
+			everything = everything.substring(0,bw);
+			lastElement = everything.lastIndexOf(keyword);
+			
 		}
 		return elements.toArray(new String[elements.size()]);		
 	}
 
-//	protected static HashMap<String,Integer> processResources (String[] resources) {
-//		HashMap<String, Integer> ret = new HashMap<String, Integer>();
-//		for (String resourceElement : resources) {
-//			String resourceName = resourceElement.substring(0,resourceElement.indexOf(" ")).trim();
-//			int resourceCap = Integer.parseInt(resourceElement.substring(resourceElement.indexOf(" ")).trim());
-//			ret.put(resourceName, resourceCap);
-//		}
-//		return ret;
-//	}
+	protected static HashMap<String,Integer> processResources (String[] resources) {
+		HashMap<String, Integer> ret = new HashMap<String, Integer>();
+		for (String resourceElement : resources) {
+			String resourceName = resourceElement.substring(0,resourceElement.indexOf(" ")).trim();
+			int resourceCap = Integer.parseInt(resourceElement.substring(resourceElement.indexOf(" ")).trim());
+			ret.put(resourceName, resourceCap);
+		}
+		return ret;
+	}
 
+	private void processFluentResourceUsages (String[] usages) {
+		fluentResourceUsages.clear();
+		for (String usageElement : usages) {			
+			fluentResourceUsages.add(parseResourceUsage(usageElement, true));
+		}
+	}
 	
+	/**
+	 * Parses a resource usage.
+	 * @param usageElement The String representing the resource usage.
+	 * @param stateUsage True if it is a state fluent that uses the resource, false if it is an action.
+	 * @return
+	 */
+	private static ResourceUsageTemplate parseResourceUsage(String usageElement, 
+			boolean stateUsage) {
+		// parse Resource
+			String resourceStr = parseKeyword(USAGE_KEYWORD, usageElement)[0];
+			String resourceName = resourceStr.substring(0,resourceStr.indexOf(" ")).trim();
+			int usageLevel = Integer.parseInt(resourceStr.substring(resourceStr.indexOf(" ")).trim());
+			
+			String fluentType = "";
+			// parse Fluent type
+			if (stateUsage) {
+				fluentType = parseKeyword(FLUENT_KEYWORD, usageElement)[0];
+			}
+			
+			// parse Params
+			String[] paramElements = parseKeyword(PARAM_KEYWORD, usageElement);
+			int[] resourceRequirementPositions = new int[paramElements.length];
+			String[] resourceRequirements = new String[paramElements.length];
+			for (int j = 0; j < paramElements.length; j++) {
+				String paramElement = paramElements[j];
+				resourceRequirementPositions[j] = 
+						Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
+				resourceRequirements[j] = paramElement.substring(paramElement.indexOf(" ")).trim();
+			}
+			
+			return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions, 
+					resourceRequirements, usageLevel);
+	}
 	
 }

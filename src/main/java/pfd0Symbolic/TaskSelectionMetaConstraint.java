@@ -56,7 +56,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 			List<ResourceUsageTemplate> l = resourcesTemplatesMap.get(rt.getResourceName());
 			if (l == null) {
 				l = new ArrayList<ResourceUsageTemplate>();
-				resourcesTemplatesMap.put(rt.getResourceName(), l);
+				resourcesTemplatesMap.put(rt.getFluentType(), l);
 			}
 			l.add(rt);
 		}
@@ -253,12 +253,15 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 			for (Variable v : cn.getVariables()) {
 				if (v instanceof VariablePrototype) {
 					String symbol = (String)((VariablePrototype) v).getParameters()[1];
-					for (ResourceUsageTemplate rt : resourcesTemplatesMap.get(symbol)) {
-						FluentConstraint resourceCon = 
-								new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
-						resourceCon.setFrom(v);
-						resourceCon.setTo(v);
-						cn.addConstraint(resourceCon);
+					List<ResourceUsageTemplate> rtList = resourcesTemplatesMap.get(symbol);
+					if (rtList != null) {
+						for (ResourceUsageTemplate rt : rtList) {
+							FluentConstraint resourceCon = 
+									new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+							resourceCon.setFrom(v);
+							resourceCon.setTo(v);
+							cn.addConstraint(resourceCon);
+						}
 					}
 				}
 			}

@@ -82,8 +82,11 @@ public class FluentResourceUsageScheduler extends Schedulable {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuilder sb = new StringBuilder("FluentResouceUsageScheduler ");
+		sb.append(name);
+		sb.append(" : ");
+		sb.append(capacity);
+		return sb.toString();
 	}
 
 	@Override

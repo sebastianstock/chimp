@@ -5,6 +5,9 @@ public class ResourceUsageTemplate {
 	/** The resource's name */
 	private final String resourceName;
 	
+	/** The type of the fluent */
+	private String fluentType;
+	
 	/** The indices of the NameVariables that need to be testet. */
 	private final int[] resourceRequirementPositions;
 	
@@ -22,11 +25,24 @@ public class ResourceUsageTemplate {
 		this.resourceRequirements = resourceRequirements;
 		this.resourceUsageLevel = resourceUsageLevel;
 	}
+	
+	public ResourceUsageTemplate(String resourceName, String fluentType, int[] resourceRequirementPositions,
+			String[] resourceRequirements, int resourceUsageLevel) {
+		this(resourceName, resourceRequirementPositions, resourceRequirements, resourceUsageLevel);
+		this.fluentType = fluentType;
+	}
 
 	public String getResourceName() {
 		return resourceName;
 	}
-
+	
+	public String getFluentType() {
+		if (fluentType == null) {
+			throw new IllegalStateException("FluentType is not set");
+		}
+		return fluentType;
+	}
+	
 	public int[] getResourceRequirementPositions() {
 		return resourceRequirementPositions;
 	}

@@ -40,13 +40,23 @@
 #(Controllable RobotProprioception) #proprioception
 #(Controllable atLocation) #tabletop perception
 
-#(Resource arm 1)
+(Resource leftArm1 1)
+(Resource rightArm1 1)
+
 
 (StateVariable On 1 mug1 mug2 mug3)
 (StateVariable HasArmPosture 1 rightArm1 leftArm1)
 
-(FluentResourceUsage Holding leftArm1
-    (Param 2 leftArm1)
+(FluentResourceUsage 
+  (Usage leftArm1 1) 
+  (Fluent Holding)
+  (Param 2 leftArm1)
+)
+
+(FluentResourceUsage 
+  (Usage rightArm1 1) 
+  (Fluent Holding)
+  (Param 2 rightArm1)
 )
 
 (:operator
@@ -94,9 +104,11 @@
 # (Constraint Duration[5,INF](Head))
  (Del p1)
  
- (ResourceUsage leftArm1 
+ (ResourceUsage 
+    (Usage leftArm1 1)
     (Param 2 leftArm1))
- (ResourceUsage rightArm1
+ (ResourceUsage 
+    (Usage rightArm1 1)
     (Param 2 rightArm1))
 )
 

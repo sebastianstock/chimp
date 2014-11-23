@@ -1,5 +1,6 @@
 package resourceFluent;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.metacsp.framework.ConstraintNetwork;
@@ -76,6 +77,7 @@ public class TestResourceUsageScheduler {
 //		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", 1, "mug1");
 //		fs.setUsage(fluents);		
 		planner.addMetaConstraint(frs);
+		MetaCSPLogging.setLevel(Level.FINEST);
 
 	}
 
