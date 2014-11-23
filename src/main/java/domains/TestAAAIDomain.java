@@ -104,9 +104,9 @@ public class TestAAAIDomain {
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 //		TaskApplicationMetaConstraint applicationConstraint = new TaskApplicationMetaConstraint();
 		Vector<PlanReportroryItem> operators = AAAIDomain.createOperators(fluentSolver);
-		selectionConstraint.setOperators(operators);
+		selectionConstraint.addOperators(operators);
 		Vector<PlanReportroryItem> methods = AAAIDomain.createMethods(fluentSolver);
-		selectionConstraint.setMethods(methods);
+		selectionConstraint.addMethods(methods);
 //		planner.addMetaConstraint(preConstraint);
 //		planner.addMetaConstraint(applicationConstraint);
 		planner.addMetaConstraint(selectionConstraint);

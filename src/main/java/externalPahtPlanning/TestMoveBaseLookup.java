@@ -83,9 +83,9 @@ public class TestMoveBaseLookup {
 	private static void initMetaConstraints() {
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 		Vector<PlanReportroryItem> operators = AAAIDomain.createOperators(fluentSolver);
-		selectionConstraint.setOperators(operators);
+		selectionConstraint.addOperators(operators);
 		Vector<PlanReportroryItem> methods = AAAIDomain.createMethods(fluentSolver);
-		selectionConstraint.setMethods(methods);
+		selectionConstraint.addMethods(methods);
 		planner.addMetaConstraint(selectionConstraint);
 		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();

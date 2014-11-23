@@ -44,7 +44,7 @@ public class TestHybridDomainParser {
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 		Vector<PlanReportroryItem> ops = dom.getOperators();
-		selectionConstraint.setOperators(dom.getOperators());
+		selectionConstraint.addOperators(dom.getOperators());
 //		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
 //		selectionConstraint.setMethods(methods);
 		

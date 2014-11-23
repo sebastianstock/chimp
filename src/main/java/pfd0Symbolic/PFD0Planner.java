@@ -7,7 +7,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -18,24 +17,18 @@ import unify.CompoundSymbolicValueConstraint;
 
 public class PFD0Planner extends MetaConstraintSolver {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8031573555691611305L;
 
-	public PFD0Planner(long origin, long horizon, long animationTime, String[][] symbols, int[] symbolicingredients) {
+	public PFD0Planner(long origin, long horizon, long animationTime, String[][] symbols, 
+			int[] symbolicingredients) {
 		// Currently only FluentConstraints. Other constraint should be added later.
 		super(new Class[] {FluentConstraint.class}, 
 				animationTime, 
 				new FluentNetworkSolver(origin, horizon, symbols, symbolicingredients));
 	}
 
-
 	@Override
-	public void preBacktrack() {
-		// TODO Do I need to do something here?
-
-	}
+	public void preBacktrack() { }
 
 	@Override
 	public void postBacktrack(MetaVariable mv) {
@@ -69,7 +62,6 @@ public class PFD0Planner extends MetaConstraintSolver {
 		logger.finest("START RETRACT_RESOLVER_SUB");
 		long startTime = System.nanoTime();
 		
-		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
 		// remove added fluents
@@ -95,22 +87,6 @@ public class PFD0Planner extends MetaConstraintSolver {
 		}
 		long endTime = System.nanoTime();
 		logger.finest("END RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
-		
-		TaskSelectionMetaConstraint ts = null;
-		TaskApplicationMetaConstraint ta = null;
-		for (MetaConstraint mcon : this.metaConstraints) {
-			if (mcon instanceof TaskSelectionMetaConstraint) ts = (TaskSelectionMetaConstraint)mcon;
-			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
-		}
-
-		//Set resource usage if necessary
-		// TODO
-//		for (Variable v : varsToRemove) {
-//			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
-//				rr.removeUsage((Fluent)v);
-//			}
-//		}
-
 	}
 
 	/**
@@ -125,12 +101,8 @@ public class PFD0Planner extends MetaConstraintSolver {
 	@Override
 	protected boolean addResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
-		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
-//		System.out.println("addResolverSub Constraints: ");
-//		for(Constraint c : metaValue.getConstraints()) {
-//			System.out.println(c);
-//		}
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
@@ -179,62 +151,43 @@ public class PFD0Planner extends MetaConstraintSolver {
 				}
 			}
 		}
-		
-		
-//		TaskSelectionMetaConstraint ts = null;
-//		TaskApplicationMetaConstraint ta = null;
-//		for (MetaConstraint mcon : this.metaConstraints) {
-//			if (mcon instanceof TaskSelectionMetaConstraint) ts = (TaskSelectionMetaConstraint)mcon;
-//			else if (mcon instanceof TaskApplicationMetaConstraint) ta = (TaskApplicationMetaConstraint)mcon;
-//		}
-
-		//Set resource usage if necessary
-		// OBSOLETE
-//		for (Variable v : metaValue.getVariables()) {
-//			for (SimpleReusableResourceFluent rr : ts.getCurrentReusableResourcesUsedByActivity(v)) {
-//				//rr.setUsage(metaValue.getSubstitution(v));
-//				rr.setUsage((Fluent)v);
-//			}
-//		}
-		
-		// Add resource constraints
 				
 		return true;
 	}
 
 	@Override
 	protected double getUpperBound() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	protected void setUpperBound() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 
 	}
 
 	@Override
 	protected double getLowerBound() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	protected void setLowerBound() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 
 	}
 
 	@Override
 	protected boolean hasConflictClause(ConstraintNetwork metaValue) {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	protected void resetFalseClause() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 
 	}
 

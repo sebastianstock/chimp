@@ -73,9 +73,9 @@ public class TestAxiomMetaConstraint {
 	private static void initMetaConstraints() {
 		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
 		Vector<PlanReportroryItem> operators = AAAIDomainSingle.createOperators(fluentSolver);
-		selectionConstraint.setOperators(operators);
+		selectionConstraint.addOperators(operators);
 		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
-		selectionConstraint.setMethods(methods);
+		selectionConstraint.addMethods(methods);
 		planner.addMetaConstraint(selectionConstraint);
 		
 		AxiomMetaConstraint axiomConstraint = new AxiomMetaConstraint();
