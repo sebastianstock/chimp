@@ -3,6 +3,7 @@ package pfd0Symbolic;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.metacsp.framework.Constraint;
@@ -20,9 +21,10 @@ public class PFD0Method extends PlanReportroryItem {
 
 	
 	public PFD0Method(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			VariablePrototype[] subtaskprototypes, Constraint[] constraints) {
-		super(taskname, arguments, preconditions);
-		this.subtaskprototypes = subtaskprototypes;
+			Map<String, VariablePrototype> effectsMap, Constraint[] constraints) {
+		
+		super(taskname, arguments, preconditions, effectsMap);
+		this.subtaskprototypes = effectsMap.values().toArray(new VariablePrototype[effectsMap.size()]);
 		this.constraints = constraints;
 	}
 	

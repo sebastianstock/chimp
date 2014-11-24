@@ -61,6 +61,14 @@
   (Param 2 rightArm1)
 )
 
+(:method
+ (Head move_object(?object ?toArea))
+ (Pre p1 On(?object ?fromArea))
+ (Subtask s1 get_object(?object))
+ (Subtask s2 put_object(?object ?toArea))
+ (Ordering Before s1 s2)
+)
+
 (:operator
  (Head !move_base(?toArea))
  (Pre p1 RobotAt(?fromArea))

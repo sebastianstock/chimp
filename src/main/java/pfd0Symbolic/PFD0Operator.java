@@ -1,7 +1,6 @@
 package pfd0Symbolic;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -17,52 +16,27 @@ import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Operator extends PlanReportroryItem {
 	
-	private VariablePrototype[] positiveEffects;
+	private VariablePrototype[] positiveEffects; // TODO can be replaced by super.effectsMap
 	private Logger logger;
 	
-	private String[] resources;
-	private int[] resourceUsages;
-	private HashMap<String, Integer> resourceUsageMap = new HashMap<String, Integer>();
 	
-	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			String[][] negativeEffects, VariablePrototype[] positiveEffects, String[] resources, int[] resourceUsages) {
-		super(taskname, arguments, preconditions);
-		this.positiveEffects = positiveEffects;
-		this.resources = resources;
-		this.resourceUsages = resourceUsages;
-		
-		if (resourceUsages != null) {
-			for (int i = 0; i < resourceUsages.length; i++) {
-				resourceUsageMap.put(resources[i], resourceUsages[i]);
-			}
-		}
-		
-		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
-	}
-	
-	
-	
-	@Deprecated
-	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			String[][] negativeEffects, VariablePrototype[] positiveEffects) {
-		this(taskname, arguments, preconditions, negativeEffects, positiveEffects, null, null);
-	}
-	
-	@Deprecated
-	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			VariablePrototype[] positiveEffects) {
-		this(taskname, arguments, preconditions, null, positiveEffects, null, null);
-	}
+//	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+//			String[][] negativeEffects, VariablePrototype[] positiveEffects, String[] resources, int[] resourceUsages) {
+//		super(taskname, arguments, preconditions);
+//		this.positiveEffects = positiveEffects;
+//	
+//		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
+//	}
+
 	
 	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
 			Map<String, VariablePrototype> effectsMap) {
-		this(taskname, arguments, preconditions, null, effectsMap.values().toArray(new VariablePrototype[effectsMap.size()]), null, null);
-		super.effectsMap = effectsMap;
-	}
+		
+		super(taskname, arguments, preconditions, effectsMap);
+		
+		this.positiveEffects = effectsMap.values().toArray(new VariablePrototype[effectsMap.size()]);
 
-	
-	public HashMap<String, Integer> getResourceUsage(){
-		return resourceUsageMap;
+		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
 	}
 	
 	// Only used by TaskApplicationMetaConstraint when we have three different meta-constraints.

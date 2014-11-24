@@ -45,10 +45,12 @@ public abstract class PlanReportroryItem {
 	protected final List<ResourceUsageTemplate> resourceUsageIndicators = 
 			new ArrayList<ResourceUsageTemplate>();
 	
-	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions) {
+	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+			Map<String, VariablePrototype> effectsMap) {
 		this.taskname = taskname;
 		this.arguments = arguments;
 		this.preconditions = preconditions;
+		this.effectsMap = effectsMap;
 	}
 	
 	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
@@ -71,12 +73,10 @@ public abstract class PlanReportroryItem {
 	public void setVariableOccurrencesMap(
 			Map<String, Map<String, Integer>> variableOccurrencesMap) {
 		this.variableOccurrencesMap = variableOccurrencesMap;
-		System.out.println("VARIABLEOCCURRENCESMAP:\n" + variableOccurrencesMap);
 	}
 	
 	public void setVariablesPossibleValuesMap(Map<String,String[]> map) {
 		this.variablesPossibleValuesMap = map;
-		System.out.println("VARIABLESPOSSIBLEVALUESMAP:\n" + variablesPossibleValuesMap);
 	}
 
 	/**

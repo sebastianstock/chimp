@@ -1,5 +1,8 @@
 package domains;
 
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.HybridDomain;
+
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -10,10 +13,8 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.DomainParsingException;
 import pfd0Symbolic.Fluent;
 import pfd0Symbolic.FluentNetworkSolver;
-import pfd0Symbolic.HybridDomain;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PlanReportroryItem;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
