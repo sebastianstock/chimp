@@ -15,8 +15,6 @@ import resourceFluent.ResourceUsageTemplate;
 
 public class OperatorParser extends PlanReportroiryItemParser {
 	
-
-	
 	
 	private final List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
 	

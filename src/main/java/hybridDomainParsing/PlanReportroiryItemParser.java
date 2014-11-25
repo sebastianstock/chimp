@@ -11,6 +11,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
 import pfd0Symbolic.FluentNetworkSolver;
+import pfd0Symbolic.PFD0Operator;
 import pfd0Symbolic.PFD0Precondition;
 import pfd0Symbolic.PlanReportroryItem;
 
@@ -212,8 +213,9 @@ public abstract class PlanReportroiryItemParser {
 		}
 	}
 	
-	private void parseAdditionalConstraints() {
-		//		class AdditionalConstraint {
+	private void handleAdditionalConstraints() {
+		
+//		class AdditionalConstraint {
 //			AllenIntervalConstraint con;
 //			int from, to;
 //			public AdditionalConstraint(AllenIntervalConstraint con, int from, int to) {
@@ -221,8 +223,8 @@ public abstract class PlanReportroiryItemParser {
 //				this.from = from;
 //				this.to = to;
 //			}
-//			public void addAdditionalConstraint(PFD0Operator op) {
-////				op.addConstraint(con, from, to); // TODO
+//			public void addAdditionalConstraint(PlanReportroryItem item) {
+//				//				item.addConstraint(con, from, to); // TODO
 //			}
 //		}
 //

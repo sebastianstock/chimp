@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
@@ -34,6 +35,8 @@ public abstract class PlanReportroryItem {
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap;
+	
+	private static final String HEAD_STRING = "head";
 	
 	Logger logger = MetaCSPLogging.getLogger(PlanReportroryItem.class);
 	
@@ -226,13 +229,20 @@ public abstract class PlanReportroryItem {
 		for (List<FluentConstraint> comb : combinations) {
 			ConstraintNetwork cn = new ConstraintNetwork(null);
 			
-			Map<String, FluentConstraint> preconditionToConstraint = 
-					new HashMap<String, FluentConstraint>();
+			Map<String, FluentConstraint> preconditionKeyToConstraint = 
+					new HashMap<String, FluentConstraint>();  // TODO probably obsolete???
+			
+			Map<String, Variable> keyToFluentMap = new HashMap<String, Variable>();
+//			keyToFluentMap.put(HEAD_STRING, taskFluent);
+			for (Entry<String, VariablePrototype> entry : effectsMap.entrySet()) {
+				keyToFluentMap.put(entry.getKey(), entry.getValue());
+			}
 			
 			// Add PRE and CLOSES constraints
 			for (FluentConstraint con : comb) {
 				cn.addConstraint(con);
-				preconditionToConstraint.put(constraintToPrecondition.get(con), con);
+				preconditionKeyToConstraint.put(constraintToPrecondition.get(con), con);
+				keyToFluentMap.put(constraintToPrecondition.get(con), con.getFrom());
 				
 				// add closes for negative effects
 				if (con.isNegativeEffect() && this instanceof PFD0Operator) {
@@ -244,50 +254,9 @@ public abstract class PlanReportroryItem {
 			}
 			
 			// add binding constraints between preconditions or effects
-			if (variableOccurrencesMap != null) {
-				for (Map<String, Integer> occurrence : variableOccurrencesMap.values()) {
-					String[] keys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
-					for (int i = 0; i < keys.length; i++) {
-						if (keys[i].equals("head")) {
-							continue;
-						}
-						for (int j = i + 1; j < keys.length; j++) {
-							if (keys[j].equals("head")) {
-								continue;
-							}
-							// Create binding constraint
-							int connections[] = new int[] {occurrence.get(keys[i]).intValue(),
-									occurrence.get(keys[j]).intValue()};
-							CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
-									CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
-									connections);
-							
-							if (preconditionToConstraint.containsKey(keys[i])) {
-								Fluent from = (Fluent) preconditionToConstraint.get(keys[i]).getFrom();
-								bcon.setFrom(from.getCompoundSymbolicVariable());
-							} else if (effectsMap != null && effectsMap.containsKey(keys[i])){
-								bcon.setFrom(effectsMap.get(keys[i]));
-							} else {
-								logger.fine("No effect found for key " + keys[i]);
-								continue;
-							}
-							
-							if (preconditionToConstraint.containsKey(keys[j])) {
-								Fluent to = (Fluent) preconditionToConstraint.get(keys[j]).getFrom();
-								bcon.setTo(to.getCompoundSymbolicVariable());
-							} else if (effectsMap != null && effectsMap.containsKey(keys[j])){
-								bcon.setTo(effectsMap.get(keys[j]));
-							} else {
-								logger.fine("No effect found for key " + keys[j]);
-								continue;
-							}
-							System.out.println("FROM: " +keys[i]);
-							System.out.println("TO: " +keys[j]);
-							cn.addConstraint(bcon);
-						}
-					}
-				}
-			}
+			for (Constraint con : createPreconditionsEffectsBindings(keyToFluentMap)) {
+				cn.addConstraint(con);
+			}		
 			
 			// Analyze if values can possibly match
 			// by calculating the intersection of possible values of involved head and preconditions.
@@ -305,11 +274,11 @@ public abstract class PlanReportroryItem {
 					
 					for (Entry<String, Integer> occ : occs.getValue().entrySet()) {
 						String id = occ.getKey();
-						FluentConstraint preCon = preconditionToConstraint.get(id);
+						FluentConstraint preCon = preconditionKeyToConstraint.get(id);
 						Fluent fl = null;
 						if (preCon != null) {
 							fl = (Fluent) preCon.getFrom();
-						} else if (id.equals("head")){
+						} else if (id.equals(HEAD_STRING)){
 							fl = taskFluent;
 						}
 						if (fl != null) {
@@ -344,7 +313,7 @@ public abstract class PlanReportroryItem {
 						if (possibleValues != null) {
 							for (Entry<String, Integer> e : occs.getValue().entrySet()) {
 								String preconditionID = e.getKey();
-								FluentConstraint preCon = preconditionToConstraint.get(preconditionID);
+								FluentConstraint preCon = preconditionKeyToConstraint.get(preconditionID);
 								if (preCon != null) {
 									int[] indices = new int[] {e.getValue().intValue()};
 									String[][] restrictions = new String[][] {possibleValues};
@@ -400,6 +369,60 @@ public abstract class PlanReportroryItem {
 		return ret;		
 	}
 	
+	private List<Constraint> createPreconditionsEffectsBindings(Map<String, Variable> keyToFluentMap) {
+		List<Constraint> ret = new ArrayList<Constraint>();
+		if (variableOccurrencesMap != null) {
+			for (Map<String, Integer> occurrence : variableOccurrencesMap.values()) {
+				String[] occKeys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
+				for (int i = 0; i < occKeys.length; i++) {
+					if (occKeys[i].equals(HEAD_STRING)) {
+						continue;
+					}
+					for (int j = i + 1; j < occKeys.length; j++) {
+						if (occKeys[j].equals(HEAD_STRING)) {
+							continue;
+						}
+						// Create binding constraint
+						int connections[] = new int[] {occurrence.get(occKeys[i]).intValue(),
+								occurrence.get(occKeys[j]).intValue()};
+						CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
+								CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
+								connections);
+
+						// set from
+						Variable from = keyToFluentMap.get(occKeys[i]);
+						if (from != null) {
+							if (from instanceof Fluent) {
+								bcon.setFrom(((Fluent) from).getCompoundSymbolicVariable());
+							} else {  // Variable Prototype (will be set in addResolverSub)
+								bcon.setFrom(from);
+							}
+						} else {
+							logger.fine("No fluent found for key " + occKeys[i]);
+							continue;
+						}
+
+						// set to
+						Variable to = keyToFluentMap.get(occKeys[j]);
+						if (to != null) {
+							if (to instanceof Fluent) {
+								bcon.setTo(((Fluent) to).getCompoundSymbolicVariable());
+							} else {  // Variable Prototype (will be set in addResolverSub)
+								bcon.setTo(to);
+							}
+						} else {
+							logger.fine("No fluent found for key " + occKeys[j]);
+							continue;
+						}
+
+						ret.add(bcon);
+					}
+				}
+			}
+		}
+		return ret;
+	}
+
 	/**
 	 * Applies the method or operator to one task.
 	 * @param taskfluent The task that has to be expanded.
