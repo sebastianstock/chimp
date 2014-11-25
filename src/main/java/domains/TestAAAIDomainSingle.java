@@ -33,7 +33,7 @@ public class TestAAAIDomainSingle {
 //		AAAIProblems.createProblemMoveTorso(fluentSolver);
 //		AAAIProblems.createProblemPlaceObject(fluentSolver);
 		
-//		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
+		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
 //		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
 //		AAAIProblemsSingle.createProblemAssumeManipulationPoseM(fluentSolver);
 //		AAAIProblemsSingle.createProblemGraspM(fluentSolver);

@@ -62,11 +62,17 @@
 )
 
 (:method
- (Head move_object(?object ?toArea))
- (Pre p1 On(?object ?fromArea))
- (Subtask s1 get_object(?object))
- (Subtask s2 put_object(?object ?toArea))
- (Ordering Before s1 s2)
+ (Head drive(?toArea))
+ (Sub s1 assume_default_driving_pose())
+ (Sub s2 !move_base(?toArea))
+ (Ordering s1 s2)
+)
+
+(:method
+ (Head assume_default_driving_pose())
+ (Sub s1 !tuck_arms(armTuckedPosture armTuckedPosture))
+ (Sub s2 !move_torso(torsoDownPosture))
+ (Ordering s1 s2)
 )
 
 (:operator

@@ -48,7 +48,7 @@ public class TestHybridDomainParser {
 		Vector<PlanReportroryItem> ops = dom.getOperators();
 		selectionConstraint.addOperators(dom.getOperators());
 //		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
-//		selectionConstraint.setMethods(methods);
+		selectionConstraint.addMethods(dom.getMethods());
 		
 		// Add resource usages
 		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
@@ -71,9 +71,11 @@ public class TestHybridDomainParser {
 		System.out.println("END");
 		
 //		createProblemMoveBase(fluentSolver);
-		createProblemPickUpObject(fluentSolver);
+//		createProblemPickUpObject(fluentSolver);
 //		AAAIProblemsSingle.createProblemMoveTorso(fluentSolver);
 //		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
+//		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
+		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
 		
 		test();
 	}

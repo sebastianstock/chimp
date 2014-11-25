@@ -15,6 +15,7 @@ import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.meta.simplePlanner.SimplePlanner;
 
 import pfd0Symbolic.FluentNetworkSolver;
+import pfd0Symbolic.PFD0Method;
 import pfd0Symbolic.PFD0Operator;
 import pfd0Symbolic.PlanReportroryItem;
 import resourceFluent.FluentResourceUsageScheduler;
@@ -41,13 +42,14 @@ public class HybridDomain{
 	public static final String DOMAIN_KEYWORD = "HybridHTNDomain";
 	public static final String MAXARGS_KEYWORD = "MaxArgs";
 	public static final String OPERATOR_KEYWORD = ":operator";
-	public static final String Method_KEYWORD = ":method";
+	public static final String METHOD_KEYWORD = ":method";
 	public static final String HEAD_KEYWORD = "Head";
 	public static final String PRECONDITION_KEYWORD = "Pre";
 	public static final String EFFECT_KEYWORD = "Add";
 	public static final String NEGATIVE_EFFECT_KEYWORD = "Del";
-	public static final String SUBTASK_KEYWORD = "Subtask";
+	public static final String SUBTASK_KEYWORD = "Sub";
 	public static final String CONSTRAINT_KEYWORD = "Constraint";
+	public static final String ORDERING_CONSTRAINT_KEYWORD = "Ordering";
 	public static final String TYPE_KEYWORD = "Type";
 	public static final String VARIABLE_RESTRICTION_KEYWORD = "Values";
 	public static final String STATE_VARIBALE_KEYWORD = "StateVariable";
@@ -60,6 +62,8 @@ public class HybridDomain{
 	
 	public static final String EMPTYSTRING = "n";
 	public static final String VARIABLE_INDICATOR = "?";
+	
+	private static final String[] NO_STRINGS = {};
 	
 	public HybridDomain(MetaConstraintSolver solver, String filename) throws DomainParsingException {
 		this.solver = solver;
@@ -93,7 +97,12 @@ public class HybridDomain{
 	}
 	
 	public static String[] extractArgs(String str) {
-		return str.substring(str.indexOf("(")+1,str.indexOf(")")).trim().split(" ");
+		String argStr =  str.substring(str.indexOf("(")+1,str.indexOf(")")).trim();
+		if (argStr.length() > 0) {
+			return argStr.split(" ");
+		} else {
+			return NO_STRINGS;
+		}
 	}
 	
 
@@ -160,12 +169,19 @@ public class HybridDomain{
 				
 				System.out.println(everything);
 				String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, everything);
-
 				for (String operatorstr : planningOperators) {
 					OperatorParser oParser = new OperatorParser(operatorstr, groundSolver, maxArgs);
 					PFD0Operator op = oParser.create();
 					System.out.println("Created Operator: " + op);
 					this.operators.addElement(op);
+				}
+				
+				String[] planningMethods = parseKeyword(METHOD_KEYWORD, everything);
+				for (String methodStr : planningMethods) {
+					MethodParser mParser = new MethodParser(methodStr, groundSolver, maxArgs);
+					PFD0Method m = mParser.create();
+					System.out.println("Created Method: " + m);
+					this.methods.addElement(m);
 				}
 				
 				// Parse state variables:
