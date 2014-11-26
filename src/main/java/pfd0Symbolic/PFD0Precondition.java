@@ -1,6 +1,9 @@
 package pfd0Symbolic;
 
+import java.util.Vector;
+
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
@@ -18,6 +21,8 @@ public class PFD0Precondition {
 	private boolean isNegativeEffect;
 	
 	private String key;
+	
+	private final Vector<AdditionalConstraintTemplate> additionalConstraints = new Vector<AdditionalConstraintTemplate>();
 
 	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections) {
 		this.fluenttype = fluenttype;
@@ -63,6 +68,14 @@ public class PFD0Precondition {
 		return key;
 	}
 	
+	public void addAdditionalConstraint(AdditionalConstraintTemplate con) {
+		this.additionalConstraints.add(con);
+	}
+	
+	public Vector<AdditionalConstraintTemplate> getAdditionalConstraints() {
+		return additionalConstraints;
+	}
+
 	@Deprecated // Only used when using three variables
 	/** Creates a constraint for this precondition.
 	 * A precondition prototype will be created. This prototype will later be 

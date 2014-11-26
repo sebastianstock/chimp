@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -36,7 +38,7 @@ public abstract class PlanReportroryItem {
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap;
 	
-	private static final String HEAD_STRING = "head";
+	public static final String HEAD_KEYWORD_STRING = "task";
 	
 	Logger logger = MetaCSPLogging.getLogger(PlanReportroryItem.class);
 	
@@ -204,12 +206,12 @@ public abstract class PlanReportroryItem {
 					String oName = openFluent.getCompoundSymbolicVariable().getPredicateName();
 					if(preName.equals(oName)) {
 						// potential match. Add PRE constraint.
-						// TODO could be optimized by testing the full name.
 						FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE, 
 								pre.getConnections());
 						preCon.setFrom(openFluent);
 						preCon.setTo(taskFluent);
 						preCon.setNegativeEffect(pre.isNegativeEffect());
+						preCon.setAdditionalConstraints(pre.getAdditionalConstraints());
 						possiblePreconditions.add(preCon);
 						constraintToPrecondition.put(preCon, pre.getKey());
 					}
@@ -253,11 +255,6 @@ public abstract class PlanReportroryItem {
 				}
 			}
 			
-			// add binding constraints between preconditions or effects
-			for (Constraint con : createPreconditionsEffectsBindings(keyToFluentMap)) {
-				cn.addConstraint(con);
-			}		
-			
 			// Analyze if values can possibly match
 			// by calculating the intersection of possible values of involved head and preconditions.
 			boolean feasibleCN = true;
@@ -278,7 +275,7 @@ public abstract class PlanReportroryItem {
 						Fluent fl = null;
 						if (preCon != null) {
 							fl = (Fluent) preCon.getFrom();
-						} else if (id.equals(HEAD_STRING)){
+						} else if (id.equals(HEAD_KEYWORD_STRING)){
 							fl = taskFluent;
 						}
 						if (fl != null) {
@@ -300,6 +297,11 @@ public abstract class PlanReportroryItem {
 			}
 			
 			if (feasibleCN) {
+
+				// add binding constraints between preconditions or effects
+				for (Constraint con : createPreconditionsEffectsBindings(keyToFluentMap)) {
+					cn.addConstraint(con);
+				}
 
 				// add positive effects/decomposition
 				for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
@@ -369,17 +371,54 @@ public abstract class PlanReportroryItem {
 		return ret;		
 	}
 	
+	private void setVarsForAdditionalConstraints(Fluent taskFluent, Map<String, Variable> keyToFluentMap) {
+		Vector<String> froms = new Vector<String>();
+		Vector<String> tos = new Vector<String>();
+		Vector<AllenIntervalConstraint> constraints = new Vector<AllenIntervalConstraint>();
+		
+		if (froms.size() != tos.size() || froms.size() != constraints.size()) {
+			throw new IllegalStateException();
+		}
+		
+		for (int i = 0; i < froms.size(); i++) {
+			String fromKey = froms.get(i);
+			String toKey = tos.get(i);
+			if (!HEAD_KEYWORD_STRING.equals(fromKey) && !HEAD_KEYWORD_STRING.equals(toKey)) {
+				Variable from = keyToFluentMap.get(fromKey);
+				if (from == null) {
+					throw new IllegalArgumentException("Error in Domain. No fluent for key " + fromKey);
+				}
+				Variable to = keyToFluentMap.get(fromKey);
+				if (to == null) {
+					throw new IllegalArgumentException("Error in Domain. No fluent for key " + toKey);
+				}
+				
+				MultiBinaryConstraint con = (MultiBinaryConstraint) constraints.get(i);
+				con.setFrom(from);
+				con.setTo(to);
+			} else if (HEAD_KEYWORD_STRING.equals(fromKey) && HEAD_KEYWORD_STRING.equals(toKey)) {    // HEAD -> HEAD
+				MultiBinaryConstraint con = (MultiBinaryConstraint) constraints.get(i);
+				con.setFrom(taskFluent);
+				con.setTo(taskFluent);
+			} else if (HEAD_KEYWORD_STRING.equals(fromKey) && !HEAD_KEYWORD_STRING.equals(toKey)) { // HEAD -> PRE
+				// Add it to DC or PRe constraint
+				
+			}
+			
+		}
+	}
+	
 	private List<Constraint> createPreconditionsEffectsBindings(Map<String, Variable> keyToFluentMap) {
 		List<Constraint> ret = new ArrayList<Constraint>();
 		if (variableOccurrencesMap != null) {
 			for (Map<String, Integer> occurrence : variableOccurrencesMap.values()) {
 				String[] occKeys = occurrence.keySet().toArray(new String[occurrence.keySet().size()]);
 				for (int i = 0; i < occKeys.length; i++) {
-					if (occKeys[i].equals(HEAD_STRING)) {
+					if (occKeys[i].equals(HEAD_KEYWORD_STRING)) {
 						continue;
 					}
 					for (int j = i + 1; j < occKeys.length; j++) {
-						if (occKeys[j].equals(HEAD_STRING)) {
+						if (occKeys[j].equals(HEAD_KEYWORD_STRING)) {
 							continue;
 						}
 						// Create binding constraint

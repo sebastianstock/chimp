@@ -10,8 +10,8 @@ import java.util.Vector;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import pfd0Symbolic.AdditionalConstraintTemplate;
 import pfd0Symbolic.FluentNetworkSolver;
-import pfd0Symbolic.PFD0Operator;
 import pfd0Symbolic.PFD0Precondition;
 import pfd0Symbolic.PlanReportroryItem;
 
@@ -26,9 +26,8 @@ public abstract class PlanReportroiryItemParser {
 	protected final String head;
 	protected final String[] argStrings;
 	
-	protected final Vector<AllenIntervalConstraint> constraints = new Vector<AllenIntervalConstraint>();
-	protected final Vector<String> froms = new Vector<String>();  // TODO Are these necessary???
-	protected final Vector<String> tos = new Vector<String>();
+	protected final Vector<AdditionalConstraintTemplate> additionalAIConstraints = 
+			new Vector<AdditionalConstraintTemplate>(); 
 	
 	protected final Map<String, Map<String, Integer>> variableOccurrencesMap = 
 			new HashMap<String, Map<String, Integer>>();
@@ -108,14 +107,18 @@ public abstract class PlanReportroiryItemParser {
 			}
 		}
 
-		PFD0Precondition ret = new PFD0Precondition(name, args, 
-				Ints.toArray(connectionsList),
-				maxArgs,
-				HybridDomain.EMPTYSTRING,
-				preKey);
-		System.out.println("PFD0Precondition " + ret);
+		PFD0Precondition ret = new PFD0Precondition(name, args, Ints.toArray(connectionsList), maxArgs, 
+				HybridDomain.EMPTYSTRING, preKey);
+		for (AdditionalConstraintTemplate additionalCon : additionalAIConstraints) {
+			if (additionalCon.involvesHeadAndKey(preKey)) {
+				ret.addAdditionalConstraint(additionalCon);
+			}
+		}
+		
 		return ret;
 	}
+	
+	
 	
 	protected Map<String,String[]> parseVariableDefinitions() {
 		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
@@ -207,9 +210,7 @@ public abstract class PlanReportroiryItemParser {
 				con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName),bounds.toArray(new Bounds[bounds.size()]));
 			}
 			else con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName));
-			constraints.add(con);
-			froms.add(from);
-			tos.add(to);
+			additionalAIConstraints.add(new AdditionalConstraintTemplate(con, from, to));
 		}
 	}
 	

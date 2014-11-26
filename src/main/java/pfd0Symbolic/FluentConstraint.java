@@ -1,5 +1,9 @@
 package pfd0Symbolic;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
@@ -28,6 +32,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private Bounds bounds;
 	private String axiom;
 	private ResourceUsageTemplate resourceIndicator;
+	private Vector<AdditionalConstraintTemplate> additionalConstraints;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -62,13 +67,14 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	protected Constraint[] createInternalConstraints(Variable f, Variable t) {
 		if (!( f instanceof Fluent) || !(t instanceof Fluent)) return null;
 		
-		// TODO: Refactor:
+		List<Constraint> retList = new ArrayList<Constraint>();
 		
 		if (this.type.equals(Type.MATCHES)) {
 			AllenIntervalConstraint eq = new AllenIntervalConstraint(
 					AllenIntervalConstraint.Type.Equals);
 			eq.setFrom(((Fluent) f).getAllenInterval());
 			eq.setTo(((Fluent) t).getAllenInterval());
+			retList.add(eq);
 
 			CompoundSymbolicValueConstraint ncon = 
 					new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
@@ -76,7 +82,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			ncon.setFrom(nf);
 			CompoundSymbolicVariable nt = ((Fluent) t).getCompoundSymbolicVariable();
 			ncon.setTo(nt);
-			return new Constraint[]{ncon, eq};
+			retList.add(ncon);
 			
 		} else if (this.type.equals(Type.DC)) {
 			AllenIntervalConstraint desf = new AllenIntervalConstraint(
@@ -84,54 +90,52 @@ public class FluentConstraint extends MultiBinaryConstraint {
 					AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes.getDefaultBounds());
 			desf.setFrom(((Fluent) t).getAllenInterval());
 			desf.setTo(((Fluent) f).getAllenInterval());
-			if (connections != null && connections.length > 0) {
-				return new Constraint[]{createSubmatches(f, t), desf};
-			} else {
-				return new Constraint[]{desf};
-			}
+			retList.add(desf);
+			
 		} else if (this.type.equals(Type.PRE)) {
-			AllenIntervalConstraint preAIC = 
-					new AllenIntervalConstraint(
-							AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, 
-							AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
-			preAIC.setFrom(((Fluent) t).getAllenInterval());
-			preAIC.setTo(((Fluent) f).getAllenInterval());
-			if (connections != null && connections.length > 0) {
-				return new Constraint[]{createSubmatches(f, t), preAIC};
-			} else {
-				return new Constraint[]{preAIC};
+			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
+				for (AdditionalConstraintTemplate aConTemplate : additionalConstraints) {
+					AllenIntervalConstraint con = (AllenIntervalConstraint) aConTemplate.getConstraint().clone();
+					if (aConTemplate.startsFromHead()) {
+						con.setFrom(((Fluent) t).getAllenInterval());
+						con.setTo(((Fluent) f).getAllenInterval());
+					} else {
+						con.setFrom(((Fluent) f).getAllenInterval());
+						con.setTo(((Fluent) t).getAllenInterval());
+					}
+					retList.add(con);
+				}
+			} else {  // use default temporal constraints
+				AllenIntervalConstraint preAIC = new AllenIntervalConstraint(
+						AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, 
+						AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
+				preAIC.setFrom(((Fluent) t).getAllenInterval());
+				preAIC.setTo(((Fluent) f).getAllenInterval());
+				retList.add(preAIC);
 			}
+			
 		} else if (this.type.equals(Type.OPENS)) { // TODO probably need other relations, too
 //			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
 //			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, new Bounds(2L, 6L));
 			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, AllenIntervalConstraint.Type.Overlaps.getDefaultBounds());
 			befCon.setFrom(((Fluent) f).getAllenInterval());
 			befCon.setTo(((Fluent) t).getAllenInterval());
-			if(connections != null) {
-				return new Constraint[]{createSubmatches(f, t), befCon};
-			} else {
-				return new Constraint[]{befCon};
-			}
+			retList.add(befCon);
+			
 		} else if (this.type.equals(Type.BEFORE)) {
 			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
 			befCon.setFrom(((Fluent) f).getAllenInterval());
 			befCon.setTo(((Fluent) t).getAllenInterval());
-			if(connections != null) {
-				return new Constraint[]{createSubmatches(f, t), befCon};
-			} else {
-				return new Constraint[]{befCon};
-			}
+			retList.add(befCon);
+			
 		} else if (this.type.equals(Type.CLOSES)) { // TODO probably need other relations, too
 			AllenIntervalConstraint oiCon = new AllenIntervalConstraint(
 					AllenIntervalConstraint.Type.OverlappedBy,
 					AllenIntervalConstraint.Type.OverlappedBy.getDefaultBounds());
 			oiCon.setFrom(((Fluent) f).getAllenInterval());
 			oiCon.setTo(((Fluent) t).getAllenInterval());
-			if(connections != null) {
-				return new Constraint[]{createSubmatches(f, t), oiCon};
-			} else {
-				return new Constraint[]{oiCon};
-			}
+			retList.add(oiCon);
+			
 		} else if (this.type.equals(Type.MOVEDURATION)) {
 			AllenIntervalConstraint durationCon = new AllenIntervalConstraint(
 					AllenIntervalConstraint.Type.Duration, this.bounds
@@ -140,9 +144,14 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			AllenInterval ai = ((Fluent) f).getAllenInterval();
 			durationCon.setFrom(ai);
 			durationCon.setTo(ai);
-			return new Constraint[]{durationCon};	
+			retList.add(durationCon);	
 		}
-		return null;
+		
+		if (connections != null && connections.length > 0) {
+			retList.add(createSubmatches(f, t));
+		}
+		return retList.toArray(new Constraint[retList.size()]);
+//		return null;
 	}
 	
 	private CompoundSymbolicValueConstraint createSubmatches(Variable f, Variable t) {
@@ -165,6 +174,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		ret.setNegativeEffect(isNegativeEffect);
 		ret.axiom = this.axiom;
 		ret.resourceIndicator = this.resourceIndicator;
+		ret.additionalConstraints = this.additionalConstraints;
 		return ret;
 	}
 
@@ -222,6 +232,10 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	
 	public int getResourceUsageLevel() {
 		return resourceIndicator.getResourceUsageLevel();
+	}
+
+	public void setAdditionalConstraints(Vector<AdditionalConstraintTemplate> additionalConstraints) {
+		this.additionalConstraints = additionalConstraints;
 	}
 
 }

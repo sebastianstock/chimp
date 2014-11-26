@@ -102,6 +102,7 @@
 (:operator
  (Head !move_torso(?newPosture))
  (Pre p1 HasTorsoPosture(?oldPosture))
+ (Constraint OverlappedBy(task,p1))
  (Del p1)
  (Add e1 HasTorsoPosture(?newPosture))
 )

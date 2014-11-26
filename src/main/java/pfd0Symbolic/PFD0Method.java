@@ -42,7 +42,6 @@ public class PFD0Method extends PlanReportroryItem {
 
 	@Override
 	public List<Constraint> expandEffectsOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
-		List<Variable> newFluents = new ArrayList<Variable>();
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 		
 		// before constraints from that goal task to another task at the same level.
@@ -54,7 +53,6 @@ public class PFD0Method extends PlanReportroryItem {
 		if (subtaskprototypes != null) {
 			for (VariablePrototype sub : subtaskprototypes) {
 				sub.setMarking(markings.UNPLANNED);
-				newFluents.add(sub);
 				// create dc constraint
 				String[] arguments = (String[])((VariablePrototype) sub).getParameters()[2];
 				FluentConstraint dc = 

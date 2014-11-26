@@ -94,7 +94,7 @@ public class TestHybridDomainParser {
 //		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[0].getConstraintNetwork());
 		
 //		Callback cb = new Callback() {
