@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.metacsp.framework.VariablePrototype;
 
+import pfd0Symbolic.EffectTemplate;
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Operator;
 import pfd0Symbolic.PFD0Precondition;
@@ -35,15 +36,9 @@ public class OperatorParser extends PlanReportroiryItemParser {
 	public PFD0Operator create() {
 		PFD0Precondition[] preconditions = createPreconditions(true);
 		
-		// Create positive effects
-		Map<String, VariablePrototype> effectsMap = new HashMap<String, VariablePrototype>();
-		for (Entry<String, String> e : parseEffects(HybridDomain.EFFECT_KEYWORD).entrySet()) {
-			String effKey = e.getKey();
-			effectsMap.put(effKey, createEffect(effKey, e.getValue()));
-		}
-		
 		String headname = HybridDomain.extractName(head);
-		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effectsMap);
+		EffectTemplate[] effects = createEffectTemplates(HybridDomain.EFFECT_KEYWORD);
+		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effects);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
 		
 		Map<String,String[]> variablesPossibleValuesMap = parseVariableDefinitions();
@@ -52,23 +47,4 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		return op;
 	}
 
-	
-	private VariablePrototype createEffect(String effKey, String effString) {
-		String name = HybridDomain.extractName(effString);
-		String[] args = HybridDomain.extractArgs(effString);
-		
-		addVariableOccurrences(args, effKey); 
-
-		// fill arguments array up to maxargs
-		String[] filledArgs = new String[maxArgs];
-		for (int i = 0; i < args.length; i++) {
-			filledArgs[i] = args[i];
-		}
-		for (int i = args.length; i < maxArgs; i++) {
-			filledArgs[i] = HybridDomain.EMPTYSTRING;
-		}
-		VariablePrototype ret = new VariablePrototype(groundSolver, "S", name, filledArgs);
-		return ret;
-	}
-	
 }

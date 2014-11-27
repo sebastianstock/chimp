@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
 
+import pfd0Symbolic.EffectTemplate;
 import pfd0Symbolic.FluentConstraint;
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Method;
@@ -24,16 +24,11 @@ public class MethodParser extends PlanReportroiryItemParser {
 	
 	public PFD0Method create() {
 		PFD0Precondition[] preconditions = createPreconditions(false);
-		
-		Map<String, VariablePrototype> subtasksMap = new HashMap<String, VariablePrototype>();
-		for (Entry<String, String> e : parseEffects(HybridDomain.SUBTASK_KEYWORD).entrySet()) {
-			String subtaskKey = e.getKey();
-			subtasksMap.put(subtaskKey, createSubtask(subtaskKey, e.getValue()));
-		}
 
 		String headname = HybridDomain.extractName(head);
-		Constraint[] orderingCons = parseFluentBeforeConstraints(subtasksMap);
-		PFD0Method ret = new PFD0Method(headname, argStrings, preconditions, subtasksMap, orderingCons);
+		EffectTemplate[] subtasks = createEffectTemplates(HybridDomain.SUBTASK_KEYWORD);
+		Constraint[] orderingCons = parseFluentBeforeConstraints(subtasks);
+		PFD0Method ret = new PFD0Method(headname, argStrings, preconditions, subtasks, orderingCons);
 		ret.setVariableOccurrencesMap(variableOccurrencesMap);
 		
 		Map<String,String[]> variablesPossibleValuesMap = parseVariableDefinitions();
@@ -41,7 +36,12 @@ public class MethodParser extends PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	private Constraint[] parseFluentBeforeConstraints(Map<String, VariablePrototype> subtasksMap) {
+	private Constraint[] parseFluentBeforeConstraints(EffectTemplate[] subtasks) {
+		Map<String, VariablePrototype> keyToPrototypesMap = new HashMap<String, VariablePrototype>();
+		for (EffectTemplate et : subtasks) {
+			keyToPrototypesMap.put(et.getKey(), et.getPrototype());
+		}
+		
 		String[] orderingElements = 
 				HybridDomain.parseKeyword(HybridDomain.ORDERING_CONSTRAINT_KEYWORD, textualSpecification);
 		List<Constraint> cons = new ArrayList<Constraint>();
@@ -49,31 +49,11 @@ public class MethodParser extends PlanReportroiryItemParser {
 			String fromKey = orderingElement.substring(0,orderingElement.indexOf(" ")).trim();
 			String toKey = orderingElement.substring(orderingElement.indexOf(" ")).trim();
 			FluentConstraint con = new FluentConstraint(FluentConstraint.Type.BEFORE);
-			con.setFrom(subtasksMap.get(fromKey));
-			con.setTo(subtasksMap.get(toKey));
+			con.setFrom(keyToPrototypesMap.get(fromKey));
+			con.setTo(keyToPrototypesMap.get(toKey));
 			cons.add(con);
 		}
 		return cons.toArray(new Constraint[cons.size()]);
 	}
-
-	private VariablePrototype createSubtask(String subKey, String subString) {
-		String name = HybridDomain.extractName(subString);
-		String[] args = HybridDomain.extractArgs(subString);
-
-		addVariableOccurrences(args, subKey); 
-
-		// fill arguments array up to maxargs
-		String[] filledArgs = new String[maxArgs];
-		for (int i = 0; i < args.length; i++) {
-			filledArgs[i] = args[i];
-		}
-		for (int i = args.length; i < maxArgs; i++) {
-			filledArgs[i] = HybridDomain.EMPTYSTRING;
-		}
-		VariablePrototype ret = new VariablePrototype(groundSolver, "S", name, filledArgs);
-		return ret;
-	}
-
-	
 	
 }

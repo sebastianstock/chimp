@@ -2,7 +2,6 @@ package pfd0Symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -15,8 +14,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Operator extends PlanReportroryItem {
-	
-	private VariablePrototype[] positiveEffects; // TODO can be replaced by super.effectsMap
+
 	private Logger logger;
 	
 	
@@ -30,11 +28,9 @@ public class PFD0Operator extends PlanReportroryItem {
 
 	
 	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			Map<String, VariablePrototype> effectsMap) {
+			EffectTemplate[] effects) {
 		
-		super(taskname, arguments, preconditions, effectsMap);
-		
-		this.positiveEffects = effectsMap.values().toArray(new VariablePrototype[effectsMap.size()]);
+		super(taskname, arguments, preconditions, effects);
 
 		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
 	}
@@ -72,8 +68,9 @@ public class PFD0Operator extends PlanReportroryItem {
 		}
 		
 		// add positive effects
-		if (positiveEffects != null) {
-			for(VariablePrototype p : positiveEffects) {
+		if (effects != null) {
+			for(EffectTemplate et : effects) {
+				VariablePrototype p = et.getPrototype();
 				p.setMarking(markings.OPEN);
 				newFluents.add(p);
 				String[] arguments = (String[])((VariablePrototype) p).getParameters()[2];
@@ -81,6 +78,9 @@ public class PFD0Operator extends PlanReportroryItem {
 						createConnections(arguments));
 				opens.setFrom(taskfluent);
 				opens.setTo(p);
+				if (et.hasAdditionalConstraints()) {
+					opens.setAdditionalConstraints(et.getAdditionalConstraints());
+				}
 				newConstraints.add(opens);
 			}
 		}
@@ -97,8 +97,9 @@ public class PFD0Operator extends PlanReportroryItem {
 		Vector<Variable> newFluents = new Vector<Variable>();
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 
-		if (positiveEffects != null) {
-			for(VariablePrototype p : positiveEffects) {
+		if (effects != null) {
+			for(EffectTemplate et : effects) {
+				VariablePrototype p = et.getPrototype();
 				p.setMarking(markings.OPEN);
 				newFluents.add(p);
 				String[] arguments = (String[])((VariablePrototype) p).getParameters()[2];
@@ -106,6 +107,9 @@ public class PFD0Operator extends PlanReportroryItem {
 						createConnections(arguments));
 				opens.setFrom(taskfluent);
 				opens.setTo(p);
+				if (et.hasAdditionalConstraints()) {
+					opens.setAdditionalConstraints(et.getAdditionalConstraints());
+				}
 				newConstraints.add(opens);
 			}
 		}

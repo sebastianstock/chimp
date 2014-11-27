@@ -3,7 +3,6 @@ package pfd0Symbolic;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.metacsp.framework.Constraint;
@@ -16,15 +15,13 @@ import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Method extends PlanReportroryItem {
 	
-	private VariablePrototype[] subtaskprototypes;
 	private Constraint[] constraints;
 
 	
 	public PFD0Method(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			Map<String, VariablePrototype> effectsMap, Constraint[] constraints) {
+			EffectTemplate[] effects, Constraint[] constraints) {
 		
-		super(taskname, arguments, preconditions, effectsMap);
-		this.subtaskprototypes = effectsMap.values().toArray(new VariablePrototype[effectsMap.size()]);
+		super(taskname, arguments, preconditions, effects);
 		this.constraints = constraints;
 	}
 	
@@ -50,18 +47,25 @@ public class PFD0Method extends PlanReportroryItem {
 		Set<Variable> subtasksWithoutSuccessor = new HashSet<Variable>();
 		
 		// create prototypes and decomposition constraints
-		if (subtaskprototypes != null) {
-			for (VariablePrototype sub : subtaskprototypes) {
-				sub.setMarking(markings.UNPLANNED);
+		if (effects != null) {
+			for (EffectTemplate et : effects) {
+				VariablePrototype subPrototype = et.getPrototype();
+				subPrototype.setMarking(markings.UNPLANNED);
 				// create dc constraint
-				String[] arguments = (String[])((VariablePrototype) sub).getParameters()[2];
+				String[] arguments = (String[])((VariablePrototype) subPrototype).getParameters()[2];
 				FluentConstraint dc = 
 						new FluentConstraint(FluentConstraint.Type.DC, createConnections(arguments));
 				dc.setFrom(taskfluent);
-				dc.setTo(sub);
+				dc.setTo(subPrototype);
+				if (et.hasAdditionalConstraints()) {
+					dc.setAdditionalConstraints(et.getAdditionalConstraints());
+				}
+				if (et.hasAdditionalConstraints()) {
+					dc.setAdditionalConstraints(et.getAdditionalConstraints());
+				}
 				newConstraints.add(dc);
 				
-				subtasksWithoutSuccessor.add(sub);
+				subtasksWithoutSuccessor.add(subPrototype);
 			}
 		}
 		if (constraints != null) {

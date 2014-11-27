@@ -85,12 +85,26 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			retList.add(ncon);
 			
 		} else if (this.type.equals(Type.DC)) {
-			AllenIntervalConstraint desf = new AllenIntervalConstraint(
-					AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes, 
-					AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes.getDefaultBounds());
-			desf.setFrom(((Fluent) t).getAllenInterval());
-			desf.setTo(((Fluent) f).getAllenInterval());
-			retList.add(desf);
+			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
+				for (AdditionalConstraintTemplate aConTemplate : additionalConstraints) {
+					AllenIntervalConstraint con = (AllenIntervalConstraint) aConTemplate.getConstraint().clone();
+					if (aConTemplate.startsFromHead()) {
+						con.setFrom(((Fluent) f).getAllenInterval());
+						con.setTo(((Fluent) t).getAllenInterval());
+					} else {
+						con.setFrom(((Fluent) f).getAllenInterval());
+						con.setTo(((Fluent) t).getAllenInterval());
+					}
+					retList.add(con);
+				}
+			} else {
+				AllenIntervalConstraint desf = new AllenIntervalConstraint(
+						AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes, 
+						AllenIntervalConstraint.Type.DuringOrEqualsOrStartsOrFinishes.getDefaultBounds());
+				desf.setFrom(((Fluent) t).getAllenInterval());
+				desf.setTo(((Fluent) f).getAllenInterval());
+				retList.add(desf);
+			}
 			
 		} else if (this.type.equals(Type.PRE)) {
 			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
@@ -114,13 +128,28 @@ public class FluentConstraint extends MultiBinaryConstraint {
 				retList.add(preAIC);
 			}
 			
-		} else if (this.type.equals(Type.OPENS)) { // TODO probably need other relations, too
-//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
-//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, new Bounds(2L, 6L));
-			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, AllenIntervalConstraint.Type.Overlaps.getDefaultBounds());
-			befCon.setFrom(((Fluent) f).getAllenInterval());
-			befCon.setTo(((Fluent) t).getAllenInterval());
-			retList.add(befCon);
+		} else if (this.type.equals(Type.OPENS)) { 
+			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
+				for (AdditionalConstraintTemplate aConTemplate : additionalConstraints) {
+					AllenIntervalConstraint con = (AllenIntervalConstraint) aConTemplate.getConstraint().clone();
+					if (aConTemplate.startsFromHead()) {
+						con.setFrom(((Fluent) f).getAllenInterval());
+						con.setTo(((Fluent) t).getAllenInterval());
+					} else {
+						con.setFrom(((Fluent) f).getAllenInterval());
+						con.setTo(((Fluent) t).getAllenInterval());
+					}
+					retList.add(con);
+				}
+			} else {
+				// TODO probably need other relations, too
+				//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+				//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, new Bounds(2L, 6L));
+				AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Overlaps, AllenIntervalConstraint.Type.Overlaps.getDefaultBounds());
+				befCon.setFrom(((Fluent) f).getAllenInterval());
+				befCon.setTo(((Fluent) t).getAllenInterval());
+				retList.add(befCon);
+			}
 			
 		} else if (this.type.equals(Type.BEFORE)) {
 			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
@@ -128,18 +157,24 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			befCon.setTo(((Fluent) t).getAllenInterval());
 			retList.add(befCon);
 			
-		} else if (this.type.equals(Type.CLOSES)) { // TODO probably need other relations, too
-			AllenIntervalConstraint oiCon = new AllenIntervalConstraint(
-					AllenIntervalConstraint.Type.OverlappedBy,
-					AllenIntervalConstraint.Type.OverlappedBy.getDefaultBounds());
-			oiCon.setFrom(((Fluent) f).getAllenInterval());
-			oiCon.setTo(((Fluent) t).getAllenInterval());
-			retList.add(oiCon);
-			
+		} else if (this.type.equals(Type.CLOSES)) { 
+			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
+				// Additional constraints are added in pre at the moment.
+
+			} else {
+				// TODO probably need other relations, too
+				AllenIntervalConstraint oiCon = new AllenIntervalConstraint(
+						AllenIntervalConstraint.Type.OverlappedBy,
+						AllenIntervalConstraint.Type.OverlappedBy.getDefaultBounds());
+				oiCon.setFrom(((Fluent) f).getAllenInterval());
+				oiCon.setTo(((Fluent) t).getAllenInterval());
+				retList.add(oiCon);
+			}
+
 		} else if (this.type.equals(Type.MOVEDURATION)) {
 			AllenIntervalConstraint durationCon = new AllenIntervalConstraint(
 					AllenIntervalConstraint.Type.Duration, this.bounds
-//					new Bounds(10, 100)
+					//					new Bounds(10, 100)
 					);
 			AllenInterval ai = ((Fluent) f).getAllenInterval();
 			durationCon.setFrom(ai);
@@ -236,6 +271,14 @@ public class FluentConstraint extends MultiBinaryConstraint {
 
 	public void setAdditionalConstraints(Vector<AdditionalConstraintTemplate> additionalConstraints) {
 		this.additionalConstraints = additionalConstraints;
+	}
+	
+	public Vector<AdditionalConstraintTemplate> getAdditionalConstraints() {
+		return additionalConstraints;
+	}
+	
+	public boolean hasAdditionalConstraints() {
+		return additionalConstraints.size() > 0;
 	}
 
 }

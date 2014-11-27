@@ -64,6 +64,7 @@
 (:method
  (Head drive(?toArea))
  (Sub s1 assume_default_driving_pose())
+# (Constraint During(s1,task))
  (Sub s2 !move_base(?toArea))
  (Ordering s1 s2)
 )
@@ -94,6 +95,7 @@
  (Del p2)
  (Add e1 HasArmPosture(?leftArm ?leftGoal))
  (Add e2 HasArmPosture(?rightArm ?rightGoal))
+ (Constraint Meets(task,e2))
 # (Type ?oldLeft ArmPosture)
  (Values ?leftArm leftArm1)
  (Values ?rightArm rightArm1)

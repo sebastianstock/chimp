@@ -22,7 +22,8 @@ public class PFD0Precondition {
 	
 	private String key;
 	
-	private final Vector<AdditionalConstraintTemplate> additionalConstraints = new Vector<AdditionalConstraintTemplate>();
+	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
+			new Vector<AdditionalConstraintTemplate>();
 
 	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections) {
 		this.fluenttype = fluenttype;

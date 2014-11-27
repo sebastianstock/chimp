@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
@@ -33,7 +32,7 @@ public abstract class PlanReportroryItem {
 	protected final PFD0Precondition[] preconditions;
 
 	protected final String[] arguments;
-	protected Map<String, VariablePrototype> effectsMap;
+	protected final EffectTemplate[] effects;
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap;
@@ -51,11 +50,11 @@ public abstract class PlanReportroryItem {
 			new ArrayList<ResourceUsageTemplate>();
 	
 	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
-			Map<String, VariablePrototype> effectsMap) {
+			EffectTemplate[] effects) {
 		this.taskname = taskname;
 		this.arguments = arguments;
 		this.preconditions = preconditions;
-		this.effectsMap = effectsMap;
+		this.effects = effects;
 	}
 	
 	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
@@ -236,8 +235,8 @@ public abstract class PlanReportroryItem {
 			
 			Map<String, Variable> keyToFluentMap = new HashMap<String, Variable>();
 //			keyToFluentMap.put(HEAD_STRING, taskFluent);
-			for (Entry<String, VariablePrototype> entry : effectsMap.entrySet()) {
-				keyToFluentMap.put(entry.getKey(), entry.getValue());
+			for (EffectTemplate et : effects) {
+				keyToFluentMap.put(et.getKey(), et.getPrototype());
 			}
 			
 			// Add PRE and CLOSES constraints
@@ -251,6 +250,9 @@ public abstract class PlanReportroryItem {
 					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
 					closes.setFrom(con.getTo());
 					closes.setTo(con.getFrom());
+					if (con.hasAdditionalConstraints()) {
+						closes.setAdditionalConstraints(con.getAdditionalConstraints());
+					}
 					cn.addConstraint(closes);
 				}
 			}
