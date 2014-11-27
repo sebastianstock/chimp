@@ -38,4 +38,14 @@ public class AdditionalConstraintTemplate {
 	public boolean startsFromHead() {
 		return fromKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING);
 	}
+	
+	public boolean headToHead() {
+		return fromKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING) &&
+				toKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING);
+	}
+	
+	public boolean withoutHead() {
+		return !fromKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING) &&
+				!toKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING);
+	}
 }

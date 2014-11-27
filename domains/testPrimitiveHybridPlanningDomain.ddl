@@ -63,6 +63,7 @@
 
 (:method
  (Head drive(?toArea))
+ (Constraint Duration[20,30](task))
  (Sub s1 assume_default_driving_pose())
 # (Constraint During(s1,task))
  (Sub s2 !move_base(?toArea))
@@ -96,9 +97,12 @@
  (Add e1 HasArmPosture(?leftArm ?leftGoal))
  (Add e2 HasArmPosture(?rightArm ?rightGoal))
  (Constraint Meets(task,e2))
+ (Constraint Meets(task,e1))
 # (Type ?oldLeft ArmPosture)
  (Values ?leftArm leftArm1)
  (Values ?rightArm rightArm1)
+ (Constraint Equals(e1,e2))
+ (Constraint Before(p1,e1))
 )
 
 (:operator

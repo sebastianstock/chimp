@@ -8,13 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -33,6 +31,7 @@ public abstract class PlanReportroryItem {
 
 	protected final String[] arguments;
 	protected final EffectTemplate[] effects;
+	protected AdditionalConstraintTemplate[] additionalConstraints;
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap;
@@ -65,6 +64,10 @@ public abstract class PlanReportroryItem {
 		resourceUsageIndicators.addAll(rtList);
 	}
 	
+	public void setAdditionalConstraints(AdditionalConstraintTemplate[] additionalConstraints) {
+		this.additionalConstraints = additionalConstraints;
+	}
+
 	public String getName() {
 		return this.taskname;
 	}
@@ -309,7 +312,12 @@ public abstract class PlanReportroryItem {
 				for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
 					cn.addConstraint(con);
 				}
-
+				
+				// add additional constraints between preconditions and effects
+				for (AllenIntervalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, keyToFluentMap)) {
+					cn.addConstraint(aCon);
+				}
+				
 				// add VALUERESTRICTION constraints for preconditions
 				if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
 					for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
@@ -373,41 +381,43 @@ public abstract class PlanReportroryItem {
 		return ret;		
 	}
 	
-	private void setVarsForAdditionalConstraints(Fluent taskFluent, Map<String, Variable> keyToFluentMap) {
-		Vector<String> froms = new Vector<String>();
-		Vector<String> tos = new Vector<String>();
-		Vector<AllenIntervalConstraint> constraints = new Vector<AllenIntervalConstraint>();
+	/**
+	 * Goes trough templates of additional constraints, creates cloned versions of the constraints and sets the variables.
+	 * @param taskFluent The fluent of the current task.
+	 * @param keyToFluentMap Map of keys to fluent variables.
+	 */
+	private List<AllenIntervalConstraint> setVarsInAdditionalConstraints(Fluent taskFluent, 
+			Map<String, Variable> keyToFluentMap) {
+		List<AllenIntervalConstraint> ret = new ArrayList<AllenIntervalConstraint>();
 		
-		if (froms.size() != tos.size() || froms.size() != constraints.size()) {
-			throw new IllegalStateException();
-		}
-		
-		for (int i = 0; i < froms.size(); i++) {
-			String fromKey = froms.get(i);
-			String toKey = tos.get(i);
-			if (!HEAD_KEYWORD_STRING.equals(fromKey) && !HEAD_KEYWORD_STRING.equals(toKey)) {
-				Variable from = keyToFluentMap.get(fromKey);
+		for (AdditionalConstraintTemplate act : additionalConstraints) {
+			if (act.withoutHead()) {
+				Variable from = keyToFluentMap.get(act.getFromKey());
 				if (from == null) {
-					throw new IllegalArgumentException("Error in Domain. No fluent for key " + fromKey);
+					throw new IllegalArgumentException("Error in Domain. No fluent for key " + act.getFromKey());
 				}
-				Variable to = keyToFluentMap.get(fromKey);
+				if (from instanceof Fluent) {
+					from = ((Fluent) from).getAllenInterval();
+				}
+				Variable to = keyToFluentMap.get(act.getToKey());
 				if (to == null) {
-					throw new IllegalArgumentException("Error in Domain. No fluent for key " + toKey);
+					throw new IllegalArgumentException("Error in Domain. No fluent for key " + act.getToKey());
 				}
-				
-				MultiBinaryConstraint con = (MultiBinaryConstraint) constraints.get(i);
-				con.setFrom(from);
-				con.setTo(to);
-			} else if (HEAD_KEYWORD_STRING.equals(fromKey) && HEAD_KEYWORD_STRING.equals(toKey)) {    // HEAD -> HEAD
-				MultiBinaryConstraint con = (MultiBinaryConstraint) constraints.get(i);
-				con.setFrom(taskFluent);
-				con.setTo(taskFluent);
-			} else if (HEAD_KEYWORD_STRING.equals(fromKey) && !HEAD_KEYWORD_STRING.equals(toKey)) { // HEAD -> PRE
-				// Add it to DC or PRe constraint
-				
+				if (to instanceof Fluent) {
+					to = ((Fluent) to).getAllenInterval();
+				}
+				AllenIntervalConstraint newCon = (AllenIntervalConstraint) act.getConstraint().clone();
+				newCon.setFrom(from);
+				newCon.setTo(to);
+				ret.add(newCon);
+			} else if (act.headToHead()) {    // HEAD -> HEAD
+				AllenIntervalConstraint newCon = (AllenIntervalConstraint) act.getConstraint().clone();
+				newCon.setFrom(taskFluent.getAllenInterval());
+				newCon.setTo(taskFluent.getAllenInterval());
+				ret.add(newCon);
 			}
-			
 		}
+		return ret;
 	}
 	
 	private List<Constraint> createPreconditionsEffectsBindings(Map<String, Variable> keyToFluentMap) {

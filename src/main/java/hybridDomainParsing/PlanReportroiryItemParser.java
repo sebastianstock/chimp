@@ -312,4 +312,14 @@ public abstract class PlanReportroiryItemParser {
 		return et;
 	}
 
+	protected AdditionalConstraintTemplate[] filterAdditionalConstraints() {
+		ArrayList<AdditionalConstraintTemplate> ret = new ArrayList<AdditionalConstraintTemplate>();
+		for (AdditionalConstraintTemplate act : additionalAIConstraints) {
+			if (act.headToHead() || act.withoutHead()) {
+				ret.add(act);
+			}
+		}
+		return ret.toArray(new AdditionalConstraintTemplate[ret.size()]);
+	}
+	
 }

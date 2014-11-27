@@ -9,6 +9,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
@@ -130,7 +131,9 @@ public class PFD0Planner extends MetaConstraintSolver {
 				if (oldScope[i] instanceof VariablePrototype) {
 					if (con instanceof CompoundSymbolicValueConstraint){
 						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getCompoundSymbolicVariable();
-					} else {	
+					} else if (con instanceof AllenIntervalConstraint){ 
+						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getAllenInterval();
+					}else {	
 						newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
 					}
 				}

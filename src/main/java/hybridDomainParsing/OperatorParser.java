@@ -41,6 +41,9 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effects);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
 		
+		// add additional constraints from head to head or between preconditions or effects
+		op.setAdditionalConstraints(filterAdditionalConstraints());
+		
 		Map<String,String[]> variablesPossibleValuesMap = parseVariableDefinitions();
 		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		op.addResourceUsageTemplates(rtList);

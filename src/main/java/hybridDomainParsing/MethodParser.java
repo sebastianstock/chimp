@@ -31,6 +31,9 @@ public class MethodParser extends PlanReportroiryItemParser {
 		PFD0Method ret = new PFD0Method(headname, argStrings, preconditions, subtasks, orderingCons);
 		ret.setVariableOccurrencesMap(variableOccurrencesMap);
 		
+		// add additional constraints from head to head or between preconditions or effects
+		ret.setAdditionalConstraints(filterAdditionalConstraints());
+		
 		Map<String,String[]> variablesPossibleValuesMap = parseVariableDefinitions();
 		ret.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		return ret;
