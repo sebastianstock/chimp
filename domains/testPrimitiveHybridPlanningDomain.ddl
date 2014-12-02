@@ -80,9 +80,9 @@
 (:operator
  (Head !move_base(?toArea))
  (Pre p1 RobotAt(?fromArea))
- (Constraint StartedBy(Head,req1))
- (Constraint OverlappedBy(Head,req1))
- (Constraint Duration[5,INF](Head))
+ (Constraint StartedBy(task,req1))
+ (Constraint OverlappedBy(task,req1))
+ (Constraint Duration[5,INF](task))
  (Add e1 RobotAt(?toArea))
  (Del p1)
  (Add e9 On(?fromArea))
@@ -122,9 +122,9 @@
  (Pre p3 Connected(?fromArea ?mArea ?preArea))
  (Add e1 Holding(?obj ?arm))
 
-# (Constraint StartedBy(Head,req1))
-# (Constraint OverlappedBy(Head,req1))
-# (Constraint Duration[5,INF](Head))
+# (Constraint StartedBy(task,req1))
+# (Constraint OverlappedBy(task,req1))
+# (Constraint Duration[5,INF](task))
  (Del p1)
  
  (ResourceUsage 
@@ -140,9 +140,9 @@
 # (Head op::!move_base(Area:?toArea Area:?fromArea))
 # # TODO set negative
 # (Pre p1 trixi::RobotAt(Area:?fromArea))
-# (Constraint StartedBy(Head,req1))
-# (Constraint OverlappedBy(Head,req1))
-# (Constraint Duration[5,INF](Head))
+# (Constraint StartedBy(task,req1))
+# (Constraint OverlappedBy(task,req1))
+# (Constraint Duration[5,INF](task))
 # (Add e1 trixi::RobotAt(Area:?toArea))
 #)
 
