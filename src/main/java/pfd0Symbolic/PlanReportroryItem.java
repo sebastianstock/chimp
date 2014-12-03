@@ -394,7 +394,8 @@ public abstract class PlanReportroryItem {
 			if (act.withoutHead()) {
 				Variable from = keyToFluentMap.get(act.getFromKey());
 				if (from == null) {
-					throw new IllegalArgumentException("Error in Domain. No fluent for key " + act.getFromKey());
+					throw new IllegalArgumentException("Error in Domain. No fluent for key " 
+							+ act.getFromKey() + " in " + taskname );
 				}
 				if (from instanceof Fluent) {
 					from = ((Fluent) from).getAllenInterval();

@@ -74,7 +74,7 @@
  (Head assume_default_driving_pose())
  (Sub s1 !tuck_arms(armTuckedPosture armTuckedPosture))
  (Sub s2 !move_torso(torsoDownPosture))
- (Ordering s1 s2)
+# (Ordering s1 s2)
 )
 
 (:operator

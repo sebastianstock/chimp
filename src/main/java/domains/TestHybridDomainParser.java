@@ -73,11 +73,18 @@ public class TestHybridDomainParser {
 //		createProblemMoveBase(fluentSolver);
 //		createProblemPickUpObject(fluentSolver);
 //		AAAIProblemsSingle.createProblemMoveTorso(fluentSolver);
-		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
+//		AAAIProblemsSingle.createProblemTuckArms(fluentSolver);
 //		AAAIProblemsSingle.createProblemAssumeDefaultDrivingPoseM(fluentSolver);
-//		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
+		AAAIProblemsSingle.createProblemDriveM(fluentSolver);
 		
 		test();
+		
+		extractPlan();
+	}
+	
+	private static void extractPlan() {
+		PlanExtractor planEx = new PlanExtractor(fluentSolver);
+		planEx.printPlan();
 	}
 	
 	private static void test() {
