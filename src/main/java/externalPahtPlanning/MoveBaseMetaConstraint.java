@@ -27,8 +27,8 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	private static final long serialVersionUID = 2789371087819357936L;
 	private static final String MOVE_BASE_NAME = "!move_base";
 	private static final String ROBOTAT_NAME = "RobotAt";
-	private static final int FROM_AREA_INDEX = 4;
-	private static final int TO_AREA_INDEX = 4;
+	private static final int FROM_AREA_INDEX = 1;
+	private static final int TO_AREA_INDEX = 1;
 	
 	private MoveBaseDurationEstimator durationEstimator;
 
