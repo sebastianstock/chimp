@@ -47,7 +47,7 @@ public class FluentScheduler extends Schedulable {
 		if (activities == null) activities = new Vector<Activity>();
 		else activities.clear();
 		ConstraintSolver s = this.getGroundSolver();
-		for (Variable var : this.getGroundSolver().getVariables()) {
+		for (Variable var : s.getVariables()) {
 			CompoundSymbolicVariable comp = ((Fluent) var).getCompoundSymbolicVariable();
 			if (comp.getPredicateName().equals(predicateName)) {
 				String[] symbols = comp.getSymbolsAt(field);

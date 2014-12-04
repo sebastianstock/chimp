@@ -29,7 +29,7 @@ public class TestFluentScheduling {
 		final PFD0Planner planner = new PFD0Planner(0,  600,  0, symbols, new int[] {1,1,1,1,1});
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		Fluent[] fluents = (Fluent[]) fluentSolver.createVariables(3);
+		Fluent[] fluents = (Fluent[]) fluentSolver.createVariables(4);
 
 
 		Callback cb = new Callback() {
@@ -42,25 +42,37 @@ public class TestFluentScheduling {
 		
 		fluents[0].setName("get_mug(mug1 pl1 none none)");
 		fluents[1].setName("get_mug(mug1 pl2 none none)");
-		fluents[2].setName("robotat(none pl2 none none)");
+		fluents[2].setName("robotat(none none ma1 none)");
+		fluents[3].setName("robotat(none none ma2 none)");
 		
-		AllenIntervalConstraint con1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		AllenIntervalConstraint con1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,30000));
 		con1.setFrom(fluents[0]);
 		con1.setTo(fluents[0]);
+		
+		System.out.println("long max: " + Long.MAX_VALUE);
+		System.out.println("long max: " + Integer.MAX_VALUE);
 
-		AllenIntervalConstraint con2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		AllenIntervalConstraint con2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,30000));
 		con2.setFrom(fluents[1]);
 		con2.setTo(fluents[1]);
 
-		AllenIntervalConstraint con3 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		AllenIntervalConstraint con3 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,30000));
 		con3.setFrom(fluents[2]);
 		con3.setTo(fluents[2]);
 		
-		fluentSolver.addConstraints(con1,con2,con3);
+		AllenIntervalConstraint con4 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,30000));
+		con4.setFrom(fluents[3]);
+		con4.setTo(fluents[3]);
+		
+		fluentSolver.addConstraints(con1,con2,con3,con4);
 		
 		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", 1, "mug1");
 //		fs.setUsage(fluents);		
 		planner.addMetaConstraint(fs);
+		
+		FluentScheduler fs1 = new FluentScheduler(null, null, "robotat", 1, "none");
+//		fs.setUsage(fluents);		
+		planner.addMetaConstraint(fs1);
 
 	}
 
