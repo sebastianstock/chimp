@@ -111,7 +111,7 @@ public class HybridDomain{
 		String[] elements = stateStr.split(" ");
 		String head = elements[0];
 		int field = Integer.parseInt(elements[1]);
-		String[] fieldValues = Arrays.copyOfRange(elements, 2, elements.length-1);
+		String[] fieldValues = Arrays.copyOfRange(elements, 2, elements.length);
 		for (String fieldValue : fieldValues) {
 			this.fluentSchedulers.add(new FluentScheduler(null, null, head, field, fieldValue));
 		}
@@ -187,9 +187,6 @@ public class HybridDomain{
 				// Parse state variables:
 				String[] stateVariableElements = parseKeyword(STATE_VARIBALE_KEYWORD, everything);
 				for (String stateStr : stateVariableElements) {
-					System.out.println("STATESTRING: {");
-					System.out.println(stateStr);
-					System.out.println("}\n");
 					createFluentSchedulers(stateStr);
 				}
 			}
