@@ -98,7 +98,7 @@ public class RACEProblemsSingle {
 		release.setFrom(mbFluent);
 		release.setTo(mbFluent);
 		fluentSolver.addConstraint(release);
-		createConnectedAreas(fluentSolver);
+		createStaticKnowledge(fluentSolver);
 	}
 	
 	// TUCK_ARMS
@@ -120,9 +120,53 @@ public class RACEProblemsSingle {
 //		taskFluent2.setName("!tuck_arms(armUnTuckedPosture armTuckedPosture)");
 //		taskFluent2.setMarking(markings.UNPLANNED);
 	}
-
 	
-	private static void createConnectedAreas(FluentNetworkSolver fluentSolver) {
+	// MOVE_TORSO
+	public static void createProblemMoveTorso(FluentNetworkSolver fluentSolver) {
+		// State
+		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
+		Variable[] stateVars = fluentSolver.createVariables(1);
+		((Fluent) stateVars[0]).setName("HasTorsoPosture(TorsoUpPosture)");
+		AllenIntervalConstraint torsoRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(0, 0));
+		torsoRelCon.setFrom(stateVars[0]);
+		torsoRelCon.setTo(stateVars[0]);
+		fluentSolver.addConstraint(torsoRelCon);
+
+		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+
+		// task
+		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
+		taskFluent.setName("!move_torso(TorsoDownPosture)");
+		taskFluent.setMarking(markings.UNPLANNED);
+		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
+		deadline.setFrom(taskFluent);
+		deadline.setTo(taskFluent);
+		fluentSolver.addConstraint(deadline);
+	}
+	
+	// PICK_UP_OBJECT
+	public static void createProblemPickUpObject(FluentNetworkSolver groundSolver) {
+		// State
+		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
+		Variable[] stateVars = groundSolver.createVariables(2);
+		((Fluent) stateVars[0]).setName("On(mug1 placingAreaWestRightTable1)");
+
+		((Fluent) stateVars[1]).setName("RobotAt(manipulationAreaSouthTable1)");
+
+		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+		setRelease(stateVars, groundSolver, 0, 0);
+
+		createStaticKnowledge(groundSolver);
+		
+		// task
+		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
+		taskFluent.setName("!pick_up_object(mug1 ?area ?manArea leftArm1)");
+		taskFluent.setMarking(markings.UNPLANNED);
+	}
+	
+
+
+	public static void createStaticKnowledge(FluentNetworkSolver fluentSolver) {
 		Variable[] stateVars = fluentSolver.createVariables(9);
 		((Fluent) stateVars[0]).setName("Connected(placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1)");
 		((Fluent) stateVars[1]).setName("Connected(placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1)");
@@ -135,6 +179,7 @@ public class RACEProblemsSingle {
 		((Fluent) stateVars[8]).setName("Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 	}
+
 	
 	///////////////////////////////////////
 	
@@ -221,32 +266,7 @@ public class RACEProblemsSingle {
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 	
-	public static void createProblemPickUpObject(FluentNetworkSolver groundSolver) {
-		// State
-		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
-		Variable[] stateVars = groundSolver.createVariables(11);
-		((Fluent) stateVars[0]).setName("On(mug1 placingAreaWestRightTable1)");
-		
-		((Fluent) stateVars[1]).setName("RobotAt(manipulationAreaSouthTable1)");
-		
-		((Fluent) stateVars[2]).setName("Connected(placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1)");
-		((Fluent) stateVars[3]).setName("Connected(placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1)");
-		((Fluent) stateVars[4]).setName("Connected(placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1)");
-		((Fluent) stateVars[5]).setName("Connected(placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1)");
-		((Fluent) stateVars[6]).setName("Connected(placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1)");
-		((Fluent) stateVars[7]).setName("Connected(placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2)");
-		((Fluent) stateVars[8]).setName("Connected(placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
-		((Fluent) stateVars[9]).setName("Connected(placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
-		((Fluent) stateVars[10]).setName("Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2)");
-		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
-		setRelease(stateVars, groundSolver, 0, 0);
-		
-		// task
-		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
-		taskFluent.setName("!pick_up_object(mug1 ?area ?manArea leftArm1)");
-		taskFluent.setMarking(markings.UNPLANNED);
-	}
-	
+
 	public static void createProblemMoveArmToSide(FluentNetworkSolver fluentSolver) {
 		// State
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
@@ -279,27 +299,7 @@ public class RACEProblemsSingle {
 	
 
 	
-	public static void createProblemMoveTorso(FluentNetworkSolver fluentSolver) {
-		// State
-		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
-		Variable[] stateVars = fluentSolver.createVariables(1);
-		((Fluent) stateVars[0]).setName("HasTorsoPosture(TorsoUpPosture)");
-		AllenIntervalConstraint torsoRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(0, 0));
-		torsoRelCon.setFrom(stateVars[0]);
-		torsoRelCon.setTo(stateVars[0]);
-		fluentSolver.addConstraint(torsoRelCon);
-		
-		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
-		
-		// task
-		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
-		taskFluent.setName("!move_torso(TorsoDownPosture)");
-		taskFluent.setMarking(markings.UNPLANNED);
-		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
-		deadline.setFrom(taskFluent);
-		deadline.setTo(taskFluent);
-		fluentSolver.addConstraint(deadline);
-	}
+
 	
 	public static void createProblemDriveM(FluentNetworkSolver fluentSolver) {
 		// State
@@ -408,20 +408,5 @@ public class RACEProblemsSingle {
 //		taskFluent.setName("assume_manipulation_pose(manipulationAreaSouthTable1 ?preManipulationAreaSouthTable1)");
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
-	
-	public static void createStaticKnowledge(FluentNetworkSolver fluentSolver) {
-		Variable[] stateVars = fluentSolver.createVariables(9);
-		((Fluent) stateVars[0]).setName("Connected(placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1)");
-		((Fluent) stateVars[1]).setName("Connected(placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1)");
-		((Fluent) stateVars[2]).setName("Connected(placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1)");
-		((Fluent) stateVars[3]).setName("Connected(placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1)");
-		((Fluent) stateVars[4]).setName("Connected(placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1)");
-		((Fluent) stateVars[5]).setName("Connected(placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2)");
-		((Fluent) stateVars[6]).setName("Connected(placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
-		((Fluent) stateVars[7]).setName("Connected(placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
-		((Fluent) stateVars[8]).setName("Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2)");
-		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
-	}
-
 	
 }

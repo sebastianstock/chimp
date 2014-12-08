@@ -65,7 +65,9 @@ public class TestRACEProblems {
 		
 //		RACEProblemsSingle.createProblemMoveBase(fluentSolver);
 //		RACEProblemsSingle.createProblemMoveBaseBlind(fluentSolver);
-		RACEProblemsSingle.createProblemTuckArms(fluentSolver);
+//		RACEProblemsSingle.createProblemTuckArms(fluentSolver);
+//		RACEProblemsSingle.createProblemMoveTorso(fluentSolver);
+		RACEProblemsSingle.createProblemPickUpObject(fluentSolver);
 		
 //		createProblemMoveBase(fluentSolver);
 //		createProblemPickUpObject(fluentSolver);

@@ -113,8 +113,41 @@
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
  (Constraint Duration[5,5](task))
- (Constraint Duration[1,10000](e1))
- (Constraint Duration[1,10000](e2))
+# (Constraint Duration[1,10000](e1))
+# (Constraint Duration[1,10000](e2))
+)
+
+# MOVE_TORSO
+(:operator
+ (Head !move_torso(?newPosture))
+ (Pre p1 HasTorsoPosture(?oldPosture))
+ (Constraint OverlappedBy(task,p1))
+ (Del p1)
+ (Add e1 HasTorsoPosture(?newPosture))
+ (Constraint Duration[5,5](task))
+)
+
+# PICK_UP_OBJECT
+(:operator
+ (Head !pick_up_object(?obj ?arm))
+ (Pre p1 On(?obj ?fromArea))
+ (Pre p2 RobotAt(?mArea))
+ (Pre p3 Connected(?fromArea ?mArea ?preArea))
+ (Del p1)
+ (Add e1 Holding(?obj ?arm))
+
+ (Constraint OverlappedBy(task,p1))
+ (Constraint During(task,p2)) # robot has to be at the table the wohle time
+ (Constraint During(task,p3))
+ # TODO Which constraint for effect?
+ (Constraint Duration[5,5](task))
+ 
+ (ResourceUsage 
+    (Usage leftArm1ManCapacity 1)
+    (Param 2 leftArm1))
+ (ResourceUsage 
+    (Usage rightArm1ManCapacity 1)
+    (Param 2 rightArm1))
 )
 
 ################################
@@ -151,35 +184,10 @@
 
 
 
-(:operator
- (Head !move_torso(?newPosture))
- (Pre p1 HasTorsoPosture(?oldPosture))
- (Constraint OverlappedBy(task,p1))
- (Del p1)
- (Add e1 HasTorsoPosture(?newPosture))
-)
 
 
-(:operator
- (Head !pick_up_object(?obj ?arm))
 
- (Pre p1 On(?obj ?fromArea))
- (Pre p2 RobotAt(?mArea))
- (Pre p3 Connected(?fromArea ?mArea ?preArea))
- (Add e1 Holding(?obj ?arm))
 
-# (Constraint StartedBy(task,req1))
-# (Constraint OverlappedBy(task,req1))
-# (Constraint Duration[5,INF](task))
- (Del p1)
- 
- (ResourceUsage 
-    (Usage leftArm1ManCapacity 1)
-    (Param 2 leftArm1))
- (ResourceUsage 
-    (Usage rightArm1ManCapacity 1)
-    (Param 2 rightArm1))
-)
 
 
 #(:operator
