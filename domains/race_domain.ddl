@@ -105,8 +105,9 @@
 # (Type ?oldLeft ArmPosture)
  (Values ?leftArm leftArm1)
  (Values ?rightArm rightArm1)
- (Values ?leftGoal ArmTuckedPosture ArmUntuckedPosture)
+ (Values ?leftGoal ArmTuckedPosture ArmUnTuckedPosture)
  (Values ?rightGoal ArmTuckedPosture ArmUnTuckedPosture)
+
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 

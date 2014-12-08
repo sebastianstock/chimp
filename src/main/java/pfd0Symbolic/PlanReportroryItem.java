@@ -22,6 +22,7 @@ import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
 import com.google.common.collect.Sets;
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 
 public abstract class PlanReportroryItem {
 	
@@ -233,20 +234,17 @@ public abstract class PlanReportroryItem {
 		for (List<FluentConstraint> comb : combinations) {
 			ConstraintNetwork cn = new ConstraintNetwork(null);
 			
-			Map<String, FluentConstraint> preconditionKeyToConstraint = 
-					new HashMap<String, FluentConstraint>();  // TODO probably obsolete???
-			
-			Map<String, Variable> keyToFluentMap = new HashMap<String, Variable>();
+			Map<String, Fluent> preKeyToFluentMap = new HashMap<String, Fluent>();
+			Map<String, Variable> effKeyToVariableMap = new HashMap<String, Variable>();
 //			keyToFluentMap.put(HEAD_STRING, taskFluent);
 			for (EffectTemplate et : effects) {
-				keyToFluentMap.put(et.getKey(), et.getPrototype());
+				effKeyToVariableMap.put(et.getKey(), et.getPrototype());
 			}
 			
 			// Add PRE and CLOSES constraints
 			for (FluentConstraint con : comb) {
 				cn.addConstraint(con);
-				preconditionKeyToConstraint.put(constraintToPrecondition.get(con), con);
-				keyToFluentMap.put(constraintToPrecondition.get(con), con.getFrom());
+				preKeyToFluentMap.put(constraintToPrecondition.get(con), (Fluent) con.getFrom());
 				
 				// add closes for negative effects
 				if (con.isNegativeEffect() && this instanceof PFD0Operator) {
@@ -276,14 +274,14 @@ public abstract class PlanReportroryItem {
 					
 					for (Entry<String, Integer> occ : occs.getValue().entrySet()) {
 						String id = occ.getKey();
-						FluentConstraint preCon = preconditionKeyToConstraint.get(id);
 						Fluent fl = null;
-						if (preCon != null) {
-							fl = (Fluent) preCon.getFrom();
-						} else if (id.equals(HEAD_KEYWORD_STRING)){
+						if (id.equals(HEAD_KEYWORD_STRING)) {
 							fl = taskFluent;
+						} else {
+							fl = preKeyToFluentMap.get(id);
 						}
-						if (fl != null) {
+
+						if (fl != null) { // head or pre-Key but not an effect key:
 							List<String> varSymbolsList = Arrays.asList(
 									fl.getCompoundSymbolicVariable().getSymbolsAt(occ.getValue().intValue() + 1));
 							if (possibleValues == null) {
@@ -304,7 +302,7 @@ public abstract class PlanReportroryItem {
 			if (feasibleCN) {
 
 				// add binding constraints between preconditions or effects
-				for (Constraint con : createPreconditionsEffectsBindings(keyToFluentMap)) {
+				for (Constraint con : createPreconditionsEffectsBindings(preKeyToFluentMap, effKeyToVariableMap)) {
 					cn.addConstraint(con);
 				}
 
@@ -314,34 +312,55 @@ public abstract class PlanReportroryItem {
 				}
 				
 				// add additional constraints between preconditions and effects
-				for (AllenIntervalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, keyToFluentMap)) {
+				for (AllenIntervalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
 					cn.addConstraint(aCon);
 				}
 				
-				// add VALUERESTRICTION constraints for preconditions
+				// add VALUERESTRICTION constraints for task, preconditions and effects
 				if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
+					// go through all variables
 					for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
-						String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey());
+						String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey()); // possible values of that varialbe
 						if (possibleValues != null) {
+
+							// go though all occurrences of that variable
 							for (Entry<String, Integer> e : occs.getValue().entrySet()) {
-								String preconditionID = e.getKey();
-								FluentConstraint preCon = preconditionKeyToConstraint.get(preconditionID);
-								if (preCon != null) {
-									int[] indices = new int[] {e.getValue().intValue()};
-									String[][] restrictions = new String[][] {possibleValues};
-									// TODO merge multiple constraints into one.
-									CompoundSymbolicValueConstraint rcon = 
-											new CompoundSymbolicValueConstraint(
-													CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
-													indices, 
-													restrictions);
-									CompoundSymbolicVariable var = 
-											((Fluent) preCon.getFrom()).getCompoundSymbolicVariable();
-									rcon.setFrom(var);
-									rcon.setTo(var);
-									cn.addConstraint(rcon);
-									logger.fine("ADDED VALUERESTRICTION");
+
+								String id = e.getKey();
+								Variable var = null;
+								if (id.equals(HEAD_KEYWORD_STRING)) {
+									var = taskFluent;
+								} else if (preKeyToFluentMap.containsKey(id)){
+									var = preKeyToFluentMap.get(id);
+								} else {
+									var = effKeyToVariableMap.get(id);
 								}
+
+								if (var == null) {
+									throw new IllegalArgumentException("Error in Domain. No fluent for key " 
+											+ id + " in " + taskname );
+								}
+
+								// if it is a fluent we set it directly to the compound variable
+								// if it is a prototype we do that in addResolverSub
+								if (var instanceof Fluent) {
+									var = ((Fluent) var).getCompoundSymbolicVariable();
+								}
+
+								int[] indices = new int[] {e.getValue().intValue()};
+								String[][] restrictions = new String[][] {possibleValues};
+								// TODO merge multiple constraints into one.
+								CompoundSymbolicValueConstraint rcon = 
+										new CompoundSymbolicValueConstraint(
+												CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
+												indices, 
+												restrictions);
+
+								rcon.setFrom(var);
+								rcon.setTo(var);
+								cn.addConstraint(rcon);
+								logger.finest("ADDED VALUERESTRICTION");
+
 							}
 						}
 					}
@@ -387,26 +406,33 @@ public abstract class PlanReportroryItem {
 	 * @param keyToFluentMap Map of keys to fluent variables.
 	 */
 	private List<AllenIntervalConstraint> setVarsInAdditionalConstraints(Fluent taskFluent, 
-			Map<String, Variable> keyToFluentMap) {
+			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
 		List<AllenIntervalConstraint> ret = new ArrayList<AllenIntervalConstraint>();
 		
 		for (AdditionalConstraintTemplate act : additionalConstraints) {
 			if (act.withoutHead()) {
-				Variable from = keyToFluentMap.get(act.getFromKey());
-				if (from == null) {
+				String fromKey = act.getFromKey();
+				Variable from = null;
+				if (preKeyToFluentMap.containsKey(fromKey)) {
+					from = ((Fluent) preKeyToFluentMap.get(fromKey)).getAllenInterval();
+				} else if (effKeyToVariableMap.containsKey(fromKey)) {
+					from = effKeyToVariableMap.get(fromKey);
+				} else {
 					throw new IllegalArgumentException("Error in Domain. No fluent for key " 
-							+ act.getFromKey() + " in " + taskname );
+							+ fromKey + " in " + taskname );
 				}
-				if (from instanceof Fluent) {
-					from = ((Fluent) from).getAllenInterval();
+				
+				String toKey = act.getToKey();
+				Variable to = null;
+				if (preKeyToFluentMap.containsKey(toKey)) {
+					to = ((Fluent) preKeyToFluentMap.get(toKey)).getAllenInterval();
+				} else if (effKeyToVariableMap.containsKey(toKey)) {
+					to = effKeyToVariableMap.get(toKey);
+				} else {
+					throw new IllegalArgumentException("Error in Domain. No fluent for key " 
+							+ toKey + " in " + taskname );
 				}
-				Variable to = keyToFluentMap.get(act.getToKey());
-				if (to == null) {
-					throw new IllegalArgumentException("Error in Domain. No fluent for key " + act.getToKey());
-				}
-				if (to instanceof Fluent) {
-					to = ((Fluent) to).getAllenInterval();
-				}
+				
 				AllenIntervalConstraint newCon = (AllenIntervalConstraint) act.getConstraint().clone();
 				newCon.setFrom(from);
 				newCon.setTo(to);
@@ -421,7 +447,8 @@ public abstract class PlanReportroryItem {
 		return ret;
 	}
 	
-	private List<Constraint> createPreconditionsEffectsBindings(Map<String, Variable> keyToFluentMap) {
+	private List<Constraint> createPreconditionsEffectsBindings(Map<String, Fluent> preKeyToFluentMap, 
+			Map<String, Variable> effKeyToVariableMap) {
 		List<Constraint> ret = new ArrayList<Constraint>();
 		if (variableOccurrencesMap != null) {
 			for (Map<String, Integer> occurrence : variableOccurrencesMap.values()) {
@@ -442,7 +469,10 @@ public abstract class PlanReportroryItem {
 								connections);
 
 						// set from
-						Variable from = keyToFluentMap.get(occKeys[i]);
+						Variable from = preKeyToFluentMap.get(occKeys[i]); // try precondition keys
+						if (from == null) {
+							from = effKeyToVariableMap.get(occKeys[i]);          // else try effect keys
+						}
 						if (from != null) {
 							if (from instanceof Fluent) {
 								bcon.setFrom(((Fluent) from).getCompoundSymbolicVariable());
@@ -455,7 +485,11 @@ public abstract class PlanReportroryItem {
 						}
 
 						// set to
-						Variable to = keyToFluentMap.get(occKeys[j]);
+						Variable to = preKeyToFluentMap.get(occKeys[j]); // try precondition keys
+						if (to == null) {
+							to = effKeyToVariableMap.get(occKeys[j]);        // else try effect keys
+						}
+						
 						if (to != null) {
 							if (to instanceof Fluent) {
 								bcon.setTo(((Fluent) to).getCompoundSymbolicVariable());

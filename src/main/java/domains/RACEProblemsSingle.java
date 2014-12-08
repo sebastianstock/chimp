@@ -44,8 +44,8 @@ public class RACEProblemsSingle {
 				"table1", "table2", "counter1", 
 				"guest1", "guest2",
 				"leftArm1", "rightArm1", 
-				"armTuckedPosture", "armUnTuckedPosture", "armToSidePosture", "armUnnamedPosture", "armCarryPosture",
-				"torsoUpPosture", "torsoDownPosture", "torsoMiddlePosture", 
+				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
+				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
 				N};
 		return symbols;
 	}
@@ -104,15 +104,15 @@ public class RACEProblemsSingle {
 	// TUCK_ARMS
 	public static void createProblemTuckArms(FluentNetworkSolver fluentSolver) {
 		Variable[] stateVars = fluentSolver.createVariables(2);
-		((Fluent) stateVars[0]).setName("HasArmPosture(leftArm1 armToSidePosture)");
-		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 armToSidePosture)");
+		((Fluent) stateVars[0]).setName("HasArmPosture(leftArm1 ArmToSidePosture)");
+		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 ArmToSidePosture)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		setRelease(stateVars, fluentSolver, 0, 0);
 		setDuration(stateVars, fluentSolver, 1, 100000);
 
 		// task
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
-		taskFluent.setName("!tuck_arms(armTuckedPosture armUnTuckedPosture)");
+		taskFluent.setName("!tuck_arms(ArmTuckedPosture ArmUnTuckedPosture)");
 		taskFluent.setMarking(markings.UNPLANNED);
 		setRelease(new Variable[] {taskFluent}, fluentSolver, 1, 1);
 		
@@ -251,8 +251,8 @@ public class RACEProblemsSingle {
 		// State
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
 		Variable[] stateVars = fluentSolver.createVariables(2);
-		((Fluent) stateVars[0]).setName("HasArmPosture(leftArm1 armUnnamedPosture)");
-		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 armCarryPosture)");
+		((Fluent) stateVars[0]).setName("HasArmPosture(leftArm1 ArmUnnamedPosture)");
+		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 ArmCarryPosture)");
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -266,8 +266,8 @@ public class RACEProblemsSingle {
 		// State
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
 		Variable[] stateVars = fluentSolver.createVariables(2);
-		((Fluent) stateVars[0]).setName("HasArmPosture(leftArm1 armToSidePosture)");
-		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 armToSidePosture)");
+		((Fluent) stateVars[0]).setName("HasArmPosture(leftArm1 ArmToSidePosture)");
+		((Fluent) stateVars[1]).setName("HasArmPosture(rightArm1 ArmToSidePosture)");
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -283,7 +283,7 @@ public class RACEProblemsSingle {
 		// State
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
 		Variable[] stateVars = fluentSolver.createVariables(1);
-		((Fluent) stateVars[0]).setName("HasTorsoPosture(torsoUpPosture)");
+		((Fluent) stateVars[0]).setName("HasTorsoPosture(TorsoUpPosture)");
 		AllenIntervalConstraint torsoRelCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(0, 0));
 		torsoRelCon.setFrom(stateVars[0]);
 		torsoRelCon.setTo(stateVars[0]);
@@ -293,7 +293,7 @@ public class RACEProblemsSingle {
 		
 		// task
 		Fluent taskFluent = (Fluent) fluentSolver.createVariable("Task1");
-		taskFluent.setName("!move_torso(torsoDownPosture)");
+		taskFluent.setName("!move_torso(TorsoDownPosture)");
 		taskFluent.setMarking(markings.UNPLANNED);
 		AllenIntervalConstraint deadline = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Deadline, new Bounds(40, 50));
 		deadline.setFrom(taskFluent);
@@ -306,9 +306,9 @@ public class RACEProblemsSingle {
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
 		Variable[] stateVars = fluentSolver.createVariables(4);
 		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaEastCounter1)");
-		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoUpPosture)");
-		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armToSidePosture)");
-		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armToSidePosture)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(TorsoUpPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 ArmToSidePosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 ArmToSidePosture)");
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -324,9 +324,9 @@ public class RACEProblemsSingle {
 		// 0:Predicate 1:Mug 2:Mug 3:PlArea 4:MArea 5:MArea 6:Furniture 7:Guest 8:Arm 9:Arm 10:Posture 11:Posture
 		Variable[] stateVars = fluentSolver.createVariables(4);
 		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaEastCounter1)");
-		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoUpPosture)");
-		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armToSidePosture)");
-		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armToSidePosture)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(TorsoUpPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 ArmToSidePosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 ArmToSidePosture)");
 		
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -353,9 +353,9 @@ public class RACEProblemsSingle {
 		
 		Variable[] stateVars = fluentSolver.createVariables(5);
 		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaSouthTable1)");
-		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoDownPosture)");
-		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armTuckedPosture)");
-		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armTuckedPosture)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(TorsoDownPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 ArmTuckedPosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 ArmTuckedPosture)");
 		((Fluent) stateVars[4]).setName("On(mug1 placingAreaWestRightTable1)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -374,9 +374,9 @@ public class RACEProblemsSingle {
 		
 		Variable[] stateVars = fluentSolver.createVariables(5);
 		((Fluent) stateVars[0]).setName("RobotAt(preManipulationAreaSouthTable1)");
-		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoDownPosture)");
-		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armTuckedPosture)");
-		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armTuckedPosture)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(TorsoDownPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 ArmTuckedPosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 ArmTuckedPosture)");
 		((Fluent) stateVars[4]).setName("On(mug1 placingAreaWestRightTable1)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		
@@ -395,9 +395,9 @@ public class RACEProblemsSingle {
 		
 		Variable[] stateVars = fluentSolver.createVariables(5);
 		((Fluent) stateVars[0]).setName("RobotAt(floorAreaTamsRestaurant1)");
-		((Fluent) stateVars[1]).setName("HasTorsoPosture(torsoDownPosture)");
-		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 armTuckedPosture)");
-		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 armTuckedPosture)");
+		((Fluent) stateVars[1]).setName("HasTorsoPosture(TorsoDownPosture)");
+		((Fluent) stateVars[2]).setName("HasArmPosture(leftArm1 ArmTuckedPosture)");
+		((Fluent) stateVars[3]).setName("HasArmPosture(rightArm1 ArmTuckedPosture)");
 		((Fluent) stateVars[4]).setName("On(mug1 placingAreaWestRightTable1)");
 		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
 		

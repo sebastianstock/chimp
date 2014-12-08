@@ -41,7 +41,7 @@ public abstract class PlanReportroiryItemParser {
 
 		this.head = HybridDomain.parseKeyword(HybridDomain.HEAD_KEYWORD, textualSpecification)[0].trim();
 		argStrings = HybridDomain.extractArgs(head);
-		addVariableOccurrences(argStrings, "head");
+		addVariableOccurrences(argStrings, PlanReportroryItem.HEAD_KEYWORD_STRING);
 		
 		// Parse type definitions
 		//		String[] typeElements = parseKeyword(TYPE_KEYWORD, textualSpecification);
@@ -51,7 +51,6 @@ public abstract class PlanReportroiryItemParser {
 		//	     // TODO
 		//		}
 		
-		parseVariableDefinitions();
 		parseAllenIntervalConstraints();
 	}
 	
@@ -100,7 +99,7 @@ public abstract class PlanReportroiryItemParser {
 		addVariableOccurrences(args, preKey);
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(HybridDomain.VARIABLE_INDICATOR)) {
-				Integer headId = variableOccurrencesMap.get(args[i]).get("head");
+				Integer headId = variableOccurrencesMap.get(args[i]).get(PlanReportroryItem.HEAD_KEYWORD_STRING);
 				if (headId != null) {
 					connectionsList.add(i);
 					connectionsList.add(headId);
