@@ -147,7 +147,8 @@ public class ProblemParser {
 			String from = null;
 			String to = null;
 			String fromSeg = null;
-			if (constraintName.equals("Duration") || constraintName.equals("Release")) {
+			if (constraintName.equals("Duration") || constraintName.equals("Release") 
+					|| constraintName.equals("Deadline")) {
 				from = conElement.substring(conElement.indexOf("(")+1, conElement.indexOf(")")).trim();
 				to = from;
 			}
