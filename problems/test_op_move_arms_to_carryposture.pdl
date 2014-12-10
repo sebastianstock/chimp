@@ -1,0 +1,18 @@
+(Problem
+
+
+(Fluent f1 HasArmPosture(leftArm1 ArmUnTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmToSidePosture))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 HasTorsoPosture(TorsoUpPosture))
+(Constraint Release[0,0](f3))
+
+
+(Task t0 !move_arms_to_carryposture())
+(Constraint Release[0,1](t0))
+(Constraint Duration[5,10](t0))
+
+)

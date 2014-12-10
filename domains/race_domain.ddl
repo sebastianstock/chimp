@@ -134,7 +134,7 @@
  (Pre p2 RobotAt(?mArea))
  (Pre p3 Connected(?fromArea ?mArea ?preArea))
  (Del p1)
- (Add e1 Holding(?obj ?arm))
+ (Add e1 Holding(?arm ?obj))
 
  (Constraint OverlappedBy(task,p1))
  (Constraint During(task,p2)) # robot has to be at the table the wohle time
@@ -148,6 +148,84 @@
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1)
     (Param 2 rightArm1))
+)
+
+# PLACE_OBJECT
+(:operator
+ (Head !place_object(?obj ?arm ?plArea))
+
+ (Pre p1 Holding(?arm ?obj))
+ (Pre p2 RobotAt(?mArea))
+ (Pre p3 Connected(?plArea ?mArea ?preArea))
+ (Pre p4 HasArmPosture(?arm ?armPosture)) # TODO maybe not necessary
+ (Values ?armPosture ArmToSidePosture)
+# (Pre p5 HasTorsoPosture(?torsoPosture)) # not necessary
+# (Values ?torsoPosture TorsoUpPosture)
+ (Del p1)
+ (Add e1 Holding(?arm ?obj))
+
+ (Constraint OverlappedBy(task,p1))
+ (Constraint During(task,p2)) # robot has to be at the table the wohle time
+ (Constraint During(task,p3))
+ # TODO Which constraint for effect? 
+ (Constraint Duration[5,5](task))
+ 
+ (ResourceUsage 
+    (Usage leftArm1ManCapacity 1)
+    (Param 2 leftArm1))
+ (ResourceUsage 
+    (Usage rightArm1ManCapacity 1)
+    (Param 2 rightArm1))
+ )
+
+# MOVE_ARM_TO_SIDE
+(:operator
+ (Head !move_arm_to_side(?arm))
+ (Pre p1 HasArmPosture(?arm ?oldPosture))
+ (Del p1)
+ (Add e1 HasArmPosture(?arm ?newPosture))
+
+ (Values ?oldPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
+ (Values ?newPosture ArmToSidePosture)
+
+ (ResourceUsage 
+    (Usage leftArm1ManCapacity 1)
+    (Param 1 leftArm1))
+ (ResourceUsage 
+    (Usage rightArm1ManCapacity 1)
+    (Param 1 rightArm1))
+ 
+ (Constraint Duration[5,5](task))
+ (Constraint OverlappedBy(task,p1))
+ (Constraint Overlaps(task,e1))
+)
+
+# MOVE_ARMS_TO_CARRYPOSTURE
+(:operator
+ (Head !move_arms_to_carryposture())
+ (Pre p1 HasArmPosture(?leftArm ?oldLeft))
+ (Pre p2 HasArmPosture(?rightArm ?oldRight))
+ (Pre p3 HasTorsoPosture(?torsoPosture))
+ (Del p1)
+ (Del p2)
+ (Add e1 HasArmPosture(?leftArm ?newPosture))
+ (Add e2 HasArmPosture(?rightArm ?newPosture))
+# (Type ?oldLeft ArmPosture)
+ (Values ?leftArm leftArm1)
+ (Values ?rightArm rightArm1)
+ (Values ?newPosture ArmCarryPosture)
+ (Values ?rightGoal ArmTuckedPosture ArmUnTuckedPosture)
+ (Values ?torsPosture TorsoUpPosture TorsoMiddlePosture)
+
+ (ResourceUsage 
+    (Usage leftArm1ManCapacity 1))
+ (ResourceUsage 
+    (Usage rightArm1ManCapacity 1))
+ (Constraint Duration[5,5](task))
+ (Constraint OverlappedBy(task,p1))
+ (Constraint OverlappedBy(task,p2))
+ (Constraint Overlaps(task,e1))   # TODO is this correct?
+ (Constraint Overlaps(task,e2))
 )
 
 ################################

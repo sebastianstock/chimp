@@ -160,7 +160,7 @@ public class RACEProblemsSingle {
 		
 		// task
 		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
-		taskFluent.setName("!pick_up_object(mug1 ?area ?manArea leftArm1)");
+		taskFluent.setName("!pick_up_object(mug1 leftArm1)");
 		taskFluent.setMarking(markings.UNPLANNED);
 	}
 	

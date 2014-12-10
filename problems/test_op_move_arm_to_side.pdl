@@ -1,0 +1,16 @@
+(Problem
+
+
+(Fluent f1 HasArmPosture(leftArm1 ArmUnTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmUnTuckedPosture))
+(Constraint Release[0,0](f2))
+
+
+
+(Task t0 !move_arm_to_side(leftArm1))
+(Constraint Release[0,1](t0))
+(Constraint Duration[5,10](t0))
+
+)

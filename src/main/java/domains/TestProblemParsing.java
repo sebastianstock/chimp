@@ -28,7 +28,11 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_op_place_object.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_arm_to_side.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl");
 		
 		String[][] symbols = RACEProblemsSingle.createSymbols();
 		int[] ingredients = RACEProblemsSingle.createIngredients();
