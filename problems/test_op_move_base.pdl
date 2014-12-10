@@ -1,0 +1,14 @@
+(Problem
+
+
+(Fluent f1 RobotAt(preManipulationAreaEastCounter1))
+(Constraint Release[0,0](f1))
+
+
+(Task t0 !move_base(manipulationAreaEastCounter1))
+(Constraint Release[0,1](t0))
+
+(Task t1 !move_base_blind(preManipulationAreaEastCounter1))
+#(Constraint Release[0,1](t1))
+
+)

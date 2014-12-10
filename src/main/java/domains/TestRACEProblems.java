@@ -64,10 +64,10 @@ public class TestRACEProblems {
 		planner.addMetaConstraint(mbConstraint);
 		
 //		RACEProblemsSingle.createProblemMoveBase(fluentSolver);
-//		RACEProblemsSingle.createProblemMoveBaseBlind(fluentSolver);
+		RACEProblemsSingle.createProblemMoveBaseBlind(fluentSolver);
 //		RACEProblemsSingle.createProblemTuckArms(fluentSolver);
 //		RACEProblemsSingle.createProblemMoveTorso(fluentSolver);
-		RACEProblemsSingle.createProblemPickUpObject(fluentSolver);
+//		RACEProblemsSingle.createProblemPickUpObject(fluentSolver);
 		
 //		createProblemMoveBase(fluentSolver);
 //		createProblemPickUpObject(fluentSolver);

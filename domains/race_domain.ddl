@@ -139,7 +139,7 @@
  (Constraint OverlappedBy(task,p1))
  (Constraint During(task,p2)) # robot has to be at the table the wohle time
  (Constraint During(task,p3))
- # TODO Which constraint for effect?
+ # TODO Which constraint for effect? 
  (Constraint Duration[5,5](task))
  
  (ResourceUsage 
