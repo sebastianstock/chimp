@@ -226,7 +226,18 @@
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))   # TODO is this correct?
  (Constraint Overlaps(task,e2))
+ )
+
+# OBSERVE_OBJECTS_ON_AREA
+(:operator
+ (Head !observe_objects_on_area(?plArea))
+ (Pre p1 RobotAt(?robotArea))    
+ (Pre p2 Connected(?plArea ?robotArea ?preArea))
+ (Constraint During(task,p1))
+ (Constraint During(task,p2))
+ (Constraint Duration[5,5](task))
 )
+
 
 ################################
 

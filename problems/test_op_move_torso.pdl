@@ -1,0 +1,11 @@
+(Problem
+
+(Fluent f1 HasTorsoPosture(TorsoUpPosture))
+(Constraint Release[0,0](f1))
+
+
+(Task t0 !move_torso(TorsoDownPosture))
+(Constraint Release[0,1](t0))
+(Constraint Deadline[5,10](t0))
+
+)

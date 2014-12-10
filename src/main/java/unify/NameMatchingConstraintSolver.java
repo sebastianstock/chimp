@@ -249,11 +249,11 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 	}
 	
 	public int getIndexOfSymbol(String symbol) {
-		Integer index = symbols2Index.get(symbol).intValue();
+		Integer index = symbols2Index.get(symbol);
 		if (index != null) {
 			return index.intValue();
 		} else {
-			throw new IllegalArgumentException("Symbol " + symbol + "does not exist");
+			throw new IllegalArgumentException("Symbol " + symbol + " does not exist");
 		}
 	}
 	
