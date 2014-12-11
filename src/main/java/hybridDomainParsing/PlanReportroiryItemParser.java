@@ -118,7 +118,17 @@ public abstract class PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	
+	protected SubDifferentDefinition[] parseSubDifferentDefinitions() {
+		String[] varElements = HybridDomain.parseKeyword(HybridDomain.VARIABLES_DIFFERENT_KEYWORD, textualSpecification);
+		SubDifferentDefinition[] ret = new SubDifferentDefinition[varElements.length];
+		for (int i = 0; i < varElements.length; i++) {
+			String varElement = varElements[i];
+			String fromKey = varElement.substring(0, varElement.indexOf(" ")).trim();
+			String toKey = varElement.substring(varElement.indexOf(" ")).trim();
+			ret[i] = new SubDifferentDefinition(fromKey, toKey);
+		}
+		return ret;
+	}
 	
 	protected Map<String,String[]> parseVariableDefinitions() {
 		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();

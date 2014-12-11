@@ -36,6 +36,9 @@ public class MethodParser extends PlanReportroiryItemParser {
 		
 		Map<String,String[]> variablesPossibleValuesMap = parseVariableDefinitions();
 		ret.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
+		
+		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();
+		ret.setSubDifferentDefinitions(subDiffs);
 		return ret;
 	}
 	

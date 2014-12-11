@@ -1,12 +1,8 @@
 package hybridDomainParsing;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import org.metacsp.framework.VariablePrototype;
 
 import pfd0Symbolic.EffectTemplate;
 import pfd0Symbolic.FluentNetworkSolver;
@@ -46,6 +42,10 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		
 		Map<String,String[]> variablesPossibleValuesMap = parseVariableDefinitions();
 		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
+		
+		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();
+		op.setSubDifferentDefinitions(subDiffs);
+		
 		op.addResourceUsageTemplates(rtList);
 		return op;
 	}

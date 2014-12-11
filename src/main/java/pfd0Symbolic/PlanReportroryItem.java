@@ -1,5 +1,7 @@
 package pfd0Symbolic;
 
+import hybridDomainParsing.SubDifferentDefinition;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,10 +21,8 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
-import unify.CompoundSymbolicVariable;
 
 import com.google.common.collect.Sets;
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 
 public abstract class PlanReportroryItem {
 	
@@ -36,6 +36,7 @@ public abstract class PlanReportroryItem {
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap;
+	protected SubDifferentDefinition[] subDifferentDefinitions;
 	
 	public static final String HEAD_KEYWORD_STRING = "task";
 	
@@ -76,7 +77,6 @@ public abstract class PlanReportroryItem {
 	public String toString() {
 		return getName();
 	}
-
 	
 	public void setVariableOccurrencesMap(
 			Map<String, Map<String, Integer>> variableOccurrencesMap) {
@@ -85,6 +85,10 @@ public abstract class PlanReportroryItem {
 	
 	public void setVariablesPossibleValuesMap(Map<String,String[]> map) {
 		this.variablesPossibleValuesMap = map;
+	}
+
+	public void setSubDifferentDefinitions(SubDifferentDefinition[] subDifferentDefinitions) {
+		this.subDifferentDefinitions = subDifferentDefinitions;
 	}
 
 	/**
@@ -316,6 +320,10 @@ public abstract class PlanReportroryItem {
 					cn.addConstraint(aCon);
 				}
 				
+				for (Constraint con : createSubDifferents(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+					cn.addConstraint(con);
+				}
+				
 				// add VALUERESTRICTION constraints for task, preconditions and effects
 				for (Constraint con : createValueRestrictions(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
 					cn.addConstraint(con);
@@ -454,6 +462,68 @@ public abstract class PlanReportroryItem {
 		}
 		return ret;
 	}
+	
+	private Variable findVariable(String id, Fluent taskFluent, 
+			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
+		Variable var = null;
+		if (id.equals(HEAD_KEYWORD_STRING)) {
+			var = taskFluent;
+		} else if (preKeyToFluentMap.containsKey(id)){
+			var = preKeyToFluentMap.get(id);
+		} else {
+			var = effKeyToVariableMap.get(id);
+		}
+
+		if (var == null) {
+			throw new IllegalArgumentException("Error in Domain. No fluent for key " 
+					+ id + " in " + taskname );
+		}
+
+		// if it is a fluent we set it directly to the compound variable
+		// if it is a prototype we do that in addResolverSub
+		if (var instanceof Fluent) {
+			var = ((Fluent) var).getCompoundSymbolicVariable();
+		}
+		return var;
+	}
+	
+	private List<Constraint> createSubDifferents(Fluent taskFluent, 
+			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
+		List<Constraint> ret = new ArrayList<Constraint>();
+		
+		if (variableOccurrencesMap != null && subDifferentDefinitions != null) {
+			for (SubDifferentDefinition diff : subDifferentDefinitions) {
+				String fromKey = diff.getFromKey();
+				String toKey = diff.getToKey();
+				
+				Map<String, Integer> fromOccs = variableOccurrencesMap.get(fromKey);
+				Map<String, Integer> toOccs = variableOccurrencesMap.get(toKey);
+				for (Entry<String, Integer> fromEntry : fromOccs.entrySet()) {
+					
+					Variable fromVar = findVariable(fromEntry.getKey(), taskFluent, preKeyToFluentMap, 
+							effKeyToVariableMap);
+
+					int fromIndex = fromEntry.getValue().intValue();
+					for (Entry<String, Integer> toEntry :toOccs.entrySet()) {
+						Variable toVar = findVariable(toEntry.getKey(), taskFluent, preKeyToFluentMap, 
+							effKeyToVariableMap);
+						// Create SUBMATCHES constraint
+						int[] connections = new int[] {fromIndex, toEntry.getValue().intValue()};
+						CompoundSymbolicValueConstraint scon = new CompoundSymbolicValueConstraint(
+								CompoundSymbolicValueConstraint.Type.SUBDIFFERENT, 
+								connections);
+						scon.setFrom(fromVar);
+						scon.setTo(toVar);
+						ret.add(scon);
+					}
+				}
+			}
+
+		}
+		return ret;
+	}
+	
+	
 	
 	private List<Constraint> createPreconditionsEffectsBindings(Map<String, Fluent> preKeyToFluentMap, 
 			Map<String, Variable> effKeyToVariableMap) {

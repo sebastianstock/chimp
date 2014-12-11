@@ -27,6 +27,9 @@ public class AAAIDomainSingle {
 				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
 				// methods
+				"adapt_torso",
+				
+				// old_methods
 				"drive", "assume_default_driving_pose", "assume_manipulation_pose",
 				"move_both_arms_to_side", "grasp_object_w_arm", "get_object_w_arm"
 				};	

@@ -253,6 +253,30 @@
   (Param 2 rightArm1)
 )
 
+#################################
+
+(:method
+ (Head adapt_torso(?newPose))
+ (Pre p1 HasTorsoPosture(?oldPose))
+ (VarDifferent ?newPose ?oldPose) 
+ (Constraint Duration[3,10](task))
+ (Sub s1 !move_torso(?newPose))
+ (Constraint Equals(s1,task))
+ )
+
+
+(:method
+ (Head adapt_torso(?posture))
+ (Pre p1 HasTorsoPosture(?posture))
+ (Constraint Duration[0,0](task))
+ (Constraint During(task,p1))
+)
+
+
+
+
+################################
+
 (:method
  (Head drive(?toArea))
  (Constraint Duration[20,30](task))
@@ -272,20 +296,4 @@
 
 
 
-
-
-
-
-
-
-
-#(:operator
-# (Head op::!move_base(Area:?toArea Area:?fromArea))
-# # TODO set negative
-# (Pre p1 trixi::RobotAt(Area:?fromArea))
-# (Constraint StartedBy(task,req1))
-# (Constraint OverlappedBy(task,req1))
-# (Constraint Duration[5,INF](task))
-# (Add e1 trixi::RobotAt(Area:?toArea))
-#)
 

@@ -59,6 +59,7 @@ public class HybridDomain{
 	public static final String USAGE_KEYWORD = "Usage";
 	public static final String RESOURCE_KEYWORD ="Resource";
 	public static final String FLUENT_KEYWORD = "Fluent";
+	public static final String VARIABLES_DIFFERENT_KEYWORD = "VarDifferent";
 	
 	public static final String EMPTYSTRING = "n";
 	public static final String VARIABLE_INDICATOR = "?";
