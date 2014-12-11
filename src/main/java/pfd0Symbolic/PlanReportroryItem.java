@@ -317,53 +317,8 @@ public abstract class PlanReportroryItem {
 				}
 				
 				// add VALUERESTRICTION constraints for task, preconditions and effects
-				if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
-					// go through all variables
-					for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
-						String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey()); // possible values of that varialbe
-						if (possibleValues != null) {
-
-							// go though all occurrences of that variable
-							for (Entry<String, Integer> e : occs.getValue().entrySet()) {
-
-								String id = e.getKey();
-								Variable var = null;
-								if (id.equals(HEAD_KEYWORD_STRING)) {
-									var = taskFluent;
-								} else if (preKeyToFluentMap.containsKey(id)){
-									var = preKeyToFluentMap.get(id);
-								} else {
-									var = effKeyToVariableMap.get(id);
-								}
-
-								if (var == null) {
-									throw new IllegalArgumentException("Error in Domain. No fluent for key " 
-											+ id + " in " + taskname );
-								}
-
-								// if it is a fluent we set it directly to the compound variable
-								// if it is a prototype we do that in addResolverSub
-								if (var instanceof Fluent) {
-									var = ((Fluent) var).getCompoundSymbolicVariable();
-								}
-
-								int[] indices = new int[] {e.getValue().intValue()};
-								String[][] restrictions = new String[][] {possibleValues};
-								// TODO merge multiple constraints into one.
-								CompoundSymbolicValueConstraint rcon = 
-										new CompoundSymbolicValueConstraint(
-												CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
-												indices, 
-												restrictions);
-
-								rcon.setFrom(var);
-								rcon.setTo(var);
-								cn.addConstraint(rcon);
-								logger.finest("ADDED VALUERESTRICTION");
-
-							}
-						}
-					}
+				for (Constraint con : createValueRestrictions(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+					cn.addConstraint(con);
 				}
 
 				// Add a UNARYAPPLIED to remember which method/operator has been used.
@@ -442,6 +397,59 @@ public abstract class PlanReportroryItem {
 				newCon.setFrom(taskFluent.getAllenInterval());
 				newCon.setTo(taskFluent.getAllenInterval());
 				ret.add(newCon);
+			}
+		}
+		return ret;
+	}
+	
+	private List<Constraint> createValueRestrictions(Fluent taskFluent, 
+			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
+		List<Constraint> ret = new ArrayList<Constraint>();
+		// add VALUERESTRICTION constraints for task, preconditions and effects
+		if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
+			// go through all variables
+			for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
+				String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey()); // possible values of that variable
+				if (possibleValues != null) {
+
+					// go though all occurrences of that variable
+					for (Entry<String, Integer> e : occs.getValue().entrySet()) {
+
+						String id = e.getKey();
+						Variable var = null;
+						if (id.equals(HEAD_KEYWORD_STRING)) {
+							var = taskFluent;
+						} else if (preKeyToFluentMap.containsKey(id)){
+							var = preKeyToFluentMap.get(id);
+						} else {
+							var = effKeyToVariableMap.get(id);
+						}
+
+						if (var == null) {
+							throw new IllegalArgumentException("Error in Domain. No fluent for key " 
+									+ id + " in " + taskname );
+						}
+
+						// if it is a fluent we set it directly to the compound variable
+						// if it is a prototype we do that in addResolverSub
+						if (var instanceof Fluent) {
+							var = ((Fluent) var).getCompoundSymbolicVariable();
+						}
+
+						int[] indices = new int[] {e.getValue().intValue()};
+						String[][] restrictions = new String[][] {possibleValues};
+						// TODO merge multiple constraints into one.
+						CompoundSymbolicValueConstraint rcon = 
+								new CompoundSymbolicValueConstraint(
+										CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
+										indices, 
+										restrictions);
+
+						rcon.setFrom(var);
+						rcon.setTo(var);
+						ret.add(rcon);
+					}
+				}
 			}
 		}
 		return ret;
