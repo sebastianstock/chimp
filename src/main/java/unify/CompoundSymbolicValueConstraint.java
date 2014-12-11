@@ -10,8 +10,6 @@ import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.PlanReportroryItem;
-import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
 import cern.colt.Arrays;
 
 
@@ -22,7 +20,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 1697594290767658650L;
 
-	public static enum Type {MATCHES, SUBMATCHES, VALUERESTRICTION};
+	public static enum Type {MATCHES, SUBMATCHES, VALUERESTRICTION, SUBDIFFERENT};
 	
 	private Type type;
 	private int[] connections;
@@ -73,8 +71,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 				constraints.add(con);
 			} 
 			return constraints.toArray(new Constraint[constraints.size()]);	
-		}	
-		else if (this.type.equals(Type.SUBMATCHES)) {
+		}	else if (this.type.equals(Type.SUBMATCHES)) {
 			logger.fine("CREATING SUBMATCHES INTERNAL CONSTRAINTS");
 			if(connections != null && ((connections.length % 2) == 0)) {
 				Vector<NameMatchingConstraint> constraints = 
@@ -82,6 +79,24 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 				int i = 0;
 				while (i < connections.length) {
 					NameMatchingConstraint con = new NameMatchingConstraint(NameMatchingConstraint.Type.EQUALS);
+					if(finternals.length > connections[i] + 1 && tinternals.length > connections[i+1] + 1) {
+						con.setFrom(finternals[connections[i] + 1]);
+						con.setTo(tinternals[connections[i+1] + 1]);
+						skipIrrelevantSolvers(con, finternalSolvers, varIndex2solverIndex[connections[i] + 1]);
+						constraints.add(con);
+					}
+					i += 2;
+				}
+				return constraints.toArray(new Constraint[constraints.size()]);
+			}
+		} else if (this.type.equals(Type.SUBDIFFERENT)) {
+			logger.fine("CREATING SUBDIFFERENT INTERNAL CONSTRAINTS");
+			if(connections != null && ((connections.length % 2) == 0)) {
+				Vector<NameMatchingConstraint> constraints = 
+						new Vector<NameMatchingConstraint>(connections.length / 2);
+				int i = 0;
+				while (i < connections.length) {
+					NameMatchingConstraint con = new NameMatchingConstraint(NameMatchingConstraint.Type.DIFFERENT);
 					if(finternals.length > connections[i] + 1 && tinternals.length > connections[i+1] + 1) {
 						con.setFrom(finternals[connections[i] + 1]);
 						con.setTo(tinternals[connections[i+1] + 1]);

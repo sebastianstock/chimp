@@ -1,13 +1,10 @@
 package unify;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.metacsp.framework.ConstraintNetwork;
 
 import unify.CompoundSymbolicValueConstraint.Type;
 
@@ -136,11 +133,35 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		cc11.setFrom(vars[1]);
 		cc11.setTo(vars[1]);
 		assertTrue(solver.addConstraint(cc11));
-		System.out.println("Var1: " + vars[1].getName());
+//		System.out.println("Var1: " + vars[1].getName());
 		assertTrue(vars[1].getName().equals("On([mug1, mug2] [placingAreaWestLeftTable1, placingAreaWestRightTable1])"));
 
 	}
 	
+	
+	@Test
+	public void testSubDifferent() {
+		vars[0].setName("On", "mug1", "placingAreaWestRightTable1");
+		vars[1].setName("On", "mug2", "?area");
+		
+		CompoundSymbolicValueConstraint cc01 = new CompoundSymbolicValueConstraint(Type.SUBDIFFERENT, 
+				new int[] {1, 1});
+		cc01.setFrom(vars[0]);
+		cc01.setTo(vars[1]);
+		assertTrue(solver.addConstraint(cc01));
+
+		
+		vars[2].setName("On", "mug1", "?area");
+		
+		CompoundSymbolicValueConstraint cc02 = new CompoundSymbolicValueConstraint(Type.SUBDIFFERENT, 
+				new int[] {1, 1});
+		cc02.setFrom(vars[0]);
+		cc02.setTo(vars[2]);
+		assertFalse(solver.addConstraint(cc02));
+		
+
+
+	}
 	
 
 

@@ -40,7 +40,7 @@ public class JUnitTestNameMatchingConstraintSolver {
 	
 	@Test
 	public void test() {
-		NameVariable[] vars = (NameVariable[]) solver.createVariables(4);
+		NameVariable[] vars = (NameVariable[]) solver.createVariables(5);
 		vars[0].setConstant("mug1");
 		vars[3].setConstant("mug2");
 		NameMatchingConstraint con01 = new NameMatchingConstraint(Type.EQUALS);
@@ -61,7 +61,25 @@ public class JUnitTestNameMatchingConstraintSolver {
 		con23.setTo(vars[3]);
 		assertFalse(solver.addConstraints(new Constraint[] {con12, con23}));
 		
+		NameMatchingConstraint con03 = new NameMatchingConstraint(Type.DIFFERENT);
+		con03.setFrom(vars[0]);
+		con03.setTo(vars[3]);
+		assertTrue(solver.addConstraints(new Constraint[] {con03}));
+		
+		NameMatchingConstraint con34 = new NameMatchingConstraint(Type.DIFFERENT);
+		con34.setFrom(vars[3]);
+		con34.setTo(vars[4]);
+		assertTrue(solver.addConstraints(new Constraint[] {con34}));
+		assertTrue("Domain of previous 'vars[1]' should be changed to 'mug1",
+				vars[4].getPossibleSymbols().length == 2);
+		assertTrue("Domain of previous 'vars[1]' should be changed to ['mug1','mug3]",
+				vars[4].getPossibleSymbols()[0].equals("mug1"));
+		assertTrue("Domain of previous 'vars[1]' should be changed to ['mug1','mug3']",
+				vars[4].getPossibleSymbols()[1].equals("mug3"));
+		
 	}
+	
+	
 	
 	
 
