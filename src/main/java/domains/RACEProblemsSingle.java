@@ -23,7 +23,7 @@ public class RACEProblemsSingle {
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
 				"!observe_objects_on_area",
 				// methods
-				"adapt_torso", "torso_assume_driving_pose", "adapt_arms",
+				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
 				
 				// old_methods
 				

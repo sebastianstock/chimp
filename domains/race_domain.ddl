@@ -299,7 +299,7 @@
  (Head torso_assume_driving_pose())
   (Pre p1 Holding(?arm ?obj))
   (NotValues ?obj nothing)
-  (Type ?obj Object)
+#  (Type ?obj Object)
 # (Constraint Duration[3,10](task))
   (Sub s1 adapt_torso(?newPose))
   (Values ?newPose TorsoMiddlePosture)
@@ -348,7 +348,33 @@
 
  (Sub s1 !move_arms_to_carryposture())
  (Constraint Equals(s1,task))
+ )
+
+###
+
+(:method    # holding nothing
+ (Head arms_assume_driving_pose())
+  (Pre p1 Holding(?leftArm ?nothing))
+  (Pre p2 Holding(?rightArm ?nothing))
+  (Values ?nothing nothing)
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+
+  (Sub s1 adapt_arms(?newPose)) 
+  (Values ?newPose ArmTuckedPosture)
+  (Constraint Equals(s1,task))
 )
+
+(:method    # holding something
+ (Head arms_assume_driving_pose())
+  (Pre p1 Holding(?arm ?obj))
+  (NotValues ?obj nothing)
+#  (Type ?obj Object)
+# (Constraint Duration[3,10](task))
+  (Sub s1 adapt_arms(?newPose))
+  (Values ?newPose ArmCarryPosture)
+  (Constraint Equals(s1,task))
+)  # todo check nothing on tray
 
 
 ################################

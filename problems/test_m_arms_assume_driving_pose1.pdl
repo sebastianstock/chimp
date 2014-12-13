@@ -1,0 +1,25 @@
+# Should move to carryposture
+
+(Problem
+
+(Fluent f1 HasArmPosture(leftArm1 ArmUnTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmTuckedPosture))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 HasTorsoPosture(TorsoMiddlePosture))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 Holding(leftArm1 mug1))
+(Constraint Release[0,0](f4))
+
+(Fluent f5 Holding(rightArm1 nothing))
+(Constraint Release[0,0](f5))
+
+
+
+(Task t0 arms_assume_driving_pose())
+(Constraint Release[0,1](t0))
+
+)
