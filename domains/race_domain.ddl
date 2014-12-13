@@ -223,7 +223,7 @@
  (Values ?rightArm rightArm1)
  (Values ?newPosture ArmCarryPosture)
  (Values ?rightGoal ArmTuckedPosture ArmUnTuckedPosture)
- (Values ?torsPosture TorsoUpPosture TorsoMiddlePosture)
+ (Values ?torsoPosture TorsoUpPosture TorsoMiddlePosture)
 
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1))
@@ -307,6 +307,49 @@
 )
 
 # TODO Version for tray
+
+
+###
+
+(:method  # Arms already there. Nothing to do.
+ (Head adapt_arms(?posture))
+ (Pre p1 HasArmPosture(?leftArm ?posture))
+ (Pre p2 HasArmPosture(?rightArm ?posture))
+
+ (Values ?leftArm leftArm1)
+ (Values ?rightArm rightArm1)
+ 
+ (Constraint Duration[0,0](task))
+ (Constraint During(task,p1))
+ (Constraint During(task,p2))
+ )
+
+(:method  # tuck arms
+ (Head adapt_arms(?posture))
+ (Pre p1 HasArmPosture(?arm ?currentposture))
+
+ (Values ?posture ArmTuckedPosture)
+ (NotValues ?currentposture ArmTuckedPosture)
+ 
+ (Constraint Duration[3,10](task))
+
+ (Sub s1 !tuck_arms(?posture ?posture))
+ (Constraint Equals(s1,task))
+)
+
+(:method  # to carryposture
+ (Head adapt_arms(?posture))
+ (Pre p1 HasArmPosture(?arm ?currentposture))
+
+ (Values ?posture ArmCarryPosture)
+ (NotValues ?currentposture ArmCarryPosture)
+ 
+ (Constraint Duration[3,10](task))
+
+ (Sub s1 !move_arms_to_carryposture())
+ (Constraint Equals(s1,task))
+)
+
 
 ################################
 

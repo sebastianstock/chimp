@@ -1,0 +1,20 @@
+# Holding a mug -> Should move torso to middle
+
+(Problem
+
+(Fluent f1 HasTorsoPosture(TorsoUpPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 Holding(leftArm1 mug1))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 Holding(rightArm1 nothing))
+(Constraint Release[0,0](f3))
+
+
+#(Task t0 adapt_torso(TorsoUpPosture))
+(Task t0 torso_assume_driving_pose())
+(Constraint Release[0,1](t0))
+#(Constraint Deadline[5,10](t0))
+
+)

@@ -1,0 +1,16 @@
+# Arms already tucked. Should do nothing.
+
+(Problem
+
+(Fluent f1 HasArmPosture(leftArm1 ArmTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmTuckedPosture))
+(Constraint Release[0,0](f2))
+
+
+
+(Task t0 adapt_arms(ArmTuckedPosture))
+(Constraint Release[0,1](t0))
+
+)

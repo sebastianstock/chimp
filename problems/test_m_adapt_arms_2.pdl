@@ -1,0 +1,19 @@
+# Should move to carryposture
+
+(Problem
+
+(Fluent f1 HasArmPosture(leftArm1 ArmUnTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmTuckedPosture))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 HasTorsoPosture(TorsoMiddlePosture))
+(Constraint Release[0,0](f3))
+
+
+
+(Task t0 adapt_arms(ArmCarryPosture))
+(Constraint Release[0,1](t0))
+
+)
