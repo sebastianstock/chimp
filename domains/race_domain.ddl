@@ -377,25 +377,56 @@
 )  # todo check nothing on tray
 
 
-################################
+###
 
-(:method
- (Head drive(?toArea))
- (Constraint Duration[20,30](task))
- (Sub s1 assume_default_driving_pose())
-# (Constraint During(s1,task))
- (Sub s2 !move_base(?toArea))
- (Ordering s1 s2)
+(:method    # already there
+ (Head drive_robot(?toArea))
+  (Pre p1 RobotAt(?toArea))
+  (Constraint During(task,p1))
+  (Constraint Duration[0,0](task))
+ )
+
+(:method    # not at manipulationarea
+ (Head drive_robot(?toArea))
+
+ (Pre p1 RobotAt(?fromArea))
+ (VarDifferent ?toArea ?fromArea)
+
+ (NotValues ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
+  
+# (Constraint Duration[20,30](task))
+ (Sub s1 torso_assume_driving_pose())
+ # (Constraint During(s1,task))
+ (Sub s2 arms_assume_driving_pose())
+
+ (Sub s3 !move_base(?toArea))
+ (Ordering s1 s3)
+ (Ordering s2 s3)
+ )
+
+(:method    # at manipulationarea
+ (Head drive_robot(?toArea))
+
+ (Pre p1 RobotAt(?fromArea))
+ (VarDifferent ?toArea ?fromArea)
+
+ (Values ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
+  
+ # (Constraint Duration[20,30](task))
+
+ (Pre p2 Connected(?plArea ?fromArea ?preArea))
+
+ (Sub s0 !move_base_blind(?preArea))
+   
+ (Sub s1 torso_assume_driving_pose())
+ # (Constraint During(s1,task))
+ (Sub s2 arms_assume_driving_pose())
+
+ (Sub s3 !move_base(?toArea))
+ (Ordering s0 s1)
+ (Ordering s0 s2)
+ (Ordering s0 s3)
+ (Ordering s1 s3)
+ (Ordering s2 s3)
 )
-
-(:method
- (Head assume_default_driving_pose())
- (Sub s1 !tuck_arms(armTuckedPosture armTuckedPosture))
- (Sub s2 !move_torso(torsoDownPosture))
-# (Ordering s1 s2)
-)
-
-
-
-
 

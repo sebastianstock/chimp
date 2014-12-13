@@ -24,6 +24,7 @@ public class RACEProblemsSingle {
 				"!observe_objects_on_area",
 				// methods
 				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
+				"drive_robot",
 				
 				// old_methods
 				
