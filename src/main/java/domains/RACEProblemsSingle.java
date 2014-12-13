@@ -23,7 +23,7 @@ public class RACEProblemsSingle {
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
 				"!observe_objects_on_area",
 				// methods
-				"adapt_torso",
+				"adapt_torso", "torso_assume_driving_pose",
 				
 				// old_methods
 				
@@ -32,7 +32,9 @@ public class RACEProblemsSingle {
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
-		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", "placingAreaEastRightCounter1",
+		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", 
+				"nothing",
+				"placingAreaEastRightCounter1",
 				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
 				"placingAreaEastLeftTable1", "placingAreaEastRightTable1",
 				"placingAreaNorthLeftTable2", "placingAreaNorthRightTable2",

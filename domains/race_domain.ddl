@@ -133,12 +133,17 @@
  (Pre p1 On(?obj ?fromArea))
  (Pre p2 RobotAt(?mArea))
  (Pre p3 Connected(?fromArea ?mArea ?preArea))
+ (Pre p4 Holding(?arm ?nothing))
+ (Values ?nothing nothing)
  (Del p1)
+ (Del p4)
  (Add e1 Holding(?arm ?obj))
 
  (Constraint OverlappedBy(task,p1))
  (Constraint During(task,p2)) # robot has to be at the table the wohle time
  (Constraint During(task,p3))
+ (Constraint OverlappedBy(task,p4))
+ (Constraint Meets(p4,e1))
  # TODO Which constraint for effect? 
  (Constraint Duration[5,5](task))
  
@@ -162,11 +167,14 @@
 # (Pre p5 HasTorsoPosture(?torsoPosture)) # not necessary
 # (Values ?torsoPosture TorsoUpPosture)
  (Del p1)
- (Add e1 Holding(?arm ?obj))
+(Add e1 Holding(?arm ?nothing))
+(Values ?nothing nothing)
+ (Add e2 On(?obj ?plArea))
 
  (Constraint OverlappedBy(task,p1))
  (Constraint During(task,p2)) # robot has to be at the table the wohle time
  (Constraint During(task,p3))
+ (Constraint Meets(p1,e1))
  # TODO Which constraint for effect? 
  (Constraint Duration[5,5](task))
  
@@ -270,10 +278,35 @@
  (Pre p1 HasTorsoPosture(?posture))
  (Constraint Duration[0,0](task))
  (Constraint During(task,p1))
+ )
+
+###
+
+(:method   # holding nothing
+ (Head torso_assume_driving_pose())
+  (Pre p1 Holding(?leftArm ?nothing))
+  (Pre p2 Holding(?rightArm ?nothing))
+  (Values ?nothing nothing)
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+# (Constraint Duration[3,10](task))
+  (Sub s1 adapt_torso(?newPose))
+  (Values ?newPose TorsoDownPosture)
+  (Constraint Equals(s1,task))
 )
 
+(:method # holding something
+ (Head torso_assume_driving_pose())
+  (Pre p1 Holding(?arm ?obj))
+  (NotValues ?obj nothing)
+  (Type ?obj Object)
+# (Constraint Duration[3,10](task))
+  (Sub s1 adapt_torso(?newPose))
+  (Values ?newPose TorsoMiddlePosture)
+  (Constraint Equals(s1,task))
+)
 
-
+# TODO Version for tray
 
 ################################
 

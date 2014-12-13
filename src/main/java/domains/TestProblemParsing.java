@@ -35,7 +35,9 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_observe_objects_on_area.pdl");
 		
-		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose0.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose1.pdl");
 		
 		String[][] symbols = RACEProblemsSingle.createSymbols();
 		int[] ingredients = RACEProblemsSingle.createIngredients();
@@ -48,7 +50,9 @@ public class TestProblemParsing {
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		MetaCSPLogging.setLevel(Level.FINEST);
+		MetaCSPLogging.setLevel(Level.FINE);
+//		MetaCSPLogging.setLevel(Level.OFF);
+		
 		
 		plan(planner, fluentSolver);
 		
@@ -65,7 +69,7 @@ public class TestProblemParsing {
 
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
 		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 

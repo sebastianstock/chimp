@@ -20,7 +20,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 1697594290767658650L;
 
-	public static enum Type {MATCHES, SUBMATCHES, VALUERESTRICTION, SUBDIFFERENT};
+	public static enum Type {MATCHES, SUBMATCHES, POSITIVEVALUERESTRICTION, NEGATIVEVALUERESTRICTION, SUBDIFFERENT};
 	
 	private Type type;
 	private int[] connections;
@@ -107,8 +107,8 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 				}
 				return constraints.toArray(new Constraint[constraints.size()]);
 			}
-		} else if (this.type.equals(Type.VALUERESTRICTION)) {
-			logger.fine("CREATING VALUERESTRICTION INTERNAL CONSTRAINTS");
+		} else if (this.type.equals(Type.POSITIVEVALUERESTRICTION)) {
+			logger.fine("CREATING POSITIVEVALUERESTRICTION INTERNAL CONSTRAINTS");
 			if (restrictionIndices != null 
 					&& restrictions != null 
 					&& restrictionIndices.length == restrictions.length) {
@@ -116,6 +116,27 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 				for (int i = 0; i < restrictionIndices.length; i++) {
 					NameMatchingConstraint con = 
 							new NameMatchingConstraint(NameMatchingConstraint.Type.UNARYEQUALS);
+					con.setFrom(finternals[restrictionIndices[i] + 1]);
+					con.setTo(finternals[restrictionIndices[i] + 1]);
+					int solverIndex = varIndex2solverIndex[restrictionIndices[i] + 1];
+					int[] unaryValues = 
+							((NameMatchingConstraintSolver) finternalSolvers[solverIndex]).getIndexArrayOfSymbols(restrictions[i]);
+					con.setUnaryValues(unaryValues);
+					
+					skipIrrelevantSolvers(con, finternalSolvers, solverIndex);
+					constraints[i] = con;
+				}
+				return constraints;
+			}
+		} else if (this.type.equals(Type.NEGATIVEVALUERESTRICTION)) {
+			logger.fine("CREATING NEGATIVEVALUERESTRICTION INTERNAL CONSTRAINTS");
+			if (restrictionIndices != null 
+					&& restrictions != null 
+					&& restrictionIndices.length == restrictions.length) {
+				Constraint[] constraints = new Constraint[restrictionIndices.length];
+				for (int i = 0; i < restrictionIndices.length; i++) {
+					NameMatchingConstraint con = 
+							new NameMatchingConstraint(NameMatchingConstraint.Type.UNARYDIFFERENT);
 					con.setFrom(finternals[restrictionIndices[i] + 1]);
 					con.setTo(finternals[restrictionIndices[i] + 1]);
 					int solverIndex = varIndex2solverIndex[restrictionIndices[i] + 1];

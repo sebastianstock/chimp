@@ -36,6 +36,7 @@ public abstract class PlanReportroryItem {
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap;
+	protected Map<String,String[]> variablesImpossibleValuesMap;
 	protected SubDifferentDefinition[] subDifferentDefinitions;
 	
 	public static final String HEAD_KEYWORD_STRING = "task";
@@ -85,6 +86,10 @@ public abstract class PlanReportroryItem {
 	
 	public void setVariablesPossibleValuesMap(Map<String,String[]> map) {
 		this.variablesPossibleValuesMap = map;
+	}
+	
+	public void setVariablesImpossibleValuesMap(Map<String,String[]> map) {
+		this.variablesImpossibleValuesMap = map;
 	}
 
 	public void setSubDifferentDefinitions(SubDifferentDefinition[] subDifferentDefinitions) {
@@ -269,10 +274,10 @@ public abstract class PlanReportroryItem {
 				for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
 					Set<String> possibleValues = null;
 					
-					if (variablesPossibleValuesMap != null) {
-						String[] restrictedValues = variablesPossibleValuesMap.get(occs.getKey());
-						if (restrictedValues != null) {
-							possibleValues = new HashSet<String>(Arrays.asList(restrictedValues));
+					if (variablesPossibleValuesMap != null && variablesPossibleValuesMap.size() > 0) {
+						String[] positiveValues = variablesPossibleValuesMap.get(occs.getKey());
+						if (positiveValues != null) {
+							possibleValues = new HashSet<String>(Arrays.asList(positiveValues));
 						}
 					}
 					
@@ -296,8 +301,17 @@ public abstract class PlanReportroryItem {
 						}
 					}
 					if (possibleValues != null) {
+						// subtract impossiblesymbols
+						if (variablesImpossibleValuesMap != null && variablesImpossibleValuesMap.size() > 0) {
+							String[] negativeValues = variablesImpossibleValuesMap.get(occs.getKey());
+							if (negativeValues != null) {
+								possibleValues.removeAll(Arrays.asList(negativeValues));
+							}
+						}
+						
 						if (possibleValues.isEmpty()) {
 							feasibleCN = false;
+							break;
 						}
 					}
 				}
@@ -414,48 +428,45 @@ public abstract class PlanReportroryItem {
 			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
 		List<Constraint> ret = new ArrayList<Constraint>();
 		// add VALUERESTRICTION constraints for task, preconditions and effects
-		if (variableOccurrencesMap != null && variablesPossibleValuesMap != null) {
+		if (variableOccurrencesMap != null && 
+				(variablesPossibleValuesMap.size() > 0 || variablesImpossibleValuesMap.size() > 0) ) {
 			// go through all variables
 			for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
-				String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey()); // possible values of that variable
-				if (possibleValues != null) {
+				String[] possibleValues = variablesPossibleValuesMap.get(occs.getKey()); 
+				String[] impossibleValues = variablesImpossibleValuesMap.get(occs.getKey());
+				if (possibleValues != null || impossibleValues != null) {
+					String[][] positiveRestrictions = new String[][] {possibleValues};
+					String[][] negativeRestrictions = new String[][] {impossibleValues};
 
 					// go though all occurrences of that variable
-					for (Entry<String, Integer> e : occs.getValue().entrySet()) {
+					for (Entry<String, Integer> occ : occs.getValue().entrySet()) {
 
-						String id = e.getKey();
-						Variable var = null;
-						if (id.equals(HEAD_KEYWORD_STRING)) {
-							var = taskFluent;
-						} else if (preKeyToFluentMap.containsKey(id)){
-							var = preKeyToFluentMap.get(id);
-						} else {
-							var = effKeyToVariableMap.get(id);
+						Variable var = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
+						int[] indices = new int[] {occ.getValue().intValue()};
+						
+						if (possibleValues != null) {
+							// TODO merge multiple constraints into one.
+							CompoundSymbolicValueConstraint rcon = 
+									new CompoundSymbolicValueConstraint(
+											CompoundSymbolicValueConstraint.Type.POSITIVEVALUERESTRICTION, 
+											indices, 
+											positiveRestrictions);
+							rcon.setFrom(var);
+							rcon.setTo(var);
+							ret.add(rcon);
 						}
-
-						if (var == null) {
-							throw new IllegalArgumentException("Error in Domain. No fluent for key " 
-									+ id + " in " + taskname );
+						
+						if (impossibleValues != null) {
+							// TODO merge multiple constraints into one.
+							CompoundSymbolicValueConstraint rcon = 
+									new CompoundSymbolicValueConstraint(
+											CompoundSymbolicValueConstraint.Type.NEGATIVEVALUERESTRICTION, 
+											indices, 
+											negativeRestrictions);
+							rcon.setFrom(var);
+							rcon.setTo(var);
+							ret.add(rcon);
 						}
-
-						// if it is a fluent we set it directly to the compound variable
-						// if it is a prototype we do that in addResolverSub
-						if (var instanceof Fluent) {
-							var = ((Fluent) var).getCompoundSymbolicVariable();
-						}
-
-						int[] indices = new int[] {e.getValue().intValue()};
-						String[][] restrictions = new String[][] {possibleValues};
-						// TODO merge multiple constraints into one.
-						CompoundSymbolicValueConstraint rcon = 
-								new CompoundSymbolicValueConstraint(
-										CompoundSymbolicValueConstraint.Type.VALUERESTRICTION, 
-										indices, 
-										restrictions);
-
-						rcon.setFrom(var);
-						rcon.setTo(var);
-						ret.add(rcon);
 					}
 				}
 			}

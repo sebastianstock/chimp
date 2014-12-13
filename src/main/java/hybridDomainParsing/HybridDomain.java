@@ -51,7 +51,8 @@ public class HybridDomain{
 	public static final String CONSTRAINT_KEYWORD = "Constraint";
 	public static final String ORDERING_CONSTRAINT_KEYWORD = "Ordering";
 	public static final String TYPE_KEYWORD = "Type";
-	public static final String VARIABLE_RESTRICTION_KEYWORD = "Values";
+	public static final String VALUE_RESTRICTION_KEYWORD = "Values";
+	public static final String NEGATED_VALUE_RESTRICTION_KEYWORD = "NotValues";
 	public static final String STATE_VARIBALE_KEYWORD = "StateVariable";
 	public static final String FLUENT_RESOURCE_KEYWORD = "FluentResourceUsage";
 	public static final String PARAM_KEYWORD = "Param";

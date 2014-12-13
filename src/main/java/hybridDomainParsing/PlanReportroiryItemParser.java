@@ -130,10 +130,10 @@ public abstract class PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	protected Map<String,String[]> parseVariableDefinitions() {
+	protected Map<String,String[]> parseValueRestrictions(String keyword) {
 		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
 		// Parse variable definitions
-		String[] varElements = HybridDomain.parseKeyword(HybridDomain.VARIABLE_RESTRICTION_KEYWORD, textualSpecification);
+		String[] varElements = HybridDomain.parseKeyword(keyword, textualSpecification);
 		for (String varElement : varElements) {
 			String varName = varElement.substring(0, varElement.indexOf(" ")).trim();
 			String[] values = varElement.substring(varElement.indexOf(" ")).trim().split(" ");

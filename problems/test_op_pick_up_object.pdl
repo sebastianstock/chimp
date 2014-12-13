@@ -32,6 +32,9 @@
 (Fluent f4 RobotAt(manipulationAreaSouthTable1))
 (Constraint Release[0,0](f4))
 
+(Fluent f5 Holding(leftArm1 nothing))
+(Constraint Release[0,0](f5))
+
 (Task t0 !pick_up_object(mug1 leftArm1))
 (Constraint Release[0,1](t0))
 #(Constraint Duration[5,10](t0))

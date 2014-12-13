@@ -128,7 +128,7 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		vars[1].setName("On", "?mug", "?area"); // "On" as precondition  (old htn version)
 		
 		CompoundSymbolicValueConstraint cc11 = new CompoundSymbolicValueConstraint(
-				Type.VALUERESTRICTION,
+				Type.POSITIVEVALUERESTRICTION,
 				new int[] {0, 1}, new String[][] {{"mug1", "mug2"}, {"placingAreaWestLeftTable1", "placingAreaWestRightTable1"}});
 		cc11.setFrom(vars[1]);
 		cc11.setTo(vars[1]);
