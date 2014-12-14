@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import pfd0Symbolic.EffectTemplate;
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Operator;
+import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PFD0Precondition;
 import resourceFluent.ResourceUsageTemplate;
+import sun.security.pkcs.ParsingException;
 
 public class OperatorParser extends PlanReportroiryItemParser {
 	
@@ -16,8 +17,8 @@ public class OperatorParser extends PlanReportroiryItemParser {
 	private final List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
 	
 
-	public OperatorParser(String textualSpecification, FluentNetworkSolver groundSolver, int maxArgs){
-		super(textualSpecification, groundSolver, maxArgs);
+	public OperatorParser(String textualSpecification, PFD0Planner planner, int maxArgs){
+		super(textualSpecification, planner, maxArgs);
 
 		// Parse Resources
 		String[] resourceElements = HybridDomain.parseKeyword(HybridDomain.ACTION_RESOURCE_KEYWORD, 
@@ -29,7 +30,7 @@ public class OperatorParser extends PlanReportroiryItemParser {
 	}
 	
 	@Override
-	public PFD0Operator create() {
+	public PFD0Operator create() throws ParsingException {
 		PFD0Precondition[] preconditions = createPreconditions(true);
 		
 		String headname = HybridDomain.extractName(head);
@@ -40,10 +41,10 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		// add additional constraints from head to head or between preconditions or effects
 		op.setAdditionalConstraints(filterAdditionalConstraints());
 		
-		Map<String,String[]> variablesPossibleValuesMap = parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD);
+		Map<String,String[]> variablesPossibleValuesMap = parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD);
 		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		
-		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD);
+		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD, HybridDomain.NOT_TYPE_KEYWORD);
 		op.setVariablesImpossibleValuesMap(variablesImpossibleValuesMap);
 		
 		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();

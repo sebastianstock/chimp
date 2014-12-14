@@ -10,19 +10,20 @@ import org.metacsp.framework.VariablePrototype;
 
 import pfd0Symbolic.EffectTemplate;
 import pfd0Symbolic.FluentConstraint;
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Method;
+import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PFD0Precondition;
+import sun.security.pkcs.ParsingException;
 
 public class MethodParser extends PlanReportroiryItemParser {
 
-	public MethodParser(String textualSpecification, FluentNetworkSolver groundSolver, int maxArgs) {
-		super(textualSpecification, groundSolver, maxArgs);
+	public MethodParser(String textualSpecification, PFD0Planner planner, int maxArgs) {
+		super(textualSpecification, planner, maxArgs);
 		
 		// TODO Should we parse resources here / Should methods consume resources?
 	}
 	
-	public PFD0Method create() {
+	public PFD0Method create() throws ParsingException {
 		PFD0Precondition[] preconditions = createPreconditions(false);
 
 		String headname = HybridDomain.extractName(head);
@@ -34,10 +35,10 @@ public class MethodParser extends PlanReportroiryItemParser {
 		// add additional constraints from head to head or between preconditions or effects
 		ret.setAdditionalConstraints(filterAdditionalConstraints());
 		
-		Map<String,String[]> variablesPossibleValuesMap = parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD);
+		Map<String,String[]> variablesPossibleValuesMap = parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD);
 		ret.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		
-		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD);
+		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD, HybridDomain.NOT_TYPE_KEYWORD);
 		ret.setVariablesImpossibleValuesMap(variablesImpossibleValuesMap);
 		
 		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();

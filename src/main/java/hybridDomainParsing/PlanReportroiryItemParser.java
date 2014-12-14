@@ -13,8 +13,10 @@ import org.metacsp.time.Bounds;
 import pfd0Symbolic.AdditionalConstraintTemplate;
 import pfd0Symbolic.EffectTemplate;
 import pfd0Symbolic.FluentNetworkSolver;
+import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PFD0Precondition;
 import pfd0Symbolic.PlanReportroryItem;
+import sun.security.pkcs.ParsingException;
 
 import com.google.common.primitives.Ints;
 
@@ -22,6 +24,7 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final String textualSpecification;
 	protected final FluentNetworkSolver groundSolver;
+	protected final PFD0Planner planner;
 	protected final int maxArgs;
 
 	protected final String head;
@@ -33,10 +36,12 @@ public abstract class PlanReportroiryItemParser {
 	protected final Map<String, Map<String, Integer>> variableOccurrencesMap = 
 			new HashMap<String, Map<String, Integer>>();
 
-	public PlanReportroiryItemParser(String textualSpecification, FluentNetworkSolver groundSolver, 
+	public PlanReportroiryItemParser(String textualSpecification, PFD0Planner planner, 
 			int maxArs) {
 		this.textualSpecification = textualSpecification;
-		this.groundSolver = groundSolver;
+		
+		this.planner = planner;
+		this.groundSolver = (FluentNetworkSolver) planner.getConstraintSolvers()[0];
 		this.maxArgs = maxArs;
 
 		this.head = HybridDomain.parseKeyword(HybridDomain.HEAD_KEYWORD, textualSpecification)[0].trim();
@@ -54,7 +59,7 @@ public abstract class PlanReportroiryItemParser {
 		parseAllenIntervalConstraints();
 	}
 	
-	public abstract PlanReportroryItem create();
+	public abstract PlanReportroryItem create() throws ParsingException;
 	
 	protected void addVariableOccurrences(String[] argStrings, String key) {
 		for (int i = 0; i < argStrings.length;  i++) {
@@ -130,15 +135,42 @@ public abstract class PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	protected Map<String,String[]> parseValueRestrictions(String keyword) {
+	protected Map<String,String[]> parseValueRestrictions(String valueKeyword, String typeKeyword) throws ParsingException {
 		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
 		// Parse variable definitions
-		String[] varElements = HybridDomain.parseKeyword(keyword, textualSpecification);
+		String[] varElements = HybridDomain.parseKeyword(valueKeyword, textualSpecification);
 		for (String varElement : varElements) {
 			String varName = varElement.substring(0, varElement.indexOf(" ")).trim();
 			String[] values = varElement.substring(varElement.indexOf(" ")).trim().split(" ");
 			variablesPossibleValuesMap.put(varName, values);
 		}
+		
+		String[] typeElements = HybridDomain.parseKeyword(valueKeyword, textualSpecification);
+		Map<String, String[]> typesInstancesMap = planner.getTypesInstancesMap();
+		if (typesInstancesMap == null && typeElements.length > 0) {
+			throw new ParsingException("Specified types in the domain but the planner does not know the instances.");
+		}
+		for (String typeElement : typeElements) {
+			String varName = typeElement.substring(0, typeElement.indexOf(" ")).trim();
+			if (!variablesPossibleValuesMap.containsKey(varName)) {        // only add type restriction if ValueRestriction not used.
+				
+				String[] types = typeElement.substring(typeElement.indexOf(" ")).trim().split(" ");
+				List<String> values = new ArrayList<String>();
+				for (String type : types) {
+					String[] instances = typesInstancesMap.get(type);
+					if (instances != null) {
+						for (String instance : instances) {
+							values.add(instance);
+						}
+					} else {
+						throw new ParsingException("Type " + type + " specified but not in typesInstancesMap");
+					}
+				}
+				variablesPossibleValuesMap.put(varName, values.toArray(new String[values.size()]));
+			}
+			
+		}
+		
 		return variablesPossibleValuesMap;
 	}
 	

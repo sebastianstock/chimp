@@ -1,5 +1,6 @@
 package pfd0Symbolic;
 
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -19,6 +20,8 @@ import unify.CompoundSymbolicValueConstraint;
 public class PFD0Planner extends MetaConstraintSolver {
 
 	private static final long serialVersionUID = 8031573555691611305L;
+	
+	private Map<String, String[]> typesInstancesMap;
 
 	public PFD0Planner(long origin, long horizon, long animationTime, String[][] symbols, 
 			int[] symbolicingredients) {
@@ -192,6 +195,14 @@ public class PFD0Planner extends MetaConstraintSolver {
 	protected void resetFalseClause() {
 		// Auto-generated method stub
 
+	}
+
+	public Map<String, String[]> getTypesInstancesMap() {
+		return typesInstancesMap;
+	}
+
+	public void setTypesInstancesMap(Map<String, String[]> typesInstancesMap) {
+		this.typesInstancesMap = typesInstancesMap;
 	}
 
 }

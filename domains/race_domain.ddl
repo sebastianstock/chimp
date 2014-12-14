@@ -392,7 +392,9 @@
  (Pre p1 RobotAt(?fromArea))
  (VarDifferent ?toArea ?fromArea)
 
- (NotValues ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
+# (NotValues ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
+ (NotType ?fromArea ManipulationArea)
+
   
 # (Constraint Duration[20,30](task))
  (Sub s1 torso_assume_driving_pose())
@@ -410,7 +412,8 @@
  (Pre p1 RobotAt(?fromArea))
  (VarDifferent ?toArea ?fromArea)
 
- (Values ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
+# (Values ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
+ (Type ?fromArea ManipulationArea)
   
  # (Constraint Duration[20,30](task))
 

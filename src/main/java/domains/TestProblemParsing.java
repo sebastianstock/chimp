@@ -4,6 +4,8 @@ import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -44,12 +46,19 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose0.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_0.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl");
 		
 		String[][] symbols = RACEProblemsSingle.createSymbols();
 		int[] ingredients = RACEProblemsSingle.createIngredients();
+		
+		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
+		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
+				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
+				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
+		
 		PFD0Planner planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
+		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		initPlanner(planner, "domains/race_domain.ddl");
