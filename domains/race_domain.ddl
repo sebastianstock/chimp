@@ -631,9 +631,47 @@
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
   (Constraint Finishes(s3,task))
+) # TODO Could be merged into get_object_w_arm
+
+### GET_OBJECT_W_ARM
+# 1. already holding another object
+## put it on the counter TODO LEFT OUT FOR NOW
+
+# 2. Robot is at preArea
+(:method 
+  (Head get_object_w_arm(?object ?arm))
+  
+  (Pre p1 RobotAt(?preArea))
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
+  (Pre p3 On(?object ?plArea))
+
+  #(Pre p4 Holding(?arm ?nothing)) # checked in pick-up
+  #(Values ?nothing nothing)
+
+  (Sub s1 grasp_object_w_arm(?object ?arm))
+
+  (Constraint Equals(s1,task))
 )
 
+# 3. Robot is not at preArea
+(:method 
+  (Head get_object_w_arm(?object ?arm))
+  
+  (Pre p1 RobotAt(?robotArea))
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
+  (Pre p3 On(?object ?plArea))
+  (VarDifferent ?robotArea ?preArea) 
 
+  #(Pre p4 Holding(?arm ?nothing)) # checked in pick-up
+  #(Values ?nothing nothing)
+
+  (Sub s1 drive_robot(?preArea))
+  (Sub s2 grasp_object_w_arm(?object ?arm))
+
+  (Ordering s1 s2)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s2,task))
+)
 
 ### UNUSED:
 

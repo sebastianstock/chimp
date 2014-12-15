@@ -25,11 +25,11 @@ public class RACEProblemsSingle {
 				// methods
 				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
 				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
-				"leave_manipulation_pose", "grasp_object_w_arm",
+				"leave_manipulation_pose", "grasp_object_w_arm", "get_object_w_arm",
 				
 				// old_methods
 				
-				"drive", "assume_default_driving_pose", "get_object_w_arm"
+				"drive", "assume_default_driving_pose"
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
