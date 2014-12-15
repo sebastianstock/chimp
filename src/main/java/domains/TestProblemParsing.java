@@ -62,9 +62,10 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_4.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_5.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 		
 		String[][] symbols = RACEProblemsSingle.createSymbols();
 		int[] ingredients = RACEProblemsSingle.createIngredients();

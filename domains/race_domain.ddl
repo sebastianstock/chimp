@@ -729,7 +729,59 @@
   (Constraint Equals(s3,task))
 )
 
-# TODO Two more methods for tray usage
+# TODO Three more methods for tray usage
+
+### MOVE_OBJECT
+(:method 
+  (Head move_object(?object ?toArea))
+
+  (Pre p1 On(?object ?fromArea))
+
+  (Values ?toArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+  (Values ?leftArm leftArm1)
+  
+  (Sub s1 get_object_w_arm(?object ?leftArm))
+  (Sub s2 put_object(?object ?toArea))
+
+  (Ordering s1 s2)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s2,task))
+)
+
+(:method 
+  (Head move_object(?object ?toArea))
+
+  (Pre p1 On(?object ?fromArea))
+
+  (Values ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+  (Values ?leftArm leftArm1)
+  
+  (Sub s1 get_object_w_arm(?object ?leftArm))
+  (Sub s2 put_object(?object ?toArea))
+
+  (Ordering s1 s2)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s2,task))
+  )
+
+(:method 
+  (Head move_object(?object ?toArea))
+
+  (Pre p1 On(?object ?fromArea))
+
+  (NotValues ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+  (NotValues ?toArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+  (Values ?rightArm rightArm1)
+  
+  (Sub s1 get_object_w_arm(?object ?rightArm))
+  (Sub s2 put_object(?object ?toArea))
+
+  (Ordering s1 s2)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s2,task))
+)
+
+
 
 ### UNUSED:
 
