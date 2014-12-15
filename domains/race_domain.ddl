@@ -56,13 +56,9 @@
  (Constraint OverlappedBy(task,p1))
 # (Constraint Duration[5,INF](task))
  (Add e1 RobotAt(?toArea))
-# (Constraint Overlaps(task,e1)) # not needed
  (Del p1)
  (ResourceUsage 
   (Usage navigationCapacity 1))
- 
- #(Add e7 RobotAt(preManipulationAreaWestTable2))
- #(Constraint OverlappedBy(task,e7))
 )
 
 # MOVE_BASE_BLIND   PreArea to ManArea
@@ -205,6 +201,30 @@
  
  (Constraint Duration[5,5](task))
  (Constraint OverlappedBy(task,p1))
+ (Constraint Overlaps(task,e1))
+ )
+
+(:operator # if arm is tucked the other must not be tucked
+ (Head !move_arm_to_side(?arm))
+ (Pre p1 HasArmPosture(?arm ?oldPosture))
+ (Pre p2 HasArmPosture(?otherArm ?otherPosture))
+ (Del p1)
+ (Add e1 HasArmPosture(?arm ?newPosture))
+
+ (Values ?oldPosture ArmTuckedPosture)
+ (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
+ (Values ?newPosture ArmToSidePosture)
+
+ (ResourceUsage 
+    (Usage leftArm1ManCapacity 1)
+    (Param 1 leftArm1))
+ (ResourceUsage 
+    (Usage rightArm1ManCapacity 1)
+    (Param 1 rightArm1))
+ 
+ (Constraint Duration[5,5](task))
+ (Constraint OverlappedBy(task,p1))
+ (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
 )
 
@@ -432,4 +452,145 @@
  (Ordering s1 s3)
  (Ordering s2 s3)
 )
+
+### MOVE_BOTH_ARMS_TO_SIDE
+## 1. both arms tucked:
+## untuck first
+## move left and move right
+(:method 
+ (Head move_both_arms_to_side())
+  (Pre p1 HasArmPosture(?leftArm ?armPosture))
+  (Pre p2 HasArmPosture(?rightArm ?armPosture))
+
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (Values ?armPosture ArmTuckedPosture)
+
+  (Sub s1 !tuck_arms(?untuckedPosture ?untuckedPosture))
+  (Values ?untuckedPosture ArmUnTuckedPosture)
+
+  (Sub s2 !move_arm_to_side(?leftArm))
+  (Sub s3 !move_arm_to_side(?rightArm))
+
+  (Ordering s1 s2)
+  (Ordering s1 s3)
+  (Constraint Starts(s1,task))
+
+  (Constraint Duration[10,16](task))
+)
+
+## 2. left arm at side, right not
+## move right arm to side
+(:method 
+ (Head move_both_arms_to_side())
+  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (Values ?leftPosture ArmToSidePosture)
+  (NotValues ?rightPosture ArmToSidePosture)
+
+  (Sub s1 !move_arm_to_side(?rightArm))
+  (Constraint Equals(s1,task))
+)
+
+# 3. right arm at side, left not
+## move left to side
+(:method 
+ (Head move_both_arms_to_side())
+  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (NotValues ?leftPosture ArmToSidePosture)
+  (Values ?rightPosture ArmToSidePosture)
+
+  (Sub s1 !move_arm_to_side(?leftArm))
+  (Constraint Equals(s1,task))
+)
+
+# 4. both at side: nothing to do
+(:method 
+ (Head move_both_arms_to_side())
+  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (Values ?leftPosture ArmToSidePosture)
+  (Values ?rightPosture ArmToSidePosture)
+  
+  (Constraint Duration[0,0](task))
+)
+
+# 5. both not at side and not tucked
+## move left and move right
+(:method 
+ (Head move_both_arms_to_side())
+  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (NotValues ?leftPosture ArmToSidePosture ArmTuckedPosture)
+  (NotValues ?rightPosture ArmToSidePosture ArmTuckedPosture)
+
+  (Sub s1 !move_arm_to_side(?leftArm))
+  (Sub s2 !move_arm_to_side(?rightArm))
+  (Constraint Duration[5,10](task))
+)
+
+
+
+
+### BOTHARMS_ASSUME_MANIPULATION_POSE
+
+
+
+(:method    # move arm to side
+ (Head arm_assume_manipulation_pose(?arm))
+  (Pre p1 HasArmPosture(?arm ?armPosture))
+
+  (NotValues ?armPosture ArmToSidePosture)
+
+  (Sub s1 move_arm_to_side_method(?sidePosture))
+  (Values ?sidePosture ArmToSidePosture)
+
+  (Constraint Equals(s1,task))
+)
+
+
+
+### UNUSED:
+
+# Use both_arms_assume_manipulation_pose instead
+# and assume_botharms_manipulation_pose
+
+(:method    # move arm to side
+ (Head arm_assume_manipulation_pose(?arm))
+  (Pre p1 HasArmPosture(?arm ?armPosture))
+
+  (NotValues ?armPosture ArmToSidePosture)
+
+  (Sub s1 move_arm_to_side_method(?sidePosture))
+  (Values ?sidePosture ArmToSidePosture)
+
+  (Constraint Equals(s1,task))
+)
+
+# TODO SHOP2 domain has another method to move the other arm (line 896)
+
+(:method    # already there
+ (Head arm_assume_manipulation_pose(?arm))
+  (Pre p1 HasArmPosture(?arm ?sidePosture))
+
+  (Values ?sidePosture ArmToSidePosture)
+
+  (Constraint Duration[0,0](task))
+  (Constraint During(task,p1))
+)
+
+
 

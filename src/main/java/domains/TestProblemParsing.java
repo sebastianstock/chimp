@@ -46,8 +46,13 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose0.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_0.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_2.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_3.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_4.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_5.pdl");
 		
 		String[][] symbols = RACEProblemsSingle.createSymbols();
 		int[] ingredients = RACEProblemsSingle.createIngredients();
@@ -86,7 +91,7 @@ public class TestProblemParsing {
 
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
 		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
