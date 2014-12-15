@@ -601,6 +601,16 @@
   (Constraint Finishes(s3,task))
 )
 
+### LEAVE_MANIPULATION_POSE
+(:method 
+ (Head leave_manipulation_pose(?manArea))
+  (Pre p1 RobotAt(?manArea))
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
+
+  (Sub s1 !move_base_blind(?preArea))
+  (Constraint Equals(s1,task))
+)
+
 
 
 ### UNUSED:
