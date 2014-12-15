@@ -92,8 +92,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 						con.setFrom(((Fluent) f).getAllenInterval());
 						con.setTo(((Fluent) t).getAllenInterval());
 					} else {
-						con.setFrom(((Fluent) f).getAllenInterval());
-						con.setTo(((Fluent) t).getAllenInterval());
+						con.setFrom(((Fluent) t).getAllenInterval());
+						con.setTo(((Fluent) f).getAllenInterval());
 					}
 					retList.add(con);
 				}
@@ -136,8 +136,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 						con.setFrom(((Fluent) f).getAllenInterval());
 						con.setTo(((Fluent) t).getAllenInterval());
 					} else {
-						con.setFrom(((Fluent) f).getAllenInterval());
-						con.setTo(((Fluent) t).getAllenInterval());
+						con.setFrom(((Fluent) t).getAllenInterval());
+						con.setTo(((Fluent) f).getAllenInterval());
 					}
 					retList.add(con);
 				}

@@ -60,9 +60,6 @@ public class PFD0Method extends PlanReportroryItem {
 				if (et.hasAdditionalConstraints()) {
 					dc.setAdditionalConstraints(et.getAdditionalConstraints());
 				}
-				if (et.hasAdditionalConstraints()) {
-					dc.setAdditionalConstraints(et.getAdditionalConstraints());
-				}
 				newConstraints.add(dc);
 				
 				subtasksWithoutSuccessor.add(subPrototype);
