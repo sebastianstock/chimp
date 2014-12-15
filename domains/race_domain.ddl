@@ -609,6 +609,28 @@
 
   (Sub s1 !move_base_blind(?preArea))
   (Constraint Equals(s1,task))
+ )
+
+### GRASP_OBJECT_W_ARM
+(:method 
+  (Head grasp_object_w_arm(?object ?arm))
+  
+#  (Pre p1 RobotAt(?preArea))  # checked in assume_manipulation_pose
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
+  (Pre p3 On(?object ?plArea))
+
+  #(Pre p4 Holding(?arm ?nothing)) # checked in pick-up
+  #(Values ?nothing nothing)
+
+  (Sub s1 assume_manipulation_pose(?manArea))
+  (Sub s2 !observe_objects_on_area(?plArea))
+  (Sub s3 !pick_up_object(?object ?arm))
+  
+  (Ordering s1 s3)
+  (Ordering s1 s2)
+  (Ordering s2 s3)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s3,task))
 )
 
 
