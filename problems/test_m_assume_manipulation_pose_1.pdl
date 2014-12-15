@@ -1,0 +1,21 @@
+(Problem
+
+
+(Fluent f1 HasArmPosture(leftArm1 ArmToSidePosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmToSidePosture))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 HasTorsoPosture(TorsoUpPosture))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 RobotAt(manipulationAreaSouthTable1))
+(Constraint Release[0,0](f4))
+
+
+
+(Task t0 assume_manipulation_pose(manipulationAreaSouthTable1))
+(Constraint Release[0,1](t0))
+
+)

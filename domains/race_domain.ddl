@@ -543,22 +543,62 @@
 )
 
 
+### ASSUME_MANIPULATION_POSE
+# 1. nothing to do
+(:method 
+ (Head assume_manipulation_pose(?manArea))
+  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+  (Pre p3 RobotAt(?manArea))
+  (Pre p4 HasTorsoPosture(?torsoPosture))
 
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (Values ?leftPosture ArmToSidePosture)
+  (Values ?rightPosture ArmToSidePosture)
+  (Values ?torsoPosture TorsoUpPosture)
+  
+  (Constraint Duration[0,0](task))
+)
 
-### BOTHARMS_ASSUME_MANIPULATION_POSE
+# 2. standard behaviour
+(:method 
+ (Head assume_manipulation_pose(?manArea))
+  (Pre p1 RobotAt(?preArea))
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
 
+  (Sub s1 adapt_torso(?torsoUpPosture))
+  (Sub s2 move_both_arms_to_side())
+  (Sub s3 !move_base_blind(?manArea))
+  
+  (Ordering s1 s3)
+  (Ordering s2 s3)
+  (Constraint Starts(s1,task))
+  (Constraint Starts(s2,task))
+  (Constraint Finishes(s3,task))
+)
 
-
-(:method    # move arm to side
- (Head arm_assume_manipulation_pose(?arm))
-  (Pre p1 HasArmPosture(?arm ?armPosture))
+# first move back to preArea
+(:method 
+ (Head assume_manipulation_pose(?manArea))
+  (Pre p1 RobotAt(?manArea))
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
+  (Pre p3 HasArmPosture(?arm ?armPosture))
 
   (NotValues ?armPosture ArmToSidePosture)
 
-  (Sub s1 move_arm_to_side_method(?sidePosture))
-  (Values ?sidePosture ArmToSidePosture)
+  (Sub s0 !move_base_blind(?preArea))
+  (Sub s1 adapt_torso(?torsoUpPosture))
+  (Sub s2 move_both_arms_to_side())
+  (Sub s3 !move_base_blind(?manArea))
 
-  (Constraint Equals(s1,task))
+  (Ordering s0 s1)
+  (Ordering s0 s2)
+  (Ordering s0 s3)
+  (Ordering s1 s3)
+  (Ordering s2 s3)
+  (Constraint Starts(s0,task))
+  (Constraint Finishes(s3,task))
 )
 
 

@@ -1,0 +1,40 @@
+(Problem
+
+
+(Fluent c0 Connected(placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1))
+(Constraint Release[0,0](c0))
+(Fluent c1 Connected(placingAreaWestLeftTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1))
+(Constraint Release[0,0](c1))
+(Fluent c2 Connected(placingAreaEastLeftTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1))
+(Constraint Release[0,0](c2))
+(Fluent c3 Connected(placingAreaWestRightTable1 manipulationAreaSouthTable1 preManipulationAreaSouthTable1))
+(Constraint Release[0,0](c3))
+(Fluent c4 Connected(placingAreaEastRightTable1 manipulationAreaNorthTable1 preManipulationAreaNorthTable1))
+(Constraint Release[0,0](c4))
+(Fluent c5 Connected(placingAreaNorthLeftTable2 manipulationAreaEastTable2  preManipulationAreaEastTable2))
+(Constraint Release[0,0](c5))
+(Fluent c6 Connected(placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2))
+(Constraint Release[0,0](c6))
+(Fluent c7 Connected(placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2))
+(Constraint Release[0,0](c7))
+(Fluent c8 Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2))
+(Constraint Release[0,0](c8))
+
+(Fluent f1 HasArmPosture(leftArm1 ArmTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 HasArmPosture(rightArm1 ArmTuckedPosture))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 HasTorsoPosture(TorsoDownPosture))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 RobotAt(preManipulationAreaSouthTable1))
+(Constraint Release[0,0](f4))
+
+
+
+(Task t0 assume_manipulation_pose(manipulationAreaSouthTable1))
+(Constraint Release[0,1](t0))
+
+)
