@@ -531,16 +531,18 @@
  (Head move_both_arms_to_side())
   (Pre p1 HasArmPosture(?leftArm ?leftPosture))
   (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+  (Pre p3 HasArmPosture(?arm ?notTucked))
 
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
-  (NotValues ?leftPosture ArmToSidePosture ArmTuckedPosture)
-  (NotValues ?rightPosture ArmToSidePosture ArmTuckedPosture)
+  (NotValues ?leftPosture ArmToSidePosture)
+  (NotValues ?rightPosture ArmToSidePosture)
+  (NotValues ?notTucked ArmTuckedPosture)
 
   (Sub s1 !move_arm_to_side(?leftArm))
   (Sub s2 !move_arm_to_side(?rightArm))
   (Constraint Duration[5,10](task))
-)
+  )
 
 
 ### ASSUME_MANIPULATION_POSE
@@ -672,6 +674,62 @@
   (Constraint Starts(s1,task))
   (Constraint Finishes(s2,task))
 )
+
+### PUT_OBJECT
+# 1. not at premanipulationarea or manipulationarea -> drive
+(:method 
+  (Head put_object(?object ?plArea))
+
+  (Pre p1 Holding(?arm ?object))
+  (Pre p2 RobotAt(?robotArea))
+  
+  (Pre p3 Connected(?plArea ?manArea ?preArea))
+  (VarDifferent ?robotArea ?preArea)
+  (VarDifferent ?robotArea ?manArea)
+
+  (Sub s1 drive_robot(?preArea))
+  (Sub s2 assume_manipulation_pose(?manArea))
+  (Sub s3 !place_object(?object ?arm ?plArea))
+
+  (Ordering s1 s2)
+  (Ordering s1 s3)
+  (Ordering s2 s3)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s3,task))
+)
+
+# 2. at premanipulationarea
+(:method 
+  (Head put_object(?object ?plArea))
+
+  (Pre p1 Holding(?arm ?object))
+  (Pre p2 RobotAt(?preArea))
+  
+  (Pre p3 Connected(?plArea ?manArea ?preArea))
+
+  (Sub s2 assume_manipulation_pose(?manArea))
+  (Sub s3 !place_object(?object ?arm ?plArea))
+
+  (Ordering s2 s3)
+  (Constraint Starts(s2,task))
+  (Constraint Finishes(s3,task))
+)
+
+# 3. at manipulationarea
+(:method 
+  (Head put_object(?object ?plArea))
+
+  (Pre p1 Holding(?arm ?object))
+  (Pre p2 RobotAt(?manArea))
+  
+  (Pre p3 Connected(?plArea ?manArea ?preArea))
+
+  (Sub s3 !place_object(?object ?arm ?plArea))
+
+  (Constraint Equals(s3,task))
+)
+
+# TODO Two more methods for tray usage
 
 ### UNUSED:
 
