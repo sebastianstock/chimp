@@ -9,7 +9,7 @@
 
 
 
-(Task t0 !tuck_arms(ArmTuckedPosture ArmUnTuckedPosture))
+(Task t0 !tuck_arms(ArmTuckedPosture ArmTuckedPosture))
 (Constraint Release[0,1](t0))
 (Constraint Duration[5,10](t0))
 

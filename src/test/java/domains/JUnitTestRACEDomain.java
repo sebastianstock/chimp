@@ -55,14 +55,17 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 	
 	@Test
 	public void testOpMoveBase() {
+		fluentSolver.deplenish();
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 
 	@Test
@@ -71,6 +74,7 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 	
 	@Test
@@ -79,6 +83,7 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 	
 		@Test
@@ -87,6 +92,7 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 		
 			@Test
@@ -95,6 +101,7 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 			
 				@Test
@@ -103,6 +110,7 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 				
 					@Test
@@ -111,6 +119,7 @@ public class JUnitTestRACEDomain {
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
 	}
 
 

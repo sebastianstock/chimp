@@ -26,7 +26,7 @@ public class RACEProblemsSingle {
 				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
 				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
 				"leave_manipulation_pose", "grasp_object_w_arm", "get_object_w_arm", "put_object",
-				"move_object"
+				"move_object", "serve_coffee_to_guest"
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -51,6 +51,7 @@ public class RACEProblemsSingle {
 				"leftArm1", "rightArm1", 
 				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
 				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
+				"coffeeJug1", "milkPot1", "sugarPot1", "sugarPot2",
 				N};
 		return symbols;
 	}

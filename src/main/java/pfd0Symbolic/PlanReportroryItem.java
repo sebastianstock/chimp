@@ -371,7 +371,7 @@ public abstract class PlanReportroryItem {
 
 				ret.add(cn);
 			} else {
-				logger.fine("Ommitting non-feasible CN");
+				logger.finest("Ommitting non-feasible CN");
 			}
 		}
 		return ret;		

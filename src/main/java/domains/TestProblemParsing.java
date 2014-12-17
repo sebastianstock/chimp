@@ -54,18 +54,20 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_4.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_5.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_2.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_3.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_2.pdl"); // PROBLEM uses Connected -> two options
+//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_3.pdl");  // Much backtracking
 //		ProblemParser pp = new ProblemParser("problems/test_m_leave_manipulation_pose_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_grasp_object_w_arm_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
 		String[][] symbols = RACEProblemsSingle.createSymbols();
 		int[] ingredients = RACEProblemsSingle.createIngredients();
@@ -112,12 +114,12 @@ public class TestProblemParsing {
 		return result;
 	}
 	
-	private static void extractPlan(FluentNetworkSolver fluentSolver) {
+	public static void extractPlan(FluentNetworkSolver fluentSolver) {
 		PlanExtractor planEx = new PlanExtractor(fluentSolver);
 		planEx.printPlan();
 	}
 	
-	private static void initPlanner(PFD0Planner planner, String domainPath) {
+	public static void initPlanner(PFD0Planner planner, String domainPath) {
 		// load domain
 		HybridDomain dom;
 		try {

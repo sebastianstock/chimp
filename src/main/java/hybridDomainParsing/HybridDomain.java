@@ -145,7 +145,7 @@ public class HybridDomain{
 				name = parseKeyword(DOMAIN_KEYWORD, everything)[0];
 				
 				maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, everything)[0]);
-				System.out.println("MaxArgs " + maxArgs);
+//				System.out.println("MaxArgs " + maxArgs);
 				
 				// Parse Resources and create ResourceSchedulers
 				String[] resourceElements = parseKeyword(RESOURCE_KEYWORD, everything);
@@ -170,12 +170,11 @@ public class HybridDomain{
 					}
 				}
 				
-				System.out.println(everything);
 				String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, everything);
 				for (String operatorstr : planningOperators) {
 					OperatorParser oParser = new OperatorParser(operatorstr, planner, maxArgs);
 					PFD0Operator op = oParser.create();
-					System.out.println("Created Operator: " + op);
+//					System.out.println("Created Operator: " + op);
 					this.operators.addElement(op);
 				}
 				
@@ -183,7 +182,7 @@ public class HybridDomain{
 				for (String methodStr : planningMethods) {
 					MethodParser mParser = new MethodParser(methodStr, planner, maxArgs);
 					PFD0Method m = mParser.create();
-					System.out.println("Created Method: " + m);
+//					System.out.println("Created Method: " + m);
 					this.methods.addElement(m);
 				}
 				

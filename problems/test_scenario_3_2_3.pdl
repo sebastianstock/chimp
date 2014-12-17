@@ -1,5 +1,28 @@
-(Problem
+#==Initial situation==
+# * T starts at an remote position where she can observe table2
+# * on counter:
+# ** milk pot
+# ** coffee jug
+# ** sugarPot1
+# * on table1:
+# ** sugarPot2
+# * on table2: 
+# ** 1-2 mugs
+# ** two plates, two spoons, two forks in standard table setting (not needed for planning)
 
+# ==D3.2.3 Hybrid Planning==
+# * T plans with Hybrid HTN to serve a coffee, a sugar pot and milk
+# * T executes plan:
+# ** T moves to counter
+# ** picks up coffee jug + milk ..using tray can be another demo which shows this possibility but should be shown on the video
+# ** moves back to table2
+# ** puts down coffee jug + milk
+# ** goes to table1 (because it's closer) and picks up sugar pot and the sugar pot has to be delivered after delivering coffee with# flexible bounds
+# ** delivers sugar pot to table2
+
+
+
+(Problem
 
 (Fluent c0 Connected(placingAreaEastRightCounter1 manipulationAreaEastCounter1 preManipulationAreaEastCounter1))
 (Constraint Release[0,0](c0))
@@ -38,12 +61,24 @@
 (Fluent f7 Holding(leftArm1 nothing))
 (Constraint Release[0,0](f7))
 
-#(Fluent f8 On(mug1 placingAreaSouthLeftTable2))
-(Fluent f8 On(mug1 placingAreaSouthRightTable2))
+(Fluent f8 On(milkPot1 placingAreaEastRightCounter1))
 (Constraint Release[0,0](f8))
 
+(Fluent f9 On(coffeeJug1 placingAreaEastRightCounter1))
+(Constraint Release[0,0](f9))
 
-(Task t0 move_object(mug1 placingAreaEastRightTable1))
+(Fluent f10 On(sugarPot1 placingAreaEastRightCounter1))
+(Constraint Release[0,0](f10))
+
+(Fluent f11 On(sugarPot2 placingAreaWestLeftTable1))
+(Constraint Release[0,0](f11))
+
+
+#(Fluent f8 On(mug1 placingAreaNorthLeftTable2))
+#(Constraint Release[0,0](f8))
+
+
+(Task t0 move_object(milkPot1 placingAreaNorthLeftTable2))
 (Constraint Release[0,1](t0))
 
 )

@@ -67,7 +67,7 @@
  (Pre p1 RobotAt(?preArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[10,10](task))
+ (Constraint Duration[10 ,10](task))
  (Add e1 RobotAt(?mArea))
  (Constraint Overlaps(task,e1))
  (Del p1)
@@ -81,7 +81,7 @@
  (Pre p1 RobotAt(?mArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[3,10](task))
+ (Constraint Duration[10,10](task))
  (Add e1 RobotAt(?preArea))
  (Constraint Overlaps(task,e1))
  (Del p1)
@@ -397,14 +397,15 @@
 )  # todo check nothing on tray
 
 
-###
+### DRIVE_ROBOT
 
 (:method    # already there
  (Head drive_robot(?toArea))
   (Pre p1 RobotAt(?toArea))
   (Constraint During(task,p1))
   (Constraint Duration[0,0](task))
- )
+  )
+
 
 (:method    # not at manipulationarea
  (Head drive_robot(?toArea))
@@ -412,19 +413,20 @@
  (Pre p1 RobotAt(?fromArea))
  (VarDifferent ?toArea ?fromArea)
 
-# (NotValues ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
  (NotType ?fromArea ManipulationArea)
 
-  
 # (Constraint Duration[20,30](task))
- (Sub s1 torso_assume_driving_pose())
- # (Constraint During(s1,task))
- (Sub s2 arms_assume_driving_pose())
+  (Sub s1 torso_assume_driving_pose())
+  (Constraint Starts(s1,task))
+   (Sub s2 arms_assume_driving_pose())
+  (Constraint Starts(s2,task))
 
- (Sub s3 !move_base(?toArea))
+  (Sub s3 !move_base(?toArea))
+  (Constraint Finishes[1,6](s3,task)) # TOO Restricting?
  (Ordering s1 s3)
  (Ordering s2 s3)
  )
+
 
 (:method    # at manipulationarea
  (Head drive_robot(?toArea))
@@ -432,20 +434,20 @@
  (Pre p1 RobotAt(?fromArea))
  (VarDifferent ?toArea ?fromArea)
 
-# (Values ?fromArea manipulationAreaEastCounter1 manipulationAreaNorthTable1) # TODO: USE TYPE!!!
  (Type ?fromArea ManipulationArea)
-  
- # (Constraint Duration[20,30](task))
 
  (Pre p2 Connected(?plArea ?fromArea ?preArea))
 
  (Sub s0 !move_base_blind(?preArea))
+ (Constraint Starts(s0,task))
    
  (Sub s1 torso_assume_driving_pose())
- # (Constraint During(s1,task))
+ (Constraint Before[1,1](s0,s1))
  (Sub s2 arms_assume_driving_pose())
+ (Constraint Before[1,1](s0,s2))
 
  (Sub s3 !move_base(?toArea))
+ (Constraint Finishes[3,17](s3,task))
  (Ordering s0 s1)
  (Ordering s0 s2)
  (Ordering s0 s3)
@@ -466,8 +468,9 @@
   (Values ?rightArm rightArm1)
   (Values ?armPosture ArmTuckedPosture)
 
-  (Sub s1 !tuck_arms(?untuckedPosture ?untuckedPosture))
-  (Values ?untuckedPosture ArmUnTuckedPosture)
+  (Sub s1 !tuck_arms(?lUntuckedPosture ?rUntuckedPosture))
+  (Values ?lUntuckedPosture ArmUnTuckedPosture)
+  (Values ?rUntuckedPosture ArmUnTuckedPosture)
 
   (Sub s2 !move_arm_to_side(?leftArm))
   (Sub s3 !move_arm_to_side(?rightArm))
@@ -475,8 +478,11 @@
   (Ordering s1 s2)
   (Ordering s1 s3)
   (Constraint Starts(s1,task))
-
-  (Constraint Duration[10,16](task))
+  (Constraint Before[1,1](s1,s2))
+  (Constraint Before[1,1](s1,s3))
+  (Constraint Finishes(s2,task)) # Dangerous for execution
+  (Constraint Finishes(s3,task)) # Dangerous for execution
+  (Constraint Duration[11,16](task))
 )
 
 ## 2. left arm at side, right not
@@ -577,7 +583,7 @@
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
   (Constraint Starts(s2,task))
-  (Constraint Finishes(s3,task))
+  (Constraint Finishes[1,12](s3,task))
 )
 
 # first move back to preArea
@@ -600,7 +606,9 @@
   (Ordering s1 s3)
   (Ordering s2 s3)
   (Constraint Starts(s0,task))
-  (Constraint Finishes(s3,task))
+  (Constraint Before[1,1](s0,s1))
+  (Constraint Before[1,1](s0,s2))
+  (Constraint Finishes[1,23](s3,task))
 )
 
 ### LEAVE_MANIPULATION_POSE
@@ -632,6 +640,8 @@
   (Ordering s1 s2)
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
+  (Constraint Before[1,1](s1,s2))
+  (Constraint Before[1,1](s2,s3))
   (Constraint Finishes(s3,task))
 ) # TODO Could be merged into get_object_w_arm
 
@@ -651,7 +661,6 @@
   #(Values ?nothing nothing)
 
   (Sub s1 grasp_object_w_arm(?object ?arm))
-
   (Constraint Equals(s1,task))
 )
 
@@ -672,6 +681,7 @@
 
   (Ordering s1 s2)
   (Constraint Starts(s1,task))
+  (Constraint Before[1,1](s1,s2))
   (Constraint Finishes(s2,task))
 )
 
@@ -695,6 +705,8 @@
   (Ordering s1 s3)
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
+  (Constraint Before[1,1](s1,s2))
+  (Constraint Before[1,1](s2,s3))
   (Constraint Finishes(s3,task))
 )
 
@@ -712,6 +724,7 @@
 
   (Ordering s2 s3)
   (Constraint Starts(s2,task))
+  (Constraint Before[1,1](s2,s3))
   (Constraint Finishes(s3,task))
 )
 
@@ -745,6 +758,7 @@
 
   (Ordering s1 s2)
   (Constraint Starts(s1,task))
+  (Constraint Before[1,1](s1,s2))
   (Constraint Finishes(s2,task))
 )
 
@@ -781,7 +795,22 @@
   (Constraint Finishes(s2,task))
 )
 
+### SERVE_COFFEE_TO_GUEST
+(:method 
+  (Head serve_coffee_to_guest(?guest))
 
+  (Pre p1 On(?object ?fromArea))
+
+  (Values ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+  (Values ?leftArm leftArm1)
+  
+  (Sub s1 get_object_w_arm(?object ?leftArm))
+  (Sub s2 put_object(?object ?toArea))
+
+  (Ordering s1 s2)
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s2,task))
+  )
 
 ### UNUSED:
 
