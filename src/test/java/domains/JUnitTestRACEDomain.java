@@ -1,11 +1,11 @@
 package domains;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.ProblemParser;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -15,15 +15,12 @@ import org.junit.Test;
 
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.TaskSelectionMetaConstraint;
-import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
 
 public class JUnitTestRACEDomain {
 	
 	private static String[][] symbols;
 	private static int[] ingredients;
+	private static final Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 	
 	private PFD0Planner planner;
 	private FluentNetworkSolver fluentSolver;
@@ -32,6 +29,9 @@ public class JUnitTestRACEDomain {
 	public static void setUpBeforeClass() throws Exception {
 		symbols = RACEProblemsSingle.createSymbols();
 		ingredients = RACEProblemsSingle.createIngredients();
+		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
+				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
+				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
 	}
 
 	@AfterClass
@@ -40,53 +40,77 @@ public class JUnitTestRACEDomain {
 	@Before
 	public void setUp() throws Exception {
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
-		HybridDomain dom;
-		try {
-			dom = new HybridDomain(planner, "domains/race_domain.ddl");
-		} catch (DomainParsingException e) {
-			System.out.println("Error while parsing domain: " + e.getMessage());
-			e.printStackTrace();
-			return;
-		}
+		planner.setTypesInstancesMap(typesInstancesMap);
+
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
-		selectionConstraint.addOperators(dom.getOperators());
-		selectionConstraint.addMethods(dom.getMethods());
-		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
-		selectionConstraint.setResourceUsages(fluentResourceUsages);
-		planner.addMetaConstraint(selectionConstraint);
-		
-		for (FluentScheduler fs : dom.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
-		}
-		
-		for (FluentResourceUsageScheduler rs : dom.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
-		}
+		TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
 	}
 
 	@After
 	public void tearDown() throws Exception {}
 
 	@Test
-	public void testMoveBase() {
-		RACEProblemsSingle.createProblemMoveBase(fluentSolver);
+	public void testOpTuckArms() {
+		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
-		// TODO analyze plan
 	}
 	
 	@Test
-	public void testMoveBaseBlind() {
-		RACEProblemsSingle.createProblemMoveBaseBlind(fluentSolver);
+	public void testOpMoveBase() {
+		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
-		// TODO analyze plan
+	}
+
+	@Test
+	public void testOpMoveBaseBlind() {
+		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		assertTrue(planner.backtrack());
 	}
 	
 	@Test
-	public void testTuckArms() {
-		RACEProblemsSingle.createProblemTuckArms(fluentSolver);
+	public void testOpPickUpObject() {
+		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
-		// TODO analyze plan
+	}
+	
+		@Test
+	public void testOpPlaceObject() {
+		ProblemParser pp = new ProblemParser("problems/test_op_place_object.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		assertTrue(planner.backtrack());
+	}
+		
+			@Test
+	public void testOpMoveArmToSide() {
+		ProblemParser pp = new ProblemParser("problems/test_op_move_arm_to_side.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		assertTrue(planner.backtrack());
+	}
+			
+				@Test
+	public void testMoveArmsToCarryposture() {
+		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		assertTrue(planner.backtrack());
+	}
+				
+					@Test
+	public void testOpObserveObjectsOnArea() {
+		ProblemParser pp = new ProblemParser("problems/test_op_observe_objects_on_area.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		assertTrue(planner.backtrack());
 	}
 
 
