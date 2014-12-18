@@ -89,8 +89,13 @@ public class FluentScheduler extends Schedulable {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuilder sb = new StringBuilder("FluentScheduler ");
+		sb.append(predicateName);
+		sb.append(" : ");
+		sb.append(field);
+		sb.append(" : ");
+		sb.append(fieldValues);
+		return sb.toString();
 	}
 
 	@Override
