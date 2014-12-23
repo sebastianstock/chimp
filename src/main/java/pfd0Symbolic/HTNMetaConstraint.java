@@ -22,7 +22,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 import cern.colt.Arrays;
 
 
-public class TaskSelectionMetaConstraint extends MetaConstraint {
+public class HTNMetaConstraint extends MetaConstraint {
 	
 	private static final long serialVersionUID = 4546697317217126280L;
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
@@ -35,11 +35,11 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 	// true if we apply preonditions and effects at the same time.
 	private boolean oneShot; 
 
-	public TaskSelectionMetaConstraint() {
+	public HTNMetaConstraint() {
 		this(true);
 	}
 	
-	public TaskSelectionMetaConstraint(boolean oneShot) {
+	public HTNMetaConstraint(boolean oneShot) {
 		super(null, null);
 		this.oneShot = oneShot;
 //		operators = new Vector<PlanReportroryItem>();

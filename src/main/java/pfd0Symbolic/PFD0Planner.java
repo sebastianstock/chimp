@@ -46,7 +46,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 				v.setMarking(markings.UNJUSTIFIED);
 			}
 		} 
-		else if (mv.getMetaConstraint() instanceof TaskSelectionMetaConstraint) {
+		else if (mv.getMetaConstraint() instanceof HTNMetaConstraint) {
 			for (Variable v : mv.getConstraintNetwork().getVariables()) {
 				v.setMarking(markings.UNPLANNED);
 			}

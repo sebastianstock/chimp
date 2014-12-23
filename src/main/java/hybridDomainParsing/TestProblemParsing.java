@@ -10,7 +10,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.TaskSelectionMetaConstraint;
+import pfd0Symbolic.HTNMetaConstraint;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
@@ -180,7 +180,7 @@ public class TestProblemParsing {
 		}
 		
 		// init meta constraints based on domain
-		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
+		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint();
 		selectionConstraint.addOperators(dom.getOperators());
 		selectionConstraint.addMethods(dom.getMethods());
 		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
