@@ -1,22 +1,19 @@
 package axioms;
 
-import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import pfd0Symbolic.Fluent;
 import pfd0Symbolic.FluentConstraint;
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.PlanReportroryItem;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
-import pfd0Symbolic.TaskSelectionMetaConstraint;
 import unify.CompoundSymbolicVariableConstraintSolver;
 import domains.AAAIDomainSingle;
+import domains.TestProblemParsing;
 
 public class TestAxiomMetaConstraint {
 	
@@ -30,7 +27,8 @@ public class TestAxiomMetaConstraint {
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		initMetaConstraints();
+//		initMetaConstraints();
+		TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
 		createProblemPickUpObject(fluentSolver);
 
 		test();
@@ -70,17 +68,17 @@ public class TestAxiomMetaConstraint {
 		System.out.println("Finished");
 	}
 	
-	private static void initMetaConstraints() {
-		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
-		Vector<PlanReportroryItem> operators = AAAIDomainSingle.createOperators(fluentSolver);
-		selectionConstraint.addOperators(operators);
-		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
-		selectionConstraint.addMethods(methods);
-		planner.addMetaConstraint(selectionConstraint);
-		
-		AxiomMetaConstraint axiomConstraint = new AxiomMetaConstraint();
-		planner.addMetaConstraint(axiomConstraint);
-	}
+//	private static void initMetaConstraints() {
+//		TaskSelectionMetaConstraint selectionConstraint = new TaskSelectionMetaConstraint();
+//		Vector<PlanReportroryItem> operators = AAAIDomainSingle.createOperators(fluentSolver);
+//		selectionConstraint.addOperators(operators);
+//		Vector<PlanReportroryItem> methods = AAAIDomainSingle.createMethods(fluentSolver);
+//		selectionConstraint.addMethods(methods);
+//		planner.addMetaConstraint(selectionConstraint);
+//		
+//		AxiomMetaConstraint axiomConstraint = new AxiomMetaConstraint();
+//		planner.addMetaConstraint(axiomConstraint);
+//	}
 	
 	public static void createProblemPickUpObject(FluentNetworkSolver groundSolver) {
 		// State
