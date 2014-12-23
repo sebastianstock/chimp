@@ -63,8 +63,8 @@ public class TestRACEProblems {
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 		planner.addMetaConstraint(mbConstraint);
 		
-//		RACEProblemsSingle.createProblemMoveBase(fluentSolver);
-		RACEProblemsSingle.createProblemMoveBaseBlind(fluentSolver);
+		RACEProblemsSingle.createProblemMoveBase(fluentSolver);
+//		RACEProblemsSingle.createProblemMoveBaseBlind(fluentSolver);
 //		RACEProblemsSingle.createProblemTuckArms(fluentSolver);
 //		RACEProblemsSingle.createProblemMoveTorso(fluentSolver);
 //		RACEProblemsSingle.createProblemPickUpObject(fluentSolver);

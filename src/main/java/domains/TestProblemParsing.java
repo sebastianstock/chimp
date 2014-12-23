@@ -30,7 +30,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_fluent_scheduling.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
@@ -66,7 +66,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
@@ -98,7 +98,7 @@ public class TestProblemParsing {
 		extractPlan(fluentSolver);
 	}
 	
-	private static boolean plan(PFD0Planner planner, FluentNetworkSolver fluentSolver) {
+	public static boolean plan(PFD0Planner planner, FluentNetworkSolver fluentSolver) {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		long startTime = System.nanoTime();
