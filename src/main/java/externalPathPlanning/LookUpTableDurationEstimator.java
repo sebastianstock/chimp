@@ -1,4 +1,4 @@
-package externalPahtPlanning;
+package externalPathPlanning;
 
 import org.metacsp.time.Bounds;
 

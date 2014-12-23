@@ -19,9 +19,9 @@ import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
-import externalPahtPlanning.LookUpTableDurationEstimator;
-import externalPahtPlanning.MoveBaseDurationEstimator;
-import externalPahtPlanning.MoveBaseMetaConstraint;
+import externalPathPlanning.LookUpTableDurationEstimator;
+import externalPathPlanning.MoveBaseDurationEstimator;
+import externalPathPlanning.MoveBaseMetaConstraint;
 
 public class TestProblemParsing {
 

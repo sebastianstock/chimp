@@ -1,4 +1,4 @@
-package externalPahtPlanning;
+package externalPathPlanning;
 
 import java.util.List;
 import java.util.Vector;
