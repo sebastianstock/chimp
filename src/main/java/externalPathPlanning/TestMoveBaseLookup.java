@@ -1,6 +1,7 @@
 package externalPathPlanning;
 
 import hybridDomainParsing.ProblemParser;
+import hybridDomainParsing.TestProblemParsing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +12,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import unify.CompoundSymbolicVariableConstraintSolver;
-import domains.RACEProblemsSingle;
-import domains.TestProblemParsing;
 
 public class TestMoveBaseLookup {
 	
@@ -21,8 +20,8 @@ public class TestMoveBaseLookup {
 		
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 		
-		String[][] symbols = RACEProblemsSingle.createSymbols();
-		int[] ingredients = RACEProblemsSingle.createIngredients();
+		String[][] symbols = TestProblemParsing.createSymbols();
+		int[] ingredients = TestProblemParsing.createIngredients();
 		
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",

@@ -2,7 +2,7 @@ package domains;
 
 import static org.junit.Assert.assertTrue;
 import hybridDomainParsing.ProblemParser;
-import unify.CompoundSymbolicVariableConstraintSolver;
+import hybridDomainParsing.TestProblemParsing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class JUnitTestRACEDomainMethods {
 	
@@ -27,8 +28,8 @@ public class JUnitTestRACEDomainMethods {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		symbols = RACEProblemsSingle.createSymbols();
-		ingredients = RACEProblemsSingle.createIngredients();
+		symbols = TestProblemParsing.createSymbols();
+		ingredients = TestProblemParsing.createIngredients();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});

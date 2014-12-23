@@ -1,5 +1,7 @@
 package axioms;
 
+import hybridDomainParsing.TestProblemParsing;
+
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
@@ -12,8 +14,6 @@ import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariableConstraintSolver;
-import domains.AAAIDomainSingle;
-import domains.TestProblemParsing;
 
 public class TestAxiomMetaConstraint {
 	
@@ -21,8 +21,8 @@ public class TestAxiomMetaConstraint {
 	private static FluentNetworkSolver fluentSolver;
 
 	public static void main(String[] args) {
-		String[][] symbols = AAAIDomainSingle.createSymbols();
-		int[] ingredients = AAAIDomainSingle.createIngredients();
+		String[][] symbols = TestProblemParsing.createSymbols();
+		int[] ingredients = TestProblemParsing.createIngredients();
 		
 		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];

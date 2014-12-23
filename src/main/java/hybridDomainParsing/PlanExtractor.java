@@ -1,4 +1,4 @@
-package domains;
+package hybridDomainParsing;
 
 import java.util.ArrayList;
 import java.util.Collections;

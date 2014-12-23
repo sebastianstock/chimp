@@ -1,8 +1,4 @@
-package domains;
-
-import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.ProblemParser;
+package hybridDomainParsing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +20,57 @@ import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
 
 public class TestProblemParsing {
+	
+	private static String N = "n";
+	
+	public static String[][] createSymbols() {
+		String[][] symbols = new String[2][];
+		// predicates  
+		// index: 0
+		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
+				"Connected",
+				// operators
+				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
+				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
+				"!observe_objects_on_area",
+				// methods
+				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
+				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
+				"leave_manipulation_pose", "grasp_object_w_arm", "get_object_w_arm", "put_object",
+				"move_object", "serve_coffee_to_guest"
+				};	
+		// race:Kitchenware		
+		// index: 1, 2
+		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", 
+				"nothing",
+				"placingAreaEastRightCounter1",
+				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
+				"placingAreaEastLeftTable1", "placingAreaEastRightTable1",
+				"placingAreaNorthLeftTable2", "placingAreaNorthRightTable2",
+				"placingAreaSouthLeftTable2", "placingAreaSouthRightTable2",
+				"trayArea1", 
+				"manipulationAreaEastCounter1", "preManipulationAreaEastCounter1",
+				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
+				"preManipulationAreaNorthTable1", "preManipulationAreaSouthTable1",
+				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
+				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
+				"floorAreaTamsRestaurant1", 
+				"sittingAreaWestTable1", "sittingAreaEastTable1",
+				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
+				"table1", "table2", "counter1", 
+				"guest1", "guest2",
+				"leftArm1", "rightArm1", 
+				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
+				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
+				"coffeeJug1", "milkPot1", "sugarPot1", "sugarPot2",
+				N};
+		return symbols;
+	}
+	
+	public static int[] createIngredients() {
+		return new int[] {1,5};
+	}
+	
 
 	public static void main(String[] args) {
 		
@@ -71,8 +118,8 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
-		String[][] symbols = RACEProblemsSingle.createSymbols();
-		int[] ingredients = RACEProblemsSingle.createIngredients();
+		String[][] symbols = createSymbols();
+		int[] ingredients = createIngredients();
 		
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
