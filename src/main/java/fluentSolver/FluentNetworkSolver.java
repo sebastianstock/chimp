@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package fluentSolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 
+import pfd0Symbolic.TaskApplicationMetaConstraint;
+import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {

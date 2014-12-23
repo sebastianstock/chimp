@@ -1,5 +1,6 @@
 package externalPathPlanning;
 
+import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -9,7 +10,6 @@ import java.util.logging.Level;
 
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import unify.CompoundSymbolicVariableConstraintSolver;
 

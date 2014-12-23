@@ -9,9 +9,9 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentConstraint;
-import pfd0Symbolic.FluentNetworkSolver;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 
 public class TestResourceUsageScheduler {

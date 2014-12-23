@@ -13,6 +13,9 @@ import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicValueConstraint;
 

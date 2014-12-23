@@ -9,9 +9,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 
-import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentConstraint;
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -20,6 +17,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Table;
+
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 
 public class PlanExtractor {
 	

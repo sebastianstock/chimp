@@ -8,6 +8,8 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.UI.Callback;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
 import resourceFluent.FluentScheduler;
 
 public class TestFluentScheduling {

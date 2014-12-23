@@ -13,8 +13,8 @@ import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
-import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentNetworkSolver;
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class ProblemParser {

@@ -1,5 +1,6 @@
 package pfd0Symbolic;
 
+import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomain;
 
 import java.util.Vector;

@@ -11,9 +11,9 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
-import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentConstraint;
-import pfd0Symbolic.FluentNetworkSolver;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import unify.CompoundSymbolicVariable;
 
 public class AxiomMetaConstraint extends MetaConstraint {

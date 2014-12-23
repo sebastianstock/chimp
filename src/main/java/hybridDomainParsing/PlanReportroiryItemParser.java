@@ -12,13 +12,14 @@ import org.metacsp.time.Bounds;
 
 import pfd0Symbolic.AdditionalConstraintTemplate;
 import pfd0Symbolic.EffectTemplate;
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PFD0Precondition;
 import pfd0Symbolic.PlanReportroryItem;
 import sun.security.pkcs.ParsingException;
 
 import com.google.common.primitives.Ints;
+
+import fluentSolver.FluentNetworkSolver;
 
 public abstract class PlanReportroiryItemParser {
 

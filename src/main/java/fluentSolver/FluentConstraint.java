@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package fluentSolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import pfd0Symbolic.AdditionalConstraintTemplate;
+import pfd0Symbolic.PlanReportroryItem;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;

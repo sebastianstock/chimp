@@ -13,7 +13,7 @@ import java.util.Vector;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.meta.simplePlanner.SimplePlanner;
 
-import pfd0Symbolic.FluentNetworkSolver;
+import fluentSolver.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Method;
 import pfd0Symbolic.PFD0Operator;
 import pfd0Symbolic.PFD0Planner;

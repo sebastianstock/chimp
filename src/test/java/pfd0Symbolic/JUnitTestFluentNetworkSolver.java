@@ -14,6 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.metacsp.framework.Constraint;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+
 
 public class JUnitTestFluentNetworkSolver {
 	

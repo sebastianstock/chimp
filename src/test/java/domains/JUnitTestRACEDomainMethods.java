@@ -1,6 +1,7 @@
 package domains;
 
 import static org.junit.Assert.assertTrue;
+import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -13,7 +14,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import unify.CompoundSymbolicVariableConstraintSolver;
 

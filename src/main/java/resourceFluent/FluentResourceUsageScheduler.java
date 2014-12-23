@@ -12,8 +12,8 @@ import org.metacsp.framework.VariableOrderingH;
 import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.activity.Activity;
 
-import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentConstraint;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
 
 public class FluentResourceUsageScheduler extends Schedulable {
 	

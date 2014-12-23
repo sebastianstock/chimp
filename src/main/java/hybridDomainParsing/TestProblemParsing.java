@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.HTNMetaConstraint;
 import resourceFluent.FluentResourceUsageScheduler;
@@ -18,6 +17,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
+import fluentSolver.FluentNetworkSolver;
 
 public class TestProblemParsing {
 	

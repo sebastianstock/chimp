@@ -11,6 +11,9 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Operator extends PlanReportroryItem {

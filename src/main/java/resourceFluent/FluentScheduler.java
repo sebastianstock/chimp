@@ -11,7 +11,7 @@ import org.metacsp.framework.VariableOrderingH;
 import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.activity.Activity;
 
-import pfd0Symbolic.Fluent;
+import fluentSolver.Fluent;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 

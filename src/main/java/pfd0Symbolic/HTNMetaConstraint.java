@@ -20,6 +20,9 @@ import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 import cern.colt.Arrays;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 
 
 public class HTNMetaConstraint extends MetaConstraint {

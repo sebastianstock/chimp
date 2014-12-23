@@ -1,5 +1,8 @@
 package pfd0Symbolic;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.SubDifferentDefinition;
 
 import java.util.ArrayList;

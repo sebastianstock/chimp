@@ -8,8 +8,8 @@ import java.util.Map;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
 
+import fluentSolver.FluentConstraint;
 import pfd0Symbolic.EffectTemplate;
-import pfd0Symbolic.FluentConstraint;
 import pfd0Symbolic.PFD0Method;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.PFD0Precondition;

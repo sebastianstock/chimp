@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package fluentSolver;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;

@@ -1,5 +1,8 @@
 package axioms;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.TestProblemParsing;
 
 import java.util.logging.Level;
@@ -8,9 +11,6 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.Fluent;
-import pfd0Symbolic.FluentConstraint;
-import pfd0Symbolic.FluentNetworkSolver;
 import pfd0Symbolic.PFD0Planner;
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariableConstraintSolver;
