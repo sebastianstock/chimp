@@ -42,6 +42,7 @@
 
 (StateVariable RobotAt 2 n)
 (StateVariable HasArmPosture 1 leftArm1 rightArm1)
+(StateVariable Holding 1 leftArm1 rightArm1)
 ##
 (StateVariable On 1 mug1 mug2 mug3)
 
@@ -576,6 +577,7 @@
   (Pre p2 Connected(?plArea ?manArea ?preArea))
 
   (Sub s1 adapt_torso(?torsoUpPosture))
+  (Values ?torsoUpPosture TorsoUpPosture)
   (Sub s2 move_both_arms_to_side())
   (Sub s3 !move_base_blind(?manArea))
   
@@ -597,6 +599,7 @@
 
   (Sub s0 !move_base_blind(?preArea))
   (Sub s1 adapt_torso(?torsoUpPosture))
+  (Values ?torsoUpPosture TorsoUpPosture)
   (Sub s2 move_both_arms_to_side())
   (Sub s3 !move_base_blind(?manArea))
 

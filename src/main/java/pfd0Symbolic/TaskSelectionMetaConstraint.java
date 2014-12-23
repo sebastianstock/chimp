@@ -14,6 +14,8 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -98,6 +100,7 @@ public class TaskSelectionMetaConstraint extends MetaConstraint {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		
 		logger.fine("getMetaValues for: " + taskFluent);
+		// TODO propagation probably not needed here
 		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
 //		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {

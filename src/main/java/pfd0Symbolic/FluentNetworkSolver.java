@@ -62,8 +62,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		ArrayList<Fluent> ret = new ArrayList<Fluent>();
 		for (Variable var: getVariables()) {
 			AllenInterval varInterval = ((Fluent) var).getAllenInterval();
-			if (varInterval.getEST() < taskLST && 
-					varInterval.getLET() >= taskEST) {
+			if (varInterval.getEST() < taskLST ) {//&& varInterval.getLET() >= taskEST) {
 				ret.add((Fluent) var);
 			}
 		}
