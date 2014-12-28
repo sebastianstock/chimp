@@ -1,4 +1,4 @@
-package symbolicUnifyTyped;
+package symbolicUnifyTypedOLD;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.metacsp.framework.ConstraintNetwork;
 
-import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
+import symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint;
+import symbolicUnifyTypedOLD.CompoundSymbolicVariable;
+import symbolicUnifyTypedOLD.CompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
 
 public class JunitTestCompoundNameMatchingConstraintSolver {
 	

@@ -1,4 +1,4 @@
-package symbolicUnifyTyped;
+package symbolicUnifyTypedOLD;
 
 import static org.junit.Assert.*;
 
@@ -10,7 +10,9 @@ import org.junit.Test;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 
-import symbolicUnifyTyped.CompoundSymbolicValueConstraint.Type;
+import symbolicUnifyTypedOLD.CompoundSymbolicVariable;
+import symbolicUnifyTypedOLD.CompoundSymbolicVariableConstraintSolver;
+import symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
 
 public class TestTypedCompoundSymbolicVariable {
 
