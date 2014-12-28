@@ -1,5 +1,7 @@
 package hybridDomainParsing;
 
+import htn.TaskApplicationMetaConstraint.markings;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,8 +10,6 @@ import java.util.List;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
-
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;

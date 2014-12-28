@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package htn;
 
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 

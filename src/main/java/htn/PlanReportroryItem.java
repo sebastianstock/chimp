@@ -1,4 +1,4 @@
-package pfd0Symbolic;
+package htn;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;

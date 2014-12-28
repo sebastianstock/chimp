@@ -1,4 +1,6 @@
-package pfd0Symbolic;
+package htn;
+
+import htn.TaskApplicationMetaConstraint.markings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 
 public class PFD0Operator extends PlanReportroryItem {
 

@@ -1,5 +1,10 @@
 package hybridDomainParsing;
 
+import htn.PFD0Method;
+import htn.PFD0Operator;
+import htn.PFD0Planner;
+import htn.PlanReportroryItem;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -14,10 +19,6 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.meta.simplePlanner.SimplePlanner;
 
 import fluentSolver.FluentNetworkSolver;
-import pfd0Symbolic.PFD0Method;
-import pfd0Symbolic.PFD0Operator;
-import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.PlanReportroryItem;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;

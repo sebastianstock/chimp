@@ -3,6 +3,8 @@ package axioms;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.PFD0Planner;
+import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.TestProblemParsing;
 
 import java.util.logging.Level;
@@ -11,8 +13,6 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAxiomMetaConstraint {

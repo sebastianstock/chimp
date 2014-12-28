@@ -1,11 +1,11 @@
 package fluentSolver;
 
+import htn.PFD0Method;
+
 import java.util.logging.Logger;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
-
-import pfd0Symbolic.PFD0Method;
 
 public class TestFluentNetworkSolver {
 

@@ -1,5 +1,8 @@
 package hybridDomainParsing;
 
+import htn.HTNMetaConstraint;
+import htn.PFD0Planner;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -8,8 +11,6 @@ import java.util.logging.Level;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.HTNMetaConstraint;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;

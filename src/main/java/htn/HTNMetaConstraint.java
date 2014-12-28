@@ -1,4 +1,6 @@
-package pfd0Symbolic;
+package htn;
+
+import htn.TaskApplicationMetaConstraint.markings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +18,6 @@ import org.metacsp.framework.meta.MetaVariable;
 
 import com.sun.xml.internal.bind.v2.TODO;
 
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 import cern.colt.Arrays;

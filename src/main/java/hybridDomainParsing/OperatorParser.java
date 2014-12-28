@@ -1,13 +1,14 @@
 package hybridDomainParsing;
 
+import htn.EffectTemplate;
+import htn.PFD0Operator;
+import htn.PFD0Planner;
+import htn.PFD0Precondition;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import pfd0Symbolic.EffectTemplate;
-import pfd0Symbolic.PFD0Operator;
-import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.PFD0Precondition;
 import resourceFluent.ResourceUsageTemplate;
 import sun.security.pkcs.ParsingException;
 

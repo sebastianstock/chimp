@@ -1,5 +1,10 @@
 package hybridDomainParsing;
 
+import htn.EffectTemplate;
+import htn.PFD0Method;
+import htn.PFD0Planner;
+import htn.PFD0Precondition;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,10 +14,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
 
 import fluentSolver.FluentConstraint;
-import pfd0Symbolic.EffectTemplate;
-import pfd0Symbolic.PFD0Method;
-import pfd0Symbolic.PFD0Planner;
-import pfd0Symbolic.PFD0Precondition;
 import sun.security.pkcs.ParsingException;
 
 public class MethodParser extends PlanReportroiryItemParser {

@@ -1,4 +1,6 @@
-package pfd0Symbolic;
+package htn;
+
+import htn.TaskApplicationMetaConstraint.markings;
 
 import java.util.Map;
 import java.util.Vector;
@@ -16,7 +18,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import pfd0Symbolic.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicValueConstraint;
 
 
