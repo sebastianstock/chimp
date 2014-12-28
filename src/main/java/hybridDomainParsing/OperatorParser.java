@@ -1,9 +1,9 @@
 package hybridDomainParsing;
 
 import htn.EffectTemplate;
-import htn.PFD0Operator;
-import htn.PFD0Planner;
-import htn.PFD0Precondition;
+import htn.HTNOperator;
+import htn.HTNPlanner;
+import htn.HTNPrecondition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class OperatorParser extends PlanReportroiryItemParser {
 	private final List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
 	
 
-	public OperatorParser(String textualSpecification, PFD0Planner planner, int maxArgs){
+	public OperatorParser(String textualSpecification, HTNPlanner planner, int maxArgs){
 		super(textualSpecification, planner, maxArgs);
 
 		// Parse Resources
@@ -31,12 +31,12 @@ public class OperatorParser extends PlanReportroiryItemParser {
 	}
 	
 	@Override
-	public PFD0Operator create() throws ParsingException {
-		PFD0Precondition[] preconditions = createPreconditions(true);
+	public HTNOperator create() throws ParsingException {
+		HTNPrecondition[] preconditions = createPreconditions(true);
 		
 		String headname = HybridDomain.extractName(head);
 		EffectTemplate[] effects = createEffectTemplates(HybridDomain.EFFECT_KEYWORD);
-		PFD0Operator op =  new PFD0Operator(headname, argStrings, preconditions, effects);
+		HTNOperator op =  new HTNOperator(headname, argStrings, preconditions, effects);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
 		
 		// add additional constraints from head to head or between preconditions or effects

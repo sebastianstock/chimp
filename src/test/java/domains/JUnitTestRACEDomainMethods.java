@@ -2,7 +2,7 @@ package domains;
 
 import static org.junit.Assert.assertTrue;
 import fluentSolver.FluentNetworkSolver;
-import htn.PFD0Planner;
+import htn.HTNPlanner;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -23,7 +23,7 @@ public class JUnitTestRACEDomainMethods {
 	private static int[] ingredients;
 	private static final Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 	
-	private PFD0Planner planner;
+	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
 
 	@BeforeClass
@@ -40,7 +40,7 @@ public class JUnitTestRACEDomainMethods {
 
 	@Before
 	public void setUp() throws Exception {
-		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
+		planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];

@@ -1,7 +1,7 @@
 package externalPathPlanning;
 
 import fluentSolver.FluentNetworkSolver;
-import htn.PFD0Planner;
+import htn.HTNPlanner;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -28,7 +28,7 @@ public class TestMoveBaseLookup {
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
 		
-		PFD0Planner planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
+		HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		

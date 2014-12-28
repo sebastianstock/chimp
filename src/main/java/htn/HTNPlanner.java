@@ -21,13 +21,13 @@ import fluentSolver.FluentNetworkSolver;
 import unify.CompoundSymbolicValueConstraint;
 
 
-public class PFD0Planner extends MetaConstraintSolver {
+public class HTNPlanner extends MetaConstraintSolver {
 
 	private static final long serialVersionUID = 8031573555691611305L;
 	
 	private Map<String, String[]> typesInstancesMap;
 
-	public PFD0Planner(long origin, long horizon, long animationTime, String[][] symbols, 
+	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols, 
 			int[] symbolicingredients) {
 		// Currently only FluentConstraints. Other constraint should be added later.
 		super(new Class[] {FluentConstraint.class}, 
@@ -66,7 +66,7 @@ public class PFD0Planner extends MetaConstraintSolver {
 	@Override
 	protected void retractResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
-		Logger logger = MetaCSPLogging.getLogger(PFD0Planner.class);
+		Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 		logger.finest("START RETRACT_RESOLVER_SUB");
 		long startTime = System.nanoTime();
 		

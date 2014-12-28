@@ -1,8 +1,8 @@
 package hybridDomainParsing;
 
-import htn.PFD0Method;
-import htn.PFD0Operator;
-import htn.PFD0Planner;
+import htn.HTNMethod;
+import htn.HTNOperator;
+import htn.HTNPlanner;
 import htn.PlanReportroryItem;
 
 import java.io.BufferedReader;
@@ -35,7 +35,7 @@ public class HybridDomain{
 	private final Vector<ResourceUsageTemplate> fluentResourceUsages = 
 			new Vector<ResourceUsageTemplate>();
 	
-	private final PFD0Planner planner;
+	private final HTNPlanner planner;
 	private final FluentNetworkSolver groundSolver;
 	private final String fileName;
 	private int maxArgs; // Maximum number of arguments of a fluent.
@@ -69,7 +69,7 @@ public class HybridDomain{
 	
 	private static final String[] NO_STRINGS = {};
 	
-	public HybridDomain(PFD0Planner planner, String filename) throws DomainParsingException {
+	public HybridDomain(HTNPlanner planner, String filename) throws DomainParsingException {
 		this.planner = planner;
 		this.groundSolver = (FluentNetworkSolver) planner.getConstraintSolvers()[0];
 		this.fileName = filename;
@@ -174,7 +174,7 @@ public class HybridDomain{
 				String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, everything);
 				for (String operatorstr : planningOperators) {
 					OperatorParser oParser = new OperatorParser(operatorstr, planner, maxArgs);
-					PFD0Operator op = oParser.create();
+					HTNOperator op = oParser.create();
 //					System.out.println("Created Operator: " + op);
 					this.operators.addElement(op);
 				}
@@ -182,7 +182,7 @@ public class HybridDomain{
 				String[] planningMethods = parseKeyword(METHOD_KEYWORD, everything);
 				for (String methodStr : planningMethods) {
 					MethodParser mParser = new MethodParser(methodStr, planner, maxArgs);
-					PFD0Method m = mParser.create();
+					HTNMethod m = mParser.create();
 //					System.out.println("Created Method: " + m);
 					this.methods.addElement(m);
 				}

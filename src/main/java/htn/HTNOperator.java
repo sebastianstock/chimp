@@ -17,7 +17,7 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
-public class PFD0Operator extends PlanReportroryItem {
+public class HTNOperator extends PlanReportroryItem {
 
 	private Logger logger;
 	
@@ -31,12 +31,12 @@ public class PFD0Operator extends PlanReportroryItem {
 //	}
 
 	
-	public PFD0Operator(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+	public HTNOperator(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
 			EffectTemplate[] effects) {
 		
 		super(taskname, arguments, preconditions, effects);
 
-		this.logger = MetaCSPLogging.getLogger(PFD0Operator.class);
+		this.logger = MetaCSPLogging.getLogger(HTNOperator.class);
 	}
 	
 	// Only used by TaskApplicationMetaConstraint when we have three different meta-constraints.

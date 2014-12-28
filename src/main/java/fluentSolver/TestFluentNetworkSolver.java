@@ -1,6 +1,6 @@
 package fluentSolver;
 
-import htn.PFD0Method;
+import htn.HTNMethod;
 
 import java.util.logging.Logger;
 
@@ -66,7 +66,7 @@ public class TestFluentNetworkSolver {
 		logger.info("Added fcon21? " + solver.addConstraint(fcon21));
 		
 		
-		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new PFD0Method(null, null, null, null, null));
+		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new HTNMethod(null, null, null, null, null));
 		fcon11.setFrom(fluents[1]);
 		fcon11.setTo(fluents[1]);
 		logger.info("Added fcon11? " + solver.addConstraint(fcon11));

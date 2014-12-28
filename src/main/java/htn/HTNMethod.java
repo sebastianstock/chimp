@@ -17,12 +17,12 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 
-public class PFD0Method extends PlanReportroryItem {
+public class HTNMethod extends PlanReportroryItem {
 	
 	private Constraint[] constraints;
 
 	
-	public PFD0Method(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+	public HTNMethod(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
 			EffectTemplate[] effects, Constraint[] constraints) {
 		
 		super(taskname, arguments, preconditions, effects);

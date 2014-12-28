@@ -31,7 +31,7 @@ public abstract class PlanReportroryItem {
 	
 	protected final String taskname;
 	
-	protected final PFD0Precondition[] preconditions;
+	protected final HTNPrecondition[] preconditions;
 
 	protected final String[] arguments;
 	protected final EffectTemplate[] effects;
@@ -54,7 +54,7 @@ public abstract class PlanReportroryItem {
 	protected final List<ResourceUsageTemplate> resourceUsageIndicators = 
 			new ArrayList<ResourceUsageTemplate>();
 	
-	public PlanReportroryItem(String taskname, String[] arguments, PFD0Precondition[] preconditions, 
+	public PlanReportroryItem(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
 			EffectTemplate[] effects) {
 		this.taskname = taskname;
 		this.arguments = arguments;
@@ -145,7 +145,7 @@ public abstract class PlanReportroryItem {
 	
 		if (openFluents != null) {
 			Map<String, Set<Fluent>> fluentmap = createFluentSetMap(openFluents);	
-			for (PFD0Precondition pre : preconditions) {
+			for (HTNPrecondition pre : preconditions) {
 				boolean fulfilled = false;
 				if (fluentmap.containsKey(pre.getFluenttype())) {
 					for (Fluent f : fluentmap.get(pre.getFluenttype())) {
@@ -178,7 +178,7 @@ public abstract class PlanReportroryItem {
 		
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		if(this.preconditions != null) {
-			for (PFD0Precondition pre : this.preconditions) {
+			for (HTNPrecondition pre : this.preconditions) {
 				ret.addConstraint(pre.createPreconditionConstraint(taskfluent, groundSolver));
 			}
 		}
@@ -214,7 +214,7 @@ public abstract class PlanReportroryItem {
 		
 		// Create set of potential precondition constraints.
 		if(this.preconditions != null) {
-			for (PFD0Precondition pre : this.preconditions) {
+			for (HTNPrecondition pre : this.preconditions) {
 				String preName = pre.getFluenttype();
 				Set<FluentConstraint> possiblePreconditions = new HashSet<FluentConstraint>();
 				for (Fluent openFluent : openFluents)  {
@@ -259,7 +259,7 @@ public abstract class PlanReportroryItem {
 				preKeyToFluentMap.put(constraintToPrecondition.get(con), (Fluent) con.getFrom());
 				
 				// add closes for negative effects
-				if (con.isNegativeEffect() && this instanceof PFD0Operator) {
+				if (con.isNegativeEffect() && this instanceof HTNOperator) {
 					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
 					closes.setFrom(con.getTo());
 					closes.setTo(con.getFrom());

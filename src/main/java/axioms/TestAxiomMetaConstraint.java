@@ -3,7 +3,7 @@ package axioms;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.PFD0Planner;
+import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -17,14 +17,14 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAxiomMetaConstraint {
 	
-	private static PFD0Planner planner;
+	private static HTNPlanner planner;
 	private static FluentNetworkSolver fluentSolver;
 
 	public static void main(String[] args) {
 		String[][] symbols = TestProblemParsing.createSymbols();
 		int[] ingredients = TestProblemParsing.createIngredients();
 		
-		planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
+		planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 //		initMetaConstraints();

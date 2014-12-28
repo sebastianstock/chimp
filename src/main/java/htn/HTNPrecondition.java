@@ -12,7 +12,7 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 
-public class PFD0Precondition {
+public class HTNPrecondition {
 	
 	private static String component = "PRE";
 	
@@ -29,13 +29,13 @@ public class PFD0Precondition {
 	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
 			new Vector<AdditionalConstraintTemplate>();
 
-	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections) {
+	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections) {
 		this.fluenttype = fluenttype;
 		this.arguments = arguments;
 		this.connections = connections;
 	}
 	
-	public PFD0Precondition(String fluenttype, String[] arguments, int[] connections, 
+	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections, 
 			int maxargs, String emptyStr, String key) {
 		this.fluenttype = fluenttype;
 		this.arguments = new String[maxargs];

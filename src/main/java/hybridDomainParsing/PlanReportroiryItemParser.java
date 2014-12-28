@@ -2,8 +2,8 @@ package hybridDomainParsing;
 
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
-import htn.PFD0Planner;
-import htn.PFD0Precondition;
+import htn.HTNPlanner;
+import htn.HTNPrecondition;
 import htn.PlanReportroryItem;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final String textualSpecification;
 	protected final FluentNetworkSolver groundSolver;
-	protected final PFD0Planner planner;
+	protected final HTNPlanner planner;
 	protected final int maxArgs;
 
 	protected final String head;
@@ -38,7 +38,7 @@ public abstract class PlanReportroiryItemParser {
 	protected final Map<String, Map<String, Integer>> variableOccurrencesMap = 
 			new HashMap<String, Map<String, Integer>>();
 
-	public PlanReportroiryItemParser(String textualSpecification, PFD0Planner planner, 
+	public PlanReportroiryItemParser(String textualSpecification, HTNPlanner planner, 
 			int maxArs) {
 		this.textualSpecification = textualSpecification;
 		
@@ -76,15 +76,15 @@ public abstract class PlanReportroiryItemParser {
 		}
 	}
 	
-	protected PFD0Precondition[] createPreconditions(boolean negativeEffects) {
+	protected HTNPrecondition[] createPreconditions(boolean negativeEffects) {
 		Map<String,String> preconditionStringsMap = parsePreconditionStrings();
 		List<String> negativeEffectsKeyList = parseNegativeEffects();
 		
-		PFD0Precondition[] preconditions = new PFD0Precondition[preconditionStringsMap.size()];
+		HTNPrecondition[] preconditions = new HTNPrecondition[preconditionStringsMap.size()];
 		int i = 0;
 		for (Entry<String, String> e : preconditionStringsMap.entrySet()) {
 			String preKey = e.getKey();
-			PFD0Precondition pre = createPrecondition(preKey, e.getValue());
+			HTNPrecondition pre = createPrecondition(preKey, e.getValue());
 			
 			if (negativeEffects) {
 				// Set negative effects
@@ -97,7 +97,7 @@ public abstract class PlanReportroiryItemParser {
 		return preconditions;
 	}
 	
-	protected PFD0Precondition createPrecondition(String preKey, String preString) {
+	protected HTNPrecondition createPrecondition(String preKey, String preString) {
 		String name = HybridDomain.extractName(preString);
 		String[] args = HybridDomain.extractArgs(preString);
 
@@ -114,7 +114,7 @@ public abstract class PlanReportroiryItemParser {
 			}
 		}
 
-		PFD0Precondition ret = new PFD0Precondition(name, args, Ints.toArray(connectionsList), maxArgs, 
+		HTNPrecondition ret = new HTNPrecondition(name, args, Ints.toArray(connectionsList), maxArgs, 
 				HybridDomain.EMPTYSTRING, preKey);
 		for (AdditionalConstraintTemplate additionalCon : additionalAIConstraints) {
 			if (additionalCon.involvesHeadAndKey(preKey)) {

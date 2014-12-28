@@ -1,7 +1,7 @@
 package hybridDomainParsing;
 
 import htn.HTNMetaConstraint;
-import htn.PFD0Planner;
+import htn.HTNPlanner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,7 +127,7 @@ public class TestProblemParsing {
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
 		
-		PFD0Planner planner = new PFD0Planner(0,  600,  0, symbols, ingredients);
+		HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
@@ -146,7 +146,7 @@ public class TestProblemParsing {
 		extractPlan(fluentSolver);
 	}
 	
-	public static boolean plan(PFD0Planner planner, FluentNetworkSolver fluentSolver) {
+	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		long startTime = System.nanoTime();
@@ -169,7 +169,7 @@ public class TestProblemParsing {
 		planEx.printPlan();
 	}
 	
-	public static void initPlanner(PFD0Planner planner, String domainPath) {
+	public static void initPlanner(HTNPlanner planner, String domainPath) {
 		// load domain
 		HybridDomain dom;
 		try {

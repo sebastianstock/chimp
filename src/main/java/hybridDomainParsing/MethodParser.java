@@ -1,9 +1,9 @@
 package hybridDomainParsing;
 
 import htn.EffectTemplate;
-import htn.PFD0Method;
-import htn.PFD0Planner;
-import htn.PFD0Precondition;
+import htn.HTNMethod;
+import htn.HTNPlanner;
+import htn.HTNPrecondition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,19 +18,19 @@ import sun.security.pkcs.ParsingException;
 
 public class MethodParser extends PlanReportroiryItemParser {
 
-	public MethodParser(String textualSpecification, PFD0Planner planner, int maxArgs) {
+	public MethodParser(String textualSpecification, HTNPlanner planner, int maxArgs) {
 		super(textualSpecification, planner, maxArgs);
 		
 		// TODO Should we parse resources here / Should methods consume resources?
 	}
 	
-	public PFD0Method create() throws ParsingException {
-		PFD0Precondition[] preconditions = createPreconditions(false);
+	public HTNMethod create() throws ParsingException {
+		HTNPrecondition[] preconditions = createPreconditions(false);
 
 		String headname = HybridDomain.extractName(head);
 		EffectTemplate[] subtasks = createEffectTemplates(HybridDomain.SUBTASK_KEYWORD);
 		Constraint[] orderingCons = parseFluentBeforeConstraints(subtasks);
-		PFD0Method ret = new PFD0Method(headname, argStrings, preconditions, subtasks, orderingCons);
+		HTNMethod ret = new HTNMethod(headname, argStrings, preconditions, subtasks, orderingCons);
 		ret.setVariableOccurrencesMap(variableOccurrencesMap);
 		
 		// add additional constraints from head to head or between preconditions or effects

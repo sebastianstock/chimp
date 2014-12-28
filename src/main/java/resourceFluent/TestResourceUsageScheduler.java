@@ -1,6 +1,6 @@
 package resourceFluent;
 
-import htn.PFD0Planner;
+import htn.HTNPlanner;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +31,7 @@ public class TestResourceUsageScheduler {
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
 		
-		final PFD0Planner planner = new PFD0Planner(0,  600,  0, symbols, new int[] {1,1,1,1,1});
+		final HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, new int[] {1,1,1,1,1});
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		Fluent[] fluents = (Fluent[]) fluentSolver.createVariables(3);
