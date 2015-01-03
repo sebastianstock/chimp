@@ -130,7 +130,8 @@ public class CompoundSymbolicVariable extends MultiVariable {
 			ret.append(internalvars[1].toString());
 		}
 		for (int i = 2; i < internalvars.length; i++) {
-			if(internalvars[i].toString().length() > 0) {
+			String varStr = internalvars[i].toString();
+			if(varStr.length() > 0 && ! varStr.equals(NONESYMBOL) ) {
 				ret.append(" ");
 				ret.append(internalvars[i].toString());
 			} else {
