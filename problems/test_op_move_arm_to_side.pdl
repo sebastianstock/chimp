@@ -11,6 +11,6 @@
 
 (Task t0 !move_arm_to_side(leftArm1))
 (Constraint Release[0,1](t0))
-(Constraint Duration[5,10](t0))
+(Constraint Duration[5000,10000](t0))
 
 )

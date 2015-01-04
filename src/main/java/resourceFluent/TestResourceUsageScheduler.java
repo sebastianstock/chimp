@@ -31,7 +31,7 @@ public class TestResourceUsageScheduler {
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
 		
-		final HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, new int[] {1,1,1,1,1});
+		final HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, new int[] {1,1,1,1,1});
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		Fluent[] fluents = (Fluent[]) fluentSolver.createVariables(3);
@@ -49,15 +49,15 @@ public class TestResourceUsageScheduler {
 		fluents[1].setName("get_mug(mug1 pl2 none none)");
 		fluents[2].setName("robotat(none pl2 none none)");
 		
-		AllenIntervalConstraint con1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		AllenIntervalConstraint con1 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10000,20000));
 		con1.setFrom(fluents[0]);
 		con1.setTo(fluents[0]);
 
-		AllenIntervalConstraint con2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		AllenIntervalConstraint con2 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10000,20000));
 		con2.setFrom(fluents[1]);
 		con2.setTo(fluents[1]);
 
-		AllenIntervalConstraint con3 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10,20));
+		AllenIntervalConstraint con3 = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(10000,20000));
 		con3.setFrom(fluents[2]);
 		con3.setTo(fluents[2]);
 		

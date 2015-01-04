@@ -40,7 +40,7 @@ public class JUnitTestRACEDomainMethods {
 
 	@Before
 	public void setUp() throws Exception {
-		planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
+		planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];

@@ -28,7 +28,7 @@ public class TestMoveBaseLookup {
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
 		
-		HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
+		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		

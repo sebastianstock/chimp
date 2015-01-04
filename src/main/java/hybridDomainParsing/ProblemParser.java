@@ -50,8 +50,15 @@ public class ProblemParser {
 		
 		// create tasks
 		for (Entry<String, String> e : taskElementsMap.entrySet()) {
-			Variable var = fluentSolver.createVariable();
-			((Fluent) var).setName(e.getValue());
+			String name = e.getValue();
+			String component;
+			if (name.startsWith("!")) {
+				component = "Activity";
+			} else {
+				component = "Task";
+			}
+			Variable var = fluentSolver.createVariable(component);
+			((Fluent) var).setName(name);
 			var.setMarking(markings.UNPLANNED);
 			varsMap.put(e.getKey(), var);
 		}

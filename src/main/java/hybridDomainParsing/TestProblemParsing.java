@@ -80,7 +80,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_fluent_scheduling.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
@@ -98,7 +98,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose0.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_0.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_2.pdl");
@@ -129,7 +129,7 @@ public class TestProblemParsing {
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
 		
-		HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
+		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
@@ -158,11 +158,21 @@ public class TestProblemParsing {
 
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
-		System.out.println(planner.getDescription());
+//		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 		System.out.println("Finished");
+		
+//		System.out.println("AGAIN");
+//		startTime = System.nanoTime();
+//		result = planner.backtrack();
+//		System.out.println("Found a plan? " + result);
+//		endTime = System.nanoTime();
+//
+//		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
+//		System.out.println("Finished");
+		
 		return result;
 	}
 	

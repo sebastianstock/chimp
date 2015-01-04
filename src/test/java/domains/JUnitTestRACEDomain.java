@@ -40,7 +40,7 @@ public class JUnitTestRACEDomain {
 
 	@Before
 	public void setUp() throws Exception {
-		planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
+		planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
@@ -63,6 +63,16 @@ public class JUnitTestRACEDomain {
 	public void testOpMoveBase() {
 		fluentSolver.deplenish();
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
+		pp.createState(fluentSolver);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		assertTrue(planner.backtrack());
+		TestProblemParsing.extractPlan(fluentSolver);
+	}
+	
+	@Test
+	public void testOpMoveTorso() {
+		fluentSolver.deplenish();
+		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
 		pp.createState(fluentSolver);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());

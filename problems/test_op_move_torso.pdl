@@ -5,7 +5,7 @@
 
 
 (Task t0 !move_torso(TorsoDownPosture))
-(Constraint Release[0,1](t0))
-(Constraint Deadline[5,10](t0))
+(Constraint Release[0,1000](t0))
+(Constraint Deadline[5000,10000](t0))
 
 )

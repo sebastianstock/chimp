@@ -55,7 +55,7 @@
  (Head !move_base(?toArea))
  (Pre p1 RobotAt(?fromArea))
  (Constraint OverlappedBy(task,p1))
-# (Constraint Duration[5,INF](task))
+# (Constraint Duration[5000,INF](task))
  (Add e1 RobotAt(?toArea))
  (Del p1)
  (ResourceUsage 
@@ -68,7 +68,7 @@
  (Pre p1 RobotAt(?preArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[10 ,10](task))
+ (Constraint Duration[10000 ,10000](task))
  (Add e1 RobotAt(?mArea))
  (Constraint Overlaps(task,e1))
  (Del p1)
@@ -82,7 +82,7 @@
  (Pre p1 RobotAt(?mArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[10,10](task))
+ (Constraint Duration[10000,10000](task))
  (Add e1 RobotAt(?preArea))
  (Constraint Overlaps(task,e1))
  (Del p1)
@@ -109,9 +109,9 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[5,5](task))
-# (Constraint Duration[1,10000](e1))
-# (Constraint Duration[1,10000](e2))
+ (Constraint Duration[5000,5000](task))
+# (Constraint Duration[1000,10000000](e1))
+# (Constraint Duration[1000,10000000](e2))
 )
 
 # MOVE_TORSO
@@ -121,7 +121,7 @@
  (Constraint OverlappedBy(task,p1))
  (Del p1)
  (Add e1 HasTorsoPosture(?newPosture))
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
 )
 
 # PICK_UP_OBJECT
@@ -142,7 +142,7 @@
  (Constraint OverlappedBy(task,p4))
  (Constraint Meets(p4,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -173,7 +173,7 @@
  (Constraint During(task,p3))
  (Constraint Meets(p1,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -200,7 +200,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint Overlaps(task,e1))
  )
@@ -223,7 +223,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
@@ -250,7 +250,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))   # TODO is this correct?
@@ -264,7 +264,7 @@
  (Pre p2 Connected(?plArea ?robotArea ?preArea))
  (Constraint During(task,p1))
  (Constraint During(task,p2))
- (Constraint Duration[5,5](task))
+ (Constraint Duration[5000,5000](task))
 )
 
 
@@ -288,7 +288,7 @@
  (Head adapt_torso(?newPose))
  (Pre p1 HasTorsoPosture(?oldPose))
  (VarDifferent ?newPose ?oldPose) 
- (Constraint Duration[3,10](task))
+ (Constraint Duration[3000,10000](task))
  (Sub s1 !move_torso(?newPose))
  (Constraint Equals(s1,task))
  )
@@ -310,7 +310,7 @@
   (Values ?nothing nothing)
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
-# (Constraint Duration[3,10](task))
+# (Constraint Duration[3000,10000](task))
   (Sub s1 adapt_torso(?newPose))
   (Values ?newPose TorsoDownPosture)
   (Constraint Equals(s1,task))
@@ -321,7 +321,7 @@
   (Pre p1 Holding(?arm ?obj))
   (NotValues ?obj nothing)
 #  (Type ?obj Object)
-# (Constraint Duration[3,10](task))
+# (Constraint Duration[3000,10000](task))
   (Sub s1 adapt_torso(?newPose))
   (Values ?newPose TorsoMiddlePosture)
   (Constraint Equals(s1,task))
@@ -352,7 +352,7 @@
  (Values ?posture ArmTuckedPosture)
  (NotValues ?currentposture ArmTuckedPosture)
  
- (Constraint Duration[3,10](task))
+ (Constraint Duration[3000,10000](task))
 
  (Sub s1 !tuck_arms(?posture ?posture))
  (Constraint Equals(s1,task))
@@ -365,7 +365,7 @@
  (Values ?posture ArmCarryPosture)
  (NotValues ?currentposture ArmCarryPosture)
  
- (Constraint Duration[3,10](task))
+ (Constraint Duration[3000,10000](task))
 
  (Sub s1 !move_arms_to_carryposture())
  (Constraint Equals(s1,task))
@@ -391,7 +391,7 @@
   (Pre p1 Holding(?arm ?obj))
   (NotValues ?obj nothing)
 #  (Type ?obj Object)
-# (Constraint Duration[3,10](task))
+# (Constraint Duration[3000,10000](task))
   (Sub s1 adapt_arms(?newPose))
   (Values ?newPose ArmCarryPosture)
   (Constraint Equals(s1,task))
@@ -416,14 +416,14 @@
 
  (NotType ?fromArea ManipulationArea)
 
-# (Constraint Duration[20,30](task))
+# (Constraint Duration[20000,30000](task))
   (Sub s1 torso_assume_driving_pose())
   (Constraint Starts(s1,task))
    (Sub s2 arms_assume_driving_pose())
   (Constraint Starts(s2,task))
 
   (Sub s3 !move_base(?toArea))
-  (Constraint Finishes[1,6](s3,task)) # TOO Restricting?
+  (Constraint Finishes[1000,6000](s3,task)) # TOO Restricting?
  (Ordering s1 s3)
  (Ordering s2 s3)
  )
@@ -443,12 +443,12 @@
  (Constraint Starts(s0,task))
    
  (Sub s1 torso_assume_driving_pose())
- (Constraint Before[1,1](s0,s1))
+ (Constraint Before[1,1000](s0,s1))
  (Sub s2 arms_assume_driving_pose())
- (Constraint Before[1,1](s0,s2))
+ (Constraint Before[1,1000](s0,s2))
 
  (Sub s3 !move_base(?toArea))
- (Constraint Finishes[3,17](s3,task))
+ (Constraint Finishes[3000,17000](s3,task))
  (Ordering s0 s1)
  (Ordering s0 s2)
  (Ordering s0 s3)
@@ -479,11 +479,11 @@
   (Ordering s1 s2)
   (Ordering s1 s3)
   (Constraint Starts(s1,task))
-  (Constraint Before[1,1](s1,s2))
-  (Constraint Before[1,1](s1,s3))
+  (Constraint Before[1,1000](s1,s2))
+  (Constraint Before[1,1000](s1,s3))
   (Constraint Finishes(s2,task)) # Dangerous for execution
   (Constraint Finishes(s3,task)) # Dangerous for execution
-  (Constraint Duration[11,16](task))
+  (Constraint Duration[11000,16000](task))
 )
 
 ## 2. left arm at side, right not
@@ -548,7 +548,7 @@
 
   (Sub s1 !move_arm_to_side(?leftArm))
   (Sub s2 !move_arm_to_side(?rightArm))
-  (Constraint Duration[5,10](task))
+  (Constraint Duration[5000,10000](task))
   )
 
 
@@ -585,7 +585,7 @@
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
   (Constraint Starts(s2,task))
-  (Constraint Finishes[1,12](s3,task))
+  (Constraint Finishes[1000,12000](s3,task))
 )
 
 # first move back to preArea
@@ -609,9 +609,9 @@
   (Ordering s1 s3)
   (Ordering s2 s3)
   (Constraint Starts(s0,task))
-  (Constraint Before[1,1](s0,s1))
-  (Constraint Before[1,1](s0,s2))
-  (Constraint Finishes[1,23](s3,task))
+  (Constraint Before[1,1000](s0,s1))
+  (Constraint Before[1,1000](s0,s2))
+  (Constraint Finishes[1000,23000](s3,task))
 )
 
 ### LEAVE_MANIPULATION_POSE
@@ -643,8 +643,8 @@
   (Ordering s1 s2)
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
-  (Constraint Before[1,1](s1,s2))
-  (Constraint Before[1,1](s2,s3))
+  (Constraint Before[1,1000](s1,s2))
+  (Constraint Before[1,1000](s2,s3))
   (Constraint Finishes(s3,task))
 ) # TODO Could be merged into get_object_w_arm
 
@@ -684,7 +684,7 @@
 
   (Ordering s1 s2)
   (Constraint Starts(s1,task))
-  (Constraint Before[1,1](s1,s2))
+  (Constraint Before[1,1000](s1,s2))
   (Constraint Finishes(s2,task))
 )
 
@@ -708,8 +708,8 @@
   (Ordering s1 s3)
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
-  (Constraint Before[1,1](s1,s2))
-  (Constraint Before[1,1](s2,s3))
+  (Constraint Before[1,1000](s1,s2))
+  (Constraint Before[1,1000](s2,s3))
   (Constraint Finishes(s3,task))
 )
 
@@ -727,7 +727,7 @@
 
   (Ordering s2 s3)
   (Constraint Starts(s2,task))
-  (Constraint Before[1,1](s2,s3))
+  (Constraint Before[1,1000](s2,s3))
   (Constraint Finishes(s3,task))
 )
 
@@ -761,7 +761,7 @@
 
   (Ordering s1 s2)
   (Constraint Starts(s1,task))
-  (Constraint Before[1,1](s1,s2))
+  (Constraint Before[1,1000](s1,s2))
   (Constraint Finishes(s2,task))
 )
 

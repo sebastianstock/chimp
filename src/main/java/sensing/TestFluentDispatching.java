@@ -1,5 +1,6 @@
 package sensing;
 
+import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import hybridDomainParsing.ProblemParser;
@@ -7,51 +8,73 @@ import hybridDomainParsing.TestProblemParsing;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import tmpDispatching.DummyInferenceCallback;
 import unify.CompoundSymbolicVariableConstraintSolver;
+import dispatching.FluentDispatchingFunction;
 
 public class TestFluentDispatching {
 
 	public static void main(String[] args) {
 		
+		// init planner
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 
-		
 		String[][] symbols = TestProblemParsing.createSymbols();
 		int[] ingredients = TestProblemParsing.createIngredients();
-		
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
 		
-		HTNPlanner planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
+//		final long origin = Calendar.getInstance().getTimeInMillis();
+		final long origin = 0L;
+
+		HTNPlanner planner = new HTNPlanner(origin, origin + 100000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
-		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+		FluentNetworkSolver fns = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
+		pp.createState(fns);
 		
-		pp.createState(fluentSolver);
-		
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		((CompoundSymbolicVariableConstraintSolver) fns.getConstraintSolvers()[0]).propagateAllSub();
 		
 //		MetaCSPLogging.setLevel(Level.FINE);
 		MetaCSPLogging.setLevel(Level.OFF);
+			
+		plan(planner, fns);
 		
+		TestProblemParsing.extractPlan(fns);
 		
-		plan(planner, fluentSolver);
-		
-		TestProblemParsing.extractPlan(fluentSolver);
-		
+		// Dispatch the plan
 		System.out.println("Starting Dispatching");
 		
-		DummyInferenceCallback cb = new DummyInferenceCallback(planner);  // does nothing in doInference()
-		FluentConstraintNetworkAnimator animator = new FluentConstraintNetworkAnimator(fluentSolver, 1000, cb);
+		FluentConstraintNetworkAnimator animator = new FluentConstraintNetworkAnimator(fns, 1000);
+		
+		final Vector<Fluent> executingActs = new Vector<Fluent>();
+		
+		FluentDispatchingFunction df = new FluentDispatchingFunction("Activity") {
+			
+			@Override
+			public boolean skip(Fluent act) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void dispatch(Fluent act) {
+				executingActs.addElement(act);
+				System.out.println("This is a call to ROS to do " + act);
+			}
+		};
+		
+		animator.addDispatchingFunctions(fns, df);
+		
+		
 	}
 	
 	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {
@@ -64,9 +87,9 @@ public class TestFluentDispatching {
 
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
-		System.out.println(planner.getDescription());
+//		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 		System.out.println("Finished");
 		return result;

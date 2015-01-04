@@ -13,6 +13,6 @@
 
 (Task t0 !move_arms_to_carryposture())
 (Constraint Release[0,1](t0))
-(Constraint Duration[5,10](t0))
+(Constraint Duration[5000,10000](t0))
 
 )
