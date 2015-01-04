@@ -18,14 +18,16 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5831971530237352714L;
+	
+	protected long origin;
+	protected long horizon;
 
 	public FluentNetworkSolver(long origin, long horizon, String[][] symbols, int[] symbolicingredients) {
 		super(new Class[] {FluentConstraint.class, AllenIntervalConstraint.class}, Fluent.class, 
 				createConstraintSolvers(origin, horizon, symbols, symbolicingredients), new int[] {1, 1});
+		this.origin = origin;
+		this.horizon = horizon;
 	}
 
 	@Override
@@ -111,5 +113,18 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		return ret;
 	}
 
+		/**
+	 * @return the origin
+	 */
+	public long getOrigin() {
+		return origin;
+	}
+
+	/**
+	 * @return the horizon
+	 */
+	public long getHorizon() {
+		return horizon;
+	}
 
 }
