@@ -209,13 +209,13 @@ public abstract class PlanReportroiryItemParser {
 		return effectsStringsMap;
 	}
 	
-	protected EffectTemplate[] createEffectTemplates (String keyword) {
+	protected EffectTemplate[] createEffectTemplates (String component, String keyword) {
 		Map<String, String> effectStringsMap = parseEffects(keyword);
 		EffectTemplate[] ret = new EffectTemplate[effectStringsMap.size()];
 		
 		int i = 0;
 		for (Entry<String, String> e : effectStringsMap.entrySet()) {
-			ret[i++] = createEffectTemplate(e.getKey(), e.getValue());
+			ret[i++] = createEffectTemplate(component, e.getKey(), e.getValue());
 		}
 		return ret;
 	}
@@ -338,13 +338,13 @@ public abstract class PlanReportroiryItemParser {
 //		return ret;
 	}
 	
-	protected EffectTemplate createEffectTemplate(String subKey, String subString) {
+	protected EffectTemplate createEffectTemplate(String component, String subKey, String subString) {
 		String name = HybridDomain.extractName(subString);
 		String[] args = HybridDomain.extractArgs(subString);
 
 		addVariableOccurrences(args, subKey);
 		
-		EffectTemplate et = new EffectTemplate(subKey, name, args, maxArgs, groundSolver);
+		EffectTemplate et = new EffectTemplate(subKey, name, args, maxArgs, groundSolver, component);
 		// Add additional AllenIntervalConstraints
 		for (AdditionalConstraintTemplate additionalCon : additionalAIConstraints) {
 			if (additionalCon.involvesHeadAndKey(subKey)) {

@@ -35,7 +35,7 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		HTNPrecondition[] preconditions = createPreconditions(true);
 		
 		String headname = HybridDomain.extractName(head);
-		EffectTemplate[] effects = createEffectTemplates(HybridDomain.EFFECT_KEYWORD);
+		EffectTemplate[] effects = createEffectTemplates("PlannedState", HybridDomain.EFFECT_KEYWORD);
 		HTNOperator op =  new HTNOperator(headname, argStrings, preconditions, effects);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
 		
