@@ -119,4 +119,6 @@ public class FluentDispatcher extends Thread {
 	public ConstraintNetwork getConstraintNetwork() {
 		return fns.getConstraintNetwork();
 	}
+
+	
 }

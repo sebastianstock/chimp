@@ -6,12 +6,17 @@ import htn.HTNPlanner;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -22,7 +27,7 @@ public class TestFluentDispatching {
 	public static void main(String[] args) {
 		
 		// init planner
-		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
 
 		String[][] symbols = TestProblemParsing.createSymbols();
 		int[] ingredients = TestProblemParsing.createIngredients();
@@ -72,9 +77,44 @@ public class TestFluentDispatching {
 			}
 		};
 		
+		for (Variable var : fns.getVariables("Activity")) {
+			var.setColor(Color.GREEN);
+		}
+		for (Variable var : fns.getVariables("Task")) {
+			var.setColor(Color.BLUE);
+		}
+		
 		animator.addDispatchingFunctions(fns, df);
 		
+		Fluent future = animator.getFuture();
+		future.setColor(Color.WHITE);
 		
+		while (true) {
+			System.out.println("Executing activities (press <enter> to refresh list):");
+			for (int i = 0; i < executingActs.size(); i++) System.out.println(i + ". " + executingActs.elementAt(i));
+			System.out.println("--");
+//			System.out.print("Please enter activity to finish: ");  
+			String input = "";
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));  
+			try { input = br.readLine(); }
+			catch (IOException e) { e.printStackTrace(); }
+			
+			for (int i = 0; i < executingActs.size(); i++) {
+				Fluent fl = executingActs.get(i);
+				if (fl.getTemporalVariable().getEET() > future.getTemporalVariable().getEST()) { 
+					df.finish(fl);
+					executingActs.remove(i);
+				}
+			}
+			
+//			if (!input.trim().equals("")) {
+//				try {
+//					df.finish(executingActs.elementAt(Integer.parseInt(input)));
+//					executingActs.remove(Integer.parseInt(input));
+//				}
+//				catch (ArrayIndexOutOfBoundsException e1) { /* Ignore unknown activity */ }
+//			}
+		}
 	}
 	
 	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {

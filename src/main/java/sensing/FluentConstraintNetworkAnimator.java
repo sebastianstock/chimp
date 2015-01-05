@@ -186,5 +186,9 @@ public class FluentConstraintNetworkAnimator extends Thread {
 			}
 		}
 	}
+	
+	public Fluent getFuture() {
+		return future;
+	}
 
 }
