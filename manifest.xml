@@ -1,0 +1,15 @@
+<package>
+  <description brief="chimp">
+
+    The CHIMP planner.
+
+  </description>
+  <author>ROS package maintained by Sebastian Stock</author>
+  <license>MIT</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/chimp</url>
+  <depend package="rosjava"/>
+  <depend package="meta_csp_framework"/>
+
+</package>
+
