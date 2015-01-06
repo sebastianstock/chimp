@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import resourceFluent.ResourceUsageTemplate;
-import sun.security.pkcs.ParsingException;
 
 public class OperatorParser extends PlanReportroiryItemParser {
 	
@@ -31,7 +30,7 @@ public class OperatorParser extends PlanReportroiryItemParser {
 	}
 	
 	@Override
-	public HTNOperator create() throws ParsingException {
+	public HTNOperator create() throws DomainParsingException {
 		HTNPrecondition[] preconditions = createPreconditions(true);
 		
 		String headname = HybridDomain.extractName(head);

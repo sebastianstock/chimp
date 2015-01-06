@@ -16,8 +16,6 @@ import java.util.Vector;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
-import sun.security.pkcs.ParsingException;
-
 import com.google.common.primitives.Ints;
 
 import fluentSolver.FluentNetworkSolver;
@@ -61,7 +59,7 @@ public abstract class PlanReportroiryItemParser {
 		parseAllenIntervalConstraints();
 	}
 	
-	public abstract PlanReportroryItem create() throws ParsingException;
+	public abstract PlanReportroryItem create() throws DomainParsingException;
 	
 	protected void addVariableOccurrences(String[] argStrings, String key) {
 		for (int i = 0; i < argStrings.length;  i++) {
@@ -137,7 +135,7 @@ public abstract class PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	protected Map<String,String[]> parseValueRestrictions(String valueKeyword, String typeKeyword) throws ParsingException {
+	protected Map<String,String[]> parseValueRestrictions(String valueKeyword, String typeKeyword) throws DomainParsingException {
 		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
 		// Parse variable definitions
 		String[] varElements = HybridDomain.parseKeyword(valueKeyword, textualSpecification);
@@ -150,7 +148,7 @@ public abstract class PlanReportroiryItemParser {
 		String[] typeElements = HybridDomain.parseKeyword(valueKeyword, textualSpecification);
 		Map<String, String[]> typesInstancesMap = planner.getTypesInstancesMap();
 		if (typesInstancesMap == null && typeElements.length > 0) {
-			throw new ParsingException("Specified types in the domain but the planner does not know the instances.");
+			throw new DomainParsingException("Specified types in the domain but the planner does not know the instances.");
 		}
 		for (String typeElement : typeElements) {
 			String varName = typeElement.substring(0, typeElement.indexOf(" ")).trim();
@@ -165,7 +163,7 @@ public abstract class PlanReportroiryItemParser {
 							values.add(instance);
 						}
 					} else {
-						throw new ParsingException("Type " + type + " specified but not in typesInstancesMap");
+						throw new DomainParsingException("Type " + type + " specified but not in typesInstancesMap");
 					}
 				}
 				variablesPossibleValuesMap.put(varName, values.toArray(new String[values.size()]));

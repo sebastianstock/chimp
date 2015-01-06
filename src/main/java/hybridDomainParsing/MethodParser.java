@@ -14,7 +14,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
 
 import fluentSolver.FluentConstraint;
-import sun.security.pkcs.ParsingException;
 
 public class MethodParser extends PlanReportroiryItemParser {
 
@@ -24,7 +23,7 @@ public class MethodParser extends PlanReportroiryItemParser {
 		// TODO Should we parse resources here / Should methods consume resources?
 	}
 	
-	public HTNMethod create() throws ParsingException {
+	public HTNMethod create() throws DomainParsingException {
 		HTNPrecondition[] preconditions = createPreconditions(false);
 
 		String headname = HybridDomain.extractName(head);

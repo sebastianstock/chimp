@@ -49,7 +49,7 @@ public class PlanExtractor {
 			printDecomposition(root, "");
 		}
 		
-	}
+	}	
 	
 	private void printDecomposition(Fluent task, String indentation) {
 		System.out.println(indentation + task);
@@ -62,8 +62,8 @@ public class PlanExtractor {
 			subtasks.add((Fluent) dc.getTo());
 		}
 		
-		Collections.sort(subtasks, new Comparator() {
-			public int compare(final Object obj1, final Object obj2) {
+		Collections.sort(subtasks, new Comparator<Fluent>() {
+			public int compare(final Fluent obj1, final Fluent obj2) {
 				if (beforesTable.contains((Fluent) obj1, (Fluent) obj2)) {
 					return -1;
 				} else if (beforesTable.contains((Fluent) obj2, (Fluent) obj1)) {
