@@ -21,7 +21,7 @@ repositories {
 }
 
 version = '0.0.0-SNAPSHOT'
-group = 'metacsp_htn_planner'
+group = 'chimp'
 
 dependencies {
 
