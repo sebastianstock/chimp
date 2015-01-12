@@ -68,7 +68,7 @@
  (Pre p1 RobotAt(?preArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[5000 ,10000](task))
+ (Constraint Duration[5000,INF](task))
  (Add e1 RobotAt(?mArea))
  (Constraint Overlaps(task,e1))
  (Del p1)
@@ -82,7 +82,7 @@
  (Pre p1 RobotAt(?mArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[5000,10000](task))
+ (Constraint Duration[5000,INF](task))
  (Add e1 RobotAt(?preArea))
  (Constraint Overlaps(task,e1))
  (Del p1)
@@ -109,7 +109,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[3000,10000](task))
+ (Constraint Duration[3000,INF](task))
 # (Constraint Duration[1000,10000000](e1))
 # (Constraint Duration[1000,10000000](e2))
 )
@@ -121,7 +121,7 @@
  (Constraint OverlappedBy(task,p1))
  (Del p1)
  (Add e1 HasTorsoPosture(?newPosture))
- (Constraint Duration[3000,7000](task))
+ (Constraint Duration[3000,INF](task))
 )
 
 # PICK_UP_OBJECT
@@ -142,7 +142,7 @@
  (Constraint OverlappedBy(task,p4))
  (Constraint Meets(p4,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[7000,20000](task))
+ (Constraint Duration[7000,INF](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -173,7 +173,7 @@
  (Constraint During(task,p3))
  (Constraint Meets(p1,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[7000,15000](task))
+ (Constraint Duration[7000,INF](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -200,7 +200,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[3000,7000](task))
+ (Constraint Duration[3000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint Overlaps(task,e1))
  )
@@ -223,7 +223,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[3000,7000](task))
+ (Constraint Duration[3000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
@@ -250,7 +250,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[5000,10000](task))
+ (Constraint Duration[5000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))   # TODO is this correct?
@@ -264,7 +264,7 @@
  (Pre p2 Connected(?plArea ?robotArea ?preArea))
  (Constraint During(task,p1))
  (Constraint During(task,p2))
- (Constraint Duration[3000,5000](task))
+ (Constraint Duration[3000,INF](task))
 )
 
 
@@ -288,7 +288,7 @@
  (Head adapt_torso(?newPose))
  (Pre p1 HasTorsoPosture(?oldPose))
  (VarDifferent ?newPose ?oldPose) 
- (Constraint Duration[3000,7000](task))
+ (Constraint Duration[3000,INF](task))
  (Sub s1 !move_torso(?newPose))
  (Constraint Equals(s1,task))
  )
@@ -297,7 +297,7 @@
 (:method
  (Head adapt_torso(?posture))
  (Pre p1 HasTorsoPosture(?posture))
- (Constraint Duration[0,0](task))
+ (Constraint Duration[0,INF](task))
  (Constraint During(task,p1))
  )
 
@@ -310,7 +310,7 @@
   (Values ?nothing nothing)
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
-#  (Constraint Duration[0,7000](task))
+#  (Constraint Duration[0,INF](task))
   (Sub s1 adapt_torso(?newPose))
   (Values ?newPose TorsoDownPosture)
   (Constraint Equals(s1,task))
@@ -321,7 +321,7 @@
   (Pre p1 Holding(?arm ?obj))
   (NotValues ?obj nothing)
 #  (Type ?obj Object)
-#  (Constraint Duration[0,7000](task))
+#  (Constraint Duration[0,INF](task))
   (Sub s1 adapt_torso(?newPose))
   (Values ?newPose TorsoMiddlePosture)
   (Constraint Equals(s1,task))
@@ -340,7 +340,7 @@
  (Values ?leftArm leftArm1)
  (Values ?rightArm rightArm1)
  
- (Constraint Duration[0,0](task))
+ (Constraint Duration[0,INF](task))
  (Constraint During(task,p1))
  (Constraint During(task,p2))
  )
@@ -352,7 +352,7 @@
  (Values ?posture ArmTuckedPosture)
  (NotValues ?currentposture ArmTuckedPosture)
  
- (Constraint Duration[3000,10000](task))
+ (Constraint Duration[3000,INF](task))
 
  (Sub s1 !tuck_arms(?posture ?posture))
  (Constraint Equals(s1,task))
@@ -365,7 +365,7 @@
  (Values ?posture ArmCarryPosture)
  (NotValues ?currentposture ArmCarryPosture)
  
- (Constraint Duration[5000,10000](task))
+ (Constraint Duration[5000,INF](task))
 
  (Sub s1 !move_arms_to_carryposture())
  (Constraint Equals(s1,task))
@@ -391,7 +391,7 @@
   (Pre p1 Holding(?arm ?obj))
   (NotValues ?obj nothing)
 #  (Type ?obj Object)
-# (Constraint Duration[3000,10000](task))
+# (Constraint Duration[3000,INF](task))
   (Sub s1 adapt_arms(?newPose))
   (Values ?newPose ArmCarryPosture)
   (Constraint Equals(s1,task))
@@ -483,7 +483,7 @@
   (Constraint Before[1,1000](s1,s3))
   (Constraint Finishes(s2,task)) # Dangerous for execution
   (Constraint Finishes(s3,task)) # Dangerous for execution
-  (Constraint Duration[6001,18000](task))
+  (Constraint Duration[6001,INF](task))
 )
 
 ## 2. left arm at side, right not
@@ -548,7 +548,7 @@
 
   (Sub s1 !move_arm_to_side(?leftArm))
   (Sub s2 !move_arm_to_side(?rightArm))
-  (Constraint Duration[3000,14000](task))
+  (Constraint Duration[3000,INF](task))
   )
 
 
@@ -815,34 +815,10 @@
   (Constraint Finishes(s2,task))
   )
 
-### UNUSED:
 
-# Use both_arms_assume_manipulation_pose instead
-# and assume_botharms_manipulation_pose
 
-(:method    # move arm to side
- (Head arm_assume_manipulation_pose(?arm))
-  (Pre p1 HasArmPosture(?arm ?armPosture))
-
-  (NotValues ?armPosture ArmToSidePosture)
-
-  (Sub s1 move_arm_to_side_method(?sidePosture))
-  (Values ?sidePosture ArmToSidePosture)
-
-  (Constraint Equals(s1,task))
+#### serve both
+(:method
+  (Head serve_coffee_to_guest(?guest))
 )
-
-# TODO SHOP2 domain has another method to move the other arm (line 896)
-
-(:method    # already there
- (Head arm_assume_manipulation_pose(?arm))
-  (Pre p1 HasArmPosture(?arm ?sidePosture))
-
-  (Values ?sidePosture ArmToSidePosture)
-
-  (Constraint Duration[0,0](task))
-  (Constraint During(task,p1))
-)
-
-
 

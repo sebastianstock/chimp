@@ -98,7 +98,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose0.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_0.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_2.pdl");
@@ -116,8 +116,8 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
+		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
+//		ProblemParser pp = new ProblemParser("problemfs/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
