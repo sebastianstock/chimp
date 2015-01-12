@@ -1,5 +1,7 @@
 package unify;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +25,8 @@ public class CompoundSymbolicVariable extends MultiVariable {
 	private static int internalVarsCount;
 	
 	private static final String NONESYMBOL = "n";
+	
+	private static final String[] noStrs = {};
 	
 	
 	public CompoundSymbolicVariable(ConstraintSolver cs, int id, ConstraintSolver[] internalSolvers,
@@ -141,6 +145,34 @@ public class CompoundSymbolicVariable extends MultiVariable {
 		}
 		ret.append(")");
 		return ret.toString();
+	}
+	
+	/**
+	 * Computes an array of ground arguments that are not NONESYMBOL.
+	 * @return Array of ground arguments.
+	 * @throws IllegalStateException if an argument is not ground.
+	 */
+	public String[] getGroundArgs() {
+		Variable[] internalVars = this.getInternalVariables();
+		if (internalVars.length < 2) {
+			return noStrs;
+		}
+		
+		List<String> ret = new ArrayList<String>(internalVars.length - 1);
+		for (int i = 1; i < internalVars.length; i++) {
+			NameVariable nv = (NameVariable) internalVars[i];
+			if (nv.isGround()) {
+				String str = nv.toString();
+				if (!str.equals(NONESYMBOL)) {
+					ret.add(str);
+				} else {
+					break;
+				}
+			} else {
+				throw new IllegalStateException(i - 1  + "th Argument is not ground!");
+			}
+		}
+		return ret.toArray(new String[ret.size()]);
 	}
 	
 	// TODO: UPDATE
