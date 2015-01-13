@@ -2,6 +2,7 @@ package hybridDomainParsing;
 
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
+import htn.NewestFluentsValOH;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import resourceFluent.FluentResourceUsageScheduler;
@@ -118,7 +120,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
-//		ProblemParser pp = new ProblemParser("problemfs/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
@@ -142,8 +144,8 @@ public class TestProblemParsing {
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-//		MetaCSPLogging.setLevel(Level.FINE);
-		MetaCSPLogging.setLevel(Level.OFF);
+		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);
+//		MetaCSPLogging.setLevel(Level.OFF);
 		
 		
 		plan(planner, fluentSolver);
@@ -196,7 +198,9 @@ public class TestProblemParsing {
 		}
 		
 		// init meta constraints based on domain
-		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint();
+		ValueOrderingH valOH = new NewestFluentsValOH();
+		
+		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
 		selectionConstraint.addOperators(dom.getOperators());
 		selectionConstraint.addMethods(dom.getMethods());
 		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
@@ -211,8 +215,6 @@ public class TestProblemParsing {
 		}
 		
 		planner.addMetaConstraint(selectionConstraint);
-		
-
 		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);

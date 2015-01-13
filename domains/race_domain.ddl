@@ -821,9 +821,11 @@
 (:method
   (Head serve_coffee_to_guest(?placingArea)) # TODO use sittingArea
 
-  (Pre p0 Type(Coffee ?coffee))
+  (Pre p0 Type(?coffeetype ?coffee))
+  (Values ?coffeetype Coffee)
   
-  (Pre p1 Type(Milk ?milk))
+  (Pre p1 Type(?milktype ?milk))
+  (Values ?milktype Milk)
   
   (Sub s1 move_object(?coffee ?placingArea))
   (Sub s2 move_object(?milk ?placingArea))

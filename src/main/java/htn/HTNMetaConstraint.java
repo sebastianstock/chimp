@@ -12,6 +12,7 @@ import java.util.Vector;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
+import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
@@ -39,6 +40,11 @@ public class HTNMetaConstraint extends MetaConstraint {
 
 	public HTNMetaConstraint() {
 		this(true);
+	}
+	
+	public HTNMetaConstraint(ValueOrderingH valOH) {
+		super(null, valOH);
+		this.oneShot = true;
 	}
 	
 	public HTNMetaConstraint(boolean oneShot) {
