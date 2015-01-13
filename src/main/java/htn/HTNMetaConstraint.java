@@ -119,6 +119,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
 			Vector<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
 		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
+//		Fluent[] openFluents = groundSolver.getOpenFluents();
 		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {

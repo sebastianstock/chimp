@@ -819,6 +819,18 @@
 
 #### serve both
 (:method
-  (Head serve_coffee_to_guest(?guest))
+  (Head serve_coffee_to_guest(?placingArea)) # TODO use sittingArea
+
+  (Pre p0 Type(Coffee ?coffee))
+  
+  (Pre p1 Type(Milk ?milk))
+  
+  (Sub s1 move_object(?coffee ?placingArea))
+  (Sub s2 move_object(?milk ?placingArea))
+
+#  (Ordering s1 s2)
+#  (Constraint Starts(s1,task))
+#  (Constraint Finishes(s2,task))
+  
 )
 

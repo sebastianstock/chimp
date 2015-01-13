@@ -29,7 +29,7 @@ public class TestProblemParsing {
 		// predicates  
 		// index: 0
 		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
-				"Connected",
+				"Connected", "Type",
 				// operators
 				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
 				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
@@ -44,7 +44,7 @@ public class TestProblemParsing {
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
-		symbols[1] = new String[] {"mug1", "mug2", "sugarpot1", "milk1", 
+		symbols[1] = new String[] {"mug1", "mug2",
 				"nothing",
 				"placingAreaEastRightCounter1",
 				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
@@ -66,6 +66,7 @@ public class TestProblemParsing {
 				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
 				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
 				"coffeeJug1", "milkPot1", "sugarPot1", "sugarPot2",
+				"Milk", "Coffee", "Sugar", "Mug", "Peppermill",
 				N};
 		return symbols;
 	}
@@ -116,10 +117,12 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
 //		ProblemParser pp = new ProblemParser("problemfs/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
+		
+		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
 		
 		String[][] symbols = createSymbols();
 		int[] ingredients = createIngredients();
@@ -198,7 +201,6 @@ public class TestProblemParsing {
 		selectionConstraint.addMethods(dom.getMethods());
 		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
 		selectionConstraint.setResourceUsages(fluentResourceUsages);
-		planner.addMetaConstraint(selectionConstraint);
 		
 		for (FluentScheduler fs : dom.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);
@@ -207,6 +209,10 @@ public class TestProblemParsing {
 		for (FluentResourceUsageScheduler rs : dom.getResourceSchedulers()) {
 			planner.addMetaConstraint(rs);
 		}
+		
+		planner.addMetaConstraint(selectionConstraint);
+		
+
 		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
