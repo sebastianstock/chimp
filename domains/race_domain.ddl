@@ -423,7 +423,7 @@
   (Constraint Starts(s2,task))
 
   (Sub s3 !move_base(?toArea))
-  (Constraint Finishes[1,10000](s3,task)) # TOO Restricting?
+  (Constraint Finishes(s3,task)) # TOO Restricting?
  (Ordering s1 s3)
  (Ordering s2 s3)
  )
@@ -448,7 +448,7 @@
  (Constraint Before[1,1000](s0,s2))
 
  (Sub s3 !move_base(?toArea))
- (Constraint Finishes[5000,27002](s3,task))
+ (Constraint Finishes(s3,task))
  (Ordering s0 s1)
  (Ordering s0 s2)
  (Ordering s0 s3)
@@ -585,7 +585,7 @@
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
   (Constraint Starts(s2,task))
-  (Constraint Finishes[1,14000](s3,task))
+  (Constraint Finishes(s3,task))
 )
 
 # first move back to preArea
@@ -611,7 +611,7 @@
   (Constraint Starts(s0,task))
   (Constraint Before[1,1000](s0,s1))
   (Constraint Before[1,1000](s0,s2))
-  (Constraint Finishes[5000,25000](s3,task))
+  (Constraint Finishes(s3,task))
 )
 
 ### LEAVE_MANIPULATION_POSE
@@ -826,13 +826,18 @@
   
   (Pre p1 Type(?milktype ?milk))
   (Values ?milktype Milk)
+
+  (Pre p2 Type(?sugartype ?sugar))
+  (Values ?sugartype Sugar)
   
   (Sub s1 move_object(?coffee ?placingArea))
   (Sub s2 move_object(?milk ?placingArea))
+  (Sub s3 move_object(?sugar ?placingArea))
 
- # (Ordering s1 s2)
- # (Constraint Starts(s1,task))
- # (Constraint Finishes(s2,task))
+  (Ordering s1 s2)
+  (Constraint Starts(s1,task))
+  (Ordering s2 s3)
+  (Constraint Finishes(s3,task))
   
 )
 
