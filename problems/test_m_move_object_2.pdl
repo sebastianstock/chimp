@@ -38,8 +38,8 @@
 (Fluent f7 Holding(leftArm1 nothing))
 (Constraint Release[0,0](f7))
 
-#(Fluent f8 On(mug1 placingAreaSouthLeftTable2))
-(Fluent f8 On(mug1 placingAreaSouthRightTable2))
+(Fluent f8 On(mug1 placingAreaSouthLeftTable2))
+#(Fluent f8 On(mug1 placingAreaSouthRightTable2))
 (Constraint Release[0,0](f8))
 
 
