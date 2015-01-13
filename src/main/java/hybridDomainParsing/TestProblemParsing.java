@@ -144,7 +144,11 @@ public class TestProblemParsing {
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);
+//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
+		
+				
+		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+		
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
 		
@@ -219,6 +223,7 @@ public class TestProblemParsing {
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 		planner.addMetaConstraint(mbConstraint);
+
 	}
 	
 

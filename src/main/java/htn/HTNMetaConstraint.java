@@ -102,6 +102,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
+		long startTime = System.nanoTime();
 		Vector<ConstraintNetwork> ret;
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
@@ -116,6 +117,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 		} else {
 			ret = applyPlanrepoirtroryItems(taskFluent, methods, groundSolver);
 		}
+		
+		long endTime = System.nanoTime();
+		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
 		
 		if (!ret.isEmpty()) 
 			return ret.toArray(new ConstraintNetwork[ret.size()]);

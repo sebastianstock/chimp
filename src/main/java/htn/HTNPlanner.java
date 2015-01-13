@@ -26,6 +26,8 @@ public class HTNPlanner extends MetaConstraintSolver {
 	private static final long serialVersionUID = 8031573555691611305L;
 	
 	private Map<String, String[]> typesInstancesMap;
+	
+	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 
 	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols, 
 			int[] symbolicingredients) {
@@ -33,6 +35,8 @@ public class HTNPlanner extends MetaConstraintSolver {
 		super(new Class[] {FluentConstraint.class}, 
 				animationTime, 
 				new FluentNetworkSolver(origin, horizon, symbols, symbolicingredients));
+		
+		logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 	}
 
 	@Override
@@ -66,8 +70,7 @@ public class HTNPlanner extends MetaConstraintSolver {
 	@Override
 	protected void retractResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
-		Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
-		logger.finest("START RETRACT_RESOLVER_SUB");
+		
 		long startTime = System.nanoTime();
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
@@ -94,7 +97,7 @@ public class HTNPlanner extends MetaConstraintSolver {
 			}
 		}
 		long endTime = System.nanoTime();
-		logger.finest("END RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
+		logger.finest("RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
 	}
 
 	/**
@@ -109,6 +112,8 @@ public class HTNPlanner extends MetaConstraintSolver {
 	@Override
 	protected boolean addResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
+		
+		long startTime = System.nanoTime();
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
@@ -161,6 +166,9 @@ public class HTNPlanner extends MetaConstraintSolver {
 				}
 			}
 		}
+		
+		long endTime = System.nanoTime();
+		logger.finest("ADD_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
 				
 		return true;
 	}
