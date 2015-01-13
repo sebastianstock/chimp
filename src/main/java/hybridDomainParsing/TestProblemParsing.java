@@ -144,7 +144,7 @@ public class TestProblemParsing {
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
+		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		
 				
 		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
@@ -167,7 +167,7 @@ public class TestProblemParsing {
 
 		planner.draw();
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
 //		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 

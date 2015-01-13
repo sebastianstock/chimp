@@ -12,6 +12,18 @@ public class NewestFluentsValOH extends ValueOrderingH {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {
+		long est0 = getPlannedTask(cn0).getAllenInterval().getEST();
+		long est1 = getPlannedTask(cn1).getAllenInterval().getEST();
+		if (est0 == est1) {
+			return comparePreconditions(cn0, cn1);
+		} else if (est0 < est1) {
+			return -1;
+		} else {
+			return 1;
+		}	
+	}
+	
+	private int comparePreconditions(ConstraintNetwork cn0, ConstraintNetwork cn1) {
 		long cn0ESTSum = calcPreconditionESTSum(cn0);
 		long cn1ESTSum = calcPreconditionESTSum(cn1);
 		
@@ -22,6 +34,15 @@ public class NewestFluentsValOH extends ValueOrderingH {
 		} else {
 			return 0;
 		}
+	}
+	
+	private Fluent getPlannedTask(ConstraintNetwork cn) {
+		for (Constraint con : cn.getConstraints()) {
+			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
+				return (Fluent) ((FluentConstraint) con).getFrom();
+			}
+		}
+		return null;
 	}
 	
 	private long calcPreconditionESTSum(ConstraintNetwork cn) {
@@ -36,8 +57,6 @@ public class NewestFluentsValOH extends ValueOrderingH {
 
 			}
 		}
-		
-		
 		return sum;
 	}
 

@@ -63,16 +63,27 @@ public class HTNMetaConstraint extends MetaConstraint {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors 
-		// a ConstraintNetwork is built.
-		// this becomes a task.
-		for (Variable var : groundSolver.getVariables()) {
+		// add it to the ConstraintNetwork network
+		ConstraintNetwork nw = new ConstraintNetwork(null);
+		ArrayList<Variable> tasks = new ArrayList<Variable>();
+		for (Variable var : groundSolver.getVariables("Activity")) {
+			tasks.add(var);
+		}
+		for (Variable var : groundSolver.getVariables("Task")) {
+			tasks.add(var);
+		}
+		for (Variable var : tasks) {
 			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-					ConstraintNetwork nw = new ConstraintNetwork(null);
+					
 					nw.addVariable(var);
-					ret.add(nw);
+					
 				}
 			}
+		}
+		
+		if (nw.getVariables().length > 0) {
+				ret.add(nw);
 		}
 		logger.finest("MetaVariables: " + ret);
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
@@ -103,22 +114,28 @@ public class HTNMetaConstraint extends MetaConstraint {
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
 		long startTime = System.nanoTime();
-		Vector<ConstraintNetwork> ret;
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
-		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
+		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		
-		logger.fine("getMetaValues for: " + taskFluent);
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		// TODO propagation probably not needed here
 		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
-		if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-			ret = applyPlanrepoirtroryItems(taskFluent, operators, groundSolver);
-		} else {
-			ret = applyPlanrepoirtroryItems(taskFluent, methods, groundSolver);
+		//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
+			
+		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
+		
+		for (Variable var : problematicNetwork.getVariables()) {
+			Fluent taskFluent = (Fluent) var;	
+			logger.finest("getMetaValues for: " + taskFluent);
+			
+			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
+				ret.addAll(applyPlanrepoirtroryItems(taskFluent, operators, groundSolver));
+			} else {
+				ret.addAll(applyPlanrepoirtroryItems(taskFluent, methods, groundSolver));
+			}
 		}
 		
 		long endTime = System.nanoTime();
+		logger.finest("Computed metaValues for " + problematicNetwork.getVariables().length + " tasks");
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
 		
 		if (!ret.isEmpty()) 
@@ -173,11 +190,18 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 */
 	@Override
 	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-		if(this.oneShot) {
-			metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
-		} else {
-			metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.SELECTED);
+		for (Constraint con : metaValue.getConstraints()) {
+			if (con instanceof FluentConstraint 
+					&& ((FluentConstraint) con).getType().equals(FluentConstraint.Type.UNARYAPPLIED)) {
+				Variable task = ((FluentConstraint) con).getFrom();
+				if(this.oneShot) {
+					task.setMarking(markings.PLANNED);
+				} else {
+					task.setMarking(markings.SELECTED);
+				}
+			}
 		}
+
 	}
 
 	@Override
