@@ -54,6 +54,15 @@ public class HTNMetaConstraint extends MetaConstraint {
 //		methods = new Vector<PlanReportroryItem>();
 	}
 	
+	private boolean checkApplied(Fluent task) {
+		for (Constraint con : this.getGroundSolver().getConstraintNetwork().getConstraints(task, task)) {
+			if (con instanceof FluentConstraint) {
+				if (((FluentConstraint)con).getType().equals(FluentConstraint.Type.UNARYAPPLIED)) return true;
+			}
+		}
+		return false;
+	}
+	
 	/** 
 	 * @return All {@link MetaVariable}s with the marking UNPLANNED and which have no unplanned 
 	 * predecessors.
@@ -73,11 +82,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 			tasks.add(var);
 		}
 		for (Variable var : tasks) {
-			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
+			if (!checkApplied((Fluent)var)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-					
 					nw.addVariable(var);
-					
 				}
 			}
 		}
@@ -98,7 +105,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (FluentConstraint flc : 
 			groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.BEFORE)) {
 			Object marking = flc.getScope()[0].getMarking();
-			if ( (marking == markings.UNPLANNED) || (marking == markings.SELECTED) ){
+			if (!checkApplied((Fluent)flc.getScope()[0])) {
 				return false;
 			}	 
 		}
@@ -124,9 +131,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		
 		for (Variable var : problematicNetwork.getVariables()) {
-			Fluent taskFluent = (Fluent) var;	
-			logger.finest("getMetaValues for: " + taskFluent);
-			
+			Fluent taskFluent = (Fluent) var;
 			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, operators, groundSolver));
 			} else {
@@ -136,6 +141,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		
 		long endTime = System.nanoTime();
 		logger.finest("Computed metaValues for " + problematicNetwork.getVariables().length + " tasks");
+		logger.finest("Found " + ret.size() + " metaValues");
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
 		
 		if (!ret.isEmpty()) 
@@ -152,7 +158,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
 				
-				logger.fine("Applying preconditions of PlanReportroryItem " + item);
+				logger.finest("Applying preconditions of PlanReportroryItem " + item);
 				if (this.oneShot) {
 					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, groundSolver, openFluents);
 					ret.addAll(newResolvers);
