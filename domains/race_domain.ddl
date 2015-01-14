@@ -91,6 +91,7 @@
 )
 
 # TUCK_ARMS
+
 (:operator
  (Head !tuck_arms(?leftGoal ?rightGoal))
  (Pre p1 HasArmPosture(?leftArm ?oldLeft))
@@ -113,6 +114,7 @@
 # (Constraint Duration[1000,10000000](e1))
 # (Constraint Duration[1000,10000000](e2))
 )
+
 
 # MOVE_TORSO
 (:operator
@@ -800,7 +802,7 @@
 
 ### SERVE_COFFEE_TO_GUEST
 (:method 
-  (Head serve_coffee_to_guest(?guest))
+  (Head serve_single_coffee_to_guest(?guest))
 
   (Pre p1 On(?object ?fromArea))
 
@@ -823,6 +825,8 @@
 
   (Pre p0 Type(?coffeetype ?coffee))
   (Values ?coffeetype Coffee)
+
+ (Values ?placingArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
   
   (Pre p1 Type(?milktype ?milk))
   (Values ?milktype Milk)
@@ -832,12 +836,13 @@
   
   (Sub s1 move_object(?coffee ?placingArea))
   (Sub s2 move_object(?milk ?placingArea))
-  (Sub s3 move_object(?sugar ?placingArea))
+#  (Sub s3 move_object(?sugar ?placingArea))
 
   (Ordering s1 s2)
-  (Constraint Starts(s1,task))
-  (Ordering s2 s3)
-  (Constraint Finishes(s3,task))
+#  (Constraint Starts(s1,task))
+#  (Ordering s1 s3)
+#  (Ordering s2 s3)
+#  (Constraint Finishes(s3,task))
   
 )
 
