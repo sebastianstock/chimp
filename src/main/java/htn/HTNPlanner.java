@@ -44,21 +44,22 @@ public class HTNPlanner extends MetaConstraintSolver {
 
 	@Override
 	public void postBacktrack(MetaVariable mv) {
-		if (mv.getMetaConstraint() instanceof TaskApplicationMetaConstraint) {
-			for (Variable v : mv.getConstraintNetwork().getVariables()) {
-				v.setMarking(markings.SELECTED);
-			}
-		}
-		else if (mv.getMetaConstraint() instanceof PreconditionMetaConstraint) {
-			for (Variable v : mv.getConstraintNetwork().getVariables()) {
-				v.setMarking(markings.UNJUSTIFIED);
-			}
-		} 
-		else if (mv.getMetaConstraint() instanceof HTNMetaConstraint) {
-			for (Variable v : mv.getConstraintNetwork().getVariables()) {
-				v.setMarking(markings.UNPLANNED);
-			}
-		} 
+//		if (mv.getMetaConstraint() instanceof TaskApplicationMetaConstraint) {
+//			for (Variable v : mv.getConstraintNetwork().getVariables()) {
+//				v.setMarking(markings.SELECTED);
+//			}
+//		}
+//		else if (mv.getMetaConstraint() instanceof PreconditionMetaConstraint) {
+//			for (Variable v : mv.getConstraintNetwork().getVariables()) {
+//				v.setMarking(markings.UNJUSTIFIED);
+//			}
+//		} 
+//		else if (mv.getMetaConstraint() instanceof HTNMetaConstraint) {
+//			for (Variable v : mv.getConstraintNetwork().getVariables()) {
+//				v.setMarking(markings.UNPLANNED);
+//				System.out.println("SET TO UNPLANNED: " + v);
+//			}
+//		} 
 	}
 
 	/**
@@ -83,6 +84,7 @@ public class HTNPlanner extends MetaConstraintSolver {
 					Variable vReal = metaValue.getSubstitution((VariablePrototype)v);
 					if (vReal != null) {
 							varsToRemove.add(vReal);
+//							System.out.println("GONNA REMOVE  " + vReal);
 					}
 				}
 			}

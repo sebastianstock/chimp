@@ -4,6 +4,9 @@ import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.NewestFluentsValOH;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -11,6 +14,8 @@ import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
+import org.metacsp.framework.Variable;
+import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import resourceFluent.FluentResourceUsageScheduler;
@@ -20,6 +25,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
+import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 
 public class TestProblemParsing {
@@ -120,11 +126,13 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs  // BUG: DOES NOT WORK
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
 		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
+		
+//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl");
 		
 		String[][] symbols = createSymbols();
 		int[] ingredients = createIngredients();
@@ -139,6 +147,7 @@ public class TestProblemParsing {
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 		initPlanner(planner, "domains/race_domain.ddl");
+//		initPlanner(planner, "domains/short_domain.ddl");
 		
 		pp.createState(fluentSolver);
 		
@@ -147,12 +156,38 @@ public class TestProblemParsing {
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		
 				
-		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+			MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 		
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
 		
 		plan(planner, fluentSolver);
+		
+		Variable[] acts = fluentSolver.getVariables();
+		ArrayList<Variable> plan = new ArrayList<Variable>();
+		for (Variable var : acts) {
+			if (var.getComponent() == null) {
+				plan.add(var);
+			}
+			else if (var.getComponent().equals("Activity")) {
+				plan.add(var);
+			}
+		}
+		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
+		Arrays.sort(planVector, new Comparator<Variable>() {
+			@Override
+			public int compare(Variable o1, Variable o2) {
+				// TODO Auto-generated method stub
+				Fluent f1 = (Fluent)o1;
+				Fluent f2 = (Fluent)o2;
+				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+			}
+		});
+		
+		int c = 0;
+		for (Variable act : planVector) {
+			System.out.println(c++ +".\t" + act);
+		}
 		
 		extractPlan(fluentSolver);
 	}
