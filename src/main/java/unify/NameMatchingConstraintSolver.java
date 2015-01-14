@@ -74,6 +74,7 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 			for (NameDomain d : backUpDomains) {
 				d.getVariable().setDomain(d);
 			}
+			logger.info("NameFailure");
 		}
 		long endTime = System.nanoTime();
 		propagationTime += endTime - startTime;
