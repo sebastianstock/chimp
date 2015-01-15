@@ -299,7 +299,7 @@
 (:method
  (Head adapt_torso(?posture))
  (Pre p1 HasTorsoPosture(?posture))
- (Constraint Duration[0,INF](task))
+ (Constraint Duration[10,INF](task))
  (Constraint During(task,p1))
  )
 
@@ -342,7 +342,7 @@
  (Values ?leftArm leftArm1)
  (Values ?rightArm rightArm1)
  
- (Constraint Duration[0,INF](task))
+ (Constraint Duration[10,INF](task))
  (Constraint During(task,p1))
  (Constraint During(task,p2))
  )
@@ -406,7 +406,7 @@
  (Head drive_robot(?toArea))
   (Pre p1 RobotAt(?toArea))
   (Constraint During(task,p1))
-  (Constraint Duration[0,0](task))
+  (Constraint Duration[10,INF](task))
   )
 
 
@@ -531,7 +531,7 @@
   (Values ?leftPosture ArmToSidePosture)
   (Values ?rightPosture ArmToSidePosture)
   
-  (Constraint Duration[0,0](task))
+  (Constraint Duration[10,INF](task))
 )
 
 # 5. both not at side and not tucked
@@ -540,7 +540,7 @@
  (Head move_both_arms_to_side())
   (Pre p1 HasArmPosture(?leftArm ?leftPosture))
   (Pre p2 HasArmPosture(?rightArm ?rightPosture))
-  (Pre p3 HasArmPosture(?arm ?notTucked))
+  (Pre p3 HasArmPosture(?arm ?notTucked))  # TODO can lead to two values
 
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
@@ -569,8 +569,9 @@
   (Values ?rightPosture ArmToSidePosture)
   (Values ?torsoPosture TorsoUpPosture)
   
-  (Constraint Duration[0,0](task))
+  (Constraint Duration[10,INF](task))
 )
+
 
 # 2. standard behaviour
 (:method 
@@ -759,12 +760,14 @@
   (Values ?leftArm leftArm1)
   
   (Sub s1 get_object_w_arm(?object ?leftArm))
+
   (Sub s2 put_object(?object ?toArea))
 
   (Ordering s1 s2)
-  (Constraint Starts(s1,task))
-  (Constraint Before[1,1000](s1,s2))
-  (Constraint Finishes(s2,task))
+#  (Constraint Starts(s1,task))
+#  (Constraint Before(s1,s2))
+#  (Constraint Before[1,1000](s1,s2))
+#  (Constraint Finishes(s2,task))
 )
 
 (:method 
@@ -835,14 +838,31 @@
   (Values ?sugartype Sugar)
   
   (Sub s1 move_object(?coffee ?placingArea))
-  (Sub s2 move_object(?milk ?placingArea))
+#  (Sub s2 move_object(?milk ?placingArea))
 #  (Sub s3 move_object(?sugar ?placingArea))
 
-  (Ordering s1 s2)
+#  (Ordering s1 s2)
 #  (Constraint Starts(s1,task))
+#(Constraint (s1,task))
 #  (Ordering s1 s3)
 #  (Ordering s2 s3)
 #  (Constraint Finishes(s3,task))
   
 )
 
+(:method
+  (Head serve_coffee_to_guest_test(?coffee ?placingArea)) # TODO use sittingArea
+
+  
+  (Sub s1 move_object(?coffee ?placingArea))
+#  (Sub s2 move_object(?milk ?placingArea))
+#  (Sub s3 move_object(?sugar ?placingArea))
+
+#  (Ordering s1 s2)
+#  (Constraint Starts(s1,task))
+#  (Constraint Equals(s1,task))
+#  (Ordering s1 s3)
+#  (Ordering s2 s3)
+#  (Constraint Finishes(s3,task))
+  
+)
