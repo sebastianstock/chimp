@@ -42,7 +42,7 @@
 (Constraint Release[0,0](f7))
 
 
-(Task t0 grasp_object_w_arm(mug1 rightArm1))
+(Task t0 grasp_object(mug1))
 (Constraint Release[0,1](t0))
 
 )

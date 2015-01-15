@@ -48,7 +48,7 @@ public class TestProblemParsing {
 				// methods
 				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
 				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
-				"leave_manipulation_pose", "grasp_object_w_arm", "get_object_w_arm", "put_object",
+				"leave_manipulation_pose", "grasp_object", "get_object", "put_object",
 				"move_object", "serve_coffee_to_guest", 
 				
 				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
@@ -108,8 +108,8 @@ public class TestProblemParsing {
 		
 		// new for merge
 //		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso_merge.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_test_merge.pdl"); 
-//		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); 
+//		ProblemParser pp = new ProblemParser("problems/test_m_test_merge.pdl"); 
+		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); 
 		
 		
 		

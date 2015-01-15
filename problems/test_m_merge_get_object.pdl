@@ -58,8 +58,8 @@
 (Constraint Release[0,0](i2))
 
 
-(Task t0 get_object_w_arm(coffeeJug1 leftArm1))
-(Task t1 get_object_w_arm(milkPot1 rightArm1))
+(Task t0 get_object(coffeeJug1))
+(Task t1 get_object(milkPot1))
 
 
 

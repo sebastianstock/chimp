@@ -647,16 +647,15 @@
   (Constraint Equals(s1,task))
  )
 
-### GRASP_OBJECT_W_ARM
+### GRASP_OBJECT
 (:method 
-  (Head grasp_object_w_arm(?object ?arm))
+  (Head grasp_object(?object))
   
-#  (Pre p1 RobotAt(?preArea))  # checked in assume_manipulation_pose
+  (Pre p1 RobotAt(?preArea))  # checked in assume_manipulation_pose
   (Pre p2 Connected(?plArea ?manArea ?preArea))
   (Pre p3 On(?object ?plArea))
 
-  #(Pre p4 Holding(?arm ?nothing)) # checked in pick-up
-  #(Values ?nothing nothing)
+  (Values ?arm leftArm1 rightArm1) # TODO use type or leave it unground
 
   (Sub s1 assume_manipulation_pose(?manArea))
   (Sub s2 !observe_objects_on_area(?plArea))
@@ -665,50 +664,41 @@
   (Ordering s1 s2)
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
-#  (Constraint Before[1,1000](s1,s2))
-#  (Constraint Before[1,1000](s2,s3))
   (Constraint Finishes(s3,task))
   (Constraint Before(s1,s2))
   (Constraint Before(s2,s3))
-) # TODO Could be merged into get_object_w_arm
+) # TODO Could be merged into get_object
 
-### GET_OBJECT_W_ARM
+### GET_OBJECT
 # 1. already holding another object
 ## put it on the counter TODO LEFT OUT FOR NOW
 
 # 2. Robot is at preArea
 (:method 
-  (Head get_object_w_arm(?object ?arm))
+  (Head get_object(?object))
   
   (Pre p1 RobotAt(?preArea))
   (Pre p2 Connected(?plArea ?manArea ?preArea))
   (Pre p3 On(?object ?plArea))
 
-  #(Pre p4 Holding(?arm ?nothing)) # checked in pick-up
-  #(Values ?nothing nothing)
-
-  (Sub s1 grasp_object_w_arm(?object ?arm))
+  (Sub s1 grasp_object(?object))
   (Constraint Equals(s1,task))
 )
 
 # 3. Robot is not at preArea
 (:method 
-  (Head get_object_w_arm(?object ?arm))
+  (Head get_object(?object))
   
   (Pre p1 RobotAt(?robotArea))
   (Pre p2 Connected(?plArea ?manArea ?preArea))
   (Pre p3 On(?object ?plArea))
   (VarDifferent ?robotArea ?preArea) 
 
-  #(Pre p4 Holding(?arm ?nothing)) # checked in pick-up
-  #(Values ?nothing nothing)
-
   (Sub s1 drive_robot(?preArea))
-  (Sub s2 grasp_object_w_arm(?object ?arm))
+  (Sub s2 grasp_object(?object))
 
   (Ordering s1 s2)
   (Constraint Starts(s1,task))
-#  (Constraint Before[1,1000](s1,s2))
   (Constraint Before(s1,s2))
   (Constraint Finishes(s2,task))
 )
@@ -782,55 +772,50 @@
 
   (Pre p1 On(?object ?fromArea))
 
-  (Values ?toArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
-  (Values ?leftArm leftArm1)
+#  (Values ?toArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
   
-  (Sub s1 get_object_w_arm(?object ?leftArm))
-
+  (Sub s1 get_object(?object))
   (Sub s2 put_object(?object ?toArea))
 
   (Ordering s1 s2)
   (Constraint Before(s1,s2))
-#  (Constraint Starts(s1,task))
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s2,task))
+)
+
+#(:method 
+#  (Head move_object(?object ?toArea))
+
+#  (Pre p1 On(?object ?fromArea))
+
+#  (Values ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+  
+#  (Sub s1 get_object(?object))
+#  (Sub s2 put_object(?object ?toArea))
+
+#  (Ordering s1 s2)
 #  (Constraint Before(s1,s2))
-#  (Constraint Before[1,1000](s1,s2))
+#  (Constraint Starts(s1,task))
 #  (Constraint Finishes(s2,task))
-)
+#  )
 
-(:method 
-  (Head move_object(?object ?toArea))
+#(:method 
+#  (Head move_object(?object ?toArea))
 
-  (Pre p1 On(?object ?fromArea))
+#  (Pre p1 On(?object ?fromArea))
 
-  (Values ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
-  (Values ?leftArm leftArm1)
+#  (NotValues ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+#  (NotValues ?toArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+#  (Values ?rightArm rightArm1)
   
-  (Sub s1 get_object_w_arm(?object ?leftArm))
-  (Sub s2 put_object(?object ?toArea))
+#  (Sub s1 get_object_w_arm(?object ?rightArm))
+#  (Sub s2 put_object(?object ?toArea))
 
-  (Ordering s1 s2)
-  (Constraint Before(s1,s2))
-  (Constraint Starts(s1,task))
-  (Constraint Finishes(s2,task))
-  )
-
-(:method 
-  (Head move_object(?object ?toArea))
-
-  (Pre p1 On(?object ?fromArea))
-
-  (NotValues ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
-  (NotValues ?toArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
-  (Values ?rightArm rightArm1)
-  
-  (Sub s1 get_object_w_arm(?object ?rightArm))
-  (Sub s2 put_object(?object ?toArea))
-
-  (Ordering s1 s2)
-  (Constraint Before(s1,s2))
-  (Constraint Starts(s1,task))
-  (Constraint Finishes(s2,task))
-)
+#  (Ordering s1 s2)
+#  (Constraint Before(s1,s2))
+#  (Constraint Starts(s1,task))
+#  (Constraint Finishes(s2,task))
+#)
 
 ### SERVE_COFFEE_TO_GUEST
 (:method 
