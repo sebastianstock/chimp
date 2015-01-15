@@ -155,10 +155,10 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			}
 			
 		} else if (this.type.equals(Type.BEFORE)) {
-			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-			befCon.setFrom(((Fluent) f).getAllenInterval());
-			befCon.setTo(((Fluent) t).getAllenInterval());
-			retList.add(befCon);
+//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+//			befCon.setFrom(((Fluent) f).getAllenInterval());
+//			befCon.setTo(((Fluent) t).getAllenInterval());
+//			retList.add(befCon);
 			
 		} else if (this.type.equals(Type.CLOSES)) { 
 			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
