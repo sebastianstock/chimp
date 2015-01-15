@@ -44,6 +44,9 @@
 (Fluent f9 On(milkPot1 placingAreaEastRightCounter1))
 (Constraint Release[0,0](f9))
 
+(Fluent f10 On(sugarPot1 placingAreaEastRightCounter1))
+(Constraint Release[0,0](f10))
+
 # new
 (Fluent i0 Type(Coffee coffeeJug1))
 (Constraint Release[0,0](i0))
@@ -51,7 +54,14 @@
 (Fluent i1 Type(Milk milkPot1))
 (Constraint Release[0,0](i1))
 
-(Task t0 serve_coffee_to_guest(placingAreaEastLeftTable1))
-(Constraint Release[0,1](t0))
+(Fluent i2 Type(Sugar sugarPot1))
+(Constraint Release[0,0](i2))
+
+
+# (Task t0 serve_coffee_to_guest_test(coffeeJug1 placingAreaEastLeftTable1))
+ (Task t0 serve_coffee_to_guest(placingAreaEastLeftTable1))
+# (Task t0 move_object(coffeeJug1 placingAreaEastLeftTable1))
+#(Task t0 serve_coffee_to_guest(coffeeJug1 placingAreaEastLeftTable1))
+#(Constraint Release[0,1](t0))
 
 )

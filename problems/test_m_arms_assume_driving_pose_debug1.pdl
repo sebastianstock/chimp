@@ -23,18 +23,24 @@
 (Fluent f1 HasArmPosture(leftArm1 ArmTuckedPosture))
 (Constraint Release[0,0](f1))
 
-(Fluent f2 HasArmPosture(rightArm1 ArmTuckedPosture))
+(Fluent f2 HasArmPosture(rightArm1 ArmUnTuckedPosture))
 (Constraint Release[0,0](f2))
 
-(Fluent f3 HasTorsoPosture(TorsoDownPosture))
+(Fluent f3 HasTorsoPosture(TorsoUpPosture))
 (Constraint Release[0,0](f3))
 
-(Fluent f4 RobotAt(preManipulationAreaSouthTable1))
+(Fluent f4 RobotAt(preManipulationAreaEastCounter1))
 (Constraint Release[0,0](f4))
 
+(Fluent f6 Holding(rightArm1 mug1))
+(Constraint Release[0,0](f6))
 
-#(Task t0 assume_manipulation_pose_wrapper(manipulationAreaSouthTable1))
-(Task t0 assume_manipulation_pose(manipulationAreaSouthTable1))
+(Fluent f7 Holding(leftArm1 nothing))
+(Constraint Release[0,0](f7))
+
+(Task t0 drive_robot(preManipulationAreaSouthTable1))
+#(Task t0 arms_assume_driving_pose())
+#(Task t0 put_object(mug1 placingAreaEastLeftTable1))
 (Constraint Release[0,1](t0))
 
 )
