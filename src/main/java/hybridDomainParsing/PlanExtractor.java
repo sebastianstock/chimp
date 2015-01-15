@@ -98,14 +98,13 @@ public class PlanExtractor {
 	
 	private List<Fluent> filterPlannedFluents() {
 		ArrayList<Fluent> ret = new ArrayList<Fluent>();
-		ConstraintNetwork cn = fluentSolver.getConstraintNetwork();
-		Variable[] vars =  cn.getVariables();
-		for (int i = 0; i < vars.length; i++) {
-			Fluent fl = (Fluent) vars[i];
-			if(fl.getMarking().equals(markings.PLANNED)) {
-				ret.add(fl);
-			}
+		for (Variable var : fluentSolver.getVariables("Activity")) {
+			ret.add((Fluent) var);
 		}
+		for (Variable var : fluentSolver.getVariables("Task")) {
+			ret.add((Fluent) var);
+		}
+		
 		return ret;
 	}
 	
