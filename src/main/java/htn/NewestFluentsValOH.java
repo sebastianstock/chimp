@@ -12,6 +12,11 @@ public class NewestFluentsValOH extends ValueOrderingH {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {
+		int matchesChecking = checkMatches(cn0, cn1);
+		if (matchesChecking != 0) {
+			return matchesChecking;
+		}
+		
 		long est0 = getPlannedTask(cn0).getAllenInterval().getEST();
 		long est1 = getPlannedTask(cn1).getAllenInterval().getEST();
 		if (est0 == est1) {
@@ -21,6 +26,33 @@ public class NewestFluentsValOH extends ValueOrderingH {
 		} else {
 			return 1;
 		}	
+	}
+	
+	private int checkMatches(ConstraintNetwork cn0, ConstraintNetwork cn1) {
+		FluentConstraint m0 = searchMatches(cn0);
+		FluentConstraint m1 = searchMatches(cn1);
+		if (m0 == null) {
+			if (m1 == null) {
+				return 0; // both do not contain matches
+			} else {
+				return 1; // only cn1 contains matches
+			}
+		} else {
+			if (m1 == null) {
+				return -1; // only cn0 contains matches
+			} else {
+				return 0; // both contain matches TODO compare intervals
+			}
+		}
+	}
+	
+	private FluentConstraint searchMatches(ConstraintNetwork cn) {
+		for (Constraint con : cn.getConstraints()) {
+			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.MATCHES) {
+				return (FluentConstraint) con;
+			}
+		}
+		return null;
 	}
 	
 	private int comparePreconditions(ConstraintNetwork cn0, ConstraintNetwork cn1) {

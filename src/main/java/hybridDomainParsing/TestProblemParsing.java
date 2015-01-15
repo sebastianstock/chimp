@@ -3,6 +3,7 @@ package hybridDomainParsing;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.NewestFluentsValOH;
+import htn.TaskApplicationMetaConstraint.markings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 
+import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
@@ -26,6 +28,7 @@ import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
 import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 public class TestProblemParsing {
@@ -103,6 +106,12 @@ public class TestProblemParsing {
 		// new for debugging:
 //		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose_debug1.pdl");
 		
+		// new for merge
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso_merge.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_test_merge.pdl"); 
+//		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); 
+		
+		
 		
 //		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose0.pdl");
@@ -136,7 +145,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
-		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl");
 		
@@ -209,8 +218,25 @@ public class TestProblemParsing {
 		long endTime = System.nanoTime();
 
 		planner.draw();
+		
+		ConstraintNetwork cn = new ConstraintNetwork(null);
+		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
+			if (con instanceof FluentConstraint) {
+				FluentConstraint fc = (FluentConstraint) con;
+				if (fc.getType() == FluentConstraint.Type.MATCHES) {
+					fc.getFrom().setMarking(markings.SELECTED);
+					cn.addConstraint(fc);
+				} else if (fc.getType() == FluentConstraint.Type.DC) {
+					cn.addConstraint(fc);
+				}
+			}
+		}
+		ConstraintNetwork.draw(cn);
+		
+		
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		
+//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
 //		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 

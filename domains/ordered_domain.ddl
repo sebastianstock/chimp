@@ -869,13 +869,13 @@
   
   (Sub s1 move_object(?coffee ?placingArea))
   (Sub s2 move_object(?milk ?placingArea))
-  (Sub s3 move_object(?sugar ?placingArea))
+#  (Sub s3 move_object(?sugar ?placingArea))
 
   (Ordering s1 s2)
 #  (Constraint Starts(s1,task))
 #(Constraint (s1,task))
 #  (Ordering s1 s3)
-  (Ordering s2 s3)
+#  (Ordering s2 s3)
 #  (Constraint Finishes(s3,task))
 
 #(Constraint Before(s1,s2))

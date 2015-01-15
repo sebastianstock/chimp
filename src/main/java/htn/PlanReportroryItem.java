@@ -347,7 +347,6 @@ public abstract class PlanReportroryItem {
 				}
 
 				// Add a UNARYAPPLIED to remember which method/operator has been used.
-				// UNARYAPPLIED is not needed anymore.
 				FluentConstraint applicationCon = 
 						new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, this);
 				applicationCon.setFrom(taskFluent);

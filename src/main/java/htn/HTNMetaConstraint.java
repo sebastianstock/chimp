@@ -133,8 +133,10 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (Variable var : problematicNetwork.getVariables()) {
 			Fluent taskFluent = (Fluent) var;
 			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
+				ret.addAll(unifyTasks(taskFluent, groundSolver));
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, operators, groundSolver));
 			} else {
+				ret.addAll(unifyTasks(taskFluent, groundSolver));
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, methods, groundSolver));
 			}
 		}
@@ -149,11 +151,49 @@ public class HTNMetaConstraint extends MetaConstraint {
 		return null;
 	}
 	
+	private List<ConstraintNetwork> unifyTasks(Fluent task, FluentNetworkSolver groundSolver) {
+		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
+		
+		String taskPredicate = task.getCompoundSymbolicVariable().getPredicateName();
+		
+		// get planned tasks with the same name
+		List<Fluent> possibleMatchingTasks = new ArrayList<Fluent>();
+		for (Variable var : groundSolver.getVariables(task.getComponent())) {
+			if (checkApplied((Fluent)var)) { // TODO CHECK start times
+				if (taskPredicate.equals(((Fluent)var).getCompoundSymbolicVariable().getPredicateName())) {
+					possibleMatchingTasks.add((Fluent) var);
+				}
+			}
+		}
+		
+		for (Fluent fl : possibleMatchingTasks) {
+			ConstraintNetwork cn = new ConstraintNetwork(null);
+			// add unification
+			FluentConstraint mc = new FluentConstraint(FluentConstraint.Type.MATCHES);
+			mc.setFrom(task);
+			mc.setTo(fl);
+			cn.addConstraint(mc);
+			// Add unaryApplied
+			FluentConstraint applicationCon = 
+					new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED);
+			applicationCon.setFrom(task);
+			applicationCon.setTo(task);
+			cn.addConstraint(applicationCon);
+			ret.add(cn);
+		}
+		if (ret.size() > 0 ) {
+			logger.info("Created MATCHES" + ret.toString());
+		}
+		
+		return ret;
+	}
+	
+	
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
 			Vector<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
 		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
 //		Fluent[] openFluents = groundSolver.getOpenFluents();
-		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));
+//		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
