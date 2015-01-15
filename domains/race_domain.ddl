@@ -422,7 +422,7 @@
   (Sub s1 torso_assume_driving_pose())
   (Constraint Starts(s1,task))
    (Sub s2 arms_assume_driving_pose())
-  (Constraint Starts(s2,task))
+#  (Constraint Starts(s2,task)) # would lead to temporal failure
 
   (Sub s3 !move_base(?toArea))
   (Constraint Finishes(s3,task)) # TOO Restricting?
