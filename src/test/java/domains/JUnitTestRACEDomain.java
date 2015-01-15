@@ -44,7 +44,7 @@ public class JUnitTestRACEDomain {
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
+		TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
 	}
 
 	@After
