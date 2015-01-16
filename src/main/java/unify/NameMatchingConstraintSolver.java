@@ -86,8 +86,8 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 		}
 		long endTime = System.nanoTime();
 		propagationTime += endTime - startTime;
-		logger.fine("Propagation took "+((endTime - startTime) / 1000000) + " ms");
-		logger.fine("Propagation took in sum "+((propagationTime) / 1000000) + " ms");
+		logger.fine("Name Propagation took "+((endTime - startTime) / 1000000) + " ms");
+		logger.fine("Name Propagation took in sum "+((propagationTime) / 1000000) + " ms");
 		return success;
 	}
 	
