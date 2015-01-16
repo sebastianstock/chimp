@@ -145,7 +145,7 @@ public abstract class PlanReportroiryItemParser {
 			variablesPossibleValuesMap.put(varName, values);
 		}
 		
-		String[] typeElements = HybridDomain.parseKeyword(valueKeyword, textualSpecification);
+		String[] typeElements = HybridDomain.parseKeyword(typeKeyword, textualSpecification);
 		Map<String, String[]> typesInstancesMap = planner.getTypesInstancesMap();
 		if (typesInstancesMap == null && typeElements.length > 0) {
 			throw new DomainParsingException("Specified types in the domain but the planner does not know the instances.");

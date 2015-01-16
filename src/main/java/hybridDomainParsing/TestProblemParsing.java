@@ -53,6 +53,7 @@ public class TestProblemParsing {
 				"move_object", "serve_coffee_to_guest", 
 				
 				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
+				"not_test",
 				// other
 				"Future"
 				};	
@@ -146,10 +147,13 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
-//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl");
-		
+		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl");
+//		
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl");
+		
+		// value ordering heuristic debugging:
+//		ProblemParser pp = new ProblemParser("problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
 		
 		String[][] symbols = createSymbols();
 		int[] ingredients = createIngredients();
@@ -166,6 +170,8 @@ public class TestProblemParsing {
 //		initPlanner(planner, "domains/race_domain.ddl");
 //		initPlanner(planner, "domains/s_domain.ddl");
 		initPlanner(planner, "domains/ordered_domain.ddl");
+		
+//		initPlanner(planner, "domains/debug_nottype.pdl");
 //		initPlanner(planner, "domains/short_domain.ddl");
 		
 		pp.createState(fluentSolver);
@@ -273,8 +279,8 @@ public class TestProblemParsing {
 		}
 		
 		// init meta constraints based on domain
-		ValueOrderingH valOH = new NewestFluentsValOH();
-//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new NewestFluentsValOH();
+		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
 		selectionConstraint.addOperators(dom.getOperators());
