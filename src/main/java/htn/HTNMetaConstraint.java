@@ -161,6 +161,11 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (Variable var : groundSolver.getVariables(task.getComponent())) {
 			if (checkApplied((Fluent)var)) { // TODO CHECK start times
 				if (taskPredicate.equals(((Fluent)var).getCompoundSymbolicVariable().getPredicateName())) {
+					
+//					if (compareParameters(task, (Fluent) var)) {
+//						
+//					}
+					
 					possibleMatchingTasks.add((Fluent) var);
 				}
 			}
@@ -189,10 +194,21 @@ public class HTNMetaConstraint extends MetaConstraint {
 	}
 	
 	
+	private boolean compareParameters(Fluent task, Fluent var) {
+		
+		try {
+			String[] taskArgs = task.getCompoundSymbolicVariable().getGroundArgs();
+			String[] varArgs = var.getCompoundSymbolicVariable().getGroundArgs();
+		} catch (IllegalStateException e) {
+			return true;
+		}
+		return false;
+	}
+
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
 			Vector<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
-		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
-//		Fluent[] openFluents = groundSolver.getOpenFluents();
+//		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
+		Fluent[] openFluents = groundSolver.getOpenFluents();
 //		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
