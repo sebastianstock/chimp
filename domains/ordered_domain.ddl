@@ -845,13 +845,14 @@
   (Pre p0 Type(?coffeetype ?coffee))
   (Values ?coffeetype Coffee)
 
- (Values ?placingArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
+ (Values ?placingArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2 placingAreaNorthRightTable2)
   
   (Pre p1 Type(?milktype ?milk))
   (Values ?milktype Milk)
 
-  (Pre p2 Type(?sugartype ?sugar))
-  (Values ?sugartype Sugar)
+#  (Pre p2 Type(?sugartype ?sugar))
+#  (Values ?sugartype Sugar)
+  (Values ?sugar sugarPot1 sugarPot2)
   
   (Sub s1 move_object(?coffee ?placingArea))
   (Sub s2 move_object(?milk ?placingArea))
