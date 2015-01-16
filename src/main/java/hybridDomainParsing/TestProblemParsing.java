@@ -109,7 +109,7 @@ public class TestProblemParsing {
 		// new for merge
 //		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso_merge.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_test_merge.pdl"); 
-		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); 
+//		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); 
 		
 		
 		
@@ -140,7 +140,7 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
