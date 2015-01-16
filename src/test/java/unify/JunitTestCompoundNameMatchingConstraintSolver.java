@@ -104,7 +104,7 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		cc01.setFrom(vars[0]);
 		cc01.setTo(vars[1]);
 		assertTrue(solver.addConstraint(cc01));
-		System.out.println("Var1: " + vars[1].getName());
+//		System.out.println("Var1: " + vars[1].getName());
 		assertTrue(vars[1].getName().equals("On(mug1 placingAreaWestRightTable1)"));
 		
 		CompoundSymbolicValueConstraint cc02 = new CompoundSymbolicValueConstraint(Type.SUBMATCHES, 
@@ -118,8 +118,8 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 		cc03.setFrom(vars[0]);
 		cc03.setTo(vars[3]);
 		assertTrue(solver.addConstraint(cc03));
-		System.out.println("Var3: " + vars[3].getName());
-		assertTrue(vars[3].getName().equals("!pick_up_object(mug1 n)"));
+//		System.out.println("Var3: " + vars[3].getName());
+		assertTrue(vars[3].getName().equals("!pick_up_object(mug1)"));
 
 	}
 	
@@ -143,18 +143,23 @@ public class JunitTestCompoundNameMatchingConstraintSolver {
 	public void testSubDifferent() {
 		vars[0].setName("On", "mug1", "placingAreaWestRightTable1");
 		vars[1].setName("On", "mug2", "?area");
+		System.out.println("Var0: " + vars[0].getName());
+		System.out.println("Var1: " + vars[1].getName());
 		
 		CompoundSymbolicValueConstraint cc01 = new CompoundSymbolicValueConstraint(Type.SUBDIFFERENT, 
 				new int[] {1, 1});
 		cc01.setFrom(vars[0]);
 		cc01.setTo(vars[1]);
 		assertTrue(solver.addConstraint(cc01));
-
 		
+		System.out.println("Var0: " + vars[0].getName());
+		System.out.println("Var1: " + vars[1].getName());
+
 		vars[2].setName("On", "mug1", "?area");
+		System.out.println("Var2: " + vars[2].getName());
 		
 		CompoundSymbolicValueConstraint cc02 = new CompoundSymbolicValueConstraint(Type.SUBDIFFERENT, 
-				new int[] {1, 1});
+				new int[] {0, 0});
 		cc02.setFrom(vars[0]);
 		cc02.setTo(vars[2]);
 		assertFalse(solver.addConstraint(cc02));
