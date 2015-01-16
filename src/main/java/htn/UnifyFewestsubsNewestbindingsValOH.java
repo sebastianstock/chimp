@@ -8,13 +8,27 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentConstraint.Type;
 
-public class NewestFluentsValOH extends ValueOrderingH {
+/**
+ * Compare based on
+ * 1. prefer unification
+ * 2. prefer planned task with earlier start time
+ * 3. prefer fewer subtasks
+ * 4. prefer newest precondition bindings
+ * 
+ * @author Sebastian Stock
+ */
+public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {
 		int matchesChecking = checkMatches(cn0, cn1);
 		if (matchesChecking != 0) {
 			return matchesChecking;
+		}
+		
+		int subtasksChecking = countSubtasks(cn0) - countSubtasks(cn1);
+		if (subtasksChecking != 0) {
+			return subtasksChecking;
 		}
 		
 		long est0 = getPlannedTask(cn0).getAllenInterval().getEST();
@@ -26,6 +40,18 @@ public class NewestFluentsValOH extends ValueOrderingH {
 		} else {
 			return 1;
 		}	
+	}
+
+	
+	private int countSubtasks(ConstraintNetwork cn) {
+		int ret = 0;
+		for (Constraint con : cn.getConstraints()) {
+			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.DC) {
+				ret++;
+			}
+		}
+		return ret;
+		
 	}
 	
 	private int checkMatches(ConstraintNetwork cn0, ConstraintNetwork cn1) {

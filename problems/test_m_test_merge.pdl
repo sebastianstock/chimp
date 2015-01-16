@@ -63,11 +63,11 @@
 
 #(Task t0 move_object(coffeeJug1 placingAreaEastLeftTable1))
 #(Task t1 move_object(milkPot1 placingAreaEastLeftTable1))
-#(Task t1 get_object_w_arm(milkPot1 rightArm1))
+#(Task t1 get_object_w_arm(milkPot1))
 
 
-# (Task t0 serve_coffee_to_guest_test(coffeeJug1 placingAreaEastLeftTable1))
- (Task t0 serve_coffee_to_guest(placingAreaEastLeftTable1))
+ (Task t0 serve_coffee_to_guest_test(coffeeJug1 milkPot1 placingAreaEastLeftTable1))
+# (Task t0 serve_coffee_to_guest(placingAreaEastLeftTable1))
 # (Task t0 move_object(coffeeJug1 placingAreaEastLeftTable1))
 #(Task t0 serve_coffee_to_guest(coffeeJug1 placingAreaEastLeftTable1))
 #(Constraint Release[0,1](t0))

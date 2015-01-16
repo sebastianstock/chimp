@@ -3,6 +3,7 @@ package hybridDomainParsing;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.NewestFluentsValOH;
+import htn.UnifyFewestsubsNewestbindingsValOH;
 import htn.TaskApplicationMetaConstraint.markings;
 
 import java.util.ArrayList;
@@ -140,12 +141,13 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl");
 		
@@ -272,6 +274,7 @@ public class TestProblemParsing {
 		
 		// init meta constraints based on domain
 		ValueOrderingH valOH = new NewestFluentsValOH();
+//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
 		selectionConstraint.addOperators(dom.getOperators());

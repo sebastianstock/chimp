@@ -71,6 +71,7 @@
  (Constraint Duration[5000,INF](task))
  (Add e1 RobotAt(?mArea))
  (Constraint Overlaps(task,e1))
+# (Constraint Meets(task,e1))
  (Del p1)
  (ResourceUsage 
     (Usage navigationCapacity 1))
@@ -84,6 +85,7 @@
  (Constraint OverlappedBy(task,p1))
  (Constraint Duration[5000,INF](task))
  (Add e1 RobotAt(?preArea))
+# (Constraint Meets(task,e1))
  (Constraint Overlaps(task,e1))
  (Del p1)
  (ResourceUsage 
