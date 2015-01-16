@@ -36,6 +36,16 @@ public class NameDomain extends Domain {
 		this.domain = Arrays.copyOf(dom.domain, dom.domain.length);
 		this.isConstant = dom.isConstant;
 	}
+	
+	protected void reset() {
+		if(isConstant > -1) {
+			Arrays.fill(this.domain, false);
+			this.domain[isConstant] = true;
+		} else {
+			Arrays.fill(this.domain, true);
+		}
+		
+	}
 
 	@Override
 	public int compareTo(Object o) {

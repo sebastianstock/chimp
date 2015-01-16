@@ -63,11 +63,19 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 	@Override
 	public boolean propagate() {
 		long startTime = System.nanoTime();
+		
+		Variable[] vars = this.getVariables();
+		
 		// create backup of old domains
 		NameDomain[] backUpDomains = new NameDomain[this.getVariables().length];
-		for (int i = 0; i < this.getVariables().length; i++) {
-			backUpDomains[i] = new NameDomain((NameDomain) this.getVariables()[i].getDomain());
+		for (int i = 0; i < vars.length; i++) {
+			NameDomain domain = (NameDomain) vars[i].getDomain();
+			backUpDomains[i] = new NameDomain(domain);
+			
+			// re-initialize the domains
+			domain.reset();
 		}
+		
 		boolean success = ac3();
 		// restore backup
 		if (!success) { 
