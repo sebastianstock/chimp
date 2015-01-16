@@ -108,8 +108,8 @@ public class NameDomain extends Domain {
 	 * @param unaryValues Sorted array of values.
 	 * @return
 	 */
-	public boolean setUnaryEquals(int[] unaryValues) {
-		// sets every each internal variable that is not in unaryValues to false
+	protected boolean setUnaryEquals(int[] unaryValues) {
+		// sets each internal variable that is not in unaryValues to false
 		boolean changed = false; // indicates if a value has been changed
 		int valueIndex = 0;
 		for (int domainIndex = 0; domainIndex < domain.length; domainIndex++) {
@@ -131,7 +131,7 @@ public class NameDomain extends Domain {
 	 * @param unaryValues Values that cannot be true.
 	 * @return
 	 */
-	public boolean setUnaryDifferent(int[] unaryValues) {
+	protected boolean setUnaryDifferent(int[] unaryValues) {
 		boolean changed = false; // indicates if a value has been changed
 		for (int i : unaryValues) {
 			if (domain[i]) {
@@ -146,7 +146,7 @@ public class NameDomain extends Domain {
 		return isConstant;
 	}
 	
-	public int applyEqualsConstr(NameDomain to) {
+	protected int applyEqualsConstr(NameDomain to) {
 		if (this.domain.length != to.domain.length) {
 			throw new IllegalArgumentException("Domains need to have the same number of symbols");
 		}
@@ -177,7 +177,7 @@ public class NameDomain extends Domain {
 		return ret;
 	}
 	
-	public int applyDifferentConstr(NameDomain to) {
+	protected int applyDifferentConstr(NameDomain to) {
 		if (this.domain.length != to.domain.length) {
 			throw new IllegalArgumentException("Domains need to have the same number of symbols");
 		}
