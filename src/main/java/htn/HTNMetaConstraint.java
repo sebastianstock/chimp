@@ -1,9 +1,6 @@
 package htn;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -162,12 +159,15 @@ public class HTNMetaConstraint extends MetaConstraint {
 			if (checkApplied((Fluent)var)) { // TODO CHECK start times
 				if (taskPredicate.equals(((Fluent)var).getCompoundSymbolicVariable().getPredicateName())) {
 					
-//					if (compareParameters(task, (Fluent) var)) {
-//						
-//					}
+//					possibleMatchingTasks.add((Fluent) var);
 					
-					possibleMatchingTasks.add((Fluent) var);
+					// compare full name
+					if (compareWithGetName(task, (Fluent) var)) {
+						possibleMatchingTasks.add((Fluent) var);
+					}
+					
 				}
+
 			}
 		}
 		
@@ -193,16 +193,26 @@ public class HTNMetaConstraint extends MetaConstraint {
 		return ret;
 	}
 	
+	private boolean compareWithGetName(Fluent task, Fluent var) {
+		return task.getCompoundSymbolicVariable().getName().equals(var.getCompoundSymbolicVariable().getName());
+	}
 	
-	private boolean compareParameters(Fluent task, Fluent var) {
+	
+	private boolean parametersAreMatching(Fluent task, Fluent var) {
 		
 		try {
 			String[] taskArgs = task.getCompoundSymbolicVariable().getGroundArgs();
 			String[] varArgs = var.getCompoundSymbolicVariable().getGroundArgs();
+			for (int i = 0; i < taskArgs.length; i++) {
+				if (!taskArgs[i].equals(varArgs[i])) {
+					return false;
+				}
+			}
+			
 		} catch (IllegalStateException e) {
-			return true;
+			
 		}
-		return false;
+		return true;
 	}
 
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
