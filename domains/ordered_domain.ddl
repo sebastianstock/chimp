@@ -464,18 +464,14 @@
  (Constraint Before(s2,s3))
 )
 
-### MOVE_BOTH_ARMS_TO_SIDE
-## 1. both arms tucked:
-## untuck first
-## move left and move right
+# MOVE_BOTH_ARMS_TO_SIDE NEW
 (:method 
  (Head move_both_arms_to_side())
-  (Pre p1 HasArmPosture(?leftArm ?armPosture))
-  (Pre p2 HasArmPosture(?rightArm ?armPosture))
+#  (Pre p1 HasArmPosture(?leftArm ?armPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?armPosture))
 
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
-  (Values ?armPosture ArmTuckedPosture)
 
   (Sub s1 !tuck_arms(?lUntuckedPosture ?rUntuckedPosture))
   (Values ?lUntuckedPosture ArmUnTuckedPosture)
@@ -487,81 +483,110 @@
   (Ordering s1 s2)
   (Ordering s2 s3)
   (Constraint Starts(s1,task))
-#  (Constraint Before[1,1000](s1,s2))
-#  (Constraint Before[1,1000](s1,s3))
-#  (Constraint Finishes(s2,task)) # Dangerous for execution
-#  (Constraint Finishes(s3,task)) # Dangerous for execution
-#  (Constraint Duration[6001,INF](task))
   (Constraint Before(s1,s2))
   (Constraint Before(s1,s3))
 )
 
-## 2. left arm at side, right not
-## move right arm to side
-(:method 
- (Head move_both_arms_to_side())
-  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
-  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
 
-  (Values ?leftArm leftArm1)
-  (Values ?rightArm rightArm1)
-  (Values ?leftPosture ArmToSidePosture)
-  (NotValues ?rightPosture ArmToSidePosture)
+#### OLD
+### MOVE_BOTH_ARMS_TO_SIDE
+## 1. both arms tucked:
+## untuck first
+## move left and move right
+#(:method 
+# (Head move_both_arms_to_side())
+#  (Pre p1 HasArmPosture(?leftArm ?armPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?armPosture))
 
-  (Sub s1 !move_arm_to_side(?rightArm))
-  (Constraint Equals(s1,task))
-)
+#  (Values ?leftArm leftArm1)
+#  (Values ?rightArm rightArm1)
+#  (Values ?armPosture ArmTuckedPosture)
+
+#  (Sub s1 !tuck_arms(?lUntuckedPosture ?rUntuckedPosture))
+#  (Values ?lUntuckedPosture ArmUnTuckedPosture)
+#  (Values ?rUntuckedPosture ArmUnTuckedPosture)
+
+#  (Sub s2 !move_arm_to_side(?leftArm))
+#  (Sub s3 !move_arm_to_side(?rightArm))
+
+#  (Ordering s1 s2)
+#  (Ordering s2 s3)
+#  (Constraint Starts(s1,task))
+##  (Constraint Before[1,1000](s1,s2))
+##  (Constraint Before[1,1000](s1,s3))
+##  (Constraint Finishes(s2,task)) # Dangerous for execution
+##  (Constraint Finishes(s3,task)) # Dangerous for execution
+##  (Constraint Duration[6001,INF](task))
+#  (Constraint Before(s1,s2))
+#  (Constraint Before(s1,s3))
+#)
+
+### 2. left arm at side, right not
+### move right arm to side
+#(:method 
+# (Head move_both_arms_to_side())
+#  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+
+#  (Values ?leftArm leftArm1)
+#  (Values ?rightArm rightArm1)
+#  (Values ?leftPosture ArmToSidePosture)
+#  (NotValues ?rightPosture ArmToSidePosture)
+
+#  (Sub s1 !move_arm_to_side(?rightArm))
+#  (Constraint Equals(s1,task))
+#)
 
 # 3. right arm at side, left not
 ## move left to side
-(:method 
- (Head move_both_arms_to_side())
-  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
-  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+#(:method 
+# (Head move_both_arms_to_side())
+#  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+#
+#  (Values ?leftArm leftArm1)
+#  (Values ?rightArm rightArm1)
+#  (NotValues ?leftPosture ArmToSidePosture)
+#  (Values ?rightPosture ArmToSidePosture)
 
-  (Values ?leftArm leftArm1)
-  (Values ?rightArm rightArm1)
-  (NotValues ?leftPosture ArmToSidePosture)
-  (Values ?rightPosture ArmToSidePosture)
-
-  (Sub s1 !move_arm_to_side(?leftArm))
-  (Constraint Equals(s1,task))
-)
+#  (Sub s1 !move_arm_to_side(?leftArm))
+#  (Constraint Equals(s1,task))
+#)
 
 # 4. both at side: nothing to do
-(:method 
- (Head move_both_arms_to_side())
-  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
-  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+#(:method 
+# (Head move_both_arms_to_side())
+#  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
 
-  (Values ?leftArm leftArm1)
-  (Values ?rightArm rightArm1)
-  (Values ?leftPosture ArmToSidePosture)
-  (Values ?rightPosture ArmToSidePosture)
+#  (Values ?leftArm leftArm1)
+#  (Values ?rightArm rightArm1)
+#  (Values ?leftPosture ArmToSidePosture)
+#  (Values ?rightPosture ArmToSidePosture)
   
-  (Constraint Duration[10,INF](task))
-)
+#  (Constraint Duration[10,INF](task))
+#)
 
 # 5. both not at side and not tucked
 ## move left and move right
-(:method 
- (Head move_both_arms_to_side())
-  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
-  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
-  (Pre p3 HasArmPosture(?arm ?notTucked))  # TODO can lead to two values
+#(:method 
+# (Head move_both_arms_to_side())
+#  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+#  (Pre p3 HasArmPosture(?arm ?notTucked))  # TODO can lead to two values
 
-  (Values ?leftArm leftArm1)
-  (Values ?rightArm rightArm1)
-  (NotValues ?leftPosture ArmToSidePosture)
-  (NotValues ?rightPosture ArmToSidePosture)
-  (NotValues ?notTucked ArmTuckedPosture)
+#  (Values ?leftArm leftArm1)
+#  (Values ?rightArm rightArm1)
+#  (NotValues ?leftPosture ArmToSidePosture)
+#  (NotValues ?rightPosture ArmToSidePosture)
+#  (NotValues ?notTucked ArmTuckedPosture)
 
-  (Sub s1 !move_arm_to_side(?leftArm))
-  (Sub s2 !move_arm_to_side(?rightArm))
-  (Constraint Duration[3000,INF](task))
+#  (Sub s1 !move_arm_to_side(?leftArm))
+#  (Sub s2 !move_arm_to_side(?rightArm))
+#  (Constraint Duration[3000,INF](task))
 
-  (Ordering s1 s2)
-  )
+#  (Ordering s1 s2)
+#  )
 
 
 ### ASSUME_MANIPULATION_POSE
