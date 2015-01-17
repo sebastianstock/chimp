@@ -67,7 +67,7 @@ public class FluentScheduler extends Schedulable {
 		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
 		con.setFrom(f1.getCompoundSymbolicVariable());
 		con.setTo(f2.getCompoundSymbolicVariable());
-		System.out.println("testing if constraint works:\n" + con);
+//		System.out.println("testing if constraint works:\n" + con);
 		if (f1.getCompoundSymbolicVariable().getConstraintSolver().addConstraint(con)) {
 			f1.getCompoundSymbolicVariable().getConstraintSolver().removeConstraint(con);
 			return false;
