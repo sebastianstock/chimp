@@ -73,6 +73,7 @@ public class TestProblemParsing {
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
 				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
 				"floorAreaTamsRestaurant1", 
+				"preManipulationAreaEastCounterOS1", "placingAreaEastRightCounterOS1", "manipulationAreaEastCounterOS1",
 				"sittingAreaWestTable1", "sittingAreaEastTable1",
 				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
 				"table1", "table2", "counter1", 
@@ -183,7 +184,7 @@ public class TestProblemParsing {
 				
 			MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 		
-//		MetaCSPLogging.setLevel(Level.OFF);
+//		MetaCSPLogging.setLevel(Level.INFO);
 		
 		
 		plan(planner, fluentSolver);
