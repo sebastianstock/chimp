@@ -69,7 +69,7 @@
  (Pre p1 RobotAt(?preArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[5000,INF](task))
+ (Constraint Duration[1000,INF](task))
  (Add e1 RobotAt(?mArea))
  (Constraint Meets(task,e1))
  (Del p1)
@@ -83,7 +83,7 @@
  (Pre p1 RobotAt(?mArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
  (Constraint OverlappedBy(task,p1))
- (Constraint Duration[5000,INF](task))
+ (Constraint Duration[1000,INF](task))
  (Add e1 RobotAt(?preArea))
  (Constraint Meets(task,e1))
  (Del p1)
@@ -111,7 +111,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[3000,INF](task))
+ (Constraint Duration[10,INF](task))
 # (Constraint Duration[1000,10000000](e1))
 # (Constraint Duration[1000,10000000](e2))
 )
@@ -124,7 +124,7 @@
  (Constraint OverlappedBy(task,p1))
  (Del p1)
  (Add e1 HasTorsoPosture(?newPosture))
- (Constraint Duration[3000,INF](task))
+ (Constraint Duration[10,INF](task))
 )
 
 # PICK_UP_OBJECT
@@ -134,7 +134,7 @@
  (Pre p2 RobotAt(?mArea))
  (Pre p3 Connected(?fromArea ?mArea ?preArea))
  (Pre p4 Holding(?arm ?nothing))
- (Values ?nothing nothing)
+ (pValues ?nothing nothing)
  (Del p1)
  (Del p4)
  (Add e1 Holding(?arm ?obj))
@@ -145,7 +145,7 @@
  (Constraint OverlappedBy(task,p4))
  (Constraint Meets(p4,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[7000,INF](task))
+ (Constraint Duration[1000,INF](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -176,7 +176,7 @@
  (Constraint During(task,p3))
  (Constraint Meets(p1,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[7000,INF](task))
+ (Constraint Duration[1000,INF](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -203,7 +203,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[3000,INF](task))
+ (Constraint Duration[10,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint Overlaps(task,e1))
  )
@@ -226,7 +226,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[3000,INF](task))
+ (Constraint Duration[10,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
@@ -253,7 +253,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[5000,INF](task))
+ (Constraint Duration[10,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))   # TODO is this correct?
@@ -267,7 +267,7 @@
  (Pre p2 Connected(?plArea ?robotArea ?preArea))
  (Constraint During(task,p1))
  (Constraint During(task,p2))
- (Constraint Duration[3000,INF](task))
+ (Constraint Duration[1,INF](task))
 )
 
 
@@ -291,7 +291,7 @@
  (Head adapt_torso(?newPose))
  (Pre p1 HasTorsoPosture(?oldPose))
  (VarDifferent ?newPose ?oldPose) 
- (Constraint Duration[3000,INF](task))
+# (Constraint Duration[3000,INF](task))
  (Sub s1 !move_torso(?newPose))
  (Constraint Equals(s1,task))
  )
@@ -355,7 +355,7 @@
  (Values ?posture ArmTuckedPosture)
  (NotValues ?currentposture ArmTuckedPosture)
  
- (Constraint Duration[3000,INF](task))
+# (Constraint Duration[10,INF](task))
 
  (Sub s1 !tuck_arms(?posture ?posture))
  (Constraint Equals(s1,task))
@@ -368,7 +368,7 @@
  (Values ?posture ArmCarryPosture)
  (NotValues ?currentposture ArmCarryPosture)
  
- (Constraint Duration[5000,INF](task))
+# (Constraint Duration[10,INF](task))
 
  (Sub s1 !move_arms_to_carryposture())
  (Constraint Equals(s1,task))
