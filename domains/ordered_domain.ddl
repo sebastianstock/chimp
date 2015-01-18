@@ -715,16 +715,16 @@
   (Pre p3 On(?object ?plArea))
 
   (Sub s1 assume_manipulation_pose(?manArea))
-  (Sub s2 !observe_objects_on_area(?plArea))
-  (Sub s3 !pick_up_object(?object ?arm))
+#  (Sub s2 !observe_objects_on_area(?plArea))
+  (Sub s2 !pick_up_object(?object ?arm))
 
   (Ordering s1 s2)
   (Constraint Before(s1,s2))
-  (Ordering s2 s3)
-  (Constraint Before(s2,s3))
+#  (Ordering s2 s3)
+#  (Constraint Before(s2,s3))
 
   (Constraint Starts(s1,task))
-  (Constraint Finishes(s3,task))
+  (Constraint Finishes(s2,task))
 )
 
 # 3. Robot is not at preArea
@@ -738,18 +738,18 @@
 
   (Sub s1 drive_robot(?preArea))
   (Sub s2 assume_manipulation_pose(?manArea))
-  (Sub s3 !observe_objects_on_area(?plArea))
-  (Sub s4 !pick_up_object(?object ?arm))
+#  (Sub s3 !observe_objects_on_area(?plArea))
+  (Sub s3 !pick_up_object(?object ?arm))
 
   (Ordering s1 s2)
   (Ordering s2 s3)
-  (Ordering s3 s4)
+#  (Ordering s3 s4)
   (Constraint Before(s1,s2))
   (Constraint Before(s2,s3))
-  (Constraint Before(s3,s4))
+#  (Constraint Before(s3,s4))
 
   (Constraint Starts(s1,task))
-  (Constraint Finishes(s4,task))
+  (Constraint Finishes(s3,task))
 )
 
 ### PUT_OBJECT
