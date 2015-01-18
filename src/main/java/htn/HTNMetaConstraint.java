@@ -14,6 +14,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
+import org.metacsp.multi.allenInterval.AllenInterval;
 
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -122,7 +123,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
 		// TODO propagation probably not needed here
-		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
+//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
 		//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 			
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
@@ -130,7 +131,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (Variable var : problematicNetwork.getVariables()) {
 			Fluent taskFluent = (Fluent) var;
 			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-				ret.addAll(unifyTasks(taskFluent, groundSolver));
+//				ret.addAll(unifyTasks(taskFluent, groundSolver));
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, operators, groundSolver));
 			} else {
 				ret.addAll(unifyTasks(taskFluent, groundSolver));
@@ -159,13 +160,15 @@ public class HTNMetaConstraint extends MetaConstraint {
 			if (checkApplied((Fluent)var)) { // TODO CHECK start times
 				if (taskPredicate.equals(((Fluent)var).getCompoundSymbolicVariable().getPredicateName())) {
 					
-//					possibleMatchingTasks.add((Fluent) var);
-					
-					// compare full name
-					if (compareWithGetName(task, (Fluent) var)) {
-						possibleMatchingTasks.add((Fluent) var);
+					if (checkTime(task.getAllenInterval(), ((Fluent) var).getAllenInterval())) {
+
+						//					possibleMatchingTasks.add((Fluent) var);
+
+						// compare full name
+						if (compareWithGetName(task, (Fluent) var)) {
+							possibleMatchingTasks.add((Fluent) var);
+						}
 					}
-					
 				}
 
 			}
@@ -193,6 +196,19 @@ public class HTNMetaConstraint extends MetaConstraint {
 		return ret;
 	}
 	
+	private boolean checkTime(AllenInterval taskInterval, AllenInterval varInterval) {
+		long taskEST = taskInterval.getEST();
+		long taskLST = taskInterval.getLST();
+		ArrayList<Fluent> ret = new ArrayList<Fluent>();
+
+
+			if (varInterval.getEST() < taskLST ) {//&& varInterval.getLET() >= taskEST) {
+
+			}
+
+		return true;
+	}
+
 	private boolean compareWithGetName(Fluent task, Fluent var) {
 		return task.getCompoundSymbolicVariable().getName().equals(var.getCompoundSymbolicVariable().getName());
 	}
@@ -217,6 +233,12 @@ public class HTNMetaConstraint extends MetaConstraint {
 
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
 			Vector<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
+//		Fluent[] openFluents;
+//		if (fl.getComponent().equals("Activity")) {
+//			openFluents = groundSolver.getOpenFluents();
+//		} else {
+//			openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
+//		}
 		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
 //		Fluent[] openFluents = groundSolver.getOpenFluents();
 //		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));

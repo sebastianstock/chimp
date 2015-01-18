@@ -74,6 +74,7 @@
 #(Constraint Release[0,1](t0))
 
 #(Constraint Deadline[0,200000](t0))
-(Constraint Deadline[0,600000](t0))
+#(Constraint Deadline[0,600000](t0))
+(Constraint Deadline[0,1650000](t0))
 
 )

@@ -32,6 +32,7 @@
 
 (MaxArgs 5)
 
+(Resource objManCapacity 1)
 
 (Resource navigationCapacity 1)
 ##
@@ -68,10 +69,11 @@
  (Head !move_base_blind(?mArea))
  (Pre p1 RobotAt(?preArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
- (Constraint OverlappedBy(task,p1))
- (Constraint Duration[1000,INF](task))
+# (Constraint OverlappedBy(task,p1))
+ (Constraint Duration[4000,INF](task))
  (Add e1 RobotAt(?mArea))
  (Constraint Meets(task,e1))
+ (Constraint Meets(p1,task))
  (Del p1)
  (ResourceUsage 
     (Usage navigationCapacity 1))
@@ -82,10 +84,11 @@
  (Head !move_base_blind(?preArea))
  (Pre p1 RobotAt(?mArea))       # TODO use type restriction
  (Pre p2 Connected(?plArea ?mArea ?preArea))
- (Constraint OverlappedBy(task,p1))
- (Constraint Duration[1000,INF](task))
+# (Constraint OverlappedBy(task,p1))
+ (Constraint Duration[4000,INF](task))
  (Add e1 RobotAt(?preArea))
  (Constraint Meets(task,e1))
+ (Constraint Meets(p1,task))
  (Del p1)
  (ResourceUsage 
     (Usage navigationCapacity 1))
@@ -111,7 +114,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[10,INF](task))
+ (Constraint Duration[4000,INF](task))
 # (Constraint Duration[1000,10000000](e1))
 # (Constraint Duration[1000,10000000](e2))
 )
@@ -124,7 +127,7 @@
  (Constraint OverlappedBy(task,p1))
  (Del p1)
  (Add e1 HasTorsoPosture(?newPosture))
- (Constraint Duration[10,INF](task))
+ (Constraint Duration[4000,INF](task))
 )
 
 # PICK_UP_OBJECT
@@ -145,7 +148,7 @@
  (Constraint OverlappedBy(task,p4))
  (Constraint Meets(p4,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[1000,INF](task))
+ (Constraint Duration[4000,INF](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -153,6 +156,9 @@
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1)
     (Param 2 rightArm1))
+    
+ (ResourceUsage 
+    (Usage objManCapacity 1))
 )
 
 # PLACE_OBJECT
@@ -176,7 +182,7 @@
  (Constraint During(task,p3))
  (Constraint Meets(p1,e1))
  # TODO Which constraint for effect? 
- (Constraint Duration[1000,INF](task))
+ (Constraint Duration[4000,INF](task))
  
  (ResourceUsage 
     (Usage leftArm1ManCapacity 1)
@@ -184,6 +190,9 @@
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1)
     (Param 2 rightArm1))
+
+ (ResourceUsage 
+    (Usage objManCapacity 1))
  )
 
 # MOVE_ARM_TO_SIDE
@@ -203,7 +212,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[10,INF](task))
+ (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint Overlaps(task,e1))
  )
@@ -226,7 +235,7 @@
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
  
- (Constraint Duration[10,INF](task))
+ (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
@@ -253,7 +262,7 @@
     (Usage leftArm1ManCapacity 1))
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1))
- (Constraint Duration[10,INF](task))
+ (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))   # TODO is this correct?
@@ -267,7 +276,7 @@
  (Pre p2 Connected(?plArea ?robotArea ?preArea))
  (Constraint During(task,p1))
  (Constraint During(task,p2))
- (Constraint Duration[1,INF](task))
+ (Constraint Duration[4000,INF](task))
 )
 
 
@@ -291,7 +300,6 @@
  (Head adapt_torso(?newPose))
  (Pre p1 HasTorsoPosture(?oldPose))
  (VarDifferent ?newPose ?oldPose) 
-# (Constraint Duration[3000,INF](task))
  (Sub s1 !move_torso(?newPose))
  (Constraint Equals(s1,task))
  )
@@ -314,7 +322,8 @@
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
 #  (Constraint Duration[0,INF](task))
-  (Sub s1 adapt_torso(?newPose))
+  (Sub s1 adapt_torso(?newPose))     # TODO PUT BACK IN
+#  (Sub s1 !move_torso(?newPose))   # TODO OUT
   (Values ?newPose TorsoDownPosture)
   (Constraint Equals(s1,task))
 )
@@ -325,7 +334,8 @@
   (NotValues ?obj nothing)
 #  (Type ?obj Object)
 #  (Constraint Duration[0,INF](task))
-  (Sub s1 adapt_torso(?newPose))
+  (Sub s1 adapt_torso(?newPose))        # TODO PUT BACK IN
+#  (Sub s1 !move_torso(?newPose))           # TODO OUT
   (Values ?newPose TorsoMiddlePosture)
   (Constraint Equals(s1,task))
 )
@@ -591,28 +601,21 @@
 
 ### ASSUME_MANIPULATION_POSE
 # 1. nothing to do
-(:method 
- (Head assume_manipulation_pose(?manArea))
-  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
-  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
-  (Pre p3 RobotAt(?manArea))
-  (Pre p4 HasTorsoPosture(?torsoPosture))
+#(:method          # TODO PUT BACK IN!!!
+# (Head assume_manipulation_pose(?manArea))
+#  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+#  (Pre p3 RobotAt(?manArea))
+#  (Pre p4 HasTorsoPosture(?torsoPosture))
 
-  (Values ?leftArm leftArm1)
-  (Values ?rightArm rightArm1)
-  (Values ?leftPosture ArmToSidePosture)
-  (Values ?rightPosture ArmToSidePosture)
-  (Values ?torsoPosture TorsoUpPosture)
+#  (Values ?leftArm leftArm1)
+#  (Values ?rightArm rightArm1)
+#  (Values ?leftPosture ArmToSidePosture)
+#  (Values ?rightPosture ArmToSidePosture)
+#  (Values ?torsoPosture TorsoUpPosture)
   
-  (Constraint Duration[10,INF](task))
-)
-
-(:method 
- (Head assume_manipulation_pose_wrapper(?manArea))
-  
-  (Sub s1 assume_manipulation_pose(?manArea))
-  (Constraint Equals(task,s1))
-)
+#  (Constraint Duration[10,INF](task))
+#)
 
 
 # 2. standard behaviour
@@ -628,40 +631,40 @@
   
   (Ordering s1 s2)
   (Ordering s2 s3)
-  (Constraint Starts(s1,task))
-  (Constraint Starts(s2,task))
-  (Constraint Finishes(s3,task))
+#  (Constraint Starts(s1,task))
+#  (Constraint Starts(s2,task))
+#  (Constraint Finishes(s3,task))
   (Constraint Before(s1,s3))
   (Constraint Before(s2,s3))
 )
 
 # first move back to preArea
-(:method 
- (Head assume_manipulation_pose(?manArea))
-  (Pre p1 RobotAt(?manArea))
-  (Pre p2 Connected(?plArea ?manArea ?preArea))
-  (Pre p3 HasArmPosture(?arm ?armPosture))
+#(:method 
+# (Head assume_manipulation_pose(?manArea))
+#  (Pre p1 RobotAt(?manArea))
+#  (Pre p2 Connected(?plArea ?manArea ?preArea))
+#  (Pre p3 HasArmPosture(?arm ?armPosture))
 
-  (NotValues ?armPosture ArmToSidePosture)
+#  (NotValues ?armPosture ArmToSidePosture)
 
-  (Sub s0 !move_base_blind(?preArea))
-  (Sub s1 adapt_torso(?torsoUpPosture))
-  (Values ?torsoUpPosture TorsoUpPosture)
-  (Sub s2 move_both_arms_to_side())
-  (Sub s3 !move_base_blind(?manArea))
+#  (Sub s0 !move_base_blind(?preArea))
+#  (Sub s1 adapt_torso(?torsoUpPosture))
+#  (Values ?torsoUpPosture TorsoUpPosture)
+#  (Sub s2 move_both_arms_to_side())
+#  (Sub s3 !move_base_blind(?manArea))
 
-  (Ordering s0 s1)
-  (Ordering s1 s2)
-  (Ordering s2 s3)
-  (Constraint Starts(s0,task))
-#  (Constraint Before[1,1000](s0,s1))
-#  (Constraint Before[1,1000](s0,s2))
-  (Constraint Finishes(s3,task))
-  (Constraint Before(s0,s1))
-  (Constraint Before(s0,s2))
-  (Constraint Before(s1,s3))
-  (Constraint Before(s2,s3))
-)
+#  (Ordering s0 s1)
+#  (Ordering s1 s2)
+#  (Ordering s2 s3)
+#  (Constraint Starts(s0,task))
+##  (Constraint Before[1,1000](s0,s1))
+##  (Constraint Before[1,1000](s0,s2))
+#  (Constraint Finishes(s3,task))
+#  (Constraint Before(s0,s1))
+#  (Constraint Before(s0,s2))
+#  (Constraint Before(s1,s3))
+#  (Constraint Before(s2,s3))
+#)
 
 ### LEAVE_MANIPULATION_POSE
 (:method 
@@ -684,15 +687,19 @@
   (Values ?arm leftArm1 rightArm1) # TODO use type or leave it unground
 
   (Sub s1 assume_manipulation_pose(?manArea))
-  (Sub s2 !observe_objects_on_area(?plArea))
+#  (Sub s2 !observe_objects_on_area(?plArea))
   (Sub s3 !pick_up_object(?object ?arm))
   
-  (Ordering s1 s2)
-  (Ordering s2 s3)
+#  (Ordering s1 s2)
+#  (Ordering s2 s3)
+
+   (Ordering s1 s3)
+   (Constraint Before(s1, s3))
+
   (Constraint Starts(s1,task))
   (Constraint Finishes(s3,task))
-  (Constraint Before(s1,s2))
-  (Constraint Before(s2,s3))
+#  (Constraint Before(s1,s2))
+#  (Constraint Before(s2,s3))
 ) # TODO Could be merged into get_object
 
 ### GET_OBJECT
@@ -707,8 +714,17 @@
   (Pre p2 Connected(?plArea ?manArea ?preArea))
   (Pre p3 On(?object ?plArea))
 
-  (Sub s1 grasp_object(?object))
-  (Constraint Equals(s1,task))
+  (Sub s1 assume_manipulation_pose(?manArea))
+  (Sub s2 !observe_objects_on_area(?plArea))
+  (Sub s3 !pick_up_object(?object ?arm))
+
+  (Ordering s1 s2)
+  (Constraint Before(s1,s2))
+  (Ordering s2 s3)
+  (Constraint Before(s2,s3))
+
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s3,task))
 )
 
 # 3. Robot is not at preArea
@@ -721,12 +737,19 @@
   (VarDifferent ?robotArea ?preArea) 
 
   (Sub s1 drive_robot(?preArea))
-  (Sub s2 grasp_object(?object))
+  (Sub s2 assume_manipulation_pose(?manArea))
+  (Sub s3 !observe_objects_on_area(?plArea))
+  (Sub s4 !pick_up_object(?object ?arm))
 
   (Ordering s1 s2)
-  (Constraint Starts(s1,task))
+  (Ordering s2 s3)
+  (Ordering s3 s4)
   (Constraint Before(s1,s2))
-  (Constraint Finishes(s2,task))
+  (Constraint Before(s2,s3))
+  (Constraint Before(s3,s4))
+
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s4,task))
 )
 
 ### PUT_OBJECT
@@ -771,7 +794,6 @@
 
   (Ordering s2 s3)
   (Constraint Starts(s2,task))
-#  (Constraint Before[1,1000](s2,s3))
   (Constraint Finishes(s3,task))
   (Constraint Before(s2,s3))
 )

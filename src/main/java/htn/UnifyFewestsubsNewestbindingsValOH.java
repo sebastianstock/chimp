@@ -11,8 +11,8 @@ import fluentSolver.FluentConstraint.Type;
 /**
  * Compare based on
  * 1. prefer unification
- * 2. prefer planned task with earlier start time
  * 3. prefer fewer subtasks
+ * 3. prefer planned task with earlier start time
  * 4. prefer newest precondition bindings
  * 
  * @author Sebastian Stock

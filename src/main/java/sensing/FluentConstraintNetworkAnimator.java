@@ -147,12 +147,16 @@ public class FluentConstraintNetworkAnimator extends Thread {
 	public void run() {
 		int iteration = 0;
 		while (true) {
-			try { Thread.sleep(period); }
-			catch (InterruptedException e) { e.printStackTrace(); }
+			
+			long startSleep = getTimeNow();
+			while (getTimeNow()-startSleep < period) {
+				try { Thread.sleep(10); }
+				catch (InterruptedException e) { e.printStackTrace(); }
+			}
 
 			if (!paused) {
 				synchronized(fns) {
-					//Update release constraint of Future
+//					//Update release constraint of Future
 					long timeNow = getTimeNow();
 					AllenIntervalConstraint releaseFuture = new AllenIntervalConstraint(
 							AllenIntervalConstraint.Type.Release, new Bounds(timeNow, timeNow));
@@ -164,21 +168,21 @@ public class FluentConstraintNetworkAnimator extends Thread {
 					}
 					currentReleaseFuture = releaseFuture;
 
-					//If there are registered sensor traces, animate them too
-					for (FluentSensor sensor : sensorValues.keySet()) {
-						Vector<Long> toRemove = new Vector<Long>();
-						HashMap<Long,String> values = sensorValues.get(sensor);
-						for (long time : values.keySet()) {
-							if (time <= timeNow) {
-								sensor.modelSensorValue(values.get(time), time);
-								toRemove.add(time);
-							}
-						}
-						for (long time : toRemove) values.remove(time);
-					}
+//					//If there are registered sensor traces, animate them too
+//					for (FluentSensor sensor : sensorValues.keySet()) {
+//						Vector<Long> toRemove = new Vector<Long>();
+//						HashMap<Long,String> values = sensorValues.get(sensor);
+//						for (long time : values.keySet()) {
+//							if (time <= timeNow) {
+//								sensor.modelSensorValue(values.get(time), time);
+//								toRemove.add(time);
+//							}
+//						}
+//						for (long time : toRemove) values.remove(time);
+//					}
 
-					//If there is a registered InferenceCallback (e.g., call a planner), run it
-					if (this.cb != null) cb.doInference(timeNow);
+//					//If there is a registered InferenceCallback (e.g., call a planner), run it
+//					if (this.cb != null) cb.doInference(timeNow);
 
 					//Print iteration number
 					logger.info("Iteration " + iteration++ + " @" + timeNow);

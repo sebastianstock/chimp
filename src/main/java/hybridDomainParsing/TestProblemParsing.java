@@ -216,6 +216,9 @@ public class TestProblemParsing {
 		}
 		
 		extractPlan(fluentSolver);
+		
+		////////////////
+		
 	}
 	
 	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {

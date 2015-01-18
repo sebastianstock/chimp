@@ -1,5 +1,7 @@
 package dispatching;
 
+import hybridDomainParsing.CopyOfTestProblemParsing;
+
 import java.util.HashMap;
 
 import org.metacsp.framework.Constraint;
@@ -8,6 +10,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import cern.colt.Arrays;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 
@@ -78,6 +81,9 @@ public class FluentDispatcher extends Thread {
 									boolean ret = fns.addConstraint(overlapsFuture);
 									if(!ret){
 										System.out.println("IGNORED: " + act);
+//										System.out.println("  CONSTRAINTS IN: " + Arrays.toString(fns.getConstraintNetwork().getIncidentEdges(act)));
+//										System.out.println("  CONSTRAINTS OUT: " + Arrays.toString(fns.getConstraintNetwork().getOutgoingEdges(act)));
+											CopyOfTestProblemParsing.extractPlan(fns);
 									}
 									else {
 										overlapFutureConstraints.put(act, overlapsFuture);
