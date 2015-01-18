@@ -1,7 +1,5 @@
 package dispatching;
 
-import hybridDomainParsing.CopyOfTestProblemParsing;
-
 import java.util.HashMap;
 
 import org.metacsp.framework.Constraint;
@@ -10,7 +8,6 @@ import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
-import cern.colt.Arrays;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 
