@@ -83,7 +83,7 @@ public class FluentDispatcher extends Thread {
 										System.out.println("IGNORED: " + act);
 //										System.out.println("  CONSTRAINTS IN: " + Arrays.toString(fns.getConstraintNetwork().getIncidentEdges(act)));
 //										System.out.println("  CONSTRAINTS OUT: " + Arrays.toString(fns.getConstraintNetwork().getOutgoingEdges(act)));
-											CopyOfTestProblemParsing.extractPlan(fns);
+//											CopyOfTestProblemParsing.extractPlan(fns);
 									}
 									else {
 										overlapFutureConstraints.put(act, overlapsFuture);
