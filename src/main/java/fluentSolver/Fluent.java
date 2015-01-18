@@ -94,4 +94,10 @@ public class Fluent extends MultiVariable implements Activity{
 		return this;
 	}
 
+
+	@Override
+	public String[] getSymbols() {
+		return new String[] {this.getInternalVariables()[0].toString()};
+	}
+
 }
