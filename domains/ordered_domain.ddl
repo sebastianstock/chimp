@@ -137,7 +137,7 @@
  (Pre p2 RobotAt(?mArea))
  (Pre p3 Connected(?fromArea ?mArea ?preArea))
  (Pre p4 Holding(?arm ?nothing))
- (pValues ?nothing nothing)
+ (Values ?nothing nothing)
  (Del p1)
  (Del p4)
  (Add e1 Holding(?arm ?obj))

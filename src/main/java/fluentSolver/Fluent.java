@@ -1,5 +1,7 @@
 package fluentSolver;
 
+import htn.TaskApplicationMetaConstraint.markings;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
@@ -75,7 +77,7 @@ public class Fluent extends MultiVariable implements Activity{
 		ret.append(">U<");
 		ret.append(this.getInternalVariables()[1].toString());
 		ret.append(">");
-		if (this.getMarking() != null) {
+		if (this.getMarking() == markings.UNIFIED) {
 			ret.append("/");
 			ret.append(this.getMarking());
 		}

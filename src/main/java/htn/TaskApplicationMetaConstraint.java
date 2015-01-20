@@ -16,7 +16,7 @@ import fluentSolver.FluentNetworkSolver;
 public class TaskApplicationMetaConstraint extends MetaConstraint {
 	
 
-	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED}; 
+	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}; 
 	
 	public TaskApplicationMetaConstraint() {
 		super(null, null);

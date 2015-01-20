@@ -280,7 +280,7 @@ public class CopyOfTestProblemParsing {
 			if (con instanceof FluentConstraint) {
 				FluentConstraint fc = (FluentConstraint) con;
 				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-					fc.getFrom().setMarking(markings.SELECTED);
+					fc.getFrom().setMarking(markings.UNIFIED);
 					cn.addConstraint(fc);
 				} else if (fc.getType() == FluentConstraint.Type.DC) {
 					cn.addConstraint(fc);
