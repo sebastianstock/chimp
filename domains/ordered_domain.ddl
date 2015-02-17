@@ -710,7 +710,7 @@
 (:method 
   (Head get_object(?object))
   
-  (Pre p1 RobotAt(?preArea))
+#  (Pre p1 RobotAt(?preArea))   # LEADS TO MUCH BACKTRACKING in Y3D
   (Pre p2 Connected(?plArea ?manArea ?preArea))
   (Pre p3 On(?object ?plArea))
 
