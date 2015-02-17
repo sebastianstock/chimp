@@ -217,29 +217,29 @@
  (Constraint Overlaps(task,e1))
  )
 
-(:operator # if arm is tucked the other must not be tucked
- (Head !move_arm_to_side(?arm))
- (Pre p1 HasArmPosture(?arm ?oldPosture))
- (Pre p2 HasArmPosture(?otherArm ?otherPosture))
- (Del p1)
- (Add e1 HasArmPosture(?arm ?newPosture))
-
- (Values ?oldPosture ArmTuckedPosture)
- (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
- (Values ?newPosture ArmToSidePosture)
-
- (ResourceUsage 
-    (Usage leftArm1ManCapacity 1)
-    (Param 1 leftArm1))
- (ResourceUsage 
-    (Usage rightArm1ManCapacity 1)
-    (Param 1 rightArm1))
- 
- (Constraint Duration[4000,INF](task))
- (Constraint OverlappedBy(task,p1))
- (Constraint OverlappedBy(task,p2))
- (Constraint Overlaps(task,e1))
-)
+#(:operator # if arm is tucked the other must not be tucked
+# (Head !move_arm_to_side(?arm))
+# (Pre p1 HasArmPosture(?arm ?oldPosture))
+# (Pre p2 HasArmPosture(?otherArm ?otherPosture))
+# (Del p1)
+# (Add e1 HasArmPosture(?arm ?newPosture))
+#
+# (Values ?oldPosture ArmTuckedPosture)
+# (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
+# (Values ?newPosture ArmToSidePosture)
+#
+# (ResourceUsage 
+#    (Usage leftArm1ManCapacity 1)
+#    (Param 1 leftArm1))
+# (ResourceUsage 
+#    (Usage rightArm1ManCapacity 1)
+#    (Param 1 rightArm1))
+# 
+# (Constraint Duration[4000,INF](task))
+# (Constraint OverlappedBy(task,p1))
+# (Constraint OverlappedBy(task,p2))
+# (Constraint Overlaps(task,e1))
+#)
 
 # MOVE_ARMS_TO_CARRYPOSTURE
 (:operator
