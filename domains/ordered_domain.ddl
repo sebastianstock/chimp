@@ -606,15 +606,15 @@
   (Pre p1 HasArmPosture(?leftArm ?leftPosture))
   (Pre p2 HasArmPosture(?rightArm ?rightPosture))
   (Pre p3 RobotAt(?manArea))
-  (Pre p4 HasTorsoPosture(?torsoPosture))
+#  (Pre p4 HasTorsoPosture(?torsoPosture))
 
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
   (Values ?leftPosture ArmToSidePosture)
   (Values ?rightPosture ArmToSidePosture)
   (Values ?torsoPosture TorsoUpPosture)
-  
-  (Constraint Duration[10,INF](task))
+
+  (Sub s1 adapt_torso(?torsoUpPosture))
 )
 
 
