@@ -601,21 +601,21 @@
 
 ### ASSUME_MANIPULATION_POSE
 # 1. nothing to do
-#(:method          # TODO PUT BACK IN!!!
-# (Head assume_manipulation_pose(?manArea))
-#  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
-#  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
-#  (Pre p3 RobotAt(?manArea))
-#  (Pre p4 HasTorsoPosture(?torsoPosture))
+(:method          # TODO PUT BACK IN!!!
+ (Head assume_manipulation_pose(?manArea))
+  (Pre p1 HasArmPosture(?leftArm ?leftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?rightPosture))
+  (Pre p3 RobotAt(?manArea))
+  (Pre p4 HasTorsoPosture(?torsoPosture))
 
-#  (Values ?leftArm leftArm1)
-#  (Values ?rightArm rightArm1)
-#  (Values ?leftPosture ArmToSidePosture)
-#  (Values ?rightPosture ArmToSidePosture)
-#  (Values ?torsoPosture TorsoUpPosture)
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+  (Values ?leftPosture ArmToSidePosture)
+  (Values ?rightPosture ArmToSidePosture)
+  (Values ?torsoPosture TorsoUpPosture)
   
-#  (Constraint Duration[10,INF](task))
-#)
+  (Constraint Duration[10,INF](task))
+)
 
 
 # 2. standard behaviour
