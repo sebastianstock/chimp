@@ -639,32 +639,32 @@
 )
 
 # first move back to preArea
-#(:method 
-# (Head assume_manipulation_pose(?manArea))
-#  (Pre p1 RobotAt(?manArea))
-#  (Pre p2 Connected(?plArea ?manArea ?preArea))
-#  (Pre p3 HasArmPosture(?arm ?armPosture))
+(:method 
+ (Head assume_manipulation_pose(?manArea))
+  (Pre p1 RobotAt(?manArea))
+  (Pre p2 Connected(?plArea ?manArea ?preArea))
+  (Pre p3 HasArmPosture(?arm ?armPosture))
 
-#  (NotValues ?armPosture ArmToSidePosture)
+  (NotValues ?armPosture ArmToSidePosture)
 
-#  (Sub s0 !move_base_blind(?preArea))
-#  (Sub s1 adapt_torso(?torsoUpPosture))
-#  (Values ?torsoUpPosture TorsoUpPosture)
-#  (Sub s2 move_both_arms_to_side())
-#  (Sub s3 !move_base_blind(?manArea))
+  (Sub s0 !move_base_blind(?preArea))
+  (Sub s1 adapt_torso(?torsoUpPosture))
+  (Values ?torsoUpPosture TorsoUpPosture)
+  (Sub s2 move_both_arms_to_side())
+  (Sub s3 !move_base_blind(?manArea))
 
-#  (Ordering s0 s1)
-#  (Ordering s1 s2)
-#  (Ordering s2 s3)
-#  (Constraint Starts(s0,task))
-##  (Constraint Before[1,1000](s0,s1))
-##  (Constraint Before[1,1000](s0,s2))
-#  (Constraint Finishes(s3,task))
-#  (Constraint Before(s0,s1))
-#  (Constraint Before(s0,s2))
-#  (Constraint Before(s1,s3))
-#  (Constraint Before(s2,s3))
-#)
+  (Ordering s0 s1)
+  (Ordering s1 s2)
+  (Ordering s2 s3)
+  (Constraint Starts(s0,task))
+#  (Constraint Before[1,1000](s0,s1))
+#  (Constraint Before[1,1000](s0,s2))
+  (Constraint Finishes(s3,task))
+  (Constraint Before(s0,s1))
+  (Constraint Before(s0,s2))
+  (Constraint Before(s1,s3))
+  (Constraint Before(s2,s3))
+)
 
 ### LEAVE_MANIPULATION_POSE
 (:method 
