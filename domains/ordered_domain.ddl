@@ -831,23 +831,8 @@
   (Constraint Finishes(s2,task))
 )
 
-#(:method 
-#  (Head move_object(?object ?toArea))
 
-#  (Pre p1 On(?object ?fromArea))
-
-#  (Values ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
-  
-#  (Sub s1 get_object(?object))
-#  (Sub s2 put_object(?object ?toArea))
-
-#  (Ordering s1 s2)
-#  (Constraint Before(s1,s2))
-#  (Constraint Starts(s1,task))
-#  (Constraint Finishes(s2,task))
-#  )
-
-#(:method 
+#(:method     # OLD WE DON'T want to specify the arm here
 #  (Head move_object(?object ?toArea))
 
 #  (Pre p1 On(?object ?fromArea))
