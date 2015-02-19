@@ -68,33 +68,33 @@ public class TestIncrementalMergingDispatching {
 		plan(planner, fluentSolver);
 		
 		// Add another task
-		String name = "move_object(milkPot1 placingAreaNorthLeftTable2)";
-		String component;
-		if (name.startsWith("!")) {
-			component = "Activity";
-		} else {
-			component = "Task";
-		}
-		Variable var = fluentSolver.createVariable(component);
-		((Fluent) var).setName(name);
-		var.setMarking(markings.UNPLANNED);
+//		String name = "move_object(milkPot1 placingAreaNorthLeftTable2)";
+//		String component;
+//		if (name.startsWith("!")) {
+//			component = "Activity";
+//		} else {
+//			component = "Task";
+//		}
+//		Variable var = fluentSolver.createVariable(component);
+//		((Fluent) var).setName(name);
+//		var.setMarking(markings.UNPLANNED);
+//		
+////		planner.clearResolvers();
+//		plan(planner, fluentSolver);
 		
-//		planner.clearResolvers();
-		plan(planner, fluentSolver);
-		
-		printActivities(fluentSolver);
+//		printActivities(fluentSolver);
 		
 //		TestProblemParsing.extractPlan(fluentSolver);
 		
 		////////////////
 		
-		dispatch(fluentSolver);
+		dispatch(planner, fluentSolver);
 		
 		
 		
 	}
 	
-private static void dispatch(FluentNetworkSolver fns) {
+private static void dispatch(HTNPlanner planner, FluentNetworkSolver fns) {
 	boolean ret = true;
 
 	logger.info("Starting Dispatching");
@@ -140,6 +140,23 @@ private static void dispatch(FluentNetworkSolver fns) {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));  
 		try { input = br.readLine(); }
 		catch (IOException e) { e.printStackTrace(); }
+		
+		if (input.length() > 0 && Character.isLetter(input.charAt(0))) {
+		// Add another task
+			String name = "move_object(milkPot1 placingAreaNorthLeftTable2)";
+			String component;
+			if (name.startsWith("!")) {
+				component = "Activity";
+			} else {
+				component = "Task";
+			}
+			Variable var = fns.createVariable(component);
+			((Fluent) var).setName(name);
+			var.setMarking(markings.UNPLANNED);
+			
+//			planner.clearResolvers();
+			plan(planner, fns);
+		}
 
 		for (int i = 0; i < executingActs.size(); i++) {
 			Fluent fl = executingActs.get(i);
