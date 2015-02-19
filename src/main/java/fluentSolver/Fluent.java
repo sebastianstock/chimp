@@ -77,10 +77,12 @@ public class Fluent extends MultiVariable implements Activity{
 		ret.append(">U<");
 		ret.append(this.getInternalVariables()[1].toString());
 		ret.append(">");
-		if (this.getMarking() == markings.UNIFIED) {
-			ret.append("/");
-			ret.append(this.getMarking());
-		}
+//		if (this.getMarking() == markings.UNIFIED) {
+//			ret.append("/");
+//			ret.append(this.getMarking());
+//		}
+		ret.append("/");
+		ret.append(this.getMarking());
 		return ret.toString();
 	}
 
