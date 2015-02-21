@@ -41,7 +41,7 @@ public class TestIncrementalMergingDispatching {
 		logger = MetaCSPLogging.getLogger(TestIncrementalMergingDispatching.class);
 		
 		// IROS
-		ProblemParser pp = new ProblemParser("problems/iros/incrementa_merging.pdl");
+		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
 		
 		String[][] symbols = TestProblemParsing.createSymbols();
 		int[] ingredients = TestProblemParsing.createIngredients();
