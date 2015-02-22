@@ -130,7 +130,7 @@ public class FluentConstraintNetworkAnimator extends Thread {
 		if (start) dis.start();
 	}
 
-	private long getTimeNow() {
+	public long getTimeNow() {
 		return getCurrentTimeInMillis()-firstTick+originOfTime;
 	}
 	
