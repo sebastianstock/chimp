@@ -39,8 +39,8 @@
 ##
 (Resource leftArm1 1)
 (Resource rightArm1 1)
-(Resource leftArm1ManCapacity 1)
-(Resource rightArm1ManCapacity 1)
+#(Resource leftArm1ManCapacity 1)
+#(Resource rightArm1ManCapacity 1)
 
 (StateVariable RobotAt 2 n)
 (StateVariable HasArmPosture 1 leftArm1 rightArm1)
@@ -111,10 +111,14 @@
  (Values ?leftGoal ArmTuckedPosture ArmUnTuckedPosture)
  (Values ?rightGoal ArmTuckedPosture ArmUnTuckedPosture)
 
+# (ResourceUsage 
+#    (Usage leftArm1ManCapacity 1))
+# (ResourceUsage 
+#    (Usage rightArm1ManCapacity 1))
+
  (ResourceUsage 
-    (Usage leftArm1ManCapacity 1))
- (ResourceUsage 
-    (Usage rightArm1ManCapacity 1))
+    (Usage armManCapacity 1))
+
  (Constraint Duration[4000,INF](task))
 # (Constraint Duration[1000,10000000](e1))
 # (Constraint Duration[1000,10000000](e2))
@@ -151,12 +155,15 @@
  # TODO Which constraint for effect? 
  (Constraint Duration[4000,INF](task))
  
+# (ResourceUsage 
+#    (Usage leftArm1ManCapacity 1)
+#    (Param 2 leftArm1))
+# (ResourceUsage 
+#    (Usage rightArm1ManCapacity 1)
+#    (Param 2 rightArm1))
+
  (ResourceUsage 
-    (Usage leftArm1ManCapacity 1)
-    (Param 2 leftArm1))
- (ResourceUsage 
-    (Usage rightArm1ManCapacity 1)
-    (Param 2 rightArm1))
+    (Usage armManCapacity 1))
     
  (ResourceUsage 
     (Usage objManCapacity 1))
@@ -206,12 +213,12 @@
  (Values ?oldPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
  (Values ?newPosture ArmToSidePosture)
 
- (ResourceUsage 
-    (Usage leftArm1ManCapacity 1)
-    (Param 1 leftArm1))
- (ResourceUsage 
-    (Usage rightArm1ManCapacity 1)
-    (Param 1 rightArm1))
+# (ResourceUsage 
+#    (Usage leftArm1ManCapacity 1)
+#    (Param 1 leftArm1))
+# (ResourceUsage 
+#    (Usage rightArm1ManCapacity 1)
+#    (Param 1 rightArm1))
 
  (ResourceUsage 
     (Usage armManCapacity 1))
@@ -262,10 +269,14 @@
  (Values ?rightGoal ArmTuckedPosture ArmUnTuckedPosture)
  (Values ?torsoPosture TorsoUpPosture TorsoMiddlePosture)
 
+# (ResourceUsage 
+#    (Usage leftArm1ManCapacity 1))
+# (ResourceUsage 
+#    (Usage rightArm1ManCapacity 1))
+
  (ResourceUsage 
-    (Usage leftArm1ManCapacity 1))
- (ResourceUsage 
-    (Usage rightArm1ManCapacity 1))
+    (Usage armManCapacity 1))
+    
  (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
  (Constraint OverlappedBy(task,p2))
