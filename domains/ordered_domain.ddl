@@ -492,8 +492,12 @@
 # MOVE_BOTH_ARMS_TO_SIDE NEW
 (:method 
  (Head move_both_arms_to_side())
-#  (Pre p1 HasArmPosture(?leftArm ?armPosture))
-#  (Pre p2 HasArmPosture(?rightArm ?armPosture))
+
+  (Pre p1 HasArmPosture(?leftArm ?oldLeftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?oldRightPosture))
+
+  (Values ?oldLeftPosture ArmTuckedPosture)
+  (Values ?oldRightPosture ArmTuckedPosture)
 
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
@@ -512,17 +516,18 @@
   (Constraint Before(s1,s3))
 )
 
-# New: don't untuck if in carryposture
+
+# New: don't untuck if not both are tucked
 (:method 
  (Head move_both_arms_to_side())
-  (Pre p1 HasArmPosture(?leftArm ?oldLeftPosture))
-  (Pre p2 HasArmPosture(?rightArm ?oldRightPosture))
+#  (Pre p1 HasArmPosture(?leftArm ?oldLeftPosture))
+#  (Pre p2 HasArmPosture(?rightArm ?oldRightPosture))
 
   (Values ?leftArm leftArm1)
   (Values ?rightArm rightArm1)
 
-  (Values ?oldLeftPosture ArmCarryPosture)
-  (Values ?oldRightPosture ArmCarryPosture)
+#  (Values ?oldLeftPosture ArmCarryPosture)
+#  (Values ?oldRightPosture ArmCarryPosture)
 
   (Sub s2 !move_arm_to_side(?leftArm))
   (Sub s3 !move_arm_to_side(?rightArm))
