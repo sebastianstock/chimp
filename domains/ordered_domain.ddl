@@ -33,6 +33,7 @@
 (MaxArgs 5)
 
 (Resource objManCapacity 1)
+(Resource armManCapacity 1)
 
 (Resource navigationCapacity 1)
 ##
@@ -211,6 +212,9 @@
  (ResourceUsage 
     (Usage rightArm1ManCapacity 1)
     (Param 1 rightArm1))
+
+ (ResourceUsage 
+    (Usage armManCapacity 1))
  
  (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
