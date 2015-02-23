@@ -156,6 +156,11 @@ public class TestProblemParsing {
 		// value ordering heuristic debugging:
 //		ProblemParser pp = new ProblemParser("problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
 		
+	// IROS
+//		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
+//		ProblemParser pp = new ProblemParser("problems/iros/iros_coffee_sugar_merging.pdl");
+		
+		
 		String[][] symbols = createSymbols();
 		int[] ingredients = createIngredients();
 		
