@@ -512,6 +512,25 @@
   (Constraint Before(s1,s3))
 )
 
+# New: don't untuck if in carryposture
+(:method 
+ (Head move_both_arms_to_side())
+  (Pre p1 HasArmPosture(?leftArm ?oldLeftPosture))
+  (Pre p2 HasArmPosture(?rightArm ?oldRightPosture))
+
+  (Values ?leftArm leftArm1)
+  (Values ?rightArm rightArm1)
+
+  (Values ?oldLeftPosture ArmCarryPosture)
+  (Values ?oldRightPosture ArmCarryPosture)
+
+  (Sub s2 !move_arm_to_side(?leftArm))
+  (Sub s3 !move_arm_to_side(?rightArm))
+
+  (Ordering s2 s3)
+  (Constraint Starts(s2,task))
+)
+
 
 #### OLD
 ### MOVE_BOTH_ARMS_TO_SIDE
