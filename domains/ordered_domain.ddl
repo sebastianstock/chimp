@@ -210,7 +210,7 @@
  (Del p1)
  (Add e1 HasArmPosture(?arm ?newPosture))
 
- (Values ?oldPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
+ (Values ?oldPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture)
  (Values ?newPosture ArmToSidePosture)
 
 # (ResourceUsage 
@@ -228,29 +228,74 @@
  (Constraint Overlaps(task,e1))
  )
 
-#(:operator # if arm is tucked the other must not be tucked
-# (Head !move_arm_to_side(?arm))
-# (Pre p1 HasArmPosture(?arm ?oldPosture))
-# (Pre p2 HasArmPosture(?otherArm ?otherPosture))
-# (Del p1)
-# (Add e1 HasArmPosture(?arm ?newPosture))
-#
-# (Values ?oldPosture ArmTuckedPosture)
-# (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
-# (Values ?newPosture ArmToSidePosture)
-#
+# MOVE_ARM_TO_SIDE # Arm is already there
+(:operator
+ (Head !move_arm_to_side(?arm))
+ (Pre p1 HasArmPosture(?arm ?oldPosture))
+
+ (Values ?oldPosture ArmToSidePosture)
+ 
+ (Constraint Duration[10,INF](task))
+ (Constraint During(task,p1))
+ )
+
+(:operator # if arm is tucked the other must not be tucked
+ (Head !move_arm_to_side(?arm))
+ (Pre p1 HasArmPosture(?arm ?oldPosture))
+ (Pre p2 HasArmPosture(?otherArm ?otherPosture))
+ (Del p1)
+ (Add e1 HasArmPosture(?arm ?newPosture))
+
+ (Values ?arm leftArm1)
+ (Values ?otherArm rightArm1)
+ (Values ?oldPosture ArmTuckedPosture)
+ (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
+ (Values ?newPosture ArmToSidePosture)
+
 # (ResourceUsage 
 #    (Usage leftArm1ManCapacity 1)
 #    (Param 1 leftArm1))
 # (ResourceUsage 
 #    (Usage rightArm1ManCapacity 1)
 #    (Param 1 rightArm1))
-# 
-# (Constraint Duration[4000,INF](task))
-# (Constraint OverlappedBy(task,p1))
-# (Constraint OverlappedBy(task,p2))
-# (Constraint Overlaps(task,e1))
-#)
+
+ (ResourceUsage 
+    (Usage armManCapacity 1))
+ 
+ (Constraint Duration[4000,INF](task))
+ (Constraint OverlappedBy(task,p1))
+ (Constraint OverlappedBy(task,p2))
+ (Constraint Overlaps(task,e1))
+)
+
+(:operator # if arm is tucked the other must not be tucked
+ (Head !move_arm_to_side(?arm))
+ (Pre p1 HasArmPosture(?arm ?oldPosture))
+ (Pre p2 HasArmPosture(?otherArm ?otherPosture))
+ (Del p1)
+ (Add e1 HasArmPosture(?arm ?newPosture))
+
+ (Values ?arm rightArm1)
+ (Values ?otherArm leftArm1)
+ (Values ?oldPosture ArmTuckedPosture)
+ (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
+ (Values ?newPosture ArmToSidePosture)
+
+# (ResourceUsage 
+#    (Usage leftArm1ManCapacity 1)
+#    (Param 1 leftArm1))
+# (ResourceUsage 
+#    (Usage rightArm1ManCapacity 1)
+#    (Param 1 rightArm1))
+
+ (ResourceUsage 
+    (Usage armManCapacity 1))
+ 
+ (Constraint Duration[4000,INF](task))
+ (Constraint OverlappedBy(task,p1))
+ (Constraint OverlappedBy(task,p2))
+ (Constraint Overlaps(task,e1))
+)
 
 # MOVE_ARMS_TO_CARRYPOSTURE
 (:operator
@@ -515,6 +560,8 @@
   (Constraint Before(s1,s2))
   (Constraint Before(s1,s3))
 )
+
+
 
 
 # New: don't untuck if not both are tucked
