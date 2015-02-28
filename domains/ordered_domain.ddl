@@ -213,13 +213,6 @@
  (Values ?oldPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture)
  (Values ?newPosture ArmToSidePosture)
 
-# (ResourceUsage 
-#    (Usage leftArm1ManCapacity 1)
-#    (Param 1 leftArm1))
-# (ResourceUsage 
-#    (Usage rightArm1ManCapacity 1)
-#    (Param 1 rightArm1))
-
  (ResourceUsage 
     (Usage armManCapacity 1))
  
@@ -252,12 +245,6 @@
  (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
  (Values ?newPosture ArmToSidePosture)
 
-# (ResourceUsage 
-#    (Usage leftArm1ManCapacity 1)
-#    (Param 1 leftArm1))
-# (ResourceUsage 
-#    (Usage rightArm1ManCapacity 1)
-#    (Param 1 rightArm1))
 
  (ResourceUsage 
     (Usage armManCapacity 1))
@@ -535,7 +522,7 @@
 )
 
 # MOVE_BOTH_ARMS_TO_SIDE NEW
-(:method 
+(:method         # both are tucked
  (Head move_both_arms_to_side())
 
   (Pre p1 HasArmPosture(?leftArm ?oldLeftPosture))
@@ -562,8 +549,6 @@
 )
 
 
-
-
 # New: don't untuck if not both are tucked
 (:method 
  (Head move_both_arms_to_side())
@@ -576,11 +561,30 @@
 #  (Values ?oldLeftPosture ArmCarryPosture)
 #  (Values ?oldRightPosture ArmCarryPosture)
 
-  (Sub s2 !move_arm_to_side(?leftArm))
-  (Sub s3 !move_arm_to_side(?rightArm))
+  (Sub s2 arm_to_side(?leftArm))
+  (Sub s3 arm_to_side(?rightArm))
 
   (Ordering s2 s3)
-  (Constraint Starts(s2,task))
+)
+
+# arm is not at side
+(:method 
+ (Head arm_to_side(?arm))
+  (Pre p1 HasArmPosture(?arm ?armPosture))
+
+  (NotValues ?armPosture ArmToSidePosture)
+
+  (Sub s1 !move_arm_to_side(?arm))
+  
+  (Constraint Equals(s1,task))
+)
+
+# arm is at side
+(:method 
+ (Head arm_to_side(?arm))
+  (Pre p1 HasArmPosture(?arm ?armPosture))
+
+  (Values ?armPosture ArmToSidePosture)
 )
 
 
