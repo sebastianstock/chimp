@@ -221,17 +221,6 @@
  (Constraint Overlaps(task,e1))
  )
 
-# MOVE_ARM_TO_SIDE # Arm is already there
-(:operator
- (Head !move_arm_to_side(?arm))
- (Pre p1 HasArmPosture(?arm ?oldPosture))
-
- (Values ?oldPosture ArmToSidePosture)
- 
- (Constraint Duration[10,INF](task))
- (Constraint During(task,p1))
- )
-
 (:operator # if arm is tucked the other must not be tucked
  (Head !move_arm_to_side(?arm))
  (Pre p1 HasArmPosture(?arm ?oldPosture))
@@ -244,7 +233,6 @@
  (Values ?oldPosture ArmTuckedPosture)
  (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
  (Values ?newPosture ArmToSidePosture)
-
 
  (ResourceUsage 
     (Usage armManCapacity 1))
