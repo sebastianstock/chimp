@@ -239,7 +239,6 @@
  
  (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
- (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
 )
 
@@ -256,19 +255,11 @@
  (Values ?otherPosture ArmUnTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture)
  (Values ?newPosture ArmToSidePosture)
 
-# (ResourceUsage 
-#    (Usage leftArm1ManCapacity 1)
-#    (Param 1 leftArm1))
-# (ResourceUsage 
-#    (Usage rightArm1ManCapacity 1)
-#    (Param 1 rightArm1))
-
  (ResourceUsage 
     (Usage armManCapacity 1))
  
  (Constraint Duration[4000,INF](task))
  (Constraint OverlappedBy(task,p1))
- (Constraint OverlappedBy(task,p2))
  (Constraint Overlaps(task,e1))
 )
 
@@ -282,17 +273,10 @@
  (Del p2)
  (Add e1 HasArmPosture(?leftArm ?newPosture))
  (Add e2 HasArmPosture(?rightArm ?newPosture))
-# (Type ?oldLeft ArmPosture)
  (Values ?leftArm leftArm1)
  (Values ?rightArm rightArm1)
  (Values ?newPosture ArmCarryPosture)
- (Values ?rightGoal ArmTuckedPosture ArmUnTuckedPosture)
  (Values ?torsoPosture TorsoUpPosture TorsoMiddlePosture)
-
-# (ResourceUsage 
-#    (Usage leftArm1ManCapacity 1))
-# (ResourceUsage 
-#    (Usage rightArm1ManCapacity 1))
 
  (ResourceUsage 
     (Usage armManCapacity 1))
@@ -412,8 +396,6 @@
 
  (Values ?posture ArmCarryPosture)
  (NotValues ?currentposture ArmCarryPosture)
- 
-# (Constraint Duration[10,INF](task))
 
  (Sub s1 !move_arms_to_carryposture())
  (Constraint Equals(s1,task))
@@ -443,7 +425,7 @@
   (Sub s1 adapt_arms(?newPose))
   (Values ?newPose ArmCarryPosture)
   (Constraint Equals(s1,task))
-)  # todo check nothing on tray
+)
 
 
 ### DRIVE_ROBOT
@@ -553,6 +535,7 @@
   (Sub s3 arm_to_side(?rightArm))
 
   (Ordering s2 s3)
+  (Constraint Before(s2,s3))
 )
 
 # arm is not at side
@@ -564,7 +547,7 @@
 
   (Sub s1 !move_arm_to_side(?arm))
   
-  (Constraint Equals(s1,task))
+ # (Constraint Equals(s1,task))
 )
 
 # arm is at side
@@ -573,6 +556,7 @@
   (Pre p1 HasArmPosture(?arm ?armPosture))
 
   (Values ?armPosture ArmToSidePosture)
+  (Constraint During(task,p1))
 )
 
 

@@ -1,10 +1,15 @@
 package hybridDomainParsing;
 
+import externalPathPlanning.LookUpTableDurationEstimator;
+import externalPathPlanning.MoveBaseDurationEstimator;
+import externalPathPlanning.MoveBaseMetaConstraint;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
-import htn.NewestFluentsValOH;
-import htn.UnifyFewestsubsNewestbindingsValOH;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,19 +23,12 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
-import externalPathPlanning.LookUpTableDurationEstimator;
-import externalPathPlanning.MoveBaseDurationEstimator;
-import externalPathPlanning.MoveBaseMetaConstraint;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
 
 public class TestProblemParsing {
 	
@@ -50,7 +48,7 @@ public class TestProblemParsing {
 				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
 				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
 				"leave_manipulation_pose", "grasp_object", "get_object", "put_object",
-				"move_object", "serve_coffee_to_guest", 
+				"move_object", "serve_coffee_to_guest", "arm_to_side",
 				
 				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
 				"not_test",
@@ -143,12 +141,12 @@ public class TestProblemParsing {
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); // 4 secs
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");    
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); 
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
 		
-		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl");
+		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl"); // #0
 //		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl");
 //		
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl");
@@ -184,26 +182,37 @@ public class TestProblemParsing {
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		
-				
-			MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
+//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 		
-//		MetaCSPLogging.setLevel(Level.INFO);
+//		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.OFF);
 		
 		
 		plan(planner, fluentSolver);
 		
-		Variable[] acts = fluentSolver.getVariables();
+		Variable[] allFluents = fluentSolver.getVariables();
 		ArrayList<Variable> plan = new ArrayList<Variable>();
-		for (Variable var : acts) {
-			if (var.getComponent() == null) {
+		int opCount = 0;
+		int mCount = 0;
+		for (Variable var : allFluents) {
+			String component = var.getComponent();
+			if (component == null) {
 				plan.add(var);
 			}
-			else if (var.getComponent().equals("Activity")) {
+			else if (component.equals("Activity")) {
 				plan.add(var);
+				opCount++;
+			} else if (component.equals("Task")) {
+				mCount++;
 			}
 		}
+		System.out.println("#Ops: " + opCount);
+		System.out.println("#Compound Taks: " + mCount);
+		System.out.println("#Fluents: " + fluentSolver.getVariables().length);
+		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
+
 		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
 		Arrays.sort(planVector, new Comparator<Variable>() {
 			@Override
@@ -217,7 +226,8 @@ public class TestProblemParsing {
 		
 		int c = 0;
 		for (Variable act : planVector) {
-			System.out.println(c++ +".\t" + act);
+			if (act.getComponent() != null)
+				System.out.println(c++ +".\t" + act);	
 		}
 		
 		extractPlan(fluentSolver);
