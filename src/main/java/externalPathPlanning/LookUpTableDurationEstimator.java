@@ -59,7 +59,7 @@ public class LookUpTableDurationEstimator implements MoveBaseDurationEstimator {
 		boundsTable.put("preManipulationAreaEastTable2", "floorAreaTamsRestaurant1"      , new Bounds(2000, APSPSolver.INF));
 		boundsTable.put("preManipulationAreaEastTable2", "preManipulationAreaEastCounterOS1", new Bounds(9000000, APSPSolver.INF));
 		
-		boundsTable.put("floorAreaTamsRestaurant1", "preManipulationAreaEastCounter1", new Bounds(30000, APSPSolver.INF));//new Bounds(3000, APSPSolver.INF - 2));
+		boundsTable.put("floorAreaTamsRestaurant1", "preManipulationAreaEastCounter1", new Bounds(10000, APSPSolver.INF));//new Bounds(3000, APSPSolver.INF - 2));
 		boundsTable.put("floorAreaTamsRestaurant1", "preManipulationAreaNorthTable1", new Bounds(3000, APSPSolver.INF));
 		boundsTable.put("floorAreaTamsRestaurant1", "preManipulationAreaSouthTable1", new Bounds(3000, APSPSolver.INF));
 		boundsTable.put("floorAreaTamsRestaurant1", "preManipulationAreaWestTable2" , new Bounds(2000, APSPSolver.INF));

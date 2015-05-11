@@ -94,69 +94,67 @@ public class TestProblemParsing {
 		
 //		ProblemParser pp = new ProblemParser("problems/test_fluent_scheduling.pdl");
 		
-//		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_place_object.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_move_arm_to_side.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_op_observe_objects_on_area.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl"); // #1
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl"); // #2
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl"); // #3
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl"); // #4
+//		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl"); // #5
+//		ProblemParser pp = new ProblemParser("problems/test_op_place_object.pdl"); // #6
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_arm_to_side.pdl"); // #7
+//		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl"); //#8
+//		ProblemParser pp = new ProblemParser("problems/test_op_observe_objects_on_area.pdl"); //#9
 		
 		// new for debugging:
-//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose_debug1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose_debug1.pdl"); //#10
 		
 		// new for merge
-//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso_merge.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_test_merge.pdl"); 
-//		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); 
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso_merge.pdl"); //#11
+//		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); //#12 
 		
 		
 		
-//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose0.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_arms_0.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_arms_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_arms_2.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose0.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_0.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_2.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_4.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_5.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_2.pdl"); // PROBLEM uses Connected -> two options
-//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_3.pdl");  // Much backtracking
-//		ProblemParser pp = new ProblemParser("problems/test_m_leave_manipulation_pose_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_grasp_object_w_arm_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_2.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl");    
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); 
-//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl");
-//		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso.pdl"); //#13
+//		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose0.pdl"); //#14
+//		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose1.pdl"); //#15
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_arms_0.pdl"); //#16
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_arms_1.pdl"); //#17
+//		ProblemParser pp = new ProblemParser("problems/test_m_adapt_arms_2.pdl"); //#18
+//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose0.pdl"); //#19
+//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose1.pdl"); //#20
+//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_0.pdl"); //#21
+//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl"); //#22
+//		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_2.pdl"); //#23
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_1.pdl"); //#24
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_2.pdl"); //#25
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_3.pdl"); //#26
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_4.pdl"); //#27
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_both_arms_to_side_5.pdl"); //#28
+//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_1.pdl"); //#29
+//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_2.pdl"); //#30 // PROBLEM uses Connected -> two options
+//		ProblemParser pp = new ProblemParser("problems/test_m_assume_manipulation_pose_3.pdl");  //#31 // Much backtracking
+//		ProblemParser pp = new ProblemParser("problems/test_m_leave_manipulation_pose_1.pdl"); //#32
+//		ProblemParser pp = new ProblemParser("problems/test_m_grasp_object_w_arm_1.pdl"); //#33
+//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_2.pdl"); //#34
+//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_3.pdl"); //#35
+//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1.pdl"); //#36
+//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_1a.pdl"); //#37
+//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_2.pdl"); //#38
+//		ProblemParser pp = new ProblemParser("problems/test_m_put_object_3.pdl"); //#39
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_1.pdl"); //#40
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_2.pdl"); //#41
+//		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl"); //#42
+//		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl"); //#43
 		
-		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl"); // #0
-//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl"); // #0
+//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl"); //#44
 //		
-//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl"); //#45
 		
 		// value ordering heuristic debugging:
 //		ProblemParser pp = new ProblemParser("problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
 		
 	// IROS
-//		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
-//		ProblemParser pp = new ProblemParser("problems/iros/iros_coffee_sugar_merging.pdl");
+		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
 		
 		
 		String[][] symbols = createSymbols();
