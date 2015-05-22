@@ -61,8 +61,7 @@
  (Add e1 RobotAt(?toArea))
  (Constraint Meets(task,e1)) # too restrictive for stefan's exmo
  (Del p1)
- (ResourceUsage 
-  (Usage navigationCapacity 1))
+ (ResourceUsage navigationCapacity 1)
 )
 
 # MOVE_BASE_BLIND   PreArea to ManArea

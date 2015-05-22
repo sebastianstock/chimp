@@ -261,29 +261,36 @@ public class HybridDomain{
 	static ResourceUsageTemplate parseResourceUsage(String usageElement, 
 			boolean stateUsage) {
 		// parse Resource
-			String resourceStr = parseKeyword(USAGE_KEYWORD, usageElement)[0];
-			String resourceName = resourceStr.substring(0,resourceStr.indexOf(" ")).trim();
-			int usageLevel = Integer.parseInt(resourceStr.substring(resourceStr.indexOf(" ")).trim());
-			
-			String fluentType = "";
-			// parse Fluent type
-			if (stateUsage) {
-				fluentType = parseKeyword(FLUENT_KEYWORD, usageElement)[0];
-			}
-			
-			// parse Params
-			String[] paramElements = parseKeyword(PARAM_KEYWORD, usageElement);
-			int[] resourceRequirementPositions = new int[paramElements.length];
-			String[] resourceRequirements = new String[paramElements.length];
-			for (int j = 0; j < paramElements.length; j++) {
-				String paramElement = paramElements[j];
-				resourceRequirementPositions[j] = 
-						Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
-				resourceRequirements[j] = paramElement.substring(paramElement.indexOf(" ")).trim();
-			}
-			
-			return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions, 
-					resourceRequirements, usageLevel);
+		
+		String resourceStr;
+		if (usageElement.startsWith("(")) { // Old domain format: (ResourceUsage (Usage objManCapacity 1))
+			resourceStr = parseKeyword(USAGE_KEYWORD, usageElement)[0];
+		} else {         				// new domain format: (ResourceUsage objMancapacity 1)
+			resourceStr = usageElement;
+		}
+		String resourceName = resourceStr.substring(0,resourceStr.indexOf(" ")).trim();
+		int usageLevel = Integer.parseInt(resourceStr.substring(resourceStr.indexOf(" ")).trim());
+
+		String fluentType = "";
+		// parse Fluent type
+		if (stateUsage) {
+			fluentType = parseKeyword(FLUENT_KEYWORD, usageElement)[0];
+		}
+
+		// parse Params
+		String[] paramElements = parseKeyword(PARAM_KEYWORD, usageElement);
+		int[] resourceRequirementPositions = new int[paramElements.length];
+		String[] resourceRequirements = new String[paramElements.length];
+		for (int j = 0; j < paramElements.length; j++) {
+			String paramElement = paramElements[j];
+			resourceRequirementPositions[j] = 
+					Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
+			resourceRequirements[j] = paramElement.substring(paramElement.indexOf(" ")).trim();
+		}
+		
+
+		return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions, 
+				resourceRequirements, usageLevel);
 	}
 	
 }
