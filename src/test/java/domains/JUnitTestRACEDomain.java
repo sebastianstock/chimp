@@ -3,6 +3,7 @@ package domains;
 import static org.junit.Assert.assertTrue;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
+import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -25,6 +26,7 @@ public class JUnitTestRACEDomain {
 	
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
+	private HybridDomain domain;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -44,7 +46,7 @@ public class JUnitTestRACEDomain {
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
+		domain = TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
 	}
 
 	@After
@@ -53,7 +55,7 @@ public class JUnitTestRACEDomain {
 	@Test
 	public void testOpTuckArms() {
 		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -63,7 +65,7 @@ public class JUnitTestRACEDomain {
 	public void testOpMoveBase() {
 		fluentSolver.deplenish();
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -73,7 +75,7 @@ public class JUnitTestRACEDomain {
 	public void testOpMoveTorso() {
 		fluentSolver.deplenish();
 		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -82,7 +84,7 @@ public class JUnitTestRACEDomain {
 	@Test
 	public void testOpMoveBaseBlind() {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -91,7 +93,7 @@ public class JUnitTestRACEDomain {
 	@Test
 	public void testOpPickUpObject() {
 		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -100,7 +102,7 @@ public class JUnitTestRACEDomain {
 		@Test
 	public void testOpPlaceObject() {
 		ProblemParser pp = new ProblemParser("problems/test_op_place_object.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -109,7 +111,7 @@ public class JUnitTestRACEDomain {
 			@Test
 	public void testOpMoveArmToSide() {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_arm_to_side.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -118,7 +120,7 @@ public class JUnitTestRACEDomain {
 				@Test
 	public void testMoveArmsToCarryposture() {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
@@ -127,7 +129,7 @@ public class JUnitTestRACEDomain {
 					@Test
 	public void testOpObserveObjectsOnArea() {
 		ProblemParser pp = new ProblemParser("problems/test_op_observe_objects_on_area.pdl");
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);

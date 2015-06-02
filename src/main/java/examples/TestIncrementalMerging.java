@@ -1,11 +1,11 @@
 package examples;
 
 import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
@@ -43,9 +41,9 @@ public class TestIncrementalMerging {
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
+		HybridDomain domain = TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
 
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		

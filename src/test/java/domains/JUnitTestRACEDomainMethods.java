@@ -3,6 +3,7 @@ package domains;
 import static org.junit.Assert.assertTrue;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
+import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -25,6 +26,7 @@ public class JUnitTestRACEDomainMethods {
 	
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
+	private HybridDomain domain;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -44,7 +46,7 @@ public class JUnitTestRACEDomainMethods {
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
+		domain = TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
 	}
 
 	@After
@@ -208,7 +210,7 @@ public class JUnitTestRACEDomainMethods {
 	
 	private void testProblem(String problemPath) {
 		ProblemParser pp = new ProblemParser(problemPath);
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);

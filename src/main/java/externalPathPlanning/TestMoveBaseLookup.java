@@ -2,6 +2,7 @@ package externalPathPlanning;
 
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
+import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.TestProblemParsing;
 
@@ -32,9 +33,9 @@ public class TestMoveBaseLookup {
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
+		HybridDomain domain = TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
 		
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		

@@ -171,12 +171,12 @@ public class TestProblemParsing {
 		
 //		initPlanner(planner, "domains/race_domain.ddl");
 //		initPlanner(planner, "domains/s_domain.ddl");
-		initPlanner(planner, "domains/ordered_domain.ddl");
+		HybridDomain domain = initPlanner(planner, "domains/ordered_domain.ddl");
 		
 //		initPlanner(planner, "domains/debug_nottype.pdl");
 //		initPlanner(planner, "domains/short_domain.ddl");
 		
-		pp.createState(fluentSolver);
+		pp.createState(fluentSolver, domain);
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
@@ -284,7 +284,7 @@ public class TestProblemParsing {
 		planEx.printPlan();
 	}
 	
-	public static void initPlanner(HTNPlanner planner, String domainPath) {
+	public static HybridDomain initPlanner(HTNPlanner planner, String domainPath) {
 		// load domain
 		HybridDomain dom;
 		try {
@@ -292,7 +292,7 @@ public class TestProblemParsing {
 		} catch (DomainParsingException e) {
 			System.out.println("Error while parsing domain: " + e.getMessage());
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
 		// init meta constraints based on domain
@@ -318,7 +318,7 @@ public class TestProblemParsing {
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 		planner.addMetaConstraint(mbConstraint);
-
+		return dom;
 	}
 	
 

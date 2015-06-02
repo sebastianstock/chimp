@@ -6,16 +6,23 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import resourceFluent.ResourceUsageTemplate;
+import unify.CompoundSymbolicVariable;
 import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 public class ProblemParser {
@@ -36,7 +43,7 @@ public class ProblemParser {
 		parseProblem();
 	}
 	
-	public void createState(FluentNetworkSolver fluentSolver) {
+	public void createState(FluentNetworkSolver fluentSolver, HybridDomain domain) {
 		Map<String, Variable> varsMap = new HashMap<String, Variable>(fluentElementsMap.size() 
 				+ taskElementsMap.size());
 		
@@ -68,6 +75,48 @@ public class ProblemParser {
 			fluentSolver.addConstraints(createAllenIntervalConstraints(stateStr, varsMap));
 		}
 
+		// create FluentResourceUsage constraints
+		fluentSolver.addConstraints(createResourceUsageConstraints(domain.getFluentResourceUsages(), varsMap.values()));
+
+	}
+	
+	private Map<String, List<ResourceUsageTemplate>> createResourceUsagesMap(List<ResourceUsageTemplate> resourceTemplates) {
+		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = 
+				new HashMap<String, List<ResourceUsageTemplate>>();  //resource name -> templates
+		for (ResourceUsageTemplate rt : resourceTemplates){
+			List<ResourceUsageTemplate> l = usageTemplatesMap.get(rt.getResourceName());
+			if (l == null) {
+				l = new ArrayList<ResourceUsageTemplate>();
+				usageTemplatesMap.put(rt.getFluentType(), l);
+			}
+			l.add(rt);
+		}
+		return usageTemplatesMap;
+	}
+
+	private Constraint[] createResourceUsageConstraints(
+			Vector<ResourceUsageTemplate> fluentResourceUsages,
+			Collection<Variable> vars) {
+		List<Constraint> ret = new ArrayList<Constraint>();
+		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = createResourceUsagesMap(fluentResourceUsages);
+		
+		for(Variable var : vars) {
+			CompoundSymbolicVariable csv = ((Fluent) var).getCompoundSymbolicVariable();
+			String symbol = csv.getPredicateName();
+			
+			List<ResourceUsageTemplate> rtList = usageTemplatesMap.get(symbol);
+			if (rtList != null) {
+				for (ResourceUsageTemplate rt : rtList) {
+					FluentConstraint resourceCon = 
+							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+					resourceCon.setFrom(var);
+					resourceCon.setTo(var);
+					ret.add(resourceCon);
+				}
+			}
+		}
+		
+		return ret.toArray(new Constraint[ret.size()]);
 	}
 
 	private void reset() {
