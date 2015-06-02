@@ -1,6 +1,10 @@
 package resourceFluent;
 
+import htn.TaskApplicationMetaConstraint.markings;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -9,8 +13,10 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.VariableOrderingH;
+import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.activity.Activity;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -39,7 +45,28 @@ public class FluentResourceUsageScheduler extends Schedulable {
 		activities = new Vector<Activity>(usageMap.keySet());
 		return super.getMetaVariables();
 	}
-	
+
+	@Override
+	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
+		ConstraintNetwork[] possiblResolvers = super.getMetaValues(metaVariable);
+		if(possiblResolvers == null) {
+			return null;
+		}
+		// We need to filter the resolvers, because we don't want to finish open state fluents.
+		List<ConstraintNetwork> filtered = new ArrayList<ConstraintNetwork>();
+		for (ConstraintNetwork cn : possiblResolvers) {
+			// test if cn has a before constraint from an open state fluent.
+			for(Constraint c : cn.getConstraints()) {
+				if (c instanceof AllenIntervalConstraint) {
+					Fluent from = (Fluent) ((AllenIntervalConstraint) c).getFrom();
+					if (from.getMarking() != markings.OPEN) {
+						filtered.add(cn);
+					}
+				}
+			}
+		}
+		return filtered.toArray(new ConstraintNetwork[filtered.size()]);
+	}
 
 	private void updateUsageMap() {
 		usageMap.clear();
