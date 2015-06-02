@@ -16,6 +16,8 @@ import java.util.Vector;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
+import resourceFluent.ResourceUsageTemplate;
+
 import com.google.common.primitives.Ints;
 
 import fluentSolver.FluentNetworkSolver;
@@ -29,6 +31,7 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final String head;
 	protected final String[] argStrings;
+	protected final List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
 	
 	protected final Vector<AdditionalConstraintTemplate> additionalAIConstraints = 
 			new Vector<AdditionalConstraintTemplate>(); 
@@ -57,6 +60,14 @@ public abstract class PlanReportroiryItemParser {
 		//		}
 		
 		parseAllenIntervalConstraints();
+		
+		// Parse Resources
+		String[] resourceElements = HybridDomain.parseKeyword(HybridDomain.ACTION_RESOURCE_KEYWORD, 
+				textualSpecification);
+		for (String resElement : resourceElements) {
+			ResourceUsageTemplate rt = HybridDomain.parseResourceUsage(resElement, false);
+			rtList.add(rt);
+		}
 	}
 	
 	public abstract PlanReportroryItem create() throws DomainParsingException;

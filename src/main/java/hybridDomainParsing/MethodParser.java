@@ -19,8 +19,6 @@ public class MethodParser extends PlanReportroiryItemParser {
 
 	public MethodParser(String textualSpecification, HTNPlanner planner, int maxArgs) {
 		super(textualSpecification, planner, maxArgs);
-		
-		// TODO Should we parse resources here / Should methods consume resources?
 	}
 	
 	public HTNMethod create() throws DomainParsingException {
@@ -43,6 +41,8 @@ public class MethodParser extends PlanReportroiryItemParser {
 		
 		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();
 		ret.setSubDifferentDefinitions(subDiffs);
+		
+		ret.addResourceUsageTemplates(rtList);
 		return ret;
 	}
 	

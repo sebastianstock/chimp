@@ -5,28 +5,15 @@ import htn.HTNOperator;
 import htn.HTNPlanner;
 import htn.HTNPrecondition;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import resourceFluent.ResourceUsageTemplate;
 
 public class OperatorParser extends PlanReportroiryItemParser {
 	
-	
-	private final List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
-	
 
 	public OperatorParser(String textualSpecification, HTNPlanner planner, int maxArgs){
 		super(textualSpecification, planner, maxArgs);
-
-		// Parse Resources
-		String[] resourceElements = HybridDomain.parseKeyword(HybridDomain.ACTION_RESOURCE_KEYWORD, 
-				textualSpecification);
-		for (String resElement : resourceElements) {
-			ResourceUsageTemplate rt = HybridDomain.parseResourceUsage(resElement, false);
-			rtList.add(rt);
-		}
 	}
 	
 	@Override
