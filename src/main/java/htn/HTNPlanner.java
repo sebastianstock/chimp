@@ -2,6 +2,9 @@ package htn;
 
 import htn.TaskApplicationMetaConstraint.markings;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -13,12 +16,13 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import unify.CompoundSymbolicValueConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import unify.CompoundSymbolicValueConstraint;
 
 
 public class HTNPlanner extends MetaConstraintSolver {
@@ -27,6 +31,10 @@ public class HTNPlanner extends MetaConstraintSolver {
 	public static final String FUTURE_STR = "Eternity";
 	
 	private Map<String, String[]> typesInstancesMap;
+	
+	private Map<Fluent, Constraint> meetsFutureMap;
+	private final Fluent future;
+	private final FluentNetworkSolver groundSolver;
 	
 	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 
@@ -38,6 +46,15 @@ public class HTNPlanner extends MetaConstraintSolver {
 				new FluentNetworkSolver(origin, horizon, symbols, symbolicingredients));
 		
 		logger = MetaCSPLogging.getLogger(HTNPlanner.class);
+		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
+		// create future fluent
+		future = (Fluent)groundSolver.createVariable("Future");
+		future.setMarking(markings.JUSTIFIED);
+		future.setName(FUTURE_STR + "()");
+		AllenIntervalConstraint futureRelease = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(horizon,horizon));
+		futureRelease.setFrom(future);
+		futureRelease.setTo(future);
+		groundSolver.addConstraint(futureRelease);
 	}
 
 	@Override
@@ -75,8 +92,6 @@ public class HTNPlanner extends MetaConstraintSolver {
 		
 		long startTime = System.nanoTime();
 		
-		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
-		
 		// remove added fluents
 		Vector<Variable> varsToRemove = new Vector<Variable>();
 		for (Variable v : metaValue.getVariables()) {
@@ -92,13 +107,29 @@ public class HTNPlanner extends MetaConstraintSolver {
 		}
 		groundSolver.removeVariables(varsToRemove.toArray(new Variable[varsToRemove.size()]));
 		
-		// change CLOSED fluents back to OPEN
+		// change CLOSED fluents back to OPEN and re-add meets future constraints
+		List<AllenIntervalConstraint> additionalMeetsFuture = new ArrayList<AllenIntervalConstraint>();
 		for(Constraint c : metaValue.getConstraints()) {
 			if ((c instanceof FluentConstraint) && 
 					(((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
 				((FluentConstraint) c).getTo().setMarking(markings.OPEN);
+				
+				AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+				meetsFuture.setFrom(((FluentConstraint) c).getTo());
+				meetsFuture.setTo(future);
+				additionalMeetsFuture.add(meetsFuture);
 			}
 		}
+		if(additionalMeetsFuture.size() > 0) {
+			if(! groundSolver.addConstraints(additionalMeetsFuture.toArray(new Constraint[additionalMeetsFuture.size()]))) {
+				logger.info("Could not re-add meet future constraints");
+			} else {
+				for (AllenIntervalConstraint con : additionalMeetsFuture) {
+					meetsFutureMap.put((Fluent) con.getFrom(), con);
+				}
+			}
+		}
+		
 		long endTime = System.nanoTime();
 		logger.finest("RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
 	}
@@ -120,6 +151,8 @@ public class HTNPlanner extends MetaConstraintSolver {
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		
+		List<AllenIntervalConstraint> additionalMeetsFutureCons = new ArrayList<AllenIntervalConstraint>();
+		
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
 			if (v instanceof VariablePrototype) {
@@ -134,6 +167,16 @@ public class HTNPlanner extends MetaConstraintSolver {
 
 				fluent.setMarking(v.getMarking());
 				metaValue.addSubstitution((VariablePrototype)v, fluent);
+				
+				// add meets future constraints for positive effects
+				if(v.getMarking().equals(markings.OPEN)) {
+					AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+					meetsFuture.setFrom(fluent);
+					meetsFuture.setTo(future);
+//					metaValue.addConstraint(meetsFuture);  // this is done below
+					additionalMeetsFutureCons.add(meetsFuture);
+					meetsFutureMap.put(fluent, meetsFuture);
+				}
 			}
 		}
 
@@ -161,14 +204,27 @@ public class HTNPlanner extends MetaConstraintSolver {
 			metaValue.addConstraint(clonedConstraint);
 		}
 		
-		// set marking of closed fluents to CLOSED
+		metaValue.addConstraints(additionalMeetsFutureCons.toArray(new AllenIntervalConstraint[additionalMeetsFutureCons.size()]));
+		
+		
+		// set marking of closed fluents to CLOSED and remove connection to the future
+		List<Constraint> constraintsToRemove = new ArrayList<Constraint>();
 		for (Constraint con : metaValue.getConstraints()) {
 			if (con instanceof FluentConstraint) {
 				if (((FluentConstraint) con).getType() == FluentConstraint.Type.CLOSES) {
 					((FluentConstraint) con).getTo().setMarking(markings.CLOSED);
+					Fluent to = (Fluent) ((FluentConstraint) con).getTo();
+					Constraint meetsConstraints = meetsFutureMap.remove(to);
+					constraintsToRemove.add(meetsConstraints);
 				}
 			}
 		}
+		
+		if (constraintsToRemove.size() > 0 ) {
+			logger.fine("Removing future constraints: " + constraintsToRemove);
+			this.getConstraintSolvers()[0].removeConstraints(constraintsToRemove.toArray(new Constraint[constraintsToRemove.size()]));
+		}
+
 		
 		long endTime = System.nanoTime();
 		logger.finest("ADD_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
@@ -219,5 +275,32 @@ public class HTNPlanner extends MetaConstraintSolver {
 	public void setTypesInstancesMap(Map<String, String[]> typesInstancesMap) {
 		this.typesInstancesMap = typesInstancesMap;
 	}
+
+	public Map<Fluent, Constraint> getMeetsFutureMap() {
+		return meetsFutureMap;
+	}
+
+	public Fluent getFutureFluent() {
+		return future;
+	}
+
+	/**
+	 * Adds meets constraint between open fluents and the future fluent.
+	 */
+	public void createInitialMeetsFutureConstraints() {
+		// set meets future constraints
+		meetsFutureMap = new HashMap<Fluent, Constraint>();
+		for (Variable var : groundSolver.getVariables()) {
+			if (var.getMarking().equals(markings.OPEN)) {
+				AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+				meetsFuture.setFrom(var);
+				meetsFuture.setTo(future);
+				if(groundSolver.addConstraint(meetsFuture)) {
+					meetsFutureMap.put((Fluent) var, meetsFuture);
+				}
+			}
+		}
+	}
+	
 
 }

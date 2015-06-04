@@ -53,7 +53,8 @@ public class TestProblemParsing {
 				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
 				"not_test",
 				// other
-				"Future"
+				"Future",
+				HTNPlanner.FUTURE_STR
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -187,7 +188,7 @@ public class TestProblemParsing {
 //		MetaCSPLogging.setLevel(Level.FINE);
 		MetaCSPLogging.setLevel(Level.OFF);
 		
-		
+		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();
