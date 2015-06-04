@@ -52,7 +52,8 @@ public class TestTransTerraProblems {
 				"!transfer_payload", "!pickup_basecamp", "!tuck_arms", "!place_basecamp",
 				// methods
 				"deploy_basecamp", "take_samples", "get_basecamp",
-				"transfer_all_samples"
+				"transfer_all_samples",
+				HTNPlanner.FUTURE_STR
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -62,7 +63,7 @@ public class TestTransTerraProblems {
 				"baseCamp1", "baseCamp2",
 				"lander1",
 				"b1", "b2", "b3", "landingSite1", "b4", "b5", "b6", "b7",
-				"sampleContainer1", "sampleContainer2",
+				"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5",
 				"payload1",
 				N};
 		return symbols;
@@ -102,7 +103,7 @@ public class TestTransTerraProblems {
 		
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("BaseCamp", new String[] {"baseCamp1", "baseCamp2"});
-		typesInstancesMap.put("SampleContainer", new String[] {"sampleContainer1"});
+		typesInstancesMap.put("SampleContainer", new String[] {"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5"});
 		typesInstancesMap.put("Rover", new String[] {"rover1"});
 		typesInstancesMap.put("Shuttle", new String[] {"shuttle1"});
 		typesInstancesMap.put("Lander", new String[] {"lander1"});
@@ -126,6 +127,7 @@ public class TestTransTerraProblems {
 		
 //		testScheduling(planner);
 		
+		planner.createInitialMeetsFutureConstraints();
 		
 		plan(planner, fluentSolver);
 		

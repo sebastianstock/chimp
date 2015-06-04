@@ -1,0 +1,30 @@
+(Problem
+
+(Fluent f0 RobotAt(shuttle1 b1))
+(Constraint Release[0,0](f0))
+
+(Fluent f1 RobotAt(rover1 b1))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 Attached(sampleContainer1 rover1))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 Attached(sampleContainer2 rover1))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 Attached(sampleContainer3 rover1))
+(Constraint Release[0,0](f4))
+
+(Fluent f5 Attached(sampleContainer4 rover1))
+(Constraint Release[0,0](f5))
+
+(Fluent f6 Attached(sampleContainer5 rover1))
+(Constraint Release[0,0](f6))
+
+
+
+
+(Task t1 transfer_all_samples(rover1 shuttle1))
+(Constraint Release[0,INF](t1))
+
+)

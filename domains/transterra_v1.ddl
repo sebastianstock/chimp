@@ -300,9 +300,8 @@
 
 (:method
  (Head transfer_all_samples(?robot1 ?robot2))
+ (Values ?robot1 rover1)
  (ResourceUsage SampleStorageCapacityRover 5)
  (Constraint Duration[2,INF](task))
 
-# (Sub s1 !!check_empty())
-# (Constraint Equals(s1,task))
 )
