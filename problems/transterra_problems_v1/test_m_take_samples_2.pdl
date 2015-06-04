@@ -1,0 +1,15 @@
+(Problem
+
+(Fluent f1 RobotAt(rover1 landingSite1))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 Attached(sampleContainer1 rover1))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 Empty(sampleContainer1))
+(Constraint Release[0,0](f3))
+
+(Task t0 take_samples(rover1 b1))
+(Constraint Release[0,1](t0))
+
+)

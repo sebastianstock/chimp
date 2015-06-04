@@ -1,0 +1,12 @@
+(Problem
+
+(Fluent f1 RobotAt(rover1 b1))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 Attached(baseCamp1 rover1))
+(Constraint Release[0,0](f2))
+
+(Task t0 !place_basecamp(rover1 baseCamp1 b1))
+(Constraint Release[0,1](t0))
+
+)

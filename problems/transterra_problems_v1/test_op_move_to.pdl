@@ -1,0 +1,9 @@
+(Problem
+
+(Fluent f1 RobotAt(rover1 landingSite1))
+(Constraint Release[0,0](f1))
+
+(Task t0 !move_to(rover1 b1))
+(Constraint Release[0,1](t0))
+
+)
