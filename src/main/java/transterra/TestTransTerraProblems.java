@@ -53,6 +53,7 @@ public class TestTransTerraProblems {
 				// methods
 				"deploy_basecamp", "take_samples", "get_basecamp",
 				"transfer_all_samples",
+				"rendezvous", "rendezvous_meet", "rendezvous_exchange_battery", "rendezvous_exchange_samples",
 				HTNPlanner.FUTURE_STR
 				};	
 		// race:Kitchenware		
@@ -77,7 +78,7 @@ public class TestTransTerraProblems {
 	public static void main(String[] args) {
 		
 		// Testproblems for TransTerrA
-		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_check_empty.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_check_empty.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_move_to.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_sample_regolith.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
@@ -94,6 +95,7 @@ public class TestTransTerraProblems {
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_get_basecamp_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_get_basecamp_2.pdl");
 		
+		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl");
 		
 		// value ordering heuristic debugging:
 //		ProblemParser pp = new ProblemParser("problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH

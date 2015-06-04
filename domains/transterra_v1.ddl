@@ -237,6 +237,47 @@
 
 ### Shuttle rendezvous  ################
 
+(:method
+ (Head rendezvous(?robot1 ?robot2))
+ (VarDifferent ?robot1 ?robot2)
+
+ (Sub s1 rendezvous_meet(?robot1 ?robot2))
+)
+
+# meet at the same location
+(:method
+ (Head rendezvous_meet(?robot1 ?robot2))
+
+ (Pre p1 RobotAt(?robot1 ?r1Area))
+ (Pre p2 RobotAt(?robot2 ?r2Area))
+ (VarDifferent ?r1Area ?r2Area)
+
+ (Sub s1 !move_to(?robot2 ?r1Area)) # TODO find good meeting point
+ (Constraint Starts(s1,task))
+ (Sub s2 rendezvous(?robot1 ?robot2))
+ (Constraint Finishes(s2,task))
+ 
+ (Ordering s1 s2)
+ (Constraint Before(s1,s2))
+)
+
+
+
+# exchange battery (transfer full batteries to robot1)
+#(:method
+# (Head rendezvous_exchange_battery(?robot1 ?robot2))
+
+# (Pre p1 RobotAt(?robot1 ?area))
+# (Pre p2 RobotAt(?robot2 ?area))
+#)
+
+# exchange samples
+(:method
+ (Head rendezvous_exchange_samples(?robot1 ?robot2))
+
+ (Pre p1 RobotAt(?robot1 ?area))
+ (Pre p2 RobotAt(?robot2 ?area))
+)
 
 
 ### Get a basecamp from the lander #####
@@ -303,5 +344,30 @@
  (Values ?robot1 rover1)
  (ResourceUsage SampleStorageCapacityRover 5)
  (Constraint Duration[2,INF](task))
+)
 
+### Transfer filled samples
+(:method
+ (Head transfer_filled_containers(?robot1 ?robot2))
+ 
+ (Pre p0 Attached(?container ?robot1))
+ (Type ?container SampleContainer)
+ 
+ (Pre p1 RobotAt(?robot1 ?robotArea))
+ (Pre p2 RobotAt(?robot2 ?robotArea))
+
+ (Sub s1 !transfer_sample(?robot1 ?robot2 ?container))
+ (Constraint Starts(s1,task))
+ (Sub s2 transfer_filled_containers(?robot1 ?robot2))
+ (Constraint Finishes(s2,task))
+ 
+ (Ordering s1 s2)
+ (Constraint Before(s1,s2))
+)
+
+(:method
+ (Head transfer_filled_containers(?robot1 ?robot2))
+ (Values ?robot1 rover1)
+ (ResourceUsage SampleStorageCapacityRover 5)
+ (Constraint Duration[2,INF](task))
 )

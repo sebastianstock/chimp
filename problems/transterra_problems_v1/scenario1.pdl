@@ -1,0 +1,52 @@
+(Problem
+
+### Initial state
+
+(Fluent f0 RobotAt(shuttle1 landingSite1))
+(Constraint Release[0,0](f0))
+
+(Fluent f1 RobotAt(rover1 landingSite1))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 Attached(baseCamp1 rover1))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 Attached(sampleContainer1 rover1))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 Empty(sampleContainer1))
+(Constraint Release[0,0](f4))
+
+(Fluent f5 Attached(sampleContainer2 rover1))
+(Constraint Release[0,0](f5))
+
+(Fluent f6 Empty(sampleContainer2))
+(Constraint Release[0,0](f6))
+
+### Tasks
+
+## B1
+(Task t1 deploy_basecamp(rover1 b1))
+(Constraint Release[0,1](t1))
+
+(Task t2 take_samples(rover1 b1))
+(Constraint Release[10000,INF](t2))
+(Constraint Before(t1,t2))
+# (Ordering t1 t2)  TODO add in problem parser
+
+
+## B2
+(Task t3 take_samples(rover1 b2))
+(Constraint Release[20000,INF](t3))
+(Constraint Before(t2,t3))
+# (Ordering t2 t3)  TODO add in problem parser
+
+(Task t4 rendezvous(rover1 shuttle1))
+(Constraint Release[20000,INF](t4))
+(Constraint Before(t3,t4))
+# (Ordering t3 t4)  TODO add in problem parser
+
+## 3
+
+
+)
