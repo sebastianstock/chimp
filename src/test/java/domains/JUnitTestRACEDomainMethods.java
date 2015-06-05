@@ -212,6 +212,7 @@ public class JUnitTestRACEDomainMethods {
 		ProblemParser pp = new ProblemParser(problemPath);
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}

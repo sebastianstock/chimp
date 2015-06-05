@@ -57,6 +57,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_tuck_arms.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -67,6 +68,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -77,6 +79,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_torso.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -86,6 +89,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base_blind.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -95,6 +99,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_pick_up_object.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -104,6 +109,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_place_object.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -113,6 +119,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_arm_to_side.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -122,6 +129,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_move_arms_to_carryposture.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
@@ -131,6 +139,7 @@ public class JUnitTestRACEDomain {
 		ProblemParser pp = new ProblemParser("problems/test_op_observe_objects_on_area.pdl");
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
