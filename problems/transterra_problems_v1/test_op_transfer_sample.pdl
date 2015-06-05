@@ -3,7 +3,7 @@
 (Fluent f1 RobotAt(rover1 b1))
 (Constraint Release[0,0](f1))
 
-(Fluent f2 Attached(sampleContainer1 rover1))
+(Fluent f2 ContainerAt(sampleContainer1 rover1 filled))
 (Constraint Release[0,0](f2))
 
 (Fluent f3 RobotAt(shuttle1 b1))

@@ -35,14 +35,22 @@
 
 #(Resource ManipulationCapacityRover 1)
 
-(Resource SampleStorageCapacityRover 5)
+#(Resource SampleStorageCapacityRover 5) # leads to conflict with filled samplestoragecapacityrover
+(Resource FilledSampleStorageCapacityRover 5)
 #(Resource SampleStorageCapacityShuttle 2)
 
 ############ Fluent Resource Usage ###
+#(FluentResourceUsage 
+#  (Usage SampleStorageCapacityRover 1) 
+#  (Fluent ContainerAt)
+#  (Param 2 rover1)
+#)
+
 (FluentResourceUsage 
-  (Usage SampleStorageCapacityRover 1) 
-  (Fluent Attached)
+  (Usage FilledSampleStorageCapacityRover 1) 
+  (Fluent ContainerAt)
   (Param 2 rover1)
+  (Param 3 filled)
 )
 
 
@@ -76,14 +84,12 @@
  (Values ?robot rover1)
  (Pre p1 RobotAt(?robot ?area))
  (Constraint During(task,p1)) # robot has to stay there
- (Pre p2 Attached(?samplecontainer ?robot))
- (Constraint During(task,p2)) # is attached the whole time
- (Pre p3 Empty(?samplecontainer))
- (Del p3)
- (Constraint Meets(p3,task))
- (Type ?samplecontainer SampleContainer)
- (Add e1 Filled(?samplecontainer))
- (Constraint Meets(task,e1))
+ (Pre p2 ContainerAt(?samplecontainer ?robot ?empty))
+ (Values ?empty empty)
+ (Del p2)
+ (Add e1 ContainerAt(?samplecontainer ?robot ?filled))
+ (Values ?filled filled)
+ (Constraint Meets(p2,e1))
  (ResourceUsage ManipulationCapacityRover 1)
 )
 
@@ -93,11 +99,11 @@
  (Head !transfer_sample(?robot1 ?robot2 ?container))
  (Pre p1 RobotAt(?robot1 ?area))
  (Pre p2 RobotAt(?robot2 ?area))
- (Pre p3 Attached(?container ?robot1))
+ (Pre p3 ContainerAt(?container ?robot1 ?level))
  (Del p3)
  (Constraint During(task,p1))
  (Constraint During(task,p2))
- (Add e1 Attached(?container ?robot2))
+ (Add e1 ContainerAt(?container ?robot2 ?level))
  (Constraint Meets(task,e1))
 # (ResourceUsage ManipulationCapacity 1)  # TODO
 )
@@ -350,8 +356,8 @@
 (:method
  (Head transfer_filled_containers(?robot1 ?robot2))
  
- (Pre p0 Attached(?container ?robot1))
- (Type ?container SampleContainer)
+ (Pre p0 ContainerAt(?container ?robot1 ?filled))
+ (Values ?filled filled)
  
  (Pre p1 RobotAt(?robot1 ?robotArea))
  (Pre p2 RobotAt(?robot2 ?robotArea))
@@ -368,6 +374,6 @@
 (:method
  (Head transfer_filled_containers(?robot1 ?robot2))
  (Values ?robot1 rover1)
- (ResourceUsage SampleStorageCapacityRover 5)
+ (ResourceUsage FilledSampleStorageCapacityRover 5)
  (Constraint Duration[2,INF](task))
 )

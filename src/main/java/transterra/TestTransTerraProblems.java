@@ -44,7 +44,7 @@ public class TestTransTerraProblems {
 		String[][] symbols = new String[2][];
 		// predicates  
 		// index: 0
-		symbols[0] = new String[] {"At", "RobotAt", "Attached", "Empty", "Filled",
+		symbols[0] = new String[] {"At", "RobotAt", "Attached", "ContainerAt",
 				// operators
 				"!create_attached_fluent",
 				"!!check_empty",
@@ -52,7 +52,7 @@ public class TestTransTerraProblems {
 				"!transfer_payload", "!pickup_basecamp", "!tuck_arms", "!place_basecamp",
 				// methods
 				"deploy_basecamp", "take_samples", "get_basecamp",
-				"transfer_all_samples",
+				"transfer_all_samples", "transfer_filled_containers",
 				"rendezvous", "rendezvous_meet", "rendezvous_exchange_battery", "rendezvous_exchange_samples",
 				HTNPlanner.FUTURE_STR
 				};	
@@ -66,6 +66,7 @@ public class TestTransTerraProblems {
 				"b1", "b2", "b3", "landingSite1", "b4", "b5", "b6", "b7",
 				"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5",
 				"payload1",
+				"filled", "empty",
 				N};
 		return symbols;
 	}
@@ -74,14 +75,23 @@ public class TestTransTerraProblems {
 		return new int[] {1,3};
 	}
 	
+	public static Map<String, String[]> createTypesInstances() {
+		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
+		typesInstancesMap.put("BaseCamp", new String[] {"baseCamp1", "baseCamp2"});
+		typesInstancesMap.put("SampleContainer", new String[] {"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5"});
+		typesInstancesMap.put("Rover", new String[] {"rover1"});
+		typesInstancesMap.put("Shuttle", new String[] {"shuttle1"});
+		typesInstancesMap.put("Lander", new String[] {"lander1"});
+		return typesInstancesMap;
+	}
+	
 
 	public static void main(String[] args) {
 		
 		// Testproblems for TransTerrA
-//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_check_empty.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_move_to.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_sample_regolith.pdl");
-//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
+		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_payload.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_pickup_basecamp.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_pickup_basecamp_2.pdl");
@@ -95,20 +105,13 @@ public class TestTransTerraProblems {
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_get_basecamp_1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_get_basecamp_2.pdl");
 		
-		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_filled.pdl");
 		
-		// value ordering heuristic debugging:
-//		ProblemParser pp = new ProblemParser("problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
 
 		String[][] symbols = createSymbols();
 		int[] ingredients = createIngredients();
 		
-		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
-		typesInstancesMap.put("BaseCamp", new String[] {"baseCamp1", "baseCamp2"});
-		typesInstancesMap.put("SampleContainer", new String[] {"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5"});
-		typesInstancesMap.put("Rover", new String[] {"rover1"});
-		typesInstancesMap.put("Shuttle", new String[] {"shuttle1"});
-		typesInstancesMap.put("Lander", new String[] {"lander1"});
+		Map<String, String[]> typesInstancesMap = createTypesInstances();
 		
 		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
