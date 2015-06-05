@@ -52,7 +52,7 @@ public class TestTransTerraProblems {
 				"!transfer_payload", "!pickup_basecamp", "!tuck_arms", "!place_basecamp",
 				// methods
 				"deploy_basecamp", "take_samples", "get_basecamp",
-				"transfer_all_samples", "transfer_filled_containers",
+				"transfer_all_samples", "transfer_filled_containers", "transfer_empty_containers",
 				"rendezvous", "rendezvous_meet", "rendezvous_exchange_battery", "rendezvous_exchange_samples",
 				HTNPlanner.FUTURE_STR
 				};	
@@ -91,7 +91,7 @@ public class TestTransTerraProblems {
 		// Testproblems for TransTerrA
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_move_to.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_sample_regolith.pdl");
-		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_transfer_payload.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_pickup_basecamp.pdl");
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_op_pickup_basecamp_2.pdl");
@@ -106,6 +106,7 @@ public class TestTransTerraProblems {
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_get_basecamp_2.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_filled.pdl");
+		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_empty.pdl");
 		
 
 		String[][] symbols = createSymbols();
@@ -248,8 +249,7 @@ public class TestTransTerraProblems {
 		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
 		selectionConstraint.addOperators(dom.getOperators());
 		selectionConstraint.addMethods(dom.getMethods());
-		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
-		selectionConstraint.setResourceUsages(fluentResourceUsages);
+		selectionConstraint.setResourceUsages(dom.getFluentResourceUsages());
 		
 		for (FluentScheduler fs : dom.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);
