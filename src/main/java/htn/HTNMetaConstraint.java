@@ -29,8 +29,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
 	private final Vector<PlanReportroryItem> methods =new Vector<PlanReportroryItem>();
 
-	private final Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap = 
-			new HashMap<String, List<ResourceUsageTemplate>>();  //resource name -> templates
+	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
 
 	//false if we split up HTN algorithm into 3 meta constraints, 
 	// true if we apply preonditions and effects at the same time.
@@ -350,14 +349,26 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 * @param resourceTemplates
 	 */
 	public void setResourceUsages(List<ResourceUsageTemplate> resourceTemplates) {
+		resourcesTemplatesMap = createResourceUsagesMap(resourceTemplates);
+	}
+	
+	/**
+	 * Generate a map from resource types to lists of ResourceUsageTemplates.
+	 * @param resourceTemplates
+	 * @return
+	 */
+	public static Map<String, List<ResourceUsageTemplate>> createResourceUsagesMap(List<ResourceUsageTemplate> resourceTemplates) {
+		Map<String, List<ResourceUsageTemplate>> ret = 
+				new HashMap<String, List<ResourceUsageTemplate>>();  //resource type -> templates
 		for (ResourceUsageTemplate rt : resourceTemplates){
-			List<ResourceUsageTemplate> l = resourcesTemplatesMap.get(rt.getResourceName());
+			List<ResourceUsageTemplate> l = ret.get(rt.getFluentType());
 			if (l == null) {
 				l = new ArrayList<ResourceUsageTemplate>();
-				resourcesTemplatesMap.put(rt.getFluentType(), l);
+				ret.put(rt.getFluentType(), l);
 			}
 			l.add(rt);
 		}
+		return ret;
 	}
 
 }

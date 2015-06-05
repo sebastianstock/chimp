@@ -1,5 +1,6 @@
 package hybridDomainParsing;
 
+import htn.HTNMetaConstraint;
 import htn.TaskApplicationMetaConstraint.markings;
 
 import java.io.BufferedReader;
@@ -79,26 +80,12 @@ public class ProblemParser {
 		fluentSolver.addConstraints(createResourceUsageConstraints(domain.getFluentResourceUsages(), varsMap.values()));
 
 	}
-	
-	private Map<String, List<ResourceUsageTemplate>> createResourceUsagesMap(List<ResourceUsageTemplate> resourceTemplates) {
-		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = 
-				new HashMap<String, List<ResourceUsageTemplate>>();  //resource name -> templates
-		for (ResourceUsageTemplate rt : resourceTemplates){
-			List<ResourceUsageTemplate> l = usageTemplatesMap.get(rt.getResourceName());
-			if (l == null) {
-				l = new ArrayList<ResourceUsageTemplate>();
-				usageTemplatesMap.put(rt.getFluentType(), l);
-			}
-			l.add(rt);
-		}
-		return usageTemplatesMap;
-	}
 
 	private Constraint[] createResourceUsageConstraints(
 			Vector<ResourceUsageTemplate> fluentResourceUsages,
 			Collection<Variable> vars) {
 		List<Constraint> ret = new ArrayList<Constraint>();
-		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = createResourceUsagesMap(fluentResourceUsages);
+		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = HTNMetaConstraint.createResourceUsagesMap(fluentResourceUsages);
 		
 		for(Variable var : vars) {
 			CompoundSymbolicVariable csv = ((Fluent) var).getCompoundSymbolicVariable();
