@@ -1,5 +1,6 @@
 package hybridDomainParsing;
 
+import htn.EffectTemplate;
 import htn.HTNMetaConstraint;
 import htn.TaskApplicationMetaConstraint.markings;
 
@@ -17,6 +18,7 @@ import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
+import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
@@ -74,6 +76,11 @@ public class ProblemParser {
 		// create AllenIntervals
 		for (String stateStr : problemStrs) {
 			fluentSolver.addConstraints(createAllenIntervalConstraints(stateStr, varsMap));
+		}
+		
+		// create Ordering Constraints
+		for (String stateStr : problemStrs) {
+			fluentSolver.addConstraints(createOrderingConstraints(stateStr, varsMap));
 		}
 
 		// create FluentResourceUsage constraints
@@ -214,4 +221,23 @@ public class ProblemParser {
 		}
 		return ret;
 	}
+	
+	private Constraint[] createOrderingConstraints(String stateStr,
+			Map<String, Variable> fluentsVarsMap) {
+		// Parse AllenIntervalConstraints:
+		String[] constraintElements = HybridDomain.parseKeyword(HybridDomain.ORDERING_CONSTRAINT_KEYWORD, stateStr);
+		Constraint[] ret = new Constraint[constraintElements.length];
+		for (int i = 0; i < constraintElements.length; i++) {
+			String orderingElement = constraintElements[i];
+			String fromKey = orderingElement.substring(0,orderingElement.indexOf(" ")).trim();
+			String toKey = orderingElement.substring(orderingElement.indexOf(" ")).trim();
+			FluentConstraint con = new FluentConstraint(FluentConstraint.Type.BEFORE);
+			
+			con.setFrom(fluentsVarsMap.get(fromKey));
+			con.setTo(fluentsVarsMap.get(toKey));
+			ret[i] = con;			
+		}
+		return ret;
+	}
+	
 }
