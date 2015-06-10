@@ -18,7 +18,6 @@ import java.util.Vector;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.meta.simplePlanner.SimplePlanner;
 
-import fluentSolver.FluentNetworkSolver;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
@@ -35,8 +34,9 @@ public class HybridDomain{
 	private final Vector<ResourceUsageTemplate> fluentResourceUsages = 
 			new Vector<ResourceUsageTemplate>();
 	
-	private final String fileName;
 	private int maxArgs; // Maximum number of arguments of a fluent.
+	private final String domainStr;
+	private final String[] predicateSymbols;
 	
 	public static final String DOMAIN_KEYWORD = "HybridHTNDomain";
 	public static final String MAXARGS_KEYWORD = "MaxArgs";
@@ -61,19 +61,24 @@ public class HybridDomain{
 	public static final String RESOURCE_KEYWORD ="Resource";
 	public static final String FLUENT_KEYWORD = "Fluent";
 	public static final String VARIABLES_DIFFERENT_KEYWORD = "VarDifferent";
+	public static final String PREDICATE_SYMBOLS_KEYWORD = "PredicateSymbols";
 	
 	public static final String EMPTYSTRING = "n";
 	public static final String VARIABLE_INDICATOR = "?";
 	
 	private static final String[] NO_STRINGS = {};
 	
-	public HybridDomain(String filename) {
-		this.fileName = filename;
+	public HybridDomain(String filename) throws DomainParsingException {
+		this.domainStr = readDomain(filename);
+		maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, domainStr)[0]);
+		predicateSymbols = parsePredicateSymbols(domainStr);
 	}
 	
 	@Deprecated
 	public HybridDomain(HTNPlanner planner, String filename) throws DomainParsingException {
-		this.fileName = filename;
+		this.domainStr = readDomain(filename);
+		maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, domainStr)[0]);
+		predicateSymbols = parsePredicateSymbols(domainStr);
 		parseDomain(planner);
 	}
 	
@@ -121,16 +126,9 @@ public class HybridDomain{
 			this.fluentSchedulers.add(new FluentScheduler(null, null, head, field, fieldValue));
 		}
 	}
-
-	/**
-	 * Parses a domain file (see domains/testDomain.ddl for an example), instantiates
-	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link SimplePlanner}.
-	 * @param sp The {@link SimplePlanner} that will use this domain.
-	 * @param fileName Text file containing the domain definition. 
-	 * @throws DomainParsingException 
-	 */
-	public void parseDomain(HTNPlanner planner) throws DomainParsingException {
-		String everything = null;
+	
+	private static String readDomain(String fileName) throws DomainParsingException{
+		String domainStr = null;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			try {
@@ -143,61 +141,72 @@ public class HybridDomain{
 					}
 					line = br.readLine();
 				}
-				everything = sb.toString();
-				name = parseKeyword(DOMAIN_KEYWORD, everything)[0];
-				
-				maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, everything)[0]);
-//				System.out.println("MaxArgs " + maxArgs);
-				
-				// Parse Resources and create ResourceSchedulers
-				String[] resourceElements = parseKeyword(RESOURCE_KEYWORD, everything);
-				Map<String,Integer> resources = processResources(resourceElements);
-				resourceSchedulers.clear();
-				for (Entry<String, Integer> entry : resources.entrySet()) {
-					FluentResourceUsageScheduler rs = new FluentResourceUsageScheduler(null, null, entry.getKey(), 
-							entry.getValue().intValue());
-					
-//					resourceSchedulers.add(new FluentResourceUsageScheduler(null, null, entry.getKey(), 
-//							entry.getValue().intValue()));
-					resourceSchedulers.add(rs);
-				}
-				
-				// Parse FluentResourceUsages
-				String[] usageElements = parseKeyword(FLUENT_RESOURCE_KEYWORD, everything);
-				processFluentResourceUsages(usageElements);
-				// test if all resources are listed:
-				for (ResourceUsageTemplate rt : fluentResourceUsages) {
-					if (!resources.containsKey(rt.getResourceName())) {
-						throw new DomainParsingException("Resource " + rt.getResourceName() + " is not defined");
-					}
-				}
-				
-				String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, everything);
-				for (String operatorstr : planningOperators) {
-					OperatorParser oParser = new OperatorParser(operatorstr, planner, maxArgs);
-					HTNOperator op = oParser.create();
-//					System.out.println("Created Operator: " + op);
-					this.operators.addElement(op);
-				}
-				
-				String[] planningMethods = parseKeyword(METHOD_KEYWORD, everything);
-				for (String methodStr : planningMethods) {
-					MethodParser mParser = new MethodParser(methodStr, planner, maxArgs);
-					HTNMethod m = mParser.create();
-//					System.out.println("Created Method: " + m);
-					this.methods.addElement(m);
-				}
-				
-				// Parse state variables:
-				String[] stateVariableElements = parseKeyword(STATE_VARIBALE_KEYWORD, everything);
-				for (String stateStr : stateVariableElements) {
-					createFluentSchedulers(stateStr);
-				}
+				domainStr = sb.toString();
 			}
 			finally { br.close(); }
 		}
 		catch (FileNotFoundException e) { e.printStackTrace(); }
 		catch (IOException e) { e.printStackTrace(); }
+		if (domainStr == null) {
+			throw new DomainParsingException("Could not read domain");
+		}
+		return domainStr;
+	}
+
+	/**
+	 * Parses a domain file (see domains/testDomain.ddl for an example), instantiates
+	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link SimplePlanner}.
+	 * @param sp The {@link SimplePlanner} that will use this domain.
+	 * @param fileName Text file containing the domain definition. 
+	 * @throws DomainParsingException 
+	 */
+	public void parseDomain(HTNPlanner planner) throws DomainParsingException {
+		name = parseKeyword(DOMAIN_KEYWORD, domainStr)[0];
+		
+		// Parse Resources and create ResourceSchedulers
+		String[] resourceElements = parseKeyword(RESOURCE_KEYWORD, domainStr);
+		Map<String,Integer> resources = processResources(resourceElements);
+		resourceSchedulers.clear();
+		for (Entry<String, Integer> entry : resources.entrySet()) {
+			FluentResourceUsageScheduler rs = new FluentResourceUsageScheduler(null, null, entry.getKey(), 
+					entry.getValue().intValue());
+			
+//			resourceSchedulers.add(new FluentResourceUsageScheduler(null, null, entry.getKey(), 
+//					entry.getValue().intValue()));
+			resourceSchedulers.add(rs);
+		}
+		
+		// Parse FluentResourceUsages
+		String[] usageElements = parseKeyword(FLUENT_RESOURCE_KEYWORD, domainStr);
+		processFluentResourceUsages(usageElements);
+		// test if all resources are listed:
+		for (ResourceUsageTemplate rt : fluentResourceUsages) {
+			if (!resources.containsKey(rt.getResourceName())) {
+				throw new DomainParsingException("Resource " + rt.getResourceName() + " is not defined");
+			}
+		}
+		
+		String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, domainStr);
+		for (String operatorstr : planningOperators) {
+			OperatorParser oParser = new OperatorParser(operatorstr, planner, maxArgs);
+			HTNOperator op = oParser.create();
+//			System.out.println("Created Operator: " + op);
+			this.operators.addElement(op);
+		}
+		
+		String[] planningMethods = parseKeyword(METHOD_KEYWORD, domainStr);
+		for (String methodStr : planningMethods) {
+			MethodParser mParser = new MethodParser(methodStr, planner, maxArgs);
+			HTNMethod m = mParser.create();
+//			System.out.println("Created Method: " + m);
+			this.methods.addElement(m);
+		}
+		
+		// Parse state variables:
+		String[] stateVariableElements = parseKeyword(STATE_VARIBALE_KEYWORD, domainStr);
+		for (String stateStr : stateVariableElements) {
+			createFluentSchedulers(stateStr);
+		}
 	}
 
 
@@ -292,6 +301,30 @@ public class HybridDomain{
 
 		return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions, 
 				resourceRequirements, usageLevel);
+	}
+
+	private static String[] parsePredicateSymbols(String everyting) {
+		try {
+			String[] parsedSymbols = parseKeyword(PREDICATE_SYMBOLS_KEYWORD, everyting)[0].split("\\s+");
+			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
+			ret[ret.length - 1] = HTNPlanner.FUTURE_STR;
+			return ret;
+		} catch (NullPointerException e) {
+			System.out.println("No definition of predicate symbols in domain file");
+		}
+		return null;
+	}
+
+	public String[] getPredicateSymbols() {
+		return predicateSymbols;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getMaxArgs() {
+		return maxArgs;
 	}
 	
 }

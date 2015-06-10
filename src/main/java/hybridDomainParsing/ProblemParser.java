@@ -1,6 +1,5 @@
 package hybridDomainParsing;
 
-import htn.EffectTemplate;
 import htn.HTNMetaConstraint;
 import htn.TaskApplicationMetaConstraint.markings;
 
@@ -9,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +18,6 @@ import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
@@ -33,11 +32,17 @@ public class ProblemParser {
 	public static final String PROBLEM_KEYWORD = "Problem";
 	public static final String FLUENT_KEYWORD = "Fluent";
 	public static final String TASK_KEYWORD = "Task";
+	private static final String ARGUMENT_SYMBOLS_KEYWORD = "ArgumentSymbols";
+	private static final String INSTANCES_KEYWORD = "Instances";
+	
+	private static final String N = "n";
 
 	private final String fileName;
 	private final Map<String, String> fluentElementsMap = new HashMap<String, String>();
 	private final Map<String, String> taskElementsMap = new HashMap<String, String>();
 	private String[] problemStrs;
+	private String[] argumentSymbols;
+	private Map<String, String[]> typesInstancesMap;
 
 
 
@@ -150,6 +155,9 @@ public class ProblemParser {
 	}
 	
 	private void parseProblem(String problem) {
+		argumentSymbols = parseArgumentSymbols(problem);
+		typesInstancesMap = parseTypesInstancesMap(problem);
+		
 		String[] fluentStrs = HybridDomain.parseKeyword(FLUENT_KEYWORD, problem);
 		for (String flStr : fluentStrs) {
 			String key = flStr.substring(0,flStr.indexOf(" ")).trim();
@@ -238,6 +246,35 @@ public class ProblemParser {
 			ret[i] = con;			
 		}
 		return ret;
+	}
+	
+	private static String[] parseArgumentSymbols(String everyting) {
+		try {
+			String[] parsedSymbols = HybridDomain.parseKeyword(ARGUMENT_SYMBOLS_KEYWORD, everyting)[0].split("\\s+");
+			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
+			ret[ret.length - 1] = N;
+			return ret;
+		} catch (NullPointerException e) {
+			System.out.println("No definition of argument symbols in domain file");
+		}
+		return null;
+	}
+	
+	private Map<String, String[]> parseTypesInstancesMap(String everything) {
+		Map<String, String[]> ret = new HashMap<String, String[]>();
+		for (String typeDef : HybridDomain.parseKeyword(INSTANCES_KEYWORD, everything)) {
+			String[] t = typeDef.split("\\s+");
+			ret.put(t[0], Arrays.copyOfRange(t, 1, t.length));
+		}
+		return ret;
+	}
+
+	public String[] getArgumentSymbols() {
+		return argumentSymbols;
+	}
+
+	public Map<String, String[]> getTypesInstancesMap() {
+		return typesInstancesMap;
 	}
 	
 }

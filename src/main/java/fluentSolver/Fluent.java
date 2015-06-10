@@ -1,7 +1,5 @@
 package fluentSolver;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
