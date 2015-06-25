@@ -1,15 +1,20 @@
 package hybridDomainParsing;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
+import org.metacsp.multi.allenInterval.AllenInterval;
+
+import unify.CompoundSymbolicVariable;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
@@ -26,6 +31,8 @@ public class PlanExtractor {
 	
 	private final FluentNetworkSolver fluentSolver;
 	
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	
 	private ListMultimap<Fluent, FluentConstraint> fluentsOutgoingDCsMultiMap;
 	private Table<Fluent, Fluent, FluentConstraint> beforesTable;
 
@@ -33,7 +40,84 @@ public class PlanExtractor {
 		this.fluentSolver = fluentSolver;
 	}
 
+	public void printActivities() {
+		Writer out
+		   = new BufferedWriter(new OutputStreamWriter(System.out));
+		writeActivities(out);
+		try {
+			out.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+	public void writeActivities(Writer writer) {
+		Variable[] allFluents = fluentSolver.getVariables();
+		ArrayList<Variable> plan = new ArrayList<Variable>();
+		for (Variable var : allFluents) {
+			String component = var.getComponent();
+			if (component == null) {
+				plan.add(var);
+			}
+			else if (component.equals("Activity")) {
+				plan.add(var);
+			}
+		}
+
+		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
+		Arrays.sort(planVector, new Comparator<Variable>() {
+			@Override
+			public int compare(Variable o1, Variable o2) {
+				Fluent f1 = (Fluent)o1;
+				Fluent f2 = (Fluent)o2;
+				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+			}
+		});
+		
+		for (Variable act : planVector) {
+			if (act.getComponent() != null)
+				try {
+					activityToYaml((Fluent) act, writer);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		
+	}
+	
+	private void activityToYaml(Fluent activity, Writer w) throws IOException {
+		CompoundSymbolicVariable csv = (CompoundSymbolicVariable) activity.getInternalVariables()[0];
+
+		w.write("- id: " + activity.getID());
+		w.append(LINE_SEPARATOR);
+		
+		w.write("  name: " + csv.getPredicateName());
+		w.append(LINE_SEPARATOR);
+		Variable[] params = csv.getInternalVariables();
+		StringBuilder argsbuilder = new StringBuilder("  arguments: [");
+		if (params.length > 1 && params[1].toString().length() > 0) {
+			argsbuilder.append(params[1].toString());
+		}
+		for (int i = 2; i < params.length; i++) {
+			String varStr = params[i].toString();
+			if(varStr.length() > 0 && ! varStr.equals(CompoundSymbolicVariable.NONESYMBOL) ) {
+				argsbuilder.append(", ");
+				argsbuilder.append(params[i].toString());
+			} else {
+				break;
+			}
+		}
+		argsbuilder.append(']');
+		w.write(argsbuilder.toString());
+		w.append(LINE_SEPARATOR);
+		AllenInterval ai = activity.getAllenInterval();
+		ai.toString();
+		w.write("  time: " + ai.getDomain());
+		w.append(LINE_SEPARATOR);
+	}
+	
 	/** 
 	 * Prints the current plan on the command line.
 	 */

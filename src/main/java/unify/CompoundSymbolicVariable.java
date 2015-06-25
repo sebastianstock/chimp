@@ -24,7 +24,7 @@ public class CompoundSymbolicVariable extends MultiVariable {
 	
 	private static int internalVarsCount;
 	
-	private static final String NONESYMBOL = "n";
+	public static final String NONESYMBOL = "n";
 	
 	private static final String[] noStrs = {};
 	
