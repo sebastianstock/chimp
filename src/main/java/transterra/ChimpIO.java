@@ -1,10 +1,24 @@
 package transterra;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.PlanExtractor;
+import hybridDomainParsing.ProblemParser;
+
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -17,17 +31,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import unify.CompoundSymbolicVariableConstraintSolver;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import htn.UnifyFewestsubsNewestbindingsValOH;
-import htn.TaskApplicationMetaConstraint.markings;
-import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
-import hybridDomainParsing.ProblemParser;
 
 public class ChimpIO {
 
@@ -36,7 +39,7 @@ public class ChimpIO {
 	
 	public static void printUsage() {
 		System.out.println("Usage: ");
-		System.out.println("chimp domain_file problem_file");
+		System.out.println("chimp domain_file problem_file [output_file]");
 	}
 	
 	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
@@ -77,8 +80,14 @@ public class ChimpIO {
 			return;
 		}
 		
+		String outputPath = null;
+		if (args.length > 2) {
+			outputPath = args[2];
+		}
+		
 		try {
-			callCHIMP(args[0], args[1]);
+			
+			callCHIMP(args[0], args[1], outputPath);
 		} catch (DomainParsingException e) {
 			System.out.println("Could not parse domain");
 		}
@@ -86,7 +95,7 @@ public class ChimpIO {
 		
 	}
 	
-	private static void callCHIMP(String domainPath, String problemPath) throws DomainParsingException {
+	private static void callCHIMP(String domainPath, String problemPath, String outputPath) throws DomainParsingException {
 		HybridDomain domain  = new HybridDomain(domainPath);
 		ProblemParser problemParser = new ProblemParser(problemPath);
 		
@@ -94,9 +103,9 @@ public class ChimpIO {
 		String[][] symbols = new String[2][];
 		symbols[0] =  domain.getPredicateSymbols();
 		symbols[1] = problemParser.getArgumentSymbols();
-		for (String s : symbols[1]) {
-			System.out.println(s);
-		}
+//		for (String s : symbols[1]) {
+//			System.out.println(s);
+//		}
 		Map<String, String[]> typesInstancesMap = problemParser.getTypesInstancesMap();
 		
 		HTNPlanner planner = new HTNPlanner(0,  HORIZON,  0, symbols, ingredients);
@@ -129,9 +138,30 @@ public class ChimpIO {
 		drawNetworks(fluentSolver);
 //		System.out.println(planner.getDescription());
 		
-		printPlan(fluentSolver);
+//		printPlan(fluentSolver);
 		
-		(new PlanExtractor(fluentSolver)).printPlan();
+		PlanExtractor pex = new PlanExtractor(fluentSolver);
+//		pex.printPlan();
+		pex.printActivities();
+		
+		// write plan to file
+		if (outputPath != null) {
+
+			Writer fw = null;
+			try
+			{
+				fw = new FileWriter(outputPath);
+				pex.writeActivities(fw);
+				fw.flush();
+			}
+			catch ( IOException e ) {
+				System.err.println( "Could not create file" );
+			}
+			finally {
+				if ( fw != null )
+					try { fw.close(); } catch ( IOException e ) { e.printStackTrace(); }
+			}
+		}
 		
 	}
 
