@@ -34,6 +34,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class ChimpIO {
 
+	private static final boolean DRAW = false;
 	
 	private static final int HORIZON = 600000;
 	
@@ -134,8 +135,11 @@ public class ChimpIO {
 		
 		plan(planner, fluentSolver);
 		
-		planner.draw();
-		drawNetworks(fluentSolver);
+		if (DRAW) {
+			planner.draw();
+			drawNetworks(fluentSolver);
+		}
+		
 //		System.out.println(planner.getDescription());
 		
 //		printPlan(fluentSolver);
