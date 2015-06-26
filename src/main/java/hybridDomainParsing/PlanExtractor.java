@@ -93,18 +93,21 @@ public class PlanExtractor {
 		w.write("- id: " + activity.getID());
 		w.append(LINE_SEPARATOR);
 		
-		w.write("  name: " + csv.getPredicateName());
+		w.write("  name: \"" + csv.getPredicateName() + '"');
 		w.append(LINE_SEPARATOR);
 		Variable[] params = csv.getInternalVariables();
 		StringBuilder argsbuilder = new StringBuilder("  arguments: [");
 		if (params.length > 1 && params[1].toString().length() > 0) {
+			argsbuilder.append('"');
 			argsbuilder.append(params[1].toString());
+			argsbuilder.append('"');
 		}
 		for (int i = 2; i < params.length; i++) {
 			String varStr = params[i].toString();
 			if(varStr.length() > 0 && ! varStr.equals(CompoundSymbolicVariable.NONESYMBOL) ) {
-				argsbuilder.append(", ");
+				argsbuilder.append(", \"");
 				argsbuilder.append(params[i].toString());
+				argsbuilder.append('"');
 			} else {
 				break;
 			}
