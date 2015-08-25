@@ -407,7 +407,7 @@
 (:method
  (Head transfer_all_samples(?robot1 ?robot2))
  
- (Pre p0 Attached(?container ?robot1))
+ (Pre p0 ContainerAt(?container ?robot1 ?level))
  (Type ?container SampleContainer)
  
  (Pre p1 RobotAt(?robot1 ?robotArea))

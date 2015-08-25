@@ -141,7 +141,7 @@ public class TestTransTerraProblems {
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 		
-		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.FINEST);
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		testScheduling(planner);
@@ -242,6 +242,8 @@ public class TestTransTerraProblems {
 	public static void extractPlan(FluentNetworkSolver fluentSolver) {
 		PlanExtractor planEx = new PlanExtractor(fluentSolver);
 		planEx.printPlan();
+		System.out.println("###### All fluents: ########");
+		planEx.printAllFluents();
 	}
 	
 	public static HybridDomain initPlanner(HTNPlanner planner, String domainPath) {
