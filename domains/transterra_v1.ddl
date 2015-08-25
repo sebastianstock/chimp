@@ -31,6 +31,19 @@
 (HybridHTNDomain RACEDomain)
 
 (MaxArgs 3)
+
+(PredicateSymbols At RobotAt Attached ContainerAt BatteryAt
+  !create_attached_fluent !!check_empty !move_to !sample_regolith
+  !transfer_sample !transfer_battery !transfer_payload !pickup_basecamp
+  !tuck_arms !place_basecamp
+  deploy_basecamp take_samples get_basecamp
+  transfer_all_samples transfer_filled_containers transfer_empty_containers
+  transfer_charged_batteries transfer_discharged_batteries
+  rendezvous rendezvous_meet rendezvous_exchange_batteries
+  rendezvous_exchange_samples
+  deposit_samples
+  scenario_test)
+
 ############ Resources ###############
 
 #(Resource ManipulationCapacityRover 1)
