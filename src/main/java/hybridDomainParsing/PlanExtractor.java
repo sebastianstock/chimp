@@ -138,6 +138,13 @@ public class PlanExtractor {
 		
 	}	
 	
+	public void printAllFluents() {
+		for (Variable var : fluentSolver.getVariables()) {
+//			ret.add((Fluent) var);
+			System.out.println(var);
+		}
+	}
+	
 	private void printDecomposition(Fluent task, String indentation) {
 		System.out.println(indentation + task);
 		
