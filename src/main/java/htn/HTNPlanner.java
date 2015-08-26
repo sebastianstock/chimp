@@ -121,6 +121,7 @@ public class HTNPlanner extends MetaConstraintSolver {
 			}
 		}
 		if(additionalMeetsFuture.size() > 0) {
+			logger.fine("DEBUG: Re-Adding future constraints(RetractResolverSub): " + additionalMeetsFuture);
 			if(! groundSolver.addConstraints(additionalMeetsFuture.toArray(new Constraint[additionalMeetsFuture.size()]))) {
 				logger.info("Could not re-add meet future constraints");
 			} else {
@@ -204,6 +205,7 @@ public class HTNPlanner extends MetaConstraintSolver {
 			metaValue.addConstraint(clonedConstraint);
 		}
 		
+		logger.fine("DEBUG: Adding future constraints to metaValue(AddResolverSub): " + additionalMeetsFutureCons);
 		metaValue.addConstraints(additionalMeetsFutureCons.toArray(new AllenIntervalConstraint[additionalMeetsFutureCons.size()]));
 		
 		
@@ -221,7 +223,7 @@ public class HTNPlanner extends MetaConstraintSolver {
 		}
 		
 		if (constraintsToRemove.size() > 0 ) {
-			logger.fine("Removing future constraints: " + constraintsToRemove);
+			logger.fine("DEBUG: Removing future constraints(AddResolverSub): " + constraintsToRemove);
 			this.getConstraintSolvers()[0].removeConstraints(constraintsToRemove.toArray(new Constraint[constraintsToRemove.size()]));
 		}
 
