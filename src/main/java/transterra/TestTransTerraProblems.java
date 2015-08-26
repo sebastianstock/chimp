@@ -44,16 +44,18 @@ public class TestTransTerraProblems {
 		String[][] symbols = new String[2][];
 		// predicates  
 		// index: 0
-		symbols[0] = new String[] {"At", "RobotAt", "Attached", "ContainerAt",
+		symbols[0] = new String[] {"At", "RobotAt", "Attached", "ContainerAt", "BatteryAt",
 				// operators
 				"!create_attached_fluent",
 				"!!check_empty",
-				"!move_to", "!sample_regolith", "!transfer_sample",
+				"!move_to", "!sample_regolith", "!transfer_sample", "!transfer_battery",
 				"!transfer_payload", "!pickup_basecamp", "!tuck_arms", "!place_basecamp",
 				// methods
 				"deploy_basecamp", "take_samples", "get_basecamp",
 				"transfer_all_samples", "transfer_filled_containers", "transfer_empty_containers",
-				"rendezvous", "rendezvous_meet", "rendezvous_exchange_battery", "rendezvous_exchange_samples",
+				"transfer_charged_batteries", "transfer_discharged_batteries",
+				"rendezvous", "rendezvous_meet", "rendezvous_exchange_batteries", "rendezvous_exchange_samples",
+				"deposit_samples", "scenario_test",
 				HTNPlanner.FUTURE_STR
 				};	
 		// race:Kitchenware		
@@ -64,9 +66,11 @@ public class TestTransTerraProblems {
 				"baseCamp1", "baseCamp2",
 				"lander1",
 				"b1", "b2", "b3", "landingSite1", "b4", "b5", "b6", "b7",
-				"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5",
+				"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5", "sampleContainer6",
 				"payload1",
+				"batteryPayload1", "batteryPayload2",
 				"filled", "empty",
+				"charged", "discharged",
 				N};
 		return symbols;
 	}
@@ -106,9 +110,18 @@ public class TestTransTerraProblems {
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_get_basecamp_2.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_filled.pdl");
-		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_empty.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_empty.pdl");
 		
-
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_rendezvous_meet.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_rendezvous_meet2.pdl");
+		
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_charged.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_discharged.pdl");
+		
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_deposit_samples.pdl");
+		
+		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl"); // sometimes second parameter of move_to(shuttle1 b2) is undefined
+		
 		String[][] symbols = createSymbols();
 		int[] ingredients = createIngredients();
 		

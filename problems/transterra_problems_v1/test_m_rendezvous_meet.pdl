@@ -1,0 +1,38 @@
+(Problem
+
+### Initial state
+
+(Fluent f0 RobotAt(shuttle1 landingSite1))
+(Constraint Release[0,0](f0))
+
+(Fluent f1 RobotAt(rover1 b1))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 Attached(baseCamp1 rover1))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 ContainerAt(sampleContainer1 rover1 empty))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 ContainerAt(sampleContainer2 rover1 empty))
+(Constraint Release[0,0](f4))
+
+(Fluent f5 ContainerAt(sampleContainer3 shuttle1 empty))
+(Constraint Release[0,0](f5))
+
+#(Fluent f6 RobotAt(rover1 b2))
+#(Constraint Release[40,40](f1))
+#(Constraint Before(f1,f6))
+
+
+### Tasks
+
+(Task t3 !move_to(rover1 b2))
+(Constraint Release[0,INF](t3))
+
+
+(Task t4 rendezvous_meet(rover1 shuttle1))
+(Constraint Release[30000,INF](t4))
+(Constraint Before(t3,t4))
+
+)

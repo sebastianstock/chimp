@@ -1,0 +1,31 @@
+0.	Activity(28)::<!move_to(rover1 b1)[[1, 1], [3, 599900]]>
+1.	Activity(27)::<!place_basecamp(rover1 baseCamp1 b1)[[4, 599901], [6, 599903]]>
+2.	Activity(31)::<!sample_regolith(rover1 b1)[[10000, 599904], [10002, 599906]]>
+3.	Activity(34)::<!move_to(rover1 b2)[[20000, 599907], [20002, 599909]]>
+4.	Activity(33)::<!sample_regolith(rover1 b2)[[20003, 599910], [20005, 599912]]>
+5.	Activity(41)::<!move_to(shuttle1 b2)[[30000, 599913], [30002, 599915]]>
+6.	Activity(45)::<!transfer_sample(rover1 shuttle1 sampleContainer1)[[30003, 599916], [30005, 599918]]>
+7.	Activity(50)::<!transfer_sample(rover1 shuttle1 sampleContainer2)[[30006, 599919], [30008, 599921]]>
+8.	Activity(56)::<!transfer_sample(shuttle1 rover1 sampleContainer5)[[30012, 599925], [30014, 599927]]>
+9.	Activity(61)::<!transfer_sample(shuttle1 rover1 sampleContainer4)[[30015, 599928], [30017, 599930]]>
+10.	Activity(66)::<!transfer_sample(shuttle1 rover1 sampleContainer6)[[30018, 599931], [30020, 599933]]>
+11.	Activity(72)::<!transfer_battery(shuttle1 rover1 batteryPayload1)[[30024, 599937], [30026, 599939]]>
+12.	Activity(75)::<!transfer_battery(rover1 shuttle1 batteryPayload2)[[30030, 599943], [30032, 599945]]>
+13.	Activity(77)::<!move_to(rover1 landingSite1)[[50000, 599949], [50002, 599951]]>
+14.	Activity(82)::<!move_to(shuttle1 landingSite1)[[50000, 599965], [50002, 599967]]>
+15.	Activity(78)::<!pickup_basecamp(rover1 baseCamp2)[[50003, 599952], [50003, 599952]]>
+16.	Activity(85)::<!move_to(rover1 b3)[[60000, 599953], [60002, 599955]]>
+17.	Activity(84)::<!sample_regolith(rover1 b3)[[60003, 599956], [60005, 599958]]>
+18.	Activity(89)::<!move_to(rover1 b4)[[60006, 599959], [60008, 599961]]>
+19.	Activity(88)::<!sample_regolith(rover1 b4)[[60009, 599962], [60011, 599964]]>
+20.	Activity(94)::<!move_to(rover1 b6)[[60012, 599965], [60014, 599967]]>
+21.	Activity(93)::<!place_basecamp(rover1 baseCamp2 b6)[[60015, 599992], [60017, 599994]]>
+22.	Activity(100)::<!move_to(shuttle1 b6)[[60015, 599968], [60017, 599970]]>
+23.	Activity(104)::<!transfer_sample(rover1 shuttle1 sampleContainer4)[[60018, 599971], [60020, 599973]]>
+24.	Activity(109)::<!transfer_sample(rover1 shuttle1 sampleContainer6)[[60021, 599974], [60023, 599976]]>
+25.	Activity(115)::<!move_to(shuttle1 landingSite1)[[60036, 599989], [60038, 599991]]>
+26.	Activity(126)::<!sample_regolith(rover1 b6)[[60036, 599991], [60038, 599993]]>
+27.	Activity(117)::<!transfer_sample(shuttle1 lander1 sampleContainer6)[[60039, 599992], [60041, 599994]]>
+28.	Activity(122)::<!transfer_sample(shuttle1 lander1 sampleContainer4)[[60042, 599995], [60044, 599997]]>
+29.	Activity(131)::<!move_to(rover1 b7)[[70000, 599994], [70002, 599996]]>
+30.	Activity(130)::<!sample_regolith(rover1 b7)[[70003, 599997], [70005, 599999]]>

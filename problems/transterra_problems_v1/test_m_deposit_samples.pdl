@@ -1,0 +1,39 @@
+(Problem
+
+(Fluent f0 RobotAt(shuttle1 b1))
+(Constraint Release[0,0](f0))
+
+(Fluent f1 RobotAt(lander1 landingSite1))
+(Constraint Release[0,0](f1))
+
+(Fluent f9 RobotAt(rover1 b2))
+(Constraint Release[0,0](f9))
+
+
+(Fluent f2 ContainerAt(sampleContainer1 rover1 filled))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 ContainerAt(sampleContainer2 rover1 filled))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 ContainerAt(sampleContainer3 shuttle1 filled))
+(Constraint Release[0,0](f4))
+
+(Fluent f5 ContainerAt(sampleContainer4 shuttle1 empty))
+(Constraint Release[0,0](f5))
+
+(Fluent f6 ContainerAt(sampleContainer5 lander1 empty))
+(Constraint Release[0,0](f6))
+
+(Task t0 rendezvous(rover1 shuttle1))
+(Constraint Release[0,1](t0))
+
+(Task t1 deposit_samples(shuttle1 lander1))
+(Constraint Release[10000,INF](t1))
+(Constraint Before(t0,t1))
+(Ordering t0 t1)
+
+#(Task t0 scenario_test())
+#(Constraint Release[0,1](t0))
+
+)

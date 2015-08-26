@@ -11,17 +11,36 @@
 (Fluent f2 Attached(baseCamp1 rover1))
 (Constraint Release[0,0](f2))
 
-(Fluent f3 Attached(sampleContainer1 rover1))
+(Fluent f3 ContainerAt(sampleContainer1 rover1 empty))
 (Constraint Release[0,0](f3))
 
-(Fluent f4 Empty(sampleContainer1))
+(Fluent f4 ContainerAt(sampleContainer2 rover1 empty))
 (Constraint Release[0,0](f4))
 
-(Fluent f5 Attached(sampleContainer2 rover1))
+(Fluent f5 ContainerAt(sampleContainer3 rover1 empty))
 (Constraint Release[0,0](f5))
 
-(Fluent f6 Empty(sampleContainer2))
+(Fluent f51 ContainerAt(sampleContainer4 shuttle1 empty))
+(Constraint Release[0,0](f51))
+
+(Fluent f52 ContainerAt(sampleContainer5 shuttle1 empty))
+(Constraint Release[0,0](f52))
+
+(Fluent f53 ContainerAt(sampleContainer6 shuttle1 empty))
+(Constraint Release[0,0](f53))
+
+(Fluent f6 BatteryAt(batteryPayload1 shuttle1 charged))
 (Constraint Release[0,0](f6))
+
+(Fluent f7 BatteryAt(batteryPayload2 rover1 discharged))
+(Constraint Release[0,0](f7))
+
+(Fluent f8 Attached(baseCamp2 lander1))
+(Constraint Release[0,0](f8))
+
+(Fluent f9 RobotAt(lander1 landingSite1))
+(Constraint Release[0,0](f9))
+
 
 ### Tasks
 
@@ -32,21 +51,66 @@
 (Task t2 take_samples(rover1 b1))
 (Constraint Release[10000,INF](t2))
 (Constraint Before(t1,t2))
-# (Ordering t1 t2)  TODO add in problem parser
+(Ordering t1 t2)
 
 
 ## B2
 (Task t3 take_samples(rover1 b2))
 (Constraint Release[20000,INF](t3))
 (Constraint Before(t2,t3))
-# (Ordering t2 t3)  TODO add in problem parser
+(Ordering t2 t3)
 
 (Task t4 rendezvous(rover1 shuttle1))
-(Constraint Release[20000,INF](t4))
+(Constraint Release[30000,INF](t4))
 (Constraint Before(t3,t4))
-# (Ordering t3 t4)  TODO add in problem parser
+(Ordering t3 t4) 
 
-## 3
+## L
+(Task t5 get_basecamp(rover1 baseCamp2))
+(Constraint Release[50000,INF](t5))
+(Constraint Before(t4,t5))
+(Ordering t4 t5)
 
+(Task t6 deposit_samples(shuttle1 lander1))
+(Constraint Release[50000,INF](t6))
+(Constraint Before(t4,t6))
+(Ordering t5 t6)
+
+## B3
+(Task t7 take_samples(rover1 b3))
+(Constraint Release[60000,INF](t7))
+(Constraint Before(t5,t7))
+(Ordering t6 t7)
+
+## B4
+(Task t8 take_samples(rover1 b4))
+(Constraint Release[60000,INF](t8))
+(Constraint Before(t7,t8))
+(Ordering t7 t8)
+
+## B6
+(Task t9 deploy_basecamp(rover1 b6))
+#(Constraint Release[0,1](t1))
+(Constraint Before(t8,t9))
+(Ordering t8 t9)
+
+(Task t10 rendezvous(rover1 shuttle1))
+(Constraint Before(t8,t10))
+(Ordering t9 t10)
+
+(Task t11 deposit_samples(shuttle1 lander1))
+(Constraint Release[60000,INF](t11))
+(Constraint Before(t10,t11))
+(Ordering t10 t11)
+
+(Task t12 take_samples(rover1 b6))
+(Constraint Release[60000,INF](t12))
+(Constraint Before(t10,t12))
+(Ordering t11 t12)
+
+(Task t13 take_samples(rover1 b7))
+(Constraint Release[70000,INF](t13))
+(Constraint Before(t12,t13))
+(Ordering t12 t13)
 
 )

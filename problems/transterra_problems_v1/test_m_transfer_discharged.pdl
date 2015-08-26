@@ -1,0 +1,19 @@
+(Problem
+
+(Fluent f0 RobotAt(shuttle1 b1))
+(Constraint Release[0,0](f0))
+
+(Fluent f1 RobotAt(rover1 b1))
+(Constraint Release[0,0](f1))
+
+(Fluent f2 BatteryAt(batteryPayload1 rover1 discharged))
+(Constraint Release[0,0](f2))
+
+(Fluent f3 BatteryAt(batteryPayload2 rover1 charged))
+(Constraint Release[0,0](f3))
+
+
+(Task t1 transfer_discharged_batteries(rover1 shuttle1))
+(Constraint Release[0,INF](t1))
+
+)

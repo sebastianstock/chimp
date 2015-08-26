@@ -37,8 +37,12 @@
 
 #(Resource SampleStorageCapacityRover 5) # leads to conflict with filled samplestoragecapacityrover
 (Resource FilledSampleStorageCapacityRover 5)
+(Resource FilledSampleStorageCapacityShuttle 5)
 (Resource EmptySampleStorageCapacityShuttle 5)
 #(Resource SampleStorageCapacityShuttle 2)
+
+(Resource ChargedBatteryStorageCapacityShuttle 5)
+(Resource DischargedBatteryStorageCapacityRover 5)
 
 ############ Fluent Resource Usage ###
 #(FluentResourceUsage 
@@ -55,11 +59,33 @@
 )
 
 (FluentResourceUsage 
+  (Usage FilledSampleStorageCapacityShuttle 1) 
+  (Fluent ContainerAt)
+  (Param 2 shuttle1)
+  (Param 3 filled)
+)
+
+(FluentResourceUsage 
   (Usage EmptySampleStorageCapacityShuttle 1) 
   (Fluent ContainerAt)
   (Param 2 shuttle1)
   (Param 3 empty)
 )
+
+(FluentResourceUsage 
+  (Usage ChargedBatteryStorageCapacityShuttle 1) 
+  (Fluent BatteryAt)
+  (Param 2 shuttle1)
+  (Param 3 charged)
+)
+
+(FluentResourceUsage 
+  (Usage DischargedBatteryStorageCapacityRover 1) 
+  (Fluent BatteryAt)
+  (Param 2 rover1)
+  (Param 3 discharged)
+)
+
 
 
 ############ Operators ###############
@@ -116,6 +142,21 @@
 # (ResourceUsage ManipulationCapacity 1)  # TODO
 )
 
+### Transfer samples from one robot1 to robot2
+# robots need to be at the same area/position
+(:operator
+ (Head !transfer_battery(?robot1 ?robot2 ?battery))
+ (Pre p1 RobotAt(?robot1 ?area))
+ (Pre p2 RobotAt(?robot2 ?area))
+ (Pre p3 BatteryAt(?battery ?robot1 ?status))
+ (Del p3)
+ (Constraint During(task,p1))
+ (Constraint During(task,p2))
+ (Add e1 BatteryAt(?battery ?robot2 ?status))
+ (Constraint Meets(task,e1))
+# (ResourceUsage ManipulationCapacity 1)  # TODO
+)
+
 ### Exchange payload item
 (:operator
  (Head !transfer_payload(?robot1 ?robot2 ?payload))
@@ -154,7 +195,7 @@
  (Constraint During(task,p1))
  (Pre p2 Attached(?camp ?lander))
  (Del p2)
- (Pre p3 At(?lander ?area))
+ (Pre p3 RobotAt(?lander ?area))
  (Constraint Meets(p2,task))
  (Add e1 Attached(?camp ?robot))
  (Constraint Meets(task,e1))
@@ -191,7 +232,7 @@
  (Pre p2 Attached(?camp ?robot))
  (Type ?camp BaseCamp)
 
- (Sub s1 !move_to(?rover ?toArea))
+ (Sub s1 !move_to(?robot ?toArea))
  (Constraint Starts(s1,task))
  (Sub s2 !place_basecamp(?robot ?camp ?toArea))
 
@@ -237,7 +278,7 @@
  (Pre p1 RobotAt(?robot ?fromArea))
  (VarDifferent ?toArea ?fromArea)
 
- (Sub s1 !move_to(?rover ?toArea))
+ (Sub s1 !move_to(?robot ?toArea))
  (Constraint Starts(s1,task))
  (Sub s2 !sample_regolith(?robot ?toArea))
  (Constraint Finishes(s2,task))
@@ -256,6 +297,12 @@
  (VarDifferent ?robot1 ?robot2)
 
  (Sub s1 rendezvous_meet(?robot1 ?robot2))
+ (Sub s2 rendezvous_exchange_samples(?robot1 ?robot2))
+ (Constraint Before(s1,s2))
+ (Ordering s1 s2)
+ (Sub s3 rendezvous_exchange_batteries(?robot1 ?robot2))
+ (Constraint Before(s2,s3))
+ (Ordering s2 s3)
 )
 
 # meet at the same location
@@ -267,31 +314,39 @@
  (VarDifferent ?r1Area ?r2Area)
 
  (Sub s1 !move_to(?robot2 ?r1Area)) # TODO find good meeting point
- (Constraint Starts(s1,task))
- (Sub s2 rendezvous(?robot1 ?robot2))
- (Constraint Finishes(s2,task))
- 
- (Ordering s1 s2)
- (Constraint Before(s1,s2))
+ (Constraint Equals(s1,task))
+)
+
+(:method
+ (Head rendezvous_meet(?robot1 ?robot2))
+
+ (Pre p1 RobotAt(?robot1 ?area))
+ (Pre p2 RobotAt(?robot2 ?area))
+ (VarDifferent ?robot1 ?robot2)
 )
 
 
-
-# exchange battery (transfer full batteries to robot1)
-#(:method
-# (Head rendezvous_exchange_battery(?robot1 ?robot2))
-
-# (Pre p1 RobotAt(?robot1 ?area))
-# (Pre p2 RobotAt(?robot2 ?area))
-#)
 
 # exchange samples
 (:method
  (Head rendezvous_exchange_samples(?robot1 ?robot2))
 
- (Pre p1 RobotAt(?robot1 ?area))
- (Pre p2 RobotAt(?robot2 ?area))
+ (Sub s1 transfer_filled_containers(?robot1 ?robot2))
+ (Sub s2 transfer_empty_containers(?robot2 ?robot1))
+ (Constraint Before(s1,s2))   # TODO not necessary if we use resources for manipulation
+ (Ordering s1 s2)
 )
+
+(:method
+ (Head rendezvous_exchange_batteries(?robot1 ?robot2))
+
+ (Sub s1 transfer_charged_batteries(?robot2 ?robot1))
+ (Sub s2 transfer_discharged_batteries(?robot1 ?robot2))
+ (Constraint Before(s1,s2))   # TODO not necessary if we use resources for manipulation
+ (Ordering s1 s2)
+)
+
+
 
 
 ### Get a basecamp from the lander #####
@@ -306,10 +361,10 @@
  (Type ?lander Lander)
  
  (Pre p1 RobotAt(?robot ?robotArea))
- (Pre p2 At(?lander ?landerArea))
+ (Pre p2 RobotAt(?lander ?landerArea))
  (VarDifferent ?robotArea ?landerArea)
 
- (Sub s1 !move_to(?rover ?landerArea))
+ (Sub s1 !move_to(?robot ?landerArea))
  (Constraint Starts(s1,task))
  (Sub s2 !pickup_basecamp(?robot ?camp))
  (Constraint Finishes(s2,task))
@@ -318,21 +373,22 @@
  (Constraint Before(s1,s2))
 )
 
+# TODO Put back in! Leads to problems with scenario1.pdl
 # case 2: robot is already near the lander
-(:method
- (Head get_basecamp(?robot ?camp))
- (Type ?robot Rover)
- (Type ?camp BaseCamp)
+#(:method
+# (Head get_basecamp(?robot ?camp))
+# (Type ?robot Rover)
+# (Type ?camp BaseCamp)
  
- (Pre p0 Attached(?camp ?lander))
- (Type ?lander Lander)
+# (Pre p0 Attached(?camp ?lander))
+# (Type ?lander Lander)
  
- (Pre p1 RobotAt(?robot ?area))
- (Pre p2 At(?lander ?area))
+# (Pre p1 RobotAt(?robot ?area))
+# (Pre p2 RobotAt(?lander ?area))
 
- (Sub s1 !pickup_basecamp(?robot ?camp))
- (Constraint Equals(s1,task))
-)
+# (Sub s1 !pickup_basecamp(?robot ?camp))
+# (Constraint Equals(s1,task))
+#)
 
 ### Transfer all samples
 (:method
@@ -386,6 +442,13 @@
  (Constraint Duration[2,INF](task))
 )
 
+(:method
+ (Head transfer_filled_containers(?robot1 ?robot2))
+ (Values ?robot1 shuttle1)
+ (ResourceUsage FilledSampleStorageCapacityShuttle 5)
+ (Constraint Duration[2,INF](task))
+)
+
 ### Transfer empty containers
 (:method
  (Head transfer_empty_containers(?robot1 ?robot2))
@@ -410,4 +473,89 @@
  (Values ?robot1 shuttle1)
  (ResourceUsage EmptySampleStorageCapacityShuttle 5)
  (Constraint Duration[2,INF](task))
+)
+
+
+### Transfer charged batteries
+(:method
+ (Head transfer_charged_batteries(?robot1 ?robot2))
+ 
+ (Pre p0 BatteryAt(?battery ?robot1 ?charged))
+ (Values ?charged charged)
+ 
+ (Pre p1 RobotAt(?robot1 ?robotArea))
+ (Pre p2 RobotAt(?robot2 ?robotArea))
+
+ (Sub s1 !transfer_battery(?robot1 ?robot2 ?battery))
+ (Constraint Starts(s1,task))
+ (Sub s2 transfer_charged_batteries(?robot1 ?robot2))
+ (Constraint Finishes(s2,task))
+ 
+ (Ordering s1 s2)
+ (Constraint Before(s1,s2))
+)
+
+(:method
+ (Head transfer_charged_batteries(?robot1 ?robot2))
+ (Values ?robot1 shuttle1)
+ (ResourceUsage ChargedBatteryStorageCapacityShuttle 5)
+ (Constraint Duration[2,INF](task))
+)
+
+### Transfer discharged batteries
+(:method
+ (Head transfer_discharged_batteries(?robot1 ?robot2))
+ 
+ (Pre p0 BatteryAt(?battery ?robot1 ?discharged))
+ (Values ?discharged discharged)
+ 
+ (Pre p1 RobotAt(?robot1 ?robotArea))
+ (Pre p2 RobotAt(?robot2 ?robotArea))
+
+ (Sub s1 !transfer_battery(?robot1 ?robot2 ?battery))
+ (Constraint Starts(s1,task))
+ (Sub s2 transfer_discharged_batteries(?robot1 ?robot2))
+ (Constraint Finishes(s2,task))
+ 
+ (Ordering s1 s2)
+ (Constraint Before(s1,s2))
+)
+
+(:method
+ (Head transfer_discharged_batteries(?robot1 ?robot2))
+ (Values ?robot1 rover1)
+ (ResourceUsage DischargedBatteryStorageCapacityRover 5)
+ (Constraint Duration[2,INF](task))
+)
+
+# 
+(:method
+ (Head deposit_samples(?robot ?lander))
+ 
+ (Pre p1 RobotAt(?robot ?robotArea))
+ (Pre p2 RobotAt(?lander ?landerArea))
+ (VarDifferent ?robotArea ?landerArea)
+
+ (Sub s1 !move_to(?robot ?landerArea))
+ (Constraint Starts(s1,task))
+ (Sub s2 transfer_filled_containers(?robot ?lander))
+ (Constraint Finishes(s2,task))
+ 
+ (Ordering s1 s2)
+ (Constraint Before(s1,s2))
+)
+
+(:method
+ (Head scenario_test())
+
+ (Sub s1 rendezvous(?rover ?shuttle))
+ (Values ?rover rover1)
+ (Values ?shuttle shuttle1)
+ (Constraint Starts(s1,task))
+ (Sub s2 deposit_samples(?shuttle ?lander))
+ (Values ?lander lander1)
+ (Constraint Finishes(s2,task))
+ 
+ (Ordering s1 s2)
+ (Constraint Before(s1,s2))
 )
