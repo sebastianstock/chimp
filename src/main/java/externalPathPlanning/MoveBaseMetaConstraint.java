@@ -14,7 +14,6 @@ import org.metacsp.time.Bounds;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import fluentSolver.FluentConstraint.Type;
 import unify.CompoundSymbolicVariable;
 
 
