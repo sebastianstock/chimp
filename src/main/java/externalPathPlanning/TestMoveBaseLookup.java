@@ -42,6 +42,7 @@ public class TestMoveBaseLookup {
 //		MetaCSPLogging.setLevel(Level.FINE);
 		MetaCSPLogging.setLevel(Level.OFF);
 		
+		planner.createInitialMeetsFutureConstraints();
 		TestProblemParsing.plan(planner, fluentSolver);
 		TestProblemParsing.extractPlan(fluentSolver);
 	}
