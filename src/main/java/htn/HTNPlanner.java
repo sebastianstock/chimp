@@ -24,6 +24,7 @@ import unify.CompoundSymbolicValueConstraint;
 public class HTNPlanner extends MetaConstraintSolver {
 
 	private static final long serialVersionUID = 8031573555691611305L;
+	public static final String FUTURE_STR = "Eternity";
 	
 	private Map<String, String[]> typesInstancesMap;
 	
