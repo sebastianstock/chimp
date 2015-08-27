@@ -1,10 +1,5 @@
 package hybridDomainParsing;
 
-import htn.HTNMethod;
-import htn.HTNOperator;
-import htn.HTNPlanner;
-import htn.PlanReportroryItem;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -14,10 +9,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.meta.simplePlanner.SimplePlanner;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
+import htn.HTNMethod;
+import htn.HTNOperator;
+import htn.HTNPlanner;
+import htn.PlanReportroryItem;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
@@ -304,15 +305,16 @@ public class HybridDomain{
 	}
 
 	private static String[] parsePredicateSymbols(String everyting) {
-		try {
-			String[] parsedSymbols = parseKeyword(PREDICATE_SYMBOLS_KEYWORD, everyting)[0].split("\\s+");
+		String[] parsed = parseKeyword(PREDICATE_SYMBOLS_KEYWORD, everyting);
+		if (parsed.length > 0 ) {
+			String[] parsedSymbols = parsed[0].split("\\s+");
 			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
 			ret[ret.length - 1] = HTNPlanner.FUTURE_STR;
 			return ret;
-		} catch (NullPointerException e) {
-			System.out.println("No definition of predicate symbols in domain file");
+		} else  {
+			MetaCSPLogging.getLogger(HybridDomain.class).warning("Warning: No predicate symbols specified in domain!");
+			return new String[]{};
 		}
-		return null;
 	}
 
 	public String[] getPredicateSymbols() {

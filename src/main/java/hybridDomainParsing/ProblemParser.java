@@ -20,6 +20,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariable;
@@ -249,15 +250,16 @@ public class ProblemParser {
 	}
 	
 	private static String[] parseArgumentSymbols(String everyting) {
-		try {
-			String[] parsedSymbols = HybridDomain.parseKeyword(ARGUMENT_SYMBOLS_KEYWORD, everyting)[0].split("\\s+");
+		String[] parsed = HybridDomain.parseKeyword(ARGUMENT_SYMBOLS_KEYWORD, everyting);
+		if (parsed.length > 0) {
+			String[] parsedSymbols = parsed[0].split("\\s+");
 			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
 			ret[ret.length - 1] = N;
 			return ret;
-		} catch (NullPointerException e) {
-			System.out.println("No definition of argument symbols in domain file");
+		} else {
+			MetaCSPLogging.getLogger(ProblemParser.class).warning("Warning: No argument symbols specified in problem!");
+			return new String[]{};
 		}
-		return null;
 	}
 	
 	private Map<String, String[]> parseTypesInstancesMap(String everything) {
