@@ -1,10 +1,7 @@
 package sensing;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.metacsp.framework.ConstraintNetwork;
@@ -19,6 +16,7 @@ import dispatching.FluentDispatcher;
 import dispatching.FluentDispatchingFunction;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentConstraintNetworkAnimator extends Thread {
 

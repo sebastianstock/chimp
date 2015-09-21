@@ -130,7 +130,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (Variable var : problematicNetwork.getVariables()) {
 			Fluent taskFluent = (Fluent) var;
 			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-//				ret.addAll(unifyTasks(taskFluent, groundSolver));
+				ret.addAll(unifyTasks(taskFluent, groundSolver));
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, operators, groundSolver));
 			} else {
 				ret.addAll(unifyTasks(taskFluent, groundSolver));

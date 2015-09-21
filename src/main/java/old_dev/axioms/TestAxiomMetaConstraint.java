@@ -1,11 +1,4 @@
-package axioms;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
-import hybridDomainParsing.TestProblemParsing;
+package old_dev.axioms;
 
 import java.util.logging.Level;
 
@@ -13,6 +6,12 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAxiomMetaConstraint {
