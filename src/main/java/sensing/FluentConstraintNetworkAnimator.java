@@ -142,6 +142,7 @@ public class FluentConstraintNetworkAnimator extends Thread {
    *  * Animates the sensor traces.
    *  * Calls doInference() of the inferenceCallback
 	 */
+	@Override
 	public void run() {
 		int iteration = 0;
 		while (true) {

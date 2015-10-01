@@ -156,10 +156,11 @@ public class PlanExtractor {
 		}
 		
 		Collections.sort(subtasks, new Comparator<Fluent>() {
+			@Override
 			public int compare(final Fluent obj1, final Fluent obj2) {
-				if (beforesTable.contains((Fluent) obj1, (Fluent) obj2)) {
+				if (beforesTable.contains(obj1, obj2)) {
 					return -1;
-				} else if (beforesTable.contains((Fluent) obj2, (Fluent) obj1)) {
+				} else if (beforesTable.contains(obj2, obj1)) {
 					return 1;
 				} else {
 					return 0;
@@ -168,7 +169,7 @@ public class PlanExtractor {
 		});
 		
 		for (Fluent sub : subtasks) {
-			printDecomposition((Fluent) sub, nextIndentation);
+			printDecomposition(sub, nextIndentation);
 		}
 		
 		for (int i = 0; i < subtasks.size(); i++) {

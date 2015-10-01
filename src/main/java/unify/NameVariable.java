@@ -46,7 +46,7 @@ public class NameVariable extends Variable {
 	}
 
 	public String[] getPossibleSymbols() {
-		int[] indizes = ((NameDomain)domain).getPossibleIndizes();
+		int[] indizes = domain.getPossibleIndizes();
 		String[] ret = new String[indizes.length];
 		String[] symbols = ((NameMatchingConstraintSolver) this.getConstraintSolver()).getSymbols();
 		for (int i = 0; i < indizes.length; i++) {
@@ -67,7 +67,7 @@ public class NameVariable extends Variable {
 	}
 	
 	public boolean isGround() {
-		return ((NameDomain) domain).isGround();
+		return domain.isGround();
 	}
 	
 	public boolean hasModel() {

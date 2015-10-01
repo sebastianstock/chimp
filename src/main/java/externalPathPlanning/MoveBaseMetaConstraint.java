@@ -66,7 +66,7 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	// Checks if a duration has been set to a variable
 	private boolean checkDuration(Variable var, FluentNetworkSolver groundSolver) {
 		List<FluentConstraint> durationCons = 
-				groundSolver.getFluentConstraintsOfTypeFrom((Fluent) var, FluentConstraint.Type.MOVEDURATION);
+				groundSolver.getFluentConstraintsOfTypeFrom(var, FluentConstraint.Type.MOVEDURATION);
 		return !durationCons.isEmpty();
 	}
 

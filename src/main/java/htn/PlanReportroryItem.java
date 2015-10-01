@@ -77,6 +77,7 @@ public abstract class PlanReportroryItem {
 		return this.taskname;
 	}
 	
+	@Override
 	public String toString() {
 		return getName();
 	}
@@ -392,7 +393,7 @@ public abstract class PlanReportroryItem {
 				String fromKey = act.getFromKey();
 				Variable from = null;
 				if (preKeyToFluentMap.containsKey(fromKey)) {
-					from = ((Fluent) preKeyToFluentMap.get(fromKey)).getAllenInterval();
+					from = preKeyToFluentMap.get(fromKey).getAllenInterval();
 				} else if (effKeyToVariableMap.containsKey(fromKey)) {
 					from = effKeyToVariableMap.get(fromKey);
 				} else {
@@ -403,7 +404,7 @@ public abstract class PlanReportroryItem {
 				String toKey = act.getToKey();
 				Variable to = null;
 				if (preKeyToFluentMap.containsKey(toKey)) {
-					to = ((Fluent) preKeyToFluentMap.get(toKey)).getAllenInterval();
+					to = preKeyToFluentMap.get(toKey).getAllenInterval();
 				} else if (effKeyToVariableMap.containsKey(toKey)) {
 					to = effKeyToVariableMap.get(toKey);
 				} else {

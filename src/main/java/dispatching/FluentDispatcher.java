@@ -32,6 +32,7 @@ public class FluentDispatcher extends Thread {
 		this.future = future;
 	}
 
+	@Override
 	public void run() {
 		while (true) {
 			try { Thread.sleep(period); }

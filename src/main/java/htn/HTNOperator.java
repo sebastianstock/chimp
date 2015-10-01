@@ -76,7 +76,7 @@ public class HTNOperator extends PlanReportroryItem {
 				VariablePrototype p = et.getPrototype();
 				p.setMarking(markings.OPEN);
 				newFluents.add(p);
-				String[] arguments = (String[])((VariablePrototype) p).getParameters()[2];
+				String[] arguments = (String[])p.getParameters()[2];
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 
 						createConnections(arguments));
 				opens.setFrom(taskfluent);
@@ -105,7 +105,7 @@ public class HTNOperator extends PlanReportroryItem {
 				VariablePrototype p = et.getPrototype();
 				p.setMarking(markings.OPEN);
 				newFluents.add(p);
-				String[] arguments = (String[])((VariablePrototype) p).getParameters()[2];
+				String[] arguments = (String[])p.getParameters()[2];
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 
 						createConnections(arguments));
 				opens.setFrom(taskfluent);

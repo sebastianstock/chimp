@@ -61,6 +61,7 @@ public class NameMatchingConstraint extends BinaryConstraint {
 		return true;
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("[");
 		sb.append(this.getFrom());

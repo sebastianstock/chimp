@@ -55,7 +55,7 @@ public class HTNMethod extends PlanReportroryItem {
 				VariablePrototype subPrototype = et.getPrototype();
 				subPrototype.setMarking(markings.UNPLANNED);
 				// create dc constraint
-				String[] arguments = (String[])((VariablePrototype) subPrototype).getParameters()[2];
+				String[] arguments = (String[])subPrototype.getParameters()[2];
 				FluentConstraint dc = 
 						new FluentConstraint(FluentConstraint.Type.DC, createConnections(arguments));
 				dc.setFrom(taskfluent);
