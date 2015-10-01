@@ -1,4 +1,4 @@
-package transterra;
+package examples;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;

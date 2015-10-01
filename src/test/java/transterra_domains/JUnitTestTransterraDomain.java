@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import transterra.TestTransTerraProblems;
+import examples.TestTransTerraProblems;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class JUnitTestTransterraDomain {

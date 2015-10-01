@@ -1,4 +1,4 @@
-package transterra;
+package examples;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
