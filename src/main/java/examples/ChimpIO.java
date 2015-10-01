@@ -1,17 +1,5 @@
 package examples;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
-import htn.UnifyFewestsubsNewestbindingsValOH;
-import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
-import hybridDomainParsing.ProblemParser;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,6 +16,17 @@ import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.PlanExtractor;
+import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import unify.CompoundSymbolicVariableConstraintSolver;

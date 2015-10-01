@@ -1,7 +1,5 @@
 package resourceFluent;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +18,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
+import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentResourceUsageScheduler extends Schedulable {
 	

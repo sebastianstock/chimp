@@ -1,11 +1,5 @@
 package hybridDomainParsing;
 
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import htn.NewestFluentsValOH;
-import htn.UnifyFewestsubsNewestbindingsValOH;
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,21 +15,24 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
-import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
-import sensing.FluentConstraintNetworkAnimator;
-import unify.CompoundSymbolicVariableConstraintSolver;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
+import resourceFluent.FluentResourceUsageScheduler;
+import resourceFluent.FluentScheduler;
+import resourceFluent.ResourceUsageTemplate;
+import sensing.FluentConstraintNetworkAnimator;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class CopyOfTestProblemParsing {
 	

@@ -3,7 +3,6 @@ package unify;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import unify.CompoundSymbolicValueConstraint.Type;

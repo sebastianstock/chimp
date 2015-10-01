@@ -1,9 +1,5 @@
 package sensing;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import hybridDomainParsing.TestProblemParsing;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,6 +14,9 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.TestProblemParsing;
 
 public class TestFluentConstraintNetworkAnimator {
 		

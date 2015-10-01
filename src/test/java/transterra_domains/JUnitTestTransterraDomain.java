@@ -1,11 +1,6 @@
 package transterra_domains;
 
 import static org.junit.Assert.assertTrue;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNPlanner;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
 
 import java.util.Map;
 
@@ -16,6 +11,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import examples.TestTransTerraProblems;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNPlanner;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.ProblemParser;
+import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class JUnitTestTransterraDomain {

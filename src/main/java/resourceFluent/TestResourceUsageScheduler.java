@@ -1,7 +1,5 @@
 package resourceFluent;
 
-import htn.HTNPlanner;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +12,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.HTNPlanner;
 
 public class TestResourceUsageScheduler {
 

@@ -1,6 +1,5 @@
 package old_dev.symbolicUnifyTypedOLD;
 
-import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;

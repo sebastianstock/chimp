@@ -1,8 +1,5 @@
 package hybridDomainParsing;
 
-import htn.HTNMetaConstraint;
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,11 +19,13 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import resourceFluent.ResourceUsageTemplate;
-import unify.CompoundSymbolicVariable;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.TaskApplicationMetaConstraint.markings;
+import resourceFluent.ResourceUsageTemplate;
+import unify.CompoundSymbolicVariable;
 
 public class ProblemParser {
 		

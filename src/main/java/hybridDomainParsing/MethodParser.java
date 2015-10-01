@@ -1,10 +1,5 @@
 package hybridDomainParsing;
 
-import htn.EffectTemplate;
-import htn.HTNMethod;
-import htn.HTNPlanner;
-import htn.HTNPrecondition;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +9,10 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
 
 import fluentSolver.FluentConstraint;
+import htn.EffectTemplate;
+import htn.HTNMethod;
+import htn.HTNPlanner;
+import htn.HTNPrecondition;
 
 public class MethodParser extends PlanReportroiryItemParser {
 

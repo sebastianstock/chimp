@@ -1,11 +1,5 @@
 package hybridDomainParsing;
 
-import htn.AdditionalConstraintTemplate;
-import htn.EffectTemplate;
-import htn.HTNPlanner;
-import htn.HTNPrecondition;
-import htn.PlanReportroryItem;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +10,15 @@ import java.util.Vector;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
-import resourceFluent.ResourceUsageTemplate;
-
 import com.google.common.primitives.Ints;
 
 import fluentSolver.FluentNetworkSolver;
+import htn.AdditionalConstraintTemplate;
+import htn.EffectTemplate;
+import htn.HTNPlanner;
+import htn.HTNPrecondition;
+import htn.PlanReportroryItem;
+import resourceFluent.ResourceUsageTemplate;
 
 public abstract class PlanReportroiryItemParser {
 

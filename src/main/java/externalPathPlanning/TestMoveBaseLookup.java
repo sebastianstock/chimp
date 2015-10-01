@@ -1,17 +1,16 @@
 package externalPathPlanning;
 
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNPlanner;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNPlanner;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.ProblemParser;
+import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestMoveBaseLookup {

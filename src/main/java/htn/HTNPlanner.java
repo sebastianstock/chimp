@@ -1,7 +1,5 @@
 package htn;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +17,11 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import unify.CompoundSymbolicValueConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
+import unify.CompoundSymbolicValueConstraint;
 
 
 public class HTNPlanner extends MetaConstraintSolver {

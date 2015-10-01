@@ -1,10 +1,5 @@
 package htn;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import hybridDomainParsing.SubDifferentDefinition;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,10 +17,14 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import com.google.common.collect.Sets;
+
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.SubDifferentDefinition;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
-
-import com.google.common.collect.Sets;
 
 public abstract class PlanReportroryItem {
 	

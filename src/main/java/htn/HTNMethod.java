@@ -1,7 +1,5 @@
 package htn;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +13,7 @@ import org.metacsp.framework.VariablePrototype;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
 
 
 public class HTNMethod extends PlanReportroryItem {

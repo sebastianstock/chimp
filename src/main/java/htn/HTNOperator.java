@@ -1,7 +1,5 @@
 package htn;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -16,6 +14,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
 
 public class HTNOperator extends PlanReportroryItem {
 

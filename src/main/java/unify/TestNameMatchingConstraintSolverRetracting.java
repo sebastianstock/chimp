@@ -1,6 +1,5 @@
 package unify;
 
-import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 
 import unify.NameMatchingConstraint.Type;

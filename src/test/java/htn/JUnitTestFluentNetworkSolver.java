@@ -3,12 +3,9 @@ package htn;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import htn.TaskApplicationMetaConstraint;
 
 import java.util.Arrays;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +15,7 @@ import org.metacsp.framework.Constraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import junit.framework.Assert;
 
 
 public class JUnitTestFluentNetworkSolver {

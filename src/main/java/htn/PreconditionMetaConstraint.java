@@ -1,7 +1,5 @@
 package htn;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
@@ -14,6 +12,7 @@ import org.metacsp.framework.meta.MetaVariable;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class PreconditionMetaConstraint extends MetaConstraint {

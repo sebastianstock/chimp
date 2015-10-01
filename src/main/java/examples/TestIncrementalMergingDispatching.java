@@ -1,14 +1,5 @@
 package examples;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
-
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,9 +16,17 @@ import java.util.logging.Logger;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import dispatching.FluentDispatchingFunction;
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.ProblemParser;
+import hybridDomainParsing.TestProblemParsing;
 import sensing.FluentConstraintNetworkAnimator;
 import unify.CompoundSymbolicVariableConstraintSolver;
-import dispatching.FluentDispatchingFunction;
 
 public class TestIncrementalMergingDispatching {
 	

@@ -1,7 +1,5 @@
 package sensing;
 
-import htn.TaskApplicationMetaConstraint.markings;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -21,6 +19,7 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentSensor implements Serializable {
 

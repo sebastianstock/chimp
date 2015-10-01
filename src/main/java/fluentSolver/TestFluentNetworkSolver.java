@@ -1,11 +1,11 @@
 package fluentSolver;
 
-import htn.HTNMethod;
-
 import java.util.logging.Logger;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
+
+import htn.HTNMethod;
 
 public class TestFluentNetworkSolver {
 

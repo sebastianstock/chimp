@@ -1,13 +1,8 @@
 package old_dev.symbolicUnifyTypedOLD;
 
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.metacsp.booleanSAT.BooleanVariable;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ConstraintSolver.OPTIONS;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 

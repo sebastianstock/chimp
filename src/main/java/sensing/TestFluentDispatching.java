@@ -1,12 +1,5 @@
 package sensing;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNPlanner;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
-
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,8 +13,14 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import unify.CompoundSymbolicVariableConstraintSolver;
 import dispatching.FluentDispatchingFunction;
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNPlanner;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.ProblemParser;
+import hybridDomainParsing.TestProblemParsing;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestFluentDispatching {
 

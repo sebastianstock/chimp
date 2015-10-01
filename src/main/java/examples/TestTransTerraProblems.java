@@ -1,5 +1,20 @@
 package examples;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
+import org.metacsp.framework.Constraint;
+import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ValueOrderingH;
+import org.metacsp.framework.Variable;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.Bounds;
+import org.metacsp.utility.logging.MetaCSPLogging;
+
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
@@ -14,23 +29,6 @@ import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import java.util.logging.Level;
-
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
-import org.metacsp.utility.logging.MetaCSPLogging;
-
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;

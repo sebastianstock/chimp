@@ -16,11 +16,10 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
-import resourceFluent.ResourceUsageTemplate;
-import unify.CompoundSymbolicVariableConstraintSolver;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import resourceFluent.ResourceUsageTemplate;
 
 
 public class HTNMetaConstraint extends MetaConstraint {

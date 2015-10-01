@@ -14,8 +14,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
-import unify.CompoundSymbolicVariable;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
@@ -26,6 +24,7 @@ import com.google.common.collect.Table;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import unify.CompoundSymbolicVariable;
 
 public class PlanExtractor {
 	

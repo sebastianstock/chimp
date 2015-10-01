@@ -1,13 +1,11 @@
 package hybridDomainParsing;
 
+import java.util.Map;
+
 import htn.EffectTemplate;
 import htn.HTNOperator;
 import htn.HTNPlanner;
 import htn.HTNPrecondition;
-
-import java.util.Map;
-
-import resourceFluent.ResourceUsageTemplate;
 
 public class OperatorParser extends PlanReportroiryItemParser {
 	

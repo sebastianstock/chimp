@@ -1,18 +1,14 @@
 package symbolicUnifyTypedOLD;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.metacsp.framework.ConstraintNetwork;
 
 import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint;
+import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
 import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicVariable;
 import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicVariableConstraintSolver;
-import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
 
 public class JunitTestCompoundNameMatchingConstraintSolver {
 	

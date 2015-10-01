@@ -1,20 +1,5 @@
 package negative_precondition_resource;
 
-import externalPathPlanning.LookUpTableDurationEstimator;
-import externalPathPlanning.MoveBaseDurationEstimator;
-import externalPathPlanning.MoveBaseMetaConstraint;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
-import htn.UnifyFewestsubsNewestbindingsValOH;
-import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
-import hybridDomainParsing.ProblemParser;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,6 +16,20 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import externalPathPlanning.LookUpTableDurationEstimator;
+import externalPathPlanning.MoveBaseDurationEstimator;
+import externalPathPlanning.MoveBaseMetaConstraint;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.PlanExtractor;
+import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;

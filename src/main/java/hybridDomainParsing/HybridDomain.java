@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.meta.simplePlanner.SimplePlanner;

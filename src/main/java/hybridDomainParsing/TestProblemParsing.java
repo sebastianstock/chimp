@@ -1,16 +1,5 @@
 package hybridDomainParsing;
 
-import externalPathPlanning.LookUpTableDurationEstimator;
-import externalPathPlanning.MoveBaseDurationEstimator;
-import externalPathPlanning.MoveBaseMetaConstraint;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
-import htn.UnifyFewestsubsNewestbindingsValOH;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,6 +14,16 @@ import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import externalPathPlanning.LookUpTableDurationEstimator;
+import externalPathPlanning.MoveBaseDurationEstimator;
+import externalPathPlanning.MoveBaseMetaConstraint;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;

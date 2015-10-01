@@ -1,11 +1,11 @@
 package htn;
 
-import fluentSolver.FluentNetworkSolver;
-import hybridDomainParsing.HybridDomain;
-
 import java.util.Vector;
 
 import org.metacsp.framework.VariablePrototype;
+
+import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.HybridDomain;
 
 public class EffectTemplate {
 	
