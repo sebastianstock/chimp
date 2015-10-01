@@ -1,4 +1,4 @@
-package symbolicUnifyTypedOLD;
+package old_dev.symbolicUnifyTypedOLD;
 
 import org.metacsp.booleanSAT.BooleanSatisfiabilitySolver;
 import org.metacsp.framework.ConstraintSolver;

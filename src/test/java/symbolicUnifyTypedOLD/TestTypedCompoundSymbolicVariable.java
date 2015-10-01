@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 
-import symbolicUnifyTypedOLD.CompoundSymbolicVariable;
-import symbolicUnifyTypedOLD.CompoundSymbolicVariableConstraintSolver;
-import symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
+import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicVariable;
+import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicVariableConstraintSolver;
+import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
 
 public class TestTypedCompoundSymbolicVariable {
 

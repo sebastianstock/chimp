@@ -1,4 +1,4 @@
-package symbolicUnifyTypedOLD;
+package old_dev.symbolicUnifyTypedOLD;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

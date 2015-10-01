@@ -1,4 +1,4 @@
-package symbolicUnifyTypedOLD;
+package old_dev.symbolicUnifyTypedOLD;
 
 import java.util.Vector;
 import java.util.logging.Level;
@@ -11,7 +11,7 @@ import org.metacsp.framework.ConstraintSolver.OPTIONS;
 import org.metacsp.multi.symbols.SymbolicVariableConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
+import old_dev.symbolicUnifyTypedOLD.CompoundSymbolicValueConstraint.Type;
 
 
 public class TestTypedCompoundSymbolicVariableConstraintSolver {

@@ -1,4 +1,4 @@
-package symbolicUnifyTypedOLD;
+package old_dev.symbolicUnifyTypedOLD;
 
 import java.util.Vector;
 
