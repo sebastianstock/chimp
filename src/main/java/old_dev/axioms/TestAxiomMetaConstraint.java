@@ -6,12 +6,12 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import examples.TestRACEDomain;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
-import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAxiomMetaConstraint {
@@ -20,14 +20,14 @@ public class TestAxiomMetaConstraint {
 	private static FluentNetworkSolver fluentSolver;
 
 	public static void main(String[] args) {
-		String[][] symbols = TestProblemParsing.createSymbols();
-		int[] ingredients = TestProblemParsing.createIngredients();
+		String[][] symbols = TestRACEDomain.createSymbols();
+		int[] ingredients = TestRACEDomain.createIngredients();
 		
 		planner = new HTNPlanner(0,  600,  0, symbols, ingredients);
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
 //		initMetaConstraints();
-		TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
+		TestRACEDomain.initPlanner(planner, "domains/race_domain.ddl");
 		createProblemPickUpObject(fluentSolver);
 
 		test();

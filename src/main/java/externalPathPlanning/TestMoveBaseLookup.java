@@ -6,11 +6,11 @@ import java.util.logging.Level;
 
 import org.metacsp.utility.logging.MetaCSPLogging;
 
+import examples.TestRACEDomain;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestMoveBaseLookup {
@@ -20,8 +20,8 @@ public class TestMoveBaseLookup {
 		
 		ProblemParser pp = new ProblemParser("problems/test_op_move_base.pdl");
 		
-		String[][] symbols = TestProblemParsing.createSymbols();
-		int[] ingredients = TestProblemParsing.createIngredients();
+		String[][] symbols = TestRACEDomain.createSymbols();
+		int[] ingredients = TestRACEDomain.createIngredients();
 		
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
@@ -32,7 +32,7 @@ public class TestMoveBaseLookup {
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		HybridDomain domain = TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
+		HybridDomain domain = TestRACEDomain.initPlanner(planner, "domains/race_domain.ddl");
 		
 		pp.createState(fluentSolver, domain);
 		
@@ -42,8 +42,8 @@ public class TestMoveBaseLookup {
 		MetaCSPLogging.setLevel(Level.OFF);
 		
 		planner.createInitialMeetsFutureConstraints();
-		TestProblemParsing.plan(planner, fluentSolver);
-		TestProblemParsing.extractPlan(fluentSolver);
+		TestRACEDomain.plan(planner, fluentSolver);
+		TestRACEDomain.extractPlan(fluentSolver);
 	}
 
 

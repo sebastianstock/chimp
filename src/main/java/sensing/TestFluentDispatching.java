@@ -14,12 +14,12 @@ import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
+import examples.TestRACEDomain;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestFluentDispatching {
@@ -29,8 +29,8 @@ public class TestFluentDispatching {
 		// init planner
 		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
 
-		String[][] symbols = TestProblemParsing.createSymbols();
-		int[] ingredients = TestProblemParsing.createIngredients();
+		String[][] symbols = TestRACEDomain.createSymbols();
+		int[] ingredients = TestRACEDomain.createIngredients();
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
@@ -43,7 +43,7 @@ public class TestFluentDispatching {
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fns = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		HybridDomain domain = TestProblemParsing.initPlanner(planner, "domains/race_domain.ddl");
+		HybridDomain domain = TestRACEDomain.initPlanner(planner, "domains/race_domain.ddl");
 		pp.createState(fns, domain);
 		
 		((CompoundSymbolicVariableConstraintSolver) fns.getConstraintSolvers()[0]).propagateAllSub();
@@ -53,7 +53,7 @@ public class TestFluentDispatching {
 			
 		plan(planner, fns);
 		
-		TestProblemParsing.extractPlan(fns);
+		TestRACEDomain.extractPlan(fns);
 		
 		// Dispatch the plan
 		System.out.println("Starting Dispatching");

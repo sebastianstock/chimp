@@ -1,4 +1,4 @@
-package hybridDomainParsing;
+package examples;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,13 +23,17 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.PlanExtractor;
+import hybridDomainParsing.ProblemParser;
 import htn.UnifyFewestsubsNewestbindingsValOH;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
-public class TestProblemParsing {
+public class TestRACEDomain {
 	
 	private static String N = "n";
 	

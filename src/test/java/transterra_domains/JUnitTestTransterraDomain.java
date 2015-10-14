@@ -10,12 +10,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import examples.TestRACEDomain;
 import examples.TestTransTerraProblems;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class JUnitTestTransterraDomain {
@@ -44,7 +44,7 @@ public class JUnitTestTransterraDomain {
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		domain = TestProblemParsing.initPlanner(planner, "domains/transterra_v1.ddl");
+		domain = TestRACEDomain.initPlanner(planner, "domains/transterra_v1.ddl");
 	}
 
 	@After
@@ -56,7 +56,7 @@ public class JUnitTestTransterraDomain {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
-		TestProblemParsing.extractPlan(fluentSolver);
+		TestRACEDomain.extractPlan(fluentSolver);
 	}
 	
 

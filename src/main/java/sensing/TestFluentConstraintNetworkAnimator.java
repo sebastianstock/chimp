@@ -14,17 +14,17 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
+import examples.TestRACEDomain;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import hybridDomainParsing.TestProblemParsing;
 
 public class TestFluentConstraintNetworkAnimator {
 		
 	public static void main(String[] args) {
 		final long origin = Calendar.getInstance().getTimeInMillis();
 		Logger logger = MetaCSPLogging.getLogger(TestFluentConstraintNetworkAnimator.class);
-		String[][] symbols = TestProblemParsing.createSymbols();
-		int[] ingredients = TestProblemParsing.createIngredients();
+		String[][] symbols = TestRACEDomain.createSymbols();
+		int[] ingredients = TestRACEDomain.createIngredients();
 
 		FluentNetworkSolver fns = new FluentNetworkSolver(origin, origin+100000, symbols, ingredients);
 

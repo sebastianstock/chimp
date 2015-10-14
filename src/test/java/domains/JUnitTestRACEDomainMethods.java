@@ -11,11 +11,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import examples.TestRACEDomain;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class JUnitTestRACEDomainMethods {
@@ -30,8 +30,8 @@ public class JUnitTestRACEDomainMethods {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		symbols = TestProblemParsing.createSymbols();
-		ingredients = TestProblemParsing.createIngredients();
+		symbols = TestRACEDomain.createSymbols();
+		ingredients = TestRACEDomain.createIngredients();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
 				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
 				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
@@ -46,7 +46,7 @@ public class JUnitTestRACEDomainMethods {
 		planner.setTypesInstancesMap(typesInstancesMap);
 
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		domain = TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
+		domain = TestRACEDomain.initPlanner(planner, "domains/ordered_domain.ddl");
 	}
 
 	@After
@@ -214,7 +214,7 @@ public class JUnitTestRACEDomainMethods {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		planner.createInitialMeetsFutureConstraints();
 		assertTrue(planner.backtrack());
-		TestProblemParsing.extractPlan(fluentSolver);
+		TestRACEDomain.extractPlan(fluentSolver);
 	}
 
 

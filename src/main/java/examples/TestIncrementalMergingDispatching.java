@@ -24,7 +24,6 @@ import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
-import hybridDomainParsing.TestProblemParsing;
 import sensing.FluentConstraintNetworkAnimator;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
@@ -40,8 +39,8 @@ public class TestIncrementalMergingDispatching {
 		// IROS
 		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
 		
-		String[][] symbols = TestProblemParsing.createSymbols();
-		int[] ingredients = TestProblemParsing.createIngredients();
+		String[][] symbols = TestRACEDomain.createSymbols();
+		int[] ingredients = TestRACEDomain.createIngredients();
 		
 		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
 		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
@@ -52,7 +51,7 @@ public class TestIncrementalMergingDispatching {
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		HybridDomain domain = TestProblemParsing.initPlanner(planner, "domains/ordered_domain.ddl");
+		HybridDomain domain = TestRACEDomain.initPlanner(planner, "domains/ordered_domain.ddl");
 
 		pp.createState(fluentSolver, domain);
 		
