@@ -17,7 +17,10 @@ import dispatching.FluentDispatchingFunction;
 import examples.TestRACEDomain;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
+import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -29,36 +32,63 @@ public class TestFluentDispatching {
 		// init planner
 		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
 
-		String[][] symbols = TestRACEDomain.createSymbols();
-		int[] ingredients = TestRACEDomain.createIngredients();
-		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
-		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
-				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
-				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
+		HybridDomain domain;
+		try {
+			domain = new HybridDomain("domains/ordered_domain.ddl");
+		} catch (DomainParsingException e) {
+			e.printStackTrace();
+			return;
+		}
+		int[] ingredients = new int[] {1, domain.getMaxArgs()};
+		String[][] symbols = new String[2][];
+		symbols[0] =  domain.getPredicateSymbols();
+		symbols[1] = pp.getArgumentSymbols();
+		Map<String, String[]> typesInstancesMap = pp.getTypesInstancesMap();
+		//+++
 		
-//		final long origin = Calendar.getInstance().getTimeInMillis();
-		final long origin = 0L;
-
-		HTNPlanner planner = new HTNPlanner(origin, origin + 100000,  0, symbols, ingredients);
+		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
-		FluentNetworkSolver fns = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		
-		HybridDomain domain = TestRACEDomain.initPlanner(planner, "domains/race_domain.ddl");
-		pp.createState(fns, domain);
+		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+		pp.createState(fluentSolver, domain);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		((CompoundSymbolicVariableConstraintSolver) fns.getConstraintSolvers()[0]).propagateAllSub();
+		try {
+			TestRACEDomain.initPlanner(planner, domain);
+		} catch (DomainParsingException e) {
+			System.out.println("Error while parsing domain: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
 		
-//		MetaCSPLogging.setLevel(Level.FINE);
-		MetaCSPLogging.setLevel(Level.OFF);
-			
-		plan(planner, fns);
+		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
+		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		MetaCSPLogging.setLevel(Level.INFO);
 		
-		TestRACEDomain.extractPlan(fns);
+		planner.createInitialMeetsFutureConstraints();
+		plan(planner, fluentSolver);
+		
+		// Add another task
+		String name = "move_object(milkPot1 placingAreaNorthLeftTable2)";
+		String component;
+		if (name.startsWith("!")) {
+			component = "Activity";
+		} else {
+			component = "Task";
+		}
+		Variable var = fluentSolver.createVariable(component);
+		((Fluent) var).setName(name);
+		var.setMarking(markings.UNPLANNED);
+		
+//		planner.clearResolvers();
+		plan(planner, fluentSolver);
+		
+		TestRACEDomain.extractPlan(fluentSolver);
 		
 		// Dispatch the plan
 		System.out.println("Starting Dispatching");
 		
-		FluentConstraintNetworkAnimator animator = new FluentConstraintNetworkAnimator(fns, 1000);
+		FluentConstraintNetworkAnimator animator = new FluentConstraintNetworkAnimator(fluentSolver, 1000);
 		
 		final Vector<Fluent> executingActs = new Vector<Fluent>();
 		
@@ -77,14 +107,14 @@ public class TestFluentDispatching {
 			}
 		};
 		
-		for (Variable var : fns.getVariables("Activity")) {
-			var.setColor(Color.GREEN);
+		for (Variable var1 : fluentSolver.getVariables("Activity")) {
+			var1.setColor(Color.GREEN);
 		}
-		for (Variable var : fns.getVariables("Task")) {
-			var.setColor(Color.BLUE);
+		for (Variable var1 : fluentSolver.getVariables("Task")) {
+			var1.setColor(Color.BLUE);
 		}
 		
-		animator.addDispatchingFunctions(fns, df);
+		animator.addDispatchingFunctions(fluentSolver, df);
 		
 		Fluent future = animator.getFuture();
 		future.setColor(Color.WHITE);

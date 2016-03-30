@@ -14,17 +14,31 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
-import examples.TestRACEDomain;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.HybridDomain;
+import hybridDomainParsing.ProblemParser;
 
 public class TestFluentConstraintNetworkAnimator {
 		
 	public static void main(String[] args) {
 		final long origin = Calendar.getInstance().getTimeInMillis();
 		Logger logger = MetaCSPLogging.getLogger(TestFluentConstraintNetworkAnimator.class);
-		String[][] symbols = TestRACEDomain.createSymbols();
-		int[] ingredients = TestRACEDomain.createIngredients();
+		
+		// only to get symbols and ingredients
+		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
+		HybridDomain domain;
+		try {
+			domain = new HybridDomain("domains/ordered_domain.ddl");
+		} catch (DomainParsingException e) {
+			e.printStackTrace();
+			return;
+		}
+		int[] ingredients = new int[] {1, domain.getMaxArgs()};
+		String[][] symbols = new String[2][];
+		symbols[0] =  domain.getPredicateSymbols();
+		symbols[1] = pp.getArgumentSymbols();
 
 		FluentNetworkSolver fns = new FluentNetworkSolver(origin, origin+100000, symbols, ingredients);
 

@@ -4,129 +4,131 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import examples.TestRACEDomain;
-import examples.TestTransTerraProblems;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
+import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class JUnitTestTransterraDomain {
 	
-	private static String[][] symbols;
-	private static int[] ingredients;
-	private static Map<String, String[]> typesInstancesMap;
-	
-	private HTNPlanner planner;
-	private FluentNetworkSolver fluentSolver;
+	private String[][] symbols;
+	private int[] ingredients;
 	private HybridDomain domain;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		symbols = TestTransTerraProblems.createSymbols();
-		ingredients = TestTransTerraProblems.createIngredients();
-		typesInstancesMap = TestTransTerraProblems.createTypesInstances();
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {}
 
 	@Before
 	public void setUp() throws Exception {
-		planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
-		planner.setTypesInstancesMap(typesInstancesMap);
-
-		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		domain = TestRACEDomain.initPlanner(planner, "domains/transterra_v1.ddl");
+		try {
+			domain = new HybridDomain("domains/transterra_v1.ddl");
+		} catch (DomainParsingException e) {
+			e.printStackTrace();
+			return;
+		}
+		ingredients = new int[] {1, domain.getMaxArgs()};
+		symbols = new String[2][];
+		symbols[0] =  domain.getPredicateSymbols();
 	}
-
-	@After
-	public void tearDown() throws Exception {}
 	
-	private void testProblem(String problemPath) {
+	private void testPlanning(String problemPath) {
 		ProblemParser pp = new ProblemParser(problemPath);
+		
+		symbols[1] = pp.getArgumentSymbols();
+		Map<String, String[]> typesInstancesMap = pp.getTypesInstancesMap();
+		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
+		planner.setTypesInstancesMap(typesInstancesMap);
+		
+		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		
+		try {
+			TestRACEDomain.initPlanner(planner, domain);
+		} catch (DomainParsingException e) {
+			System.out.println("Error while parsing domain: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
+		
 		planner.createInitialMeetsFutureConstraints();
+
 		assertTrue(planner.backtrack());
+		
 		TestRACEDomain.extractPlan(fluentSolver);
 	}
 	
 
 	@Test
 	public void testOpMoveTo() {
-		testProblem("problems/transterra_problems_v1/test_op_move_to.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_move_to.pdl");
 	}
 
 	@Test
 	public void testOpSample() {
-		testProblem("problems/transterra_problems_v1/test_op_sample_regolith.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_sample_regolith.pdl");
 	}
 
 	@Test
 	public void testOpTransferSample() {
-		testProblem("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_transfer_sample.pdl");
 	}
 
 	@Test
 	public void testOpTransferPayload() {
-		testProblem("problems/transterra_problems_v1/test_op_transfer_payload.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_transfer_payload.pdl");
 	}
 
 	@Test
 	public void testOpPickupBasecamp() {
-		testProblem("problems/transterra_problems_v1/test_op_pickup_basecamp.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_pickup_basecamp.pdl");
 	}
 
 	@Test
 	public void testOpPickupBasecamp2() {
-		testProblem("problems/transterra_problems_v1/test_op_pickup_basecamp_2.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_pickup_basecamp_2.pdl");
 	}
 
 	@Test
 	public void testOpPlaceBasecamp() {
-		testProblem("problems/transterra_problems_v1/test_op_place_basecamp.pdl");
+		testPlanning("problems/transterra_problems_v1/test_op_place_basecamp.pdl");
 	}
 
 	@Test
 	public void testMDeployBasecamp1() {
-		testProblem("problems/transterra_problems_v1/test_m_deploy_basecamp_1.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_deploy_basecamp_1.pdl");
 	}
 
 	@Test
 	public void testMDeployBasecamp2() {
-		testProblem("problems/transterra_problems_v1/test_m_deploy_basecamp_2.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_deploy_basecamp_2.pdl");
 	}
 
 	@Test
 	public void testMTakeSamples1() {
-		testProblem("problems/transterra_problems_v1/test_m_take_samples_1.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_take_samples_1.pdl");
 	}
 
 	@Test
 	public void testMTakeSamples2() {
-		testProblem("problems/transterra_problems_v1/test_m_take_samples_2.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_take_samples_2.pdl");
 	}
 
 	@Test
 	public void testMGetBasecamp1() {
-		testProblem("problems/transterra_problems_v1/test_m_get_basecamp_1.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_get_basecamp_1.pdl");
 	}
 
 	@Test
 	public void testMGetBasecamp2() {
-		testProblem("problems/transterra_problems_v1/test_m_get_basecamp_2.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_get_basecamp_2.pdl");
 	}
 	
 	@Test
 	public void testMTransferFilled() {
-		testProblem("problems/transterra_problems_v1/test_m_transfer_filled.pdl");
+		testPlanning("problems/transterra_problems_v1/test_m_transfer_filled.pdl");
 	}
 }

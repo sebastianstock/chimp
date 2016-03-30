@@ -3,7 +3,6 @@ package examples;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -23,11 +22,11 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
-import htn.UnifyFewestsubsNewestbindingsValOH;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
@@ -35,63 +34,63 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRACEDomain {
 	
-	private static String N = "n";
+//	private static String N = "n";
 	
-	public static String[][] createSymbols() {
-		String[][] symbols = new String[2][];
-		// predicates  
-		// index: 0
-		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
-				"Connected", "Type",
-				// operators
-				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
-				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
-				"!observe_objects_on_area",
-				// methods
-				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
-				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
-				"leave_manipulation_pose", "grasp_object", "get_object", "put_object",
-				"move_object", "serve_coffee_to_guest", "arm_to_side",
-				
-				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
-				"not_test",
-				// other
-				"Future",
-				HTNPlanner.FUTURE_STR
-				};	
-		// race:Kitchenware		
-		// index: 1, 2
-		symbols[1] = new String[] {"mug1", "mug2",
-				"nothing",
-				"placingAreaEastRightCounter1",
-				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
-				"placingAreaEastLeftTable1", "placingAreaEastRightTable1",
-				"placingAreaNorthLeftTable2", "placingAreaNorthRightTable2",
-				"placingAreaSouthLeftTable2", "placingAreaSouthRightTable2",
-				"trayArea1", 
-				"manipulationAreaEastCounter1", "preManipulationAreaEastCounter1",
-				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
-				"preManipulationAreaNorthTable1", "preManipulationAreaSouthTable1",
-				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
-				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
-				"floorAreaTamsRestaurant1", 
-				"preManipulationAreaEastCounterOS1", "placingAreaEastRightCounterOS1", "manipulationAreaEastCounterOS1",
-				"sittingAreaWestTable1", "sittingAreaEastTable1",
-				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
-				"table1", "table2", "counter1", 
-				"guest1", "guest2",
-				"leftArm1", "rightArm1", 
-				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
-				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
-				"coffeeJug1", "milkPot1", "sugarPot1", "sugarPot2",
-				"Milk", "Coffee", "Sugar", "Mug", "Peppermill",
-				N};
-		return symbols;
-	}
+//	public static String[][] createSymbols() {
+//		String[][] symbols = new String[2][];
+//		// predicates  
+//		// index: 0
+//		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
+//				"Connected", "Type",
+//				// operators
+//				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
+//				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
+//				"!observe_objects_on_area",
+//				// methods
+//				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
+//				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
+//				"leave_manipulation_pose", "grasp_object", "get_object", "put_object",
+//				"move_object", "serve_coffee_to_guest", "arm_to_side",
+//				
+//				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
+//				"not_test",
+//				// other
+//				"Future",
+//				HTNPlanner.FUTURE_STR
+//				};	
+//		// race:Kitchenware		
+//		// index: 1, 2
+//		symbols[1] = new String[] {"mug1", "mug2",
+//				"nothing",
+//				"placingAreaEastRightCounter1",
+//				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
+//				"placingAreaEastLeftTable1", "placingAreaEastRightTable1",
+//				"placingAreaNorthLeftTable2", "placingAreaNorthRightTable2",
+//				"placingAreaSouthLeftTable2", "placingAreaSouthRightTable2",
+//				"trayArea1", 
+//				"manipulationAreaEastCounter1", "preManipulationAreaEastCounter1",
+//				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
+//				"preManipulationAreaNorthTable1", "preManipulationAreaSouthTable1",
+//				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
+//				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
+//				"floorAreaTamsRestaurant1", 
+//				"preManipulationAreaEastCounterOS1", "placingAreaEastRightCounterOS1", "manipulationAreaEastCounterOS1",
+//				"sittingAreaWestTable1", "sittingAreaEastTable1",
+//				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
+//				"table1", "table2", "counter1", 
+//				"guest1", "guest2",
+//				"leftArm1", "rightArm1", 
+//				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
+//				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
+//				"coffeeJug1", "milkPot1", "sugarPot1", "sugarPot2",
+//				"Milk", "Coffee", "Sugar", "Mug", "Peppermill",
+//				N};
+//		return symbols;
+//	}
 	
-	public static int[] createIngredients() {
-		return new int[] {1,5};
-	}
+//	public static int[] createIngredients() {
+//		return new int[] {1,5};
+//	}
 	
 
 	public static void main(String[] args) {
@@ -160,34 +159,37 @@ public class TestRACEDomain {
 	// IROS
 //		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
 		
-		
-		String[][] symbols = createSymbols();
-		int[] ingredients = createIngredients();
-		
-		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
-		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
-				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
-				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
+		HybridDomain domain;
+		try {
+			domain = new HybridDomain("domains/ordered_domain.ddl");
+		} catch (DomainParsingException e) {
+			e.printStackTrace();
+			return;
+		}
+		int[] ingredients = new int[] {1, domain.getMaxArgs()};
+		String[][] symbols = new String[2][];
+		symbols[0] =  domain.getPredicateSymbols();
+		symbols[1] = pp.getArgumentSymbols();
+		Map<String, String[]> typesInstancesMap = pp.getTypesInstancesMap();
 		
 		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
+		
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		
-//		initPlanner(planner, "domains/race_domain.ddl");
-//		initPlanner(planner, "domains/s_domain.ddl");
-		HybridDomain domain = initPlanner(planner, "domains/ordered_domain.ddl");
-		
-//		initPlanner(planner, "domains/debug_nottype.pdl");
-//		initPlanner(planner, "domains/short_domain.ddl");
-		
 		pp.createState(fluentSolver, domain);
-		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
+		try {
+			initPlanner(planner, domain);
+		} catch (DomainParsingException e) {
+			System.out.println("Error while parsing domain: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
 		
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-		
+
 //		MetaCSPLogging.setLevel(Level.FINE);
 		MetaCSPLogging.setLevel(Level.OFF);
 		
@@ -211,7 +213,7 @@ public class TestRACEDomain {
 			}
 		}
 		System.out.println("#Ops: " + opCount);
-		System.out.println("#Compound Taks: " + mCount);
+		System.out.println("#Compound Tasks: " + mCount);
 		System.out.println("#Fluents: " + fluentSolver.getVariables().length);
 		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
 
@@ -288,41 +290,34 @@ public class TestRACEDomain {
 		planEx.printPlan();
 	}
 	
-	public static HybridDomain initPlanner(HTNPlanner planner, String domainPath) {
+	
+	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
 		// load domain
-		HybridDomain dom;
-		try {
-			dom = new HybridDomain(planner, domainPath);
-		} catch (DomainParsingException e) {
-			System.out.println("Error while parsing domain: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
+		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new NewestFluentsValOH();
 		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
-		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
-		selectionConstraint.addOperators(dom.getOperators());
-		selectionConstraint.addMethods(dom.getMethods());
-		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
-		selectionConstraint.setResourceUsages(fluentResourceUsages);
+		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
+		htnConstraint.addOperators(domain.getOperators());
+		htnConstraint.addMethods(domain.getMethods());
+		Vector<ResourceUsageTemplate> fluentResourceUsages = domain.getFluentResourceUsages();
+		htnConstraint.setResourceUsages(fluentResourceUsages);
 		
-		for (FluentScheduler fs : dom.getFluentSchedulers()) {
+		for (FluentScheduler fs : domain.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);
 		}
 		
-		for (FluentResourceUsageScheduler rs : dom.getResourceSchedulers()) {
+		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
 			planner.addMetaConstraint(rs);
 		}
 		
-		planner.addMetaConstraint(selectionConstraint);
+		planner.addMetaConstraint(htnConstraint);
 		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 		planner.addMetaConstraint(mbConstraint);
-		return dom;
 	}
 	
 

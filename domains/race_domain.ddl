@@ -32,6 +32,20 @@
 
 (MaxArgs 5)
 
+(PredicateSymbols On RobotAt Holding HasArmPosture HasTorsoPosture
+  Connected Type
+  !move_base !move_base_blind !place_object !pick_up_object
+  !move_arm_to_side !move_arms_to_carryposture !tuck_arms !move_torso
+  !observe_objects_on_area
+  adapt_torso torso_assume_driving_pose adapt_arms arms_assume_driving_pose
+  drive_robot move_both_arms_to_side assume_manipulation_pose
+  leave_manipulation_pose grasp_object get_object put_object
+  move_object serve_coffee_to_guest arm_to_side
+  serve_coffee_to_guest_test assume_manipulation_pose_wrapper
+  not_test
+  Future
+  Eternity)
+
 
 (Resource navigationCapacity 1)
 ##

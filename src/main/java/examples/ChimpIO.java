@@ -68,10 +68,6 @@ public class ChimpIO {
 //		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 //		planner.addMetaConstraint(mbConstraint);
 	}
-	
-	public static void callCHIMP() {
-		
-	}
 
 	public static void main(String[] args) {
 		
@@ -103,9 +99,6 @@ public class ChimpIO {
 		String[][] symbols = new String[2][];
 		symbols[0] =  domain.getPredicateSymbols();
 		symbols[1] = problemParser.getArgumentSymbols();
-//		for (String s : symbols[1]) {
-//			System.out.println(s);
-//		}
 		Map<String, String[]> typesInstancesMap = problemParser.getTypesInstancesMap();
 		
 		HTNPlanner planner = new HTNPlanner(0,  HORIZON,  0, symbols, ingredients);

@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -22,6 +21,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
 import sensing.FluentConstraintNetworkAnimator;
@@ -39,28 +39,40 @@ public class TestIncrementalMergingDispatching {
 		// IROS
 		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
 		
-		String[][] symbols = TestRACEDomain.createSymbols();
-		int[] ingredients = TestRACEDomain.createIngredients();
-		
-		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
-		typesInstancesMap.put("ManipulationArea", new String[] {"manipulationAreaEastCounter1",
-				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
-				"manipulationAreaWestTable2", "manipulationAreaEastTable2",});
+		HybridDomain domain;
+		try {
+			domain = new HybridDomain("domains/ordered_domain.ddl");
+		} catch (DomainParsingException e) {
+			e.printStackTrace();
+			return;
+		}
+		int[] ingredients = new int[] {1, domain.getMaxArgs()};
+		String[][] symbols = new String[2][];
+		symbols[0] =  domain.getPredicateSymbols();
+		symbols[1] = pp.getArgumentSymbols();
+		Map<String, String[]> typesInstancesMap = pp.getTypesInstancesMap();
+		//+++
 		
 		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
+		
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		
-		HybridDomain domain = TestRACEDomain.initPlanner(planner, "domains/ordered_domain.ddl");
-
 		pp.createState(fluentSolver, domain);
-		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		
+		try {
+			TestRACEDomain.initPlanner(planner, domain);
+		} catch (DomainParsingException e) {
+			System.out.println("Error while parsing domain: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
 		
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 //		MetaCSPLogging.setLevel(Level.INFO);
 		
+		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		// Add another task
