@@ -47,20 +47,16 @@
 
 # Operators:
   !pick_object !place_object !move_torso !move_base !move_arm
-  !observe
+  !observe_area
   # optional:
   #!open_door !close_door !follow_person
 
 # Methods
-  move_object serve_coffee
+  move_object serve_coffee_to_guest
   #approach_person deliver_mail cleanup_table search_object explore_kb_updates
 
-#adapt_torso torso_assume_driving_pose adapt_arms arms_assume_driving_pose
-#  drive_robot move_both_arms_to_side assume_manipulation_pose
-#  leave_manipulation_pose grasp_object get_object put_object
-#  move_object serve_coffee_to_guest arm_to_side
-#  serve_coffee_to_guest_test assume_manipulation_pose_wrapper
-#  not_test
+  adapt_arm adapt_torso assume_driving_pose assume_manipulation_pose drive get_object put_object
+
   Future
   Eternity)
 

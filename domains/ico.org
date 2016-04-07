@@ -37,7 +37,6 @@ tucked/untucked/side/top
 ** TODO search_object
 ** TODO explore_kb_updates
 
-
 * Tasks
 
 ** DONE adapt_arm
