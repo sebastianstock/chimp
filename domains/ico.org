@@ -1,0 +1,95 @@
+* Features/Extensions:
+** Conditional Effects???
+
+* Tiago Features
+** Detection of people, faces and objects 
+** Speech recognition and synthesis
+** Whole body control???
+* Open issues
+** TODO In get_object: how model robot NOT NEAR the object?
+  - Hat jede object_area genau eine manipulation_area (repräsentiert
+    mit Connected)?
+** TODO serve_coffee: specify which object to use
+* Operators:
+** !pick_up_object
+Für Greifen vom Tisch und vom Boden. Torso hoch/runterfahren macht
+übergeordnete Methode
+** !place_object/2
+   - object
+   - area
+** !move_base
+** !move_torso
+up/middle/down
+** !move_arm/1
+tucked/untucked/side/top
+** !observe_area/1
+- area
+** TODO !open_door
+** TODO !close_door
+** TODO !follow_person
+
+* High-Level Tasks
+** DONE move_object
+** DONE serve_coffee_to_guest
+** TODO approach_person
+** TODO deliver_mail
+** TODO cleanup_table
+** TODO search_object
+** TODO explore_kb_updates
+
+
+* Tasks
+
+** DONE adapt_arm
+** DONE adapt_torso
+** DONE assume_driving_pose
+** DONE assume_manipulation_pose
+** DONE drive
+** DONE get_object
+** DONE put_object
+** NOT_NEEDED grasp_object
+
+* RobotState:
+** ArmPosture/1
+- ArmUnTuckedPosture ArmTuckedPosture ArmCarryPosture ArmUnnamedPosture ArmToSidePosture
+** TorsoPosture/1
+** RobotAt/1
+** Holding/1
+  - object/nothing
+
+* EnvironmentState:
+
+** Connected/2
+   - objectarea
+   - robotarea
+** On/2
+   - object
+   - table
+** DoorState
+** In
+Objekte in Räumen
+
+* Objektklassen:
+** Room: Office/Kitchen/ConferenceRoom/StudentRoom
+** Door
+** Table
+** Cupboard
+** Chair
+** Person
+** Mug
+** Cutlery: Fork/Knife/Spoon
+** Mail
+** CoffeeMachine
+
+* Ressourcen:
+** armManCapacity
+** navigationCapacity
+
+* State variables:
+** RobotAt
+** At 
+** Holding
+** On???
+** In??? (TODO!)
+
+Area -> Place
