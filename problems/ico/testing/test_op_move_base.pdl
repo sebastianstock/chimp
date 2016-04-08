@@ -1,0 +1,62 @@
+(Problem
+
+(ArgumentSymbols mug1 mug2 nothing placingAreaEastRightCounter1
+  placingAreaWestLeftTable1 placingAreaWestRightTable1
+  placingAreaEastLeftTable1 placingAreaEastRightTable1
+  placingAreaNorthLeftTable2 placingAreaNorthRightTable2
+  placingAreaSouthLeftTable2 placingAreaSouthRightTable2 trayArea1
+  manipulationAreaEastCounter1
+  manipulationAreaNorthTable1 manipulationAreaSouthTable1
+  manipulationAreaWestTable2 manipulationAreaEastTable2
+  floorAreaTamsRestaurant1
+  sittingAreaWestTable1 sittingAreaEastTable1 sittingAreaNorthTable2
+  sittingConstraintSouthTable2
+  table1 table2 counter1
+  guest1 guest2
+  guestArea1
+  ArmTuckedPosture ArmUnTuckedPosture
+  ArmToSidePosture ArmUnnamedPosture ArmCarryPosture
+  TorsoUpPosture TorsoDownPosture TorsoMiddlePosture
+  coffeeJug1
+  milkPot1 sugarPot1 sugarPot2 Milk
+  Coffee Sugar Mug Peppermill
+  n)
+  
+
+(Fluent c0 Connected(placingAreaEastRightCounter1 manipulationAreaEastCounter1))
+(Constraint Release[0,0](c0))
+(Fluent c1 Connected(placingAreaWestLeftTable1 manipulationAreaNorthTable1))
+(Constraint Release[0,0](c1))
+(Fluent c2 Connected(placingAreaEastLeftTable1 manipulationAreaSouthTable1))
+(Constraint Release[0,0](c2))
+(Fluent c3 Connected(placingAreaWestRightTable1 manipulationAreaSouthTable1))
+(Constraint Release[0,0](c3))
+(Fluent c4 Connected(placingAreaEastRightTable1 manipulationAreaNorthTable1))
+(Constraint Release[0,0](c4))
+(Fluent c5 Connected(placingAreaNorthLeftTable2 manipulationAreaEastTable2))
+(Constraint Release[0,0](c5))
+(Fluent c6 Connected(placingAreaNorthRightTable2 manipulationAreaWestTable2))
+(Constraint Release[0,0](c6))
+(Fluent c7 Connected(placingAreaSouthLeftTable2 manipulationAreaWestTable2))
+(Constraint Release[0,0](c7))
+(Fluent c8 Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2))
+(Constraint Release[0,0](c8))
+
+(Fluent f1 ArmPosture(ArmTuckedPosture))
+(Constraint Release[0,0](f1))
+
+(Fluent f3 TorsoPosture(TorsoDownPosture))
+(Constraint Release[0,0](f3))
+
+(Fluent f4 RobotAt(floorAreaTamsRestaurant1))
+#(Fluent f4 RobotAt(preManipulationAreaEastCounter1))
+(Constraint Release[0,0](f4))
+
+(Task t0 !move_base(manipulationAreaEastTable2))
+(Constraint Release[0,1](t0))
+
+#(Constraint Deadline[0,200000](t0))
+#(Constraint Deadline[0,600000](t0))
+(Constraint Deadline[0,1650000](t0))
+
+)

@@ -34,7 +34,7 @@
 
 (PredicateSymbols
 # Robot state:
-  ArmPosture TorsoPosture RobotAt Holding
+  ArmPosture TorsoPosture RobotAt Holding At
 # Environment state:
   On DoorState In
   Connected Type
@@ -46,7 +46,7 @@
   Mug Mail Fork Knife Spoon CoffeeMachine
 
 # Operators:
-  !pick_object !place_object !move_torso !move_base !move_arm
+  !pick_up_object !place_object !move_torso !move_base !move_arm
   !observe_area
   # optional:
   #!open_door !close_door !follow_person
@@ -68,7 +68,7 @@
 
 (StateVariable RobotAt 2 n)
 (StateVariable ArmPosture 2 n)
-(StateVariable Holding 1 leftArm1 rightArm1)
+(StateVariable Holding 2 n)
 ##
 (StateVariable On 1 mug1 mug2 mug3)
 #(StateVariable In 1 ...)
@@ -92,10 +92,10 @@
 # MOVE_TORSO
 (:operator
  (Head !move_torso(?newPosture))
- (Pre p1 HasTorsoPosture(?oldPosture))
+ (Pre p1 TorsoPosture(?oldPosture))
  (Constraint OverlappedBy(task,p1))
  (Del p1)
- (Add e1 HasTorsoPosture(?newPosture))
+ (Add e1 TorsoPosture(?newPosture))
  (Constraint Duration[4000,INF](task))
 )
 
@@ -122,16 +122,16 @@
     (Usage armManCapacity 1))
 )
 
-# PLACE_OBJECT
+# place_object
 (:operator
- (Head !place_object(?obj ?arm ?plArea))
+ (Head !place_object(?obj ?plArea))
 
  (Pre p1 Holding(?obj))
  (Pre p2 RobotAt(?mArea))
  (Pre p3 Connected(?plArea ?mArea))
- (Pre p4 ArmPosture(?armPosture)) # TODO maybe not necessary
- (Values ?armPosture ArmToSidePosture)
-# (Pre p5 HasTorsoPosture(?torsoPosture)) # not necessary
+# (Pre p4 ArmPosture(?armPosture)) # TODO probably not necessary
+# (Values ?armPosture ArmToSidePosture)
+# (Pre p5 TorsoPosture(?torsoPosture)) # not necessary
 # (Values ?torsoPosture TorsoUpPosture)
  (Del p1)
  (Add e1 Holding(?nothing))
@@ -149,7 +149,7 @@
     (Usage armManCapacity 1))
  )
 
-# MOVE_ARM_TO_SIDE
+# move_arm
 (:operator
  (Head !move_arm(?newPosture))
  (Pre p1 ArmPosture(?oldPosture))
@@ -168,7 +168,7 @@
  )
 
 
-# OBSERVE_OBJECTS_ON_AREA
+# observe_area
 (:operator
  (Head !observe_area(?plArea))
  (Pre p1 RobotAt(?robotArea))    
@@ -181,17 +181,17 @@
 
 ################################
 
-(FluentResourceUsage 
-  (Usage leftArm1 1) 
-  (Fluent Holding)
-  (Param 2 leftArm1)
-)
-
-(FluentResourceUsage 
-  (Usage rightArm1 1) 
-  (Fluent Holding)
-  (Param 2 rightArm1)
-)
+#(FluentResourceUsage 
+#  (Usage leftArm1 1) 
+#  (Fluent Holding)
+#  (Param 2 leftArm1)
+#)
+#
+#(FluentResourceUsage 
+#  (Usage rightArm1 1) 
+#  (Fluent Holding)
+#  (Param 2 rightArm1)
+#)
 
 #################################
 
@@ -277,7 +277,7 @@
   (Sub s1 adapt_torso(?torsoUpPosture))
   (Values ?torsoUpPosture TorsoUpPosture)
   (Sub s2 adapt_arm(?armSidePosture))
-  (Values ?armSidePosture ArmSidePosture)
+  (Values ?armSidePosture ArmToSidePosture)
   (Ordering s1 s2)
 )
 
@@ -331,8 +331,8 @@
 
   (Sub s1 drive(?manArea))
   (Sub s2 assume_manipulation_pose(?manArea))
-  (Sub s3 !observe_objects_on_area(?plArea))
-  (Sub s4 !pick_up_object(?object ?arm))
+  (Sub s3 !observe_area(?plArea))
+  (Sub s4 !pick_up_object(?object))
 
   (Ordering s1 s2)
   (Ordering s2 s3)

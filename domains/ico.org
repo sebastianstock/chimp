@@ -38,7 +38,6 @@ tucked/untucked/side/top
 ** TODO explore_kb_updates
 
 * Tasks
-
 ** DONE adapt_arm
 ** DONE adapt_torso
 ** DONE assume_driving_pose
