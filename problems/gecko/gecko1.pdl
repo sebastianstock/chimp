@@ -1,0 +1,24 @@
+(Problem
+
+(ArgumentSymbols
+  cross1
+  conveyor1
+  up down
+  n)
+
+  
+
+(Fluent c0 crossState(cross1 down))
+(Constraint Release[0,0](c0))
+
+
+(Task t0 channelR1L1())
+#(Task t1 !move_up(cross1))
+# (Task t0 move_object(coffeeJug1 placingAreaEastLeftTable1))
+(Constraint Release[0,1](t0))
+
+#(Constraint Deadline[0,200000](t0))
+#(Constraint Deadline[0,600000](t0))
+#(Constraint Deadline[0,1650000](t0))
+
+)
