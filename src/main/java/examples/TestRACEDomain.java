@@ -34,64 +34,6 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRACEDomain {
 	
-//	private static String N = "n";
-	
-//	public static String[][] createSymbols() {
-//		String[][] symbols = new String[2][];
-//		// predicates  
-//		// index: 0
-//		symbols[0] = new String[] {"On", "RobotAt", "Holding", "HasArmPosture", "HasTorsoPosture",
-//				"Connected", "Type",
-//				// operators
-//				"!move_base", "!move_base_blind", "!place_object", "!pick_up_object",
-//				"!move_arm_to_side", "!move_arms_to_carryposture", "!tuck_arms", "!move_torso",
-//				"!observe_objects_on_area",
-//				// methods
-//				"adapt_torso", "torso_assume_driving_pose", "adapt_arms", "arms_assume_driving_pose",
-//				"drive_robot", "move_both_arms_to_side", "assume_manipulation_pose", 
-//				"leave_manipulation_pose", "grasp_object", "get_object", "put_object",
-//				"move_object", "serve_coffee_to_guest", "arm_to_side",
-//				
-//				"serve_coffee_to_guest_test", "assume_manipulation_pose_wrapper",
-//				"not_test",
-//				// other
-//				"Future",
-//				HTNPlanner.FUTURE_STR
-//				};	
-//		// race:Kitchenware		
-//		// index: 1, 2
-//		symbols[1] = new String[] {"mug1", "mug2",
-//				"nothing",
-//				"placingAreaEastRightCounter1",
-//				"placingAreaWestLeftTable1", "placingAreaWestRightTable1",
-//				"placingAreaEastLeftTable1", "placingAreaEastRightTable1",
-//				"placingAreaNorthLeftTable2", "placingAreaNorthRightTable2",
-//				"placingAreaSouthLeftTable2", "placingAreaSouthRightTable2",
-//				"trayArea1", 
-//				"manipulationAreaEastCounter1", "preManipulationAreaEastCounter1",
-//				"manipulationAreaNorthTable1", "manipulationAreaSouthTable1",
-//				"preManipulationAreaNorthTable1", "preManipulationAreaSouthTable1",
-//				"manipulationAreaWestTable2", "manipulationAreaEastTable2",
-//				"preManipulationAreaWestTable2", "preManipulationAreaEastTable2",
-//				"floorAreaTamsRestaurant1", 
-//				"preManipulationAreaEastCounterOS1", "placingAreaEastRightCounterOS1", "manipulationAreaEastCounterOS1",
-//				"sittingAreaWestTable1", "sittingAreaEastTable1",
-//				"sittingAreaNorthTable2", "sittingConstraintSouthTable2",
-//				"table1", "table2", "counter1", 
-//				"guest1", "guest2",
-//				"leftArm1", "rightArm1", 
-//				"ArmTuckedPosture", "ArmUnTuckedPosture", "ArmToSidePosture", "ArmUnnamedPosture", "ArmCarryPosture",
-//				"TorsoUpPosture", "TorsoDownPosture", "TorsoMiddlePosture", 
-//				"coffeeJug1", "milkPot1", "sugarPot1", "sugarPot2",
-//				"Milk", "Coffee", "Sugar", "Mug", "Peppermill",
-//				N};
-//		return symbols;
-//	}
-	
-//	public static int[] createIngredients() {
-//		return new int[] {1,5};
-//	}
-	
 
 	public static void main(String[] args) {
 		
@@ -113,8 +55,6 @@ public class TestRACEDomain {
 		// new for merge
 //		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso_merge.pdl"); //#11
 //		ProblemParser pp = new ProblemParser("problems/test_m_merge_get_object.pdl"); //#12 
-		
-		
 		
 //		ProblemParser pp = new ProblemParser("problems/test_m_adapt_torso.pdl"); //#13
 //		ProblemParser pp = new ProblemParser("problems/test_m_torso_assume_driving_pose0.pdl"); //#14
