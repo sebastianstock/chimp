@@ -1,21 +1,44 @@
 (Problem
 
 (ArgumentSymbols
-  cross1
-  conveyor1
+  cross1 cross2 cross3
+  conveyor1 conveyor2 conveyor3
   up down
   n)
 
-  
+
+(Fluent a0 hasConveyor(cross1 conveyor1))
+(Constraint Release[0,0](a0))
+
+(Fluent a1 hasConveyor(cross2 conveyor2))
+(Constraint Release[0,0](a1))
+
+(Fluent a2 hasConveyor(cross3 conveyor3))
+(Constraint Release[0,0](a2))
 
 (Fluent c0 crossState(cross1 down))
 (Constraint Release[0,0](c0))
 
+(Fluent c1 crossState(cross2 down))
+(Constraint Release[0,0](c1))
 
-(Task t0 channelR1L1())
+(Fluent c2 crossState(cross3 down))
+(Constraint Release[0,0](c2))
+
+
+
+#(Task t0 channelR1L1())
+
+#(Task t1 channelR2L2())
+#(Task t2 channelR3L3())
 #(Task t1 !move_up(cross1))
-# (Task t0 move_object(coffeeJug1 placingAreaEastLeftTable1))
+
+(Task t0 channelRL(cross1))
+(Task t1 channelRL(cross2))
+(Task t2 channelRL(cross3))
 (Constraint Release[0,1](t0))
+(Constraint Release[0,1](t1))
+(Constraint Release[0,1](t2))
 
 #(Constraint Deadline[0,200000](t0))
 #(Constraint Deadline[0,600000](t0))

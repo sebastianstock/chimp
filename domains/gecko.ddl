@@ -4,11 +4,13 @@
 
 (PredicateSymbols
   crossState
+  hasConveyor
 
   !move_forward
   !move_up
 
-  channelR1L1
+  channelRL
+  channelR1L1 channelR2L2
 
   Future
   Eternity
@@ -20,8 +22,10 @@
 # TMcontroller: Idle, ChannelR1L1, ChannelR2L2, ChannelR3L3
 
 (StateVariable crossState 1 cross1)
+(StateVariable crossState 1 cross2)
 
 (Resource conveyor1Movement 1)
+(Resource conveyor2Movement 1)
 
 # Components (Instances of state variables)
 # TM
@@ -46,6 +50,10 @@
  (ResourceUsage 
     (Usage conveyor1Movement 1)
     (Param 1 conveyor1))
+
+ (ResourceUsage 
+    (Usage conveyor2Movement 1)
+    (Param 1 conveyor2))
 )
 
 (:operator
@@ -55,6 +63,9 @@
  (ResourceUsage 
     (Usage conveyor1Movement 1)
     (Param 1 conveyor1))
+ (ResourceUsage 
+    (Usage conveyor2Movement 1)
+    (Param 1 conveyor2))
 )
 
 # TODO: Temporal relations
@@ -84,6 +95,27 @@
 
 
 (:method
+ (Head channelRL(?cross))
+ (Pre p0 hasConveyor(?cross ?conveyor))
+ (Pre p1 crossState(?cross ?up))
+ (Values ?up up)
+ (Sub s1 !move_forward(?conveyor))
+ (Constraint Equals(s1,task))
+)
+
+(:method
+ (Head channelRL(?cross))
+ (Pre p0 hasConveyor(?cross ?conveyor))
+ (Pre p1 crossState(?cross ?down))
+ (Values ?down down)
+ (Sub s0 !move_up(?cross))
+ (Sub s1 !move_forward(?conveyor))
+ (Constraint Meets(s0,s1))
+ (Ordering s0 s1)
+)
+
+
+(:method
  (Head channelR1L1())
  (Pre p1 crossState(?cross ?up))
  (Values ?cross cross1)
@@ -101,6 +133,29 @@
  (Sub s0 !move_up(?cross))
  (Sub s1 !move_forward(?conveyor))
  (Values ?conveyor conveyor1)
+ (Constraint Meets(s0,s1))
+ (Ordering s0 s1)
+)
+
+
+(:method
+ (Head channelR2L2())
+ (Pre p1 crossState(?cross ?up))
+ (Values ?cross cross2)
+ (Values ?up up)
+ (Sub s1 !move_forward(?conveyor))
+ (Values ?conveyor conveyor2)
+ (Constraint Equals(s1,task))
+)
+
+(:method
+ (Head channelR2L2())
+ (Pre p1 crossState(?cross ?down))
+ (Values ?cross cross2)
+ (Values ?down down)
+ (Sub s0 !move_up(?cross))
+ (Sub s1 !move_forward(?conveyor))
+ (Values ?conveyor conveyor2)
  (Constraint Meets(s0,s1))
  (Ordering s0 s1)
 )
