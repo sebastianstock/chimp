@@ -49,7 +49,7 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 		for (Variable var : groundSolver.getVariables()) {
 			if (((Fluent) var).getCompoundSymbolicVariable().getPredicateName().equals(MOVE_BASE_NAME)) {
 				//			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
-				if (! checkDuration(var, groundSolver)) {
+				if (checkApplied((Fluent) var) && ! checkDuration(var, groundSolver)) {
 					ConstraintNetwork nw = new ConstraintNetwork(null);
 					nw.addVariable(var);
 					ret.add(nw);
@@ -60,6 +60,15 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 		logger.finest("MetaVariables: " + ret);
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
 	
+	}
+	
+	private boolean checkApplied(Fluent task) {
+		for (Constraint con : this.getGroundSolver().getConstraintNetwork().getConstraints(task, task)) {
+			if (con instanceof FluentConstraint) {
+				if (((FluentConstraint)con).getType().equals(FluentConstraint.Type.UNARYAPPLIED)) return true;
+			}
+		}
+		return false;
 	}
 	
 

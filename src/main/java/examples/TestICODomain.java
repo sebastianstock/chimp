@@ -215,11 +215,11 @@ public class TestICODomain {
 			planner.addMetaConstraint(rs);
 		}
 		
-		planner.addMetaConstraint(htnConstraint);
-		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimatorICO();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 		planner.addMetaConstraint(mbConstraint);
+		
+		planner.addMetaConstraint(htnConstraint);
 	}
 	
 

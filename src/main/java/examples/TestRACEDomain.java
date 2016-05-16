@@ -245,6 +245,7 @@ public class TestRACEDomain {
 		Vector<ResourceUsageTemplate> fluentResourceUsages = domain.getFluentResourceUsages();
 		htnConstraint.setResourceUsages(fluentResourceUsages);
 		
+		
 		for (FluentScheduler fs : domain.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);
 		}
@@ -253,11 +254,11 @@ public class TestRACEDomain {
 			planner.addMetaConstraint(rs);
 		}
 		
-		planner.addMetaConstraint(htnConstraint);
-		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
 		planner.addMetaConstraint(mbConstraint);
+		
+		planner.addMetaConstraint(htnConstraint);
 	}
 	
 
