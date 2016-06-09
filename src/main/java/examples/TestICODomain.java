@@ -21,6 +21,7 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
+import htn.NewestFluentsValOH;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
@@ -58,7 +59,8 @@ public class TestICODomain {
 //		ProblemParser pp = new ProblemParser("problems/ico/testing/test_m_put_object1.pdl");
 //		ProblemParser pp = new ProblemParser("problems/ico/testing/test_m_move_object1.pdl");
 		
-		ProblemParser pp = new ProblemParser("problems/ico/test_m_serve_coffee_problem_1.pdl");
+//		ProblemParser pp = new ProblemParser("problems/ico/test_m_serve_coffee_problem_1.pdl");
+		ProblemParser pp = new ProblemParser("problems/ico/move_2_objects.pdl");
 		
 
 		HybridDomain domain;
@@ -198,8 +200,8 @@ public class TestICODomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-//		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+		ValueOrderingH valOH = new NewestFluentsValOH();
+//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());
