@@ -122,11 +122,16 @@ public class FluentConstraint extends MultiBinaryConstraint {
 					retList.add(con);
 				}
 			} else {  // use default temporal constraints
+//				AllenIntervalConstraint preAIC = new AllenIntervalConstraint(
+//						AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, 
+//						AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
+//				preAIC.setFrom(((Fluent) t).getAllenInterval());
+//				preAIC.setTo(((Fluent) f).getAllenInterval());
 				AllenIntervalConstraint preAIC = new AllenIntervalConstraint(
-						AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring, 
-						AllenIntervalConstraint.Type.MetByOrOverlappedByOrIsFinishedByOrDuring.getDefaultBounds());
-				preAIC.setFrom(((Fluent) t).getAllenInterval());
-				preAIC.setTo(((Fluent) f).getAllenInterval());
+						AllenIntervalConstraint.Type.MeetsOrOverlapsOrFinishedByOrContains, 
+						AllenIntervalConstraint.Type.MeetsOrOverlapsOrFinishedByOrContains.getDefaultBounds());
+				preAIC.setFrom(((Fluent) f).getAllenInterval());
+				preAIC.setTo(((Fluent) t).getAllenInterval());
 				retList.add(preAIC);
 			}
 			
