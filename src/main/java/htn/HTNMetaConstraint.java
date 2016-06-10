@@ -188,23 +188,18 @@ public class HTNMetaConstraint extends MetaConstraint {
 			ret.add(cn);
 		}
 		if (ret.size() > 0 ) {
-			logger.info("Created MATCHES" + ret.toString());
+			logger.info("Created " + ret.size() + " TaskUnification-Meta-Values.");
 		}
 		
 		return ret;
 	}
 	
 	private boolean checkTime(AllenInterval taskInterval, AllenInterval varInterval) {
-		long taskEST = taskInterval.getEST();
-		long taskLST = taskInterval.getLST();
-		ArrayList<Fluent> ret = new ArrayList<Fluent>();
 
-
-			if (varInterval.getEST() < taskLST ) {//&& varInterval.getLET() >= taskEST) {
-
-			}
-
-		return true;
+		return varInterval.getEST() <= taskInterval.getLST()
+				&& taskInterval.getEST() <= varInterval.getLST()
+				&& varInterval.getEET() <= taskInterval.getLET()
+				&& taskInterval.getEET() <= varInterval.getLET();
 	}
 
 	private boolean compareWithGetName(Fluent task, Fluent var) {
