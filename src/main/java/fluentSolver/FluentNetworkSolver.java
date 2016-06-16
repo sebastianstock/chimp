@@ -10,6 +10,9 @@ import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
+import org.metacsp.multi.allenInterval.AllenIntervalNetworkUtilities;
+import org.metacsp.time.APSPSolver;
+import org.metacsp.time.Bounds;
 
 import htn.TaskApplicationMetaConstraint;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -60,13 +63,23 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	 * @return All Fluents that are active in a given interval.
 	 */
 	public Fluent[] getOpenFluents(AllenInterval taskInterval) {
-		long taskEST = taskInterval.getEST();
+//		long taskEST = taskInterval.getEST();
 		long taskLST = taskInterval.getLST();
 		ArrayList<Fluent> ret = new ArrayList<Fluent>();
 		for (Variable var: getVariables()) {
 			AllenInterval varInterval = ((Fluent) var).getAllenInterval();
-			if (varInterval.getEST() < taskLST ) {//&& varInterval.getLET() >= taskEST) {
-				ret.add((Fluent) var);
+			if (varInterval.getEST() < taskLST ){ //&& varInterval.getEET() > taskEST){//&& varInterval.getLET() >= taskEST) {
+				
+				// testing:
+				AllenIntervalNetworkSolver aisolver = (AllenIntervalNetworkSolver) this.constraintSolvers[1];
+//				System.out.println(taskInterval);
+//			    System.out.println(var);
+//				System.out.println(aisolver.getAdmissibleDistanceBounds(taskInterval.getStart(), varInterval.getEnd()));
+			
+				Bounds b = aisolver.getAdmissibleDistanceBounds(taskInterval.getStart(), varInterval.getEnd());
+				if (b.max > -1) 
+					ret.add((Fluent) var);
+//				
 			}
 		}
 		return ret.toArray(new Fluent[ret.size()]);
