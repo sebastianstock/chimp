@@ -42,10 +42,6 @@ public class JUnitTestTransterraDomain {
 		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		
-		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		pp.createState(fluentSolver, domain);
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		
 		try {
 			TestRACEDomain.initPlanner(planner, domain);
 		} catch (DomainParsingException e) {
@@ -53,6 +49,10 @@ public class JUnitTestTransterraDomain {
 			e.printStackTrace();
 			return;
 		}
+		
+		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+		pp.createState(fluentSolver, domain);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		planner.createInitialMeetsFutureConstraints();
 

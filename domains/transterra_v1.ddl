@@ -386,22 +386,21 @@
  (Constraint Before(s1,s2))
 )
 
-# TODO Put back in! Leads to problems with scenario1.pdl
 # case 2: robot is already near the lander
-#(:method
-# (Head get_basecamp(?robot ?camp))
-# (Type ?robot Rover)
-# (Type ?camp BaseCamp)
+(:method
+ (Head get_basecamp(?robot ?camp))
+ (Type ?robot Rover)
+ (Type ?camp BaseCamp)
  
-# (Pre p0 Attached(?camp ?lander))
-# (Type ?lander Lander)
+ (Pre p0 Attached(?camp ?lander))
+ (Type ?lander Lander)
  
-# (Pre p1 RobotAt(?robot ?area))
-# (Pre p2 RobotAt(?lander ?area))
+ (Pre p1 RobotAt(?robot ?area))
+ (Pre p2 RobotAt(?lander ?area))
 
-# (Sub s1 !pickup_basecamp(?robot ?camp))
-# (Constraint Equals(s1,task))
-#)
+ (Sub s1 !pickup_basecamp(?robot ?camp))
+ (Constraint Equals(s1,task))
+)
 
 ### Transfer all samples
 (:method

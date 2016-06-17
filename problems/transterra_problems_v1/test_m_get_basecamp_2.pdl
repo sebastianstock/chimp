@@ -21,7 +21,7 @@
 (Fluent f2 Attached(baseCamp2 lander1))
 (Constraint Release[0,0](f2))
 
-(Fluent f3 At(lander1 landingSite1))
+(Fluent f3 RobotAt(lander1 landingSite1))
 (Constraint Release[0,0](f3))
 
 (Task t0 get_basecamp(rover1 baseCamp2))

@@ -3,8 +3,8 @@ package examples;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
@@ -16,6 +16,7 @@ import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
+import externalPathPlanning.LookUpTableDurationEstimatorICO;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
 import fluentSolver.Fluent;
@@ -23,6 +24,7 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
+import htn.NewestFluentsValOH;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
@@ -35,57 +37,6 @@ import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestTransTerraProblems {
-	
-	private static String N = "n";
-	
-	public static String[][] createSymbols() {
-		String[][] symbols = new String[2][];
-		// predicates  
-		// index: 0
-		symbols[0] = new String[] {"At", "RobotAt", "Attached", "ContainerAt", "BatteryAt",
-				// operators
-				"!create_attached_fluent",
-				"!!check_empty",
-				"!move_to", "!sample_regolith", "!transfer_sample", "!transfer_battery",
-				"!transfer_payload", "!pickup_basecamp", "!tuck_arms", "!place_basecamp",
-				// methods
-				"deploy_basecamp", "take_samples", "get_basecamp",
-				"transfer_all_samples", "transfer_filled_containers", "transfer_empty_containers",
-				"transfer_charged_batteries", "transfer_discharged_batteries",
-				"rendezvous", "rendezvous_meet", "rendezvous_exchange_batteries", "rendezvous_exchange_samples",
-				"deposit_samples", "scenario_test",
-				HTNPlanner.FUTURE_STR
-				};	
-		// race:Kitchenware		
-		// index: 1, 2
-		symbols[1] = new String[] {"mug1", "mug2",
-				"nothing",
-				"rover1", "shuttle1",
-				"baseCamp1", "baseCamp2",
-				"lander1",
-				"b1", "b2", "b3", "landingSite1", "b4", "b5", "b6", "b7",
-				"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5", "sampleContainer6",
-				"payload1",
-				"batteryPayload1", "batteryPayload2",
-				"filled", "empty",
-				"charged", "discharged",
-				N};
-		return symbols;
-	}
-	
-	public static int[] createIngredients() {
-		return new int[] {1,3};
-	}
-	
-	public static Map<String, String[]> createTypesInstances() {
-		Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
-		typesInstancesMap.put("BaseCamp", new String[] {"baseCamp1", "baseCamp2"});
-		typesInstancesMap.put("SampleContainer", new String[] {"sampleContainer1", "sampleContainer2", "sampleContainer3", "sampleContainer4", "sampleContainer5"});
-		typesInstancesMap.put("Rover", new String[] {"rover1"});
-		typesInstancesMap.put("Shuttle", new String[] {"shuttle1"});
-		typesInstancesMap.put("Lander", new String[] {"lander1"});
-		return typesInstancesMap;
-	}
 	
 
 	public static void main(String[] args) {
@@ -117,35 +68,49 @@ public class TestTransTerraProblems {
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transfer_discharged.pdl");
 		
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_deposit_samples.pdl");
+//		
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transferall.pdl");
 		
-		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl"); // sometimes second parameter of move_to(shuttle1 b2) is undefined
-		
-		String[][] symbols = createSymbols();
-		int[] ingredients = createIngredients();
-		
-		Map<String, String[]> typesInstancesMap = createTypesInstances();
+		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl");
+
+		HybridDomain domain;
+		try {
+			domain = new HybridDomain("domains/transterra_v1.ddl");
+		} catch (DomainParsingException e) {
+			e.printStackTrace();
+			return;
+		}
+		int[] ingredients = new int[] {1, domain.getMaxArgs()};
+		String[][] symbols = new String[2][];
+		symbols[0] =  domain.getPredicateSymbols();
+		symbols[1] = pp.getArgumentSymbols();
+		Map<String, String[]> typesInstancesMap = pp.getTypesInstancesMap();
 		
 		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
-		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-
-		HybridDomain domain = initPlanner(planner, "domains/transterra_v1.ddl");
-
-		pp.createState(fluentSolver, domain);
 		
+		try {
+			initPlanner(planner, domain);
+		} catch (DomainParsingException e) {
+			System.out.println("Error while parsing domain: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
+
+		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
+
 		
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-		
 		MetaCSPLogging.setLevel(Level.FINEST);
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		testScheduling(planner);
 		
 		planner.createInitialMeetsFutureConstraints();
-		
 		plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();
@@ -219,9 +184,9 @@ public class TestTransTerraProblems {
 		
 		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
 		
-//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
-//		System.out.println(planner.getDescription());
+		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 		System.out.println("Finished");
 		
@@ -326,6 +291,35 @@ public class TestTransTerraProblems {
 //		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", 1, "mug1");
 //		fs.setUsage(fluents);		
 		planner.addMetaConstraint(frs);
+	}
+	
+	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
+		// load domain
+		domain.parseDomain(planner);
+		
+		// init meta constraints based on domain
+		ValueOrderingH valOH = new NewestFluentsValOH();
+//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+		
+		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
+		htnConstraint.addOperators(domain.getOperators());
+		htnConstraint.addMethods(domain.getMethods());
+		Vector<ResourceUsageTemplate> fluentResourceUsages = domain.getFluentResourceUsages();
+		htnConstraint.setResourceUsages(fluentResourceUsages);
+		
+		for (FluentScheduler fs : domain.getFluentSchedulers()) {
+			planner.addMetaConstraint(fs);
+		}
+		
+		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
+			planner.addMetaConstraint(rs);
+		}
+		
+		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimatorICO();
+		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
+		planner.addMetaConstraint(mbConstraint);
+		
+		planner.addMetaConstraint(htnConstraint);
 	}
 	
 

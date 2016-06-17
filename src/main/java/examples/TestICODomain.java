@@ -200,8 +200,8 @@ public class TestICODomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-		ValueOrderingH valOH = new NewestFluentsValOH();
-//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new NewestFluentsValOH();
+		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());

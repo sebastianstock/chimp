@@ -88,7 +88,7 @@ public class TestRACEDomain {
 //		ProblemParser pp = new ProblemParser("problems/test_m_move_object_3.pdl"); //#42
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl"); //#43
 		
-		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl"); // #0
+//		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl"); // #0
 //		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl"); //#44
 //		
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl"); //#45
@@ -98,6 +98,8 @@ public class TestRACEDomain {
 		
 	// IROS
 //		ProblemParser pp = new ProblemParser("problems/iros/iros_incremental_merging_initial.pdl");
+		
+		ProblemParser pp = new ProblemParser("tmp/iros_full.pdl"); // #0
 		
 		HybridDomain domain;
 		try {
