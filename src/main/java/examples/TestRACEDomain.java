@@ -117,10 +117,6 @@ public class TestRACEDomain {
 		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		
-		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		pp.createState(fluentSolver, domain);
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		
 		try {
 			initPlanner(planner, domain);
 		} catch (DomainParsingException e) {
@@ -128,6 +124,11 @@ public class TestRACEDomain {
 			e.printStackTrace();
 			return;
 		}
+		
+		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
+		pp.createState(fluentSolver, domain);
+		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		
 		
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
