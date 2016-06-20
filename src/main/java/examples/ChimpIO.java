@@ -123,7 +123,7 @@ public class ChimpIO {
 //		MetaCSPLogging.setLevel(Level.FINE);
 		MetaCSPLogging.setLevel(Level.OFF);
 		
-		planner.createInitialMeetsFutureConstraints();
+//		planner.createInitialMeetsFutureConstraints();
 		
 		plan(planner, fluentSolver);
 		

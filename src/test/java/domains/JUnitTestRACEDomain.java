@@ -53,8 +53,6 @@ public class JUnitTestRACEDomain {
 			e.printStackTrace();
 			return;
 		}
-		
-		planner.createInitialMeetsFutureConstraints();
 
 		assertTrue(planner.backtrack());
 		

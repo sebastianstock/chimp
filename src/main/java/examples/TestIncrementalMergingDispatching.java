@@ -71,8 +71,8 @@ public class TestIncrementalMergingDispatching {
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 //		MetaCSPLogging.setLevel(Level.INFO);
+		  
 		
-		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		// Add another task

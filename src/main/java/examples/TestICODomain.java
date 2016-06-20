@@ -96,10 +96,9 @@ public class TestICODomain {
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-		MetaCSPLogging.setLevel(Level.FINE);
-//		MetaCSPLogging.setLevel(Level.OFF);
+//		MetaCSPLogging.setLevel(Level.FINE);
+		MetaCSPLogging.setLevel(Level.OFF);
 		
-		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();

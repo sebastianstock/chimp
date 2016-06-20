@@ -28,11 +28,12 @@ public class HTNPlanner extends MetaConstraintSolver {
 
 	private static final long serialVersionUID = 8031573555691611305L;
 	public static final String FUTURE_STR = "Eternity";
+	public static final boolean MAINTAIN_ETERNITY_CONSTRAINTS = false;
 	
 	private Map<String, String[]> typesInstancesMap;
 	
 	private Map<Fluent, Constraint> meetsFutureMap;
-	private final Fluent future;
+	private Fluent future;
 	private final FluentNetworkSolver groundSolver;
 	
 	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
@@ -47,13 +48,15 @@ public class HTNPlanner extends MetaConstraintSolver {
 		logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 		// create future fluent
-		future = (Fluent)groundSolver.createVariable("Future");
-		future.setMarking(markings.JUSTIFIED);
-		future.setName(FUTURE_STR + "()");
-		AllenIntervalConstraint futureRelease = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(horizon,horizon));
-		futureRelease.setFrom(future);
-		futureRelease.setTo(future);
-		groundSolver.addConstraint(futureRelease);
+		if (MAINTAIN_ETERNITY_CONSTRAINTS) {
+			future = (Fluent)groundSolver.createVariable("Future");
+			future.setMarking(markings.JUSTIFIED);
+			future.setName(FUTURE_STR + "()");
+			AllenIntervalConstraint futureRelease = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Release, new Bounds(horizon,horizon));
+			futureRelease.setFrom(future);
+			futureRelease.setTo(future);
+			groundSolver.addConstraint(futureRelease);
+		}
 	}
 
 	@Override
@@ -113,12 +116,15 @@ public class HTNPlanner extends MetaConstraintSolver {
 					(((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
 				((FluentConstraint) c).getTo().setMarking(markings.OPEN);
 				
-				AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
-				meetsFuture.setFrom(((FluentConstraint) c).getTo());
-				meetsFuture.setTo(future);
-				additionalMeetsFuture.add(meetsFuture);
+				if (MAINTAIN_ETERNITY_CONSTRAINTS) {
+					AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+					meetsFuture.setFrom(((FluentConstraint) c).getTo());
+					meetsFuture.setTo(future);
+					additionalMeetsFuture.add(meetsFuture);
+				}
 			}
 		}
+		
 		if(additionalMeetsFuture.size() > 0) {
 			logger.fine("DEBUG: Re-Adding future constraints(RetractResolverSub): " + additionalMeetsFuture);
 			if(! groundSolver.addConstraints(additionalMeetsFuture.toArray(new Constraint[additionalMeetsFuture.size()]))) {
@@ -169,13 +175,15 @@ public class HTNPlanner extends MetaConstraintSolver {
 				metaValue.addSubstitution((VariablePrototype)v, fluent);
 				
 				// add meets future constraints for positive effects
-				if(v.getMarking().equals(markings.OPEN)) {
-					AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
-					meetsFuture.setFrom(fluent);
-					meetsFuture.setTo(future);
-//					metaValue.addConstraint(meetsFuture);  // this is done below
-					additionalMeetsFutureCons.add(meetsFuture);
-					meetsFutureMap.put(fluent, meetsFuture);
+				if (MAINTAIN_ETERNITY_CONSTRAINTS) {
+					if(v.getMarking().equals(markings.OPEN)) {
+						AllenIntervalConstraint meetsFuture = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Meets);
+						meetsFuture.setFrom(fluent);
+						meetsFuture.setTo(future);
+						//					metaValue.addConstraint(meetsFuture);  // this is done below
+						additionalMeetsFutureCons.add(meetsFuture);
+						meetsFutureMap.put(fluent, meetsFuture);
+					}
 				}
 			}
 		}
@@ -204,26 +212,31 @@ public class HTNPlanner extends MetaConstraintSolver {
 			metaValue.addConstraint(clonedConstraint);
 		}
 		
-		logger.fine("DEBUG: Adding future constraints to metaValue(AddResolverSub): " + additionalMeetsFutureCons);
-		metaValue.addConstraints(additionalMeetsFutureCons.toArray(new AllenIntervalConstraint[additionalMeetsFutureCons.size()]));
-		
+		if (MAINTAIN_ETERNITY_CONSTRAINTS) {
+			logger.fine("DEBUG: Adding future constraints to metaValue(AddResolverSub): " + additionalMeetsFutureCons);
+			metaValue.addConstraints(additionalMeetsFutureCons.toArray(new AllenIntervalConstraint[additionalMeetsFutureCons.size()]));
+		}
 		
 		// set marking of closed fluents to CLOSED and remove connection to the future
 		List<Constraint> constraintsToRemove = new ArrayList<Constraint>();
 		for (Constraint con : metaValue.getConstraints()) {
 			if (con instanceof FluentConstraint) {
 				if (((FluentConstraint) con).getType() == FluentConstraint.Type.CLOSES) {
-					((FluentConstraint) con).getTo().setMarking(markings.CLOSED);
+					((FluentConstraint) con).getTo().setMarking(markings.CLOSED); // TODO These markings are not really used and could be removed
 					Fluent to = (Fluent) ((FluentConstraint) con).getTo();
-					Constraint meetsConstraints = meetsFutureMap.remove(to);
-					constraintsToRemove.add(meetsConstraints);
+					if (MAINTAIN_ETERNITY_CONSTRAINTS) {
+						Constraint meetsConstraints = meetsFutureMap.remove(to);
+						constraintsToRemove.add(meetsConstraints);
+					}
 				}
 			}
 		}
 		
-		if (constraintsToRemove.size() > 0 ) {
-			logger.fine("DEBUG: Removing future constraints(AddResolverSub): " + constraintsToRemove);
-			this.getConstraintSolvers()[0].removeConstraints(constraintsToRemove.toArray(new Constraint[constraintsToRemove.size()]));
+		if (MAINTAIN_ETERNITY_CONSTRAINTS) {
+			if (constraintsToRemove.size() > 0 ) {
+				logger.fine("DEBUG: Removing future constraints(AddResolverSub): " + constraintsToRemove);
+				this.getConstraintSolvers()[0].removeConstraints(constraintsToRemove.toArray(new Constraint[constraintsToRemove.size()]));
+			}
 		}
 
 		

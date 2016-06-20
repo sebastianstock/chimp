@@ -59,7 +59,6 @@ public class TestIncrementalMerging {
 		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 //		MetaCSPLogging.setLevel(Level.INFO);
 		
-		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		// Add another task

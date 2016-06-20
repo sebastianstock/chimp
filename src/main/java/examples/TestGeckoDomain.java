@@ -95,7 +95,6 @@ public class TestGeckoDomain {
 		MetaCSPLogging.setLevel(Level.FINE);
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
-		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();
