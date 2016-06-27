@@ -110,7 +110,7 @@ public class TestTransTerraProblems {
 		
 //		testScheduling(planner);
 		
-		planner.createInitialMeetsFutureConstraints();
+//		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();
