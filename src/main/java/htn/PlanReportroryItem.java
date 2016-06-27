@@ -28,6 +28,9 @@ import unify.CompoundSymbolicValueConstraint;
 
 public abstract class PlanReportroryItem {
 	
+	private static int EXPAND_COUNT = 0;
+	private static long time_sum = 0;
+	
 	protected final String taskname;
 	
 	protected final HTNPrecondition[] preconditions;
@@ -205,6 +208,10 @@ public abstract class PlanReportroryItem {
 	 * @return The resulting ConstraintNetwork.
 	 */
 	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
+		long startTime = System.nanoTime();
+		long t;
+		EXPAND_COUNT++;
+//		System.out.println("ExpandCount: " + EXPAND_COUNT);
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
@@ -239,12 +246,15 @@ public abstract class PlanReportroryItem {
 			}
 		}
 		
+		long td_add = 0;
+		
 		// Create constraint networks as cartesian product of precondition constraints
 		Set<List<FluentConstraint>> combinations = Sets.cartesianProduct(fluentConstraints);
+
+//		System.out.println("combinations.size: " + combinations.size());
 		
 		// Create Constraint networks
 		for (List<FluentConstraint> comb : combinations) {
-			ConstraintNetwork cn = new ConstraintNetwork(null);
 			
 			Map<String, Fluent> preKeyToFluentMap = new HashMap<String, Fluent>();
 			Map<String, Variable> effKeyToVariableMap = new HashMap<String, Variable>();
@@ -253,21 +263,8 @@ public abstract class PlanReportroryItem {
 				effKeyToVariableMap.put(et.getKey(), et.getPrototype());
 			}
 			
-			// Add PRE and CLOSES constraints
 			for (FluentConstraint con : comb) {
-				cn.addConstraint(con);
 				preKeyToFluentMap.put(constraintToPrecondition.get(con), (Fluent) con.getFrom());
-				
-				// add closes for negative effects
-				if (con.isNegativeEffect() && this instanceof HTNOperator) {
-					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-					closes.setFrom(con.getTo());
-					closes.setTo(con.getFrom());
-					if (con.hasAdditionalConstraints()) {
-						closes.setAdditionalConstraints(con.getAdditionalConstraints());
-					}
-					cn.addConstraint(closes);
-				}
 			}
 			
 			// Analyze if values can possibly match
@@ -321,6 +318,26 @@ public abstract class PlanReportroryItem {
 			}
 			
 			if (feasibleCN) {
+				
+				// Add PRE and CLOSES constraints
+				long td1 = System.nanoTime();
+				ConstraintNetwork cn = new ConstraintNetwork(null);
+				for (FluentConstraint con : comb) {
+					cn.addConstraint(con);
+//					preKeyToFluentMap.put(constraintToPrecondition.get(con), (Fluent) con.getFrom()); // already done earlier
+					
+					// add closes for negative effects
+					if (con.isNegativeEffect() && this instanceof HTNOperator) {
+						FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+						closes.setFrom(con.getTo());
+						closes.setTo(con.getFrom());
+						if (con.hasAdditionalConstraints()) {
+							closes.setAdditionalConstraints(con.getAdditionalConstraints());
+						}
+						cn.addConstraint(closes);
+					}
+				}
+				td_add += (System.nanoTime() - td1);
 
 				// add binding constraints between preconditions or effects
 				for (Constraint con : createPreconditionsEffectsBindings(preKeyToFluentMap, effKeyToVariableMap)) {
@@ -376,6 +393,11 @@ public abstract class PlanReportroryItem {
 				logger.finest("Ommitting non-feasible CN");
 			}
 		}
+//		System.out.println("td_add = " + td_add / 1000000 + " ms");
+//		long diff = System.nanoTime() - startTime;
+//		System.out.println("Full Took "+((diff) / 1000000) + " ms"); 
+//		time_sum += diff;
+//		System.out.println("Full Took in sum "+((time_sum) / 1000000) + " ms"); 
 		return ret;		
 	}
 	

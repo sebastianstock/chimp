@@ -82,6 +82,7 @@ public class Fluent extends MultiVariable implements Activity{
 		ret.append("/");
 		ret.append(this.getMarking());
 		return ret.toString();
+//		return "";
 	}
 
 

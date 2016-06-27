@@ -88,7 +88,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		if (nw.getVariables().length > 0) {
 				ret.add(nw);
 		}
-		logger.finest("MetaVariables: " + ret);
+//		logger.finest("MetaVariables: " + ret);
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
 	}
 	
