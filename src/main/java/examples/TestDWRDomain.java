@@ -38,7 +38,10 @@ public class TestDWRDomain {
 //	static final String ProblemPath = "domains/dwr/test/test_op_leave.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_move.pdl";
-	static String ProblemPath = "domains/dwr/test/test_op_stack.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_op_stack.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_op_unstack.pdl";
+	static String ProblemPath = "domains/dwr/test/test_op_put.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_op_take.pdl";
 
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
