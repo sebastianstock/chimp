@@ -228,51 +228,63 @@ public abstract class PlanReportroiryItemParser {
 	}
 	
 	private void parseAllenIntervalConstraints() {
-				// Parse AllenIntervalConstraints:
+		// Parse AllenIntervalConstraints:
 		String[] constraintElements = HybridDomain.parseKeyword(HybridDomain.CONSTRAINT_KEYWORD, textualSpecification);
 		for (String conElement : constraintElements) {
-			String constraintName = null;
-			Vector<Bounds> bounds = null;
-			if (conElement.contains("[")) {
-				constraintName = conElement.substring(0,conElement.indexOf("[")).trim();
-				String boundsString = conElement.substring(conElement.indexOf("["),conElement.lastIndexOf("]")+1);
-				String[] splitBounds = boundsString.split("\\[");
-				bounds = new Vector<Bounds>();
-				for (String oneBound : splitBounds) {
-					if (!oneBound.trim().equals("")) {
-						String lbString = oneBound.substring(oneBound.indexOf("[")+1,oneBound.indexOf(",")).trim();
-						String ubString = oneBound.substring(oneBound.indexOf(",")+1,oneBound.indexOf("]")).trim();
-						long lb, ub;
-						if (lbString.equals("INF")) lb = org.metacsp.time.APSPSolver.INF;
-						else lb = Long.parseLong(lbString);
-						if (ubString.equals("INF")) ub = org.metacsp.time.APSPSolver.INF;
-						else ub = Long.parseLong(ubString);
-						bounds.add(new Bounds(lb,ub));
+			try {
+				String constraintName = null;
+				Vector<Bounds> bounds = null;
+				if (conElement.contains("[")) {
+					constraintName = conElement.substring(0,conElement.indexOf("[")).trim();
+					String boundsString = conElement.substring(conElement.indexOf("["),conElement.lastIndexOf("]")+1);
+					String[] splitBounds = boundsString.split("\\[");
+					bounds = new Vector<Bounds>();
+					for (String oneBound : splitBounds) {
+						if (!oneBound.trim().equals("")) {
+							String lbString = oneBound.substring(oneBound.indexOf("[")+1,oneBound.indexOf(",")).trim();
+							String ubString = oneBound.substring(oneBound.indexOf(",")+1,oneBound.indexOf("]")).trim();
+							long lb, ub;
+							if (lbString.equals("INF")) lb = org.metacsp.time.APSPSolver.INF;
+							else lb = Long.parseLong(lbString);
+							if (ubString.equals("INF")) ub = org.metacsp.time.APSPSolver.INF;
+							else ub = Long.parseLong(ubString);
+							bounds.add(new Bounds(lb,ub));
+						}
 					}
 				}
-			}
-			else {
-				constraintName = conElement.substring(0,conElement.indexOf("(")).trim();
-			}
-			String from = null;
-			String to = null;
-			String fromSeg = null;
-			if (constraintName.equals("Duration")) {
-				from = conElement.substring(conElement.indexOf("(")+1, conElement.indexOf(")")).trim();
-				to = from;
-			}
-			else {
-				fromSeg = conElement.substring(conElement.indexOf("("));
-				from = fromSeg.substring(fromSeg.indexOf("(")+1, fromSeg.indexOf(",")).trim();
-				to = fromSeg.substring(fromSeg.indexOf(",")+1, fromSeg.indexOf(")")).trim();
-			}
+				else {
+					try {
+						constraintName = conElement.substring(0,conElement.indexOf("(")).trim();
+					} catch (Exception e) {
+						System.err.println(e);
+						System.out.println(conElement);
+						throw new IllegalArgumentException();
+					}
+				}
+				String from = null;
+				String to = null;
+				String fromSeg = null;
+				if (constraintName.equals("Duration")) {
+					from = conElement.substring(conElement.indexOf("(")+1, conElement.indexOf(")")).trim();
+					to = from;
+				}
+				else {
+					fromSeg = conElement.substring(conElement.indexOf("("));
+					from = fromSeg.substring(fromSeg.indexOf("(")+1, fromSeg.indexOf(",")).trim();
+					to = fromSeg.substring(fromSeg.indexOf(",")+1, fromSeg.indexOf(")")).trim();
+				}
 
-			AllenIntervalConstraint con = null;
-			if (bounds != null) {
-				con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName),bounds.toArray(new Bounds[bounds.size()]));
+				AllenIntervalConstraint con = null;
+				if (bounds != null) {
+					con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName),bounds.toArray(new Bounds[bounds.size()]));
+				}
+				else con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName));
+				additionalAIConstraints.add(new AdditionalConstraintTemplate(con, from, to));
+			} catch (Exception e) {
+				System.err.println(e);
+				System.out.println(conElement);
+				throw new IllegalArgumentException();
 			}
-			else con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName));
-			additionalAIConstraints.add(new AdditionalConstraintTemplate(con, from, to));
 		}
 	}
 	
