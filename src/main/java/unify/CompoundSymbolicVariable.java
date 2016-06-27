@@ -243,5 +243,26 @@ public class CompoundSymbolicVariable extends MultiVariable {
 		}
 	}
 	
+	public boolean possibleArgumentsMatch(CompoundSymbolicVariable other, int[] connections) {
+		if (connections.length > 0) {
+			for (int i = 0; i < connections.length; i+=2) {
+				if ( ! possibleArgumentMatch(other, connections[i], connections[i+1])) {
+					return false;
+				}
+			}
+		}	
+		return true;
+	}
+	
+	public boolean possibleArgumentMatch(CompoundSymbolicVariable other, int from, int to) {
+		for (String symbol : getSymbolsAt(from+1)) {
+			for (String otherSymbol : other.getSymbolsAt(to+1)) {
+				if (symbol.equals(otherSymbol))
+					return true;
+			}
+		}
+		return false;
+	}
+	
 
 }

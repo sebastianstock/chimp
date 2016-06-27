@@ -25,6 +25,7 @@ import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.SubDifferentDefinition;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariable;
 
 public abstract class PlanReportroryItem {
 	
@@ -227,15 +228,21 @@ public abstract class PlanReportroryItem {
 				for (Fluent openFluent : openFluents)  {
 					String oName = openFluent.getCompoundSymbolicVariable().getPredicateName();
 					if(preName.equals(oName)) {
-						// potential match. Add PRE constraint.
-						FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE, 
-								pre.getConnections());
-						preCon.setFrom(openFluent);
-						preCon.setTo(taskFluent);
-						preCon.setNegativeEffect(pre.isNegativeEffect());
-						preCon.setAdditionalConstraints(pre.getAdditionalConstraints());
-						possiblePreconditions.add(preCon);
-						constraintToPrecondition.put(preCon, pre.getKey());
+						if (testArguments(taskFluent, pre, openFluent)) {
+//							System.out.println("true: " + taskFluent.getCompoundSymbolicVariable() + " " + openFluent.getCompoundSymbolicVariable() + " " + Arrays.toString(pre.getConnections()));
+							// potential match. Add PRE constraint.
+							FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE, 
+									pre.getConnections());
+							preCon.setFrom(openFluent);
+							preCon.setTo(taskFluent);
+							preCon.setNegativeEffect(pre.isNegativeEffect());
+							preCon.setAdditionalConstraints(pre.getAdditionalConstraints());
+							possiblePreconditions.add(preCon);
+							constraintToPrecondition.put(preCon, pre.getKey());
+						}
+//						else {
+////							System.out.println("false" + taskFluent.getCompoundSymbolicVariable() + " " + openFluent.getCompoundSymbolicVariable() + " " + Arrays.toString(pre.getConnections()));
+//						}
 					}
 				}
 				if (possiblePreconditions.size() > 0) {
@@ -252,6 +259,7 @@ public abstract class PlanReportroryItem {
 		Set<List<FluentConstraint>> combinations = Sets.cartesianProduct(fluentConstraints);
 
 //		System.out.println("combinations.size: " + combinations.size());
+//		System.out.println("Computing combinations took: " + ((System.nanoTime() - startTime) / 1000000) + " ms");
 		
 		// Create Constraint networks
 		for (List<FluentConstraint> comb : combinations) {
@@ -401,6 +409,17 @@ public abstract class PlanReportroryItem {
 		return ret;		
 	}
 	
+	private boolean testArguments(Fluent taskFluent, HTNPrecondition pre,
+			Fluent openFluent) {
+		int[] connections = pre.getConnections();
+		if (connections.length > 0) {
+			CompoundSymbolicVariable task_symb = taskFluent.getCompoundSymbolicVariable();
+			return openFluent.getCompoundSymbolicVariable().possibleArgumentsMatch(task_symb, connections);
+		}
+		
+		return true;
+	}
+
 	/**
 	 * Goes trough templates of additional constraints, creates cloned versions of the constraints and sets the variables.
 	 * @param taskFluent The fluent of the current task.
