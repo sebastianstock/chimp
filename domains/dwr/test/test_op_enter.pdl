@@ -1,0 +1,77 @@
+(Problem
+
+(ArgumentSymbols
+ r1 r2
+ d1 d2 d3 d4
+ k1 k2 k3 k4
+ c11 c12 c21 c22
+ w1 w2 w3 w4 w5 w6
+ p11 p12 p21 p22 p3 p4
+ empty free true
+ n)
+
+(Instances Robot r1 r2)
+(Instances Dock d1 d2 d3 d4)
+(Instances Crane k1 k2 k3 k4)
+(Instances Container c11 c12 c21 c22)
+(Instances Waypoint w1 w2 w3 w4 w5 w6)
+(Instances Pile p11 p12 p21 p22 p3 p4)
+
+# static fluents:
+
+(Fluent adj0 adjacent(d1 w1))
+(Fluent adj1 adjacent(d2 w2))
+(Fluent adj2 adjacent(d3 w3))
+(Fluent adj3 adjacent(d4 w4))
+(Constraint Release[0,0](adj0))
+(Constraint Release[0,0](adj1))
+(Constraint Release[0,0](adj2))
+(Constraint Release[0,0](adj3))
+#(Constraint Deadline[INF,INF](adj0))
+#(Constraint Deadline[INF,INF](adj1))
+#(Constraint Deadline[INF,INF](adj2))
+#(Constraint Deadline[INF,INF](adj3))
+
+(Fluent con0 connected(w1 w5))
+(Fluent con1 connected(w5 w1))
+(Fluent con2 connected(w2 w5))
+(Fluent con3 connected(w5 w2))
+(Fluent con4 connected(w3 w6))
+(Fluent con5 connected(w6 w3))
+(Fluent con6 connected(w4 w6))
+(Fluent con7 connected(w6 w4))
+(Fluent con8 connected(w5 w6))
+(Fluent con9 connected(w6 w5))
+(Constraint Release[0,0](con0))
+(Constraint Release[0,0](con1))
+(Constraint Release[0,0](con2))
+(Constraint Release[0,0](con3))
+(Constraint Release[0,0](con4))
+(Constraint Release[0,0](con5))
+(Constraint Release[0,0](con6))
+(Constraint Release[0,0](con7))
+(Constraint Release[0,0](con8))
+(Constraint Release[0,0](con9))
+
+(Fluent docc1 d_occupant(d1 free))
+(Fluent docc2 d_occupant(d2 free))
+(Fluent docc3 d_occupant(d3 free))
+(Fluent docc4 d_occupant(d4 r2))
+(Constraint Release[0,0](docc1))
+(Constraint Release[0,0](docc2))
+(Constraint Release[0,0](docc3))
+(Constraint Release[0,0](docc4))
+
+(Fluent rloc1 r_loc(r1 w3))
+(Fluent rloc2 r_loc(r2 d4))
+(Constraint Release[0,0](rloc1))
+(Constraint Release[0,0](rloc2))
+
+
+# tasks
+(Task t0 !enter(r1 d3 w3))
+#(Task t1 !move(r1 w3 w5))
+#(Ordering t0 t1)
+#(Constraint Before(t0,t1))
+
+)
