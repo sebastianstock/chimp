@@ -37,9 +37,18 @@
   adjacent # adjacent(dock waypoint)
   connected
   
+  
 # predicates
-  at # at(robot location)
-  occupant # occupant(dock robot)
+  r_loc       # robot is at location
+  d_occupant  # d_occupant(dock robot)
+  k_attached  # k_attached(crane dock)
+  p_ondock    # p_ondock(pile dock)
+  p_available # p_available(pile true/false)
+  k_grip      # k_grip(crane container)
+  c_in        # c_in(container pile)
+  c_on        # c_on(container container)
+  p_top       # p_top(pile container)
+  r_freight   # r_freight(robot container)
 
 # Operators:
   !leave   # !leave(robot dock waypoint) leaves a dock to a waypoint
@@ -65,7 +74,7 @@
 #(StateVariable On 1 mug1 mug2 mug3)
 (StateVariable r_loc 1 robot1 robot2 robot3)
 (StateVariable d_occupant 1 dock1 dock2 dock3)
-(StateVariable k_attached 1 container1 container2 container3)
+(StateVariable k_attached 1 crane1 crane2 crane3)
 (StateVariable p_ondock 1 pile1 pile2 pile3)
 (StateVariable p_available 1 pile1 pile2 pile3) # ASK: Why should the pile be available???
 (StateVariable k_grip 1 crane1 crane2 crane3)
@@ -89,9 +98,9 @@
  (Del p2)
  (Constraint Duration[1000,INF](task))
  (Add e1 r_loc(?robot ?waypoint))
- (Constraint BeforeOrMeets p1 e1) # TODO
+ (Constraint BeforeOrMeets(p1,e1)) # TODO
  (Add e2 d_occupant(?dock ?free))
- (Constraint Meets(p2 e2))
+ (Constraint Meets(p2,e2))
  (Values ?free free)
 )
 
@@ -106,9 +115,9 @@
  (Del p2)
  (Constraint Duration[1000,INF](task))
  (Add e1 r_loc(?robot ?dock))
- (Constraint BeforeOrMeets p1 e1)
+ (Constraint BeforeOrMeets(p1,e1))
  (Add e2 d_occupant(?dock ?robot))
- (Constraint Meets(p2 e2))
+ (Constraint Meets(p2,e2))
  (Values ?free free)
 )
 
@@ -118,16 +127,16 @@
  (Constraint Duration[1000,2000](task))
  (Pre p0 connected(?wp1 ?wp2))
  (Constraint During(task,p0))
- (Pre p1 at(?robot ?wp1))
+ (Pre p1 r_loc(?robot ?wp1))
  (Del p1)
- (Add e1 at(?robot ?wp2))
- (Constraint BeforeOrMeets p1 e1)
+ (Add e1 r_loc(?robot ?wp2))
+ (Constraint BeforeOrMeets(p1,e1))
 )
 
 # ?crane holding ?container stacks it on top of ?pile
 (:operator
  (Head !stack(?crane ?container ?pile))
- (Pre p0 k_attached(?container ?dock))
+ (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_available(?pile, ?true)) # ASK: Why should the pile be available???
  (Values ?true true)
@@ -135,21 +144,25 @@
  (Del p3)
  (Add e3 k_grip(?crane ?empty))
  (Values ?empty empty)
+ (Constraint BeforeOrMeets(p3,e3))
  (Pre p4 c_in(?container ?crane))
  (Del p4)
  (Add e4 c_in(?container ?pile))
+ (Constraint BeforeOrMeets(p4,e4)) 
  (Pre p5 c_on(?container ?empty))
  (Del p5)
  (Add e5 c_on(?container ?prevtop))
+ (Constraint BeforeOrMeets(p5,e5))
  (Pre p6 p_top(?pile ?prevtop))
  (Del p6)
  (Add e6 p_top(?pile ?container))
+ (Constraint BeforeOrMeets(p5,e6))
 )
 
 # empty ?crane unstacks ?container from ?pile
 (:operator
  (Head !unstack(?crane ?container ?pile))
- (Pre p0 k_attached(?container ?dock))
+ (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_available(?pile, ?true)) # ASK: Why should the pile be available???
  (Values ?true true)
@@ -215,10 +228,10 @@
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_top(?pile ?container))
  (Pre p3 r_lock(?robot ?dock))
- (Constraint During(task p3))
+ (Constraint During(task,p3))
  (Pre p4 p_available(?pile ?true))
  (Values ?true true)
- (Constraint During(task p4))
+ (Constraint During(task,p4))
  (Sub s1 !unstack(?crane ?container ?robot))
  (Sub s2 !put(?crane ?container ?robot))
  (Constraint BeforeOrMeets(s1,s2)) # TODO BEFOREORMEETS
@@ -232,10 +245,10 @@
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 c_in(?container ?robot))
  (Pre p3 r_lock(?robot ?dock))
- (Constraint During(task p3))
+ (Constraint During(task,p3))
  (Pre p4 p_available(?pile ?true))
  (Values ?true true)
- (Constraint During(task p4))
+ (Constraint During(task,p4))
  (Sub s1 !take(?crane ?container ?robot))
  (Sub s2 !stack(?crane ?container ?pile))
  (Constraint BeforeOrMeets(s1,s2)) # TODO BEFOREORMEETS
@@ -261,8 +274,8 @@
  (Pre p5 p_available(?pile ?true))
  (Pre p6 p_available(?otherp ?true))
  (Values ?true true)
- (Sub s1 unstack(?crane ?prevtop ?pile))
- (Sub s2 stack(?crane ?prevtop ?otherp))
+ (Sub s1 !unstack(?crane ?prevtop ?pile))
+ (Sub s2 !stack(?crane ?prevtop ?otherp))
  (Sub s3 uncover(?container ?pile))
  (Constraint BeforeOrMeets(s1,s2))
  (Constraint BeforeOrMeets(s2,s3))
@@ -283,7 +296,7 @@
  (VarDifferent ?wp2 ?wp3)
  (Sub s1 !move(?robot ?wp1 ?wp3))
  (Sub s2 navigate(?robot ?wp3 ?wp2))
- (Constraint BeforeOrMeets(s1 s2))
+ (Constraint BeforeOrMeets(s1,s2))
  (Ordering s1 s2)
 )
 
@@ -291,6 +304,7 @@
 (:method
  (Head goto(?robot ?dock))
  (Pre p0 r_loc(?robot ?dock))
+)
 
 (:method
  (Head goto(?robot ?dock))
@@ -311,7 +325,7 @@
 (:method
  (Head bring(?container ?pile))
  (Pre p0 c_in(?container ?pile))
- (Constraint During(task p0))
+ (Constraint During(task,p0))
  (Constraint Duration[1,1](task))
 )
 
