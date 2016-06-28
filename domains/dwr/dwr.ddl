@@ -139,7 +139,7 @@
  (Constraint Duration[10000,INF](task))
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
- (Pre p2 p_available(?pile, ?true)) # ASK: Why should the pile be available???
+ (Pre p2 p_available(?pile ?true)) # ASK: Why should the pile be available???
  (Values ?true true)
  (Pre p3 k_grip(?crane ?container))
  (Del p3)
@@ -166,7 +166,7 @@
  (Constraint Duration[10000,INF](task)) 
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
- (Pre p2 p_available(?pile, ?true)) # ASK: Why should the pile be available???
+ (Pre p2 p_available(?pile ?true)) # ASK: Why should the pile be available???
  (Values ?true true)
  (Pre p3 k_grip(?crane ?empty))
  (Del p3)
@@ -177,7 +177,6 @@
  (Add e4 c_in(?container ?crane))
  (Pre p5 c_on(?container ?nextop))
  (Del p5)
- (Values ?empty empty)
  (Add e5 c_on(?container ?empty))
  (Pre p6 p_top(?pile ?container))
  (Del p6)
