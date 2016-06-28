@@ -90,13 +90,13 @@
 # leave a dock
 (:operator
  (Head !leave(?robot ?dock ?waypoint))
+ (Constraint Duration[10000,INF](task))
  (Pre p0 adjacent(?dock ?waypoint))
  (Constraint During(task,p0))
  (Pre p1 r_loc(?robot ?dock))
  (Del p1)
  (Pre p2 d_occupant(?dock ?robot))
  (Del p2)
- (Constraint Duration[1000,INF](task))
  (Add e1 r_loc(?robot ?waypoint))
  (Constraint BeforeOrMeets(p1,e1)) # TODO
  (Add e2 d_occupant(?dock ?free))
@@ -107,13 +107,13 @@
 # enter a dock
 (:operator
  (Head !enter(?robot ?dock ?waypoint))
+ (Constraint Duration[20000,INF](task))
  (Pre p0 adjacent(?dock ?waypoint))
  (Constraint During(task,p0))
  (Pre p1 r_loc(?robot ?waypoint))
  (Del p1)
  (Pre p2 d_occupant(?dock ?free))
  (Del p2)
- (Constraint Duration[10000,INF](task))
  (Add e1 r_loc(?robot ?dock))
  (Constraint BeforeOrMeets(p1,e1))
  (Add e2 d_occupant(?dock ?robot))
@@ -136,6 +136,7 @@
 # ?crane holding ?container stacks it on top of ?pile
 (:operator
  (Head !stack(?crane ?container ?pile))
+ (Constraint Duration[10000,INF](task))
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_available(?pile, ?true)) # ASK: Why should the pile be available???
@@ -162,6 +163,7 @@
 # empty ?crane unstacks ?container from ?pile
 (:operator
  (Head !unstack(?crane ?container ?pile))
+ (Constraint Duration[10000,INF](task)) 
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_available(?pile, ?true)) # ASK: Why should the pile be available???
@@ -185,6 +187,7 @@
 # ?crane holding ?conrainer puts it on ?robot which was empty
 (:operator
  (Head !put(?crane ?container ?robot))
+ (Constraint Duration[10000,INF](task))
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 k_grip(?crane ?container))
  (Del p1)
@@ -203,6 +206,7 @@
 # empty ?crane takes ?conrainer from ?robot
 (:operator
  (Head !take(?crane ?container ?robot))
+ (Constraint Duration[10000,INF](task))
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 k_grip(?crane ?empty))
  (Del p1)
@@ -298,7 +302,7 @@
  (Sub s2 navigate(?robot ?wp3 ?wp2))
  (Constraint BeforeOrMeets(s1,s2))
  (Ordering s1 s2)
- (Constraint Duration[1,40000](task))
+ (Constraint Duration[1,20000](task))
 )
 
 # ?robot goes to ?dock

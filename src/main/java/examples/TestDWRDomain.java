@@ -54,7 +54,8 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_bring1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
 	
-	static String ProblemPath = "domains/dwr/dwr_problem0.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_problem_straight-connected.pdl";
+	static String ProblemPath = "domains/dwr/example/dwr_bring2_faster_without_ordering.pdl";
 
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
