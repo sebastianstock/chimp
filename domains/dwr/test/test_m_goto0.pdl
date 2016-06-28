@@ -97,14 +97,14 @@
 
 (Fluent docc1 d_occupant(d1 free))
 (Fluent docc2 d_occupant(d2 free))
-(Fluent docc3 d_occupant(d3 r1))
+(Fluent docc3 d_occupant(d3 free))
 (Fluent docc4 d_occupant(d4 r2))
 (Constraint Release[0,0](docc1))
 (Constraint Release[0,0](docc2))
 (Constraint Release[0,0](docc3))
 (Constraint Release[0,0](docc4))
 
-(Fluent rloc1 r_loc(r1 d3))
+(Fluent rloc1 r_loc(r1 w3))
 (Fluent rloc2 r_loc(r2 d4))
 (Constraint Release[0,0](rloc1))
 (Constraint Release[0,0](rloc2))
@@ -147,14 +147,6 @@
 
 
 # tasks
-#(Task t0 goto(r1 d1))
-#(Task t0 !leave(r1 d3 w3))
-#(Task t1 navigate(r1 w3 w1))
-(Task t1 !move(r1 w3 w5))
-#(Ordering t0 t1)
-#(Constraint Before(t0,t1))
-
-#(Task t0 bring(c11 p3))
-#(Task t1 bring(c21 p4))
+(Task t0 goto(r2 d4))
 
 )

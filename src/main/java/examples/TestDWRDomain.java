@@ -40,8 +40,19 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_op_move.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_stack.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_unstack.pdl";
-	static String ProblemPath = "domains/dwr/test/test_op_put.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_op_put.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_take.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_load.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_unload.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_uncover0.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_uncover1.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_navigate0.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_navigate1.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_goto0.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_goto1.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_bring0.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_bring1.pdl";
+	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
 
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
@@ -103,6 +114,10 @@ public class TestDWRDomain {
 				opCount++;
 			} else if (component.equals("Task")) {
 				mCount++;
+			}
+			
+			if (var.getMarking() == markings.OPEN) {
+				System.out.println(var);
 			}
 		}
 		System.out.println("#Ops: " + opCount);

@@ -147,14 +147,6 @@
 
 
 # tasks
-#(Task t0 goto(r1 d1))
-#(Task t0 !leave(r1 d3 w3))
-#(Task t1 navigate(r1 w3 w1))
-(Task t1 !move(r1 w3 w5))
-#(Ordering t0 t1)
-#(Constraint Before(t0,t1))
-
-#(Task t0 bring(c11 p3))
-#(Task t1 bring(c21 p4))
+(Task t0 bring(c11 p11))
 
 )

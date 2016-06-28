@@ -113,7 +113,7 @@
  (Del p1)
  (Pre p2 d_occupant(?dock ?free))
  (Del p2)
- (Constraint Duration[1000,INF](task))
+ (Constraint Duration[10000,INF](task))
  (Add e1 r_loc(?robot ?dock))
  (Constraint BeforeOrMeets(p1,e1))
  (Add e2 d_occupant(?dock ?robot))
@@ -124,7 +124,7 @@
 # move from waypoint1 to waypoint2
 (:operator
  (Head !move(?robot ?wp1 ?wp2))
- (Constraint Duration[1000,2000](task))
+ (Constraint Duration[10000,20000](task))
  (Pre p0 connected(?wp1 ?wp2))
  (Constraint During(task,p0))
  (Pre p1 r_loc(?robot ?wp1))
@@ -227,14 +227,14 @@
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_top(?pile ?container))
- (Pre p3 r_lock(?robot ?dock))
+ (Pre p3 r_loc(?robot ?dock))
  (Constraint During(task,p3))
  (Pre p4 p_available(?pile ?true))
  (Values ?true true)
  (Constraint During(task,p4))
- (Sub s1 !unstack(?crane ?container ?robot))
+ (Sub s1 !unstack(?crane ?container ?pile))
  (Sub s2 !put(?crane ?container ?robot))
- (Constraint BeforeOrMeets(s1,s2)) # TODO BEFOREORMEETS
+ (Constraint BeforeOrMeets(s1,s2))
  (Ordering s1 s2)
 )
 
@@ -244,14 +244,14 @@
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 c_in(?container ?robot))
- (Pre p3 r_lock(?robot ?dock))
+ (Pre p3 r_loc(?robot ?dock))
  (Constraint During(task,p3))
  (Pre p4 p_available(?pile ?true))
  (Values ?true true)
  (Constraint During(task,p4))
  (Sub s1 !take(?crane ?container ?robot))
  (Sub s2 !stack(?crane ?container ?pile))
- (Constraint BeforeOrMeets(s1,s2)) # TODO BEFOREORMEETS
+ (Constraint BeforeOrMeets(s1,s2))
  (Ordering s1 s2)
 )
 
@@ -298,6 +298,7 @@
  (Sub s2 navigate(?robot ?wp3 ?wp2))
  (Constraint BeforeOrMeets(s1,s2))
  (Ordering s1 s2)
+ (Constraint Duration[1,40000](task))
 )
 
 # ?robot goes to ?dock
@@ -322,6 +323,7 @@
 )
 
 # bring ?container to ?pile
+# already there
 (:method
  (Head bring(?container ?pile))
  (Pre p0 c_in(?container ?pile))
@@ -329,6 +331,7 @@
  (Constraint Duration[1,1](task))
 )
 
+# alredy at correct dock
 (:method
  (Head bring(?container ?pile))
  (Pre p0 k_attached(?crane ?dock))
@@ -348,10 +351,11 @@
  (Ordering s2 s3)
 )
 
+# bring to other dock
 (:method
  (Head bring(?container ?pile))
- (Pre p0 p_ondock(?pile ?fromdock))
- (Pre p1 p_ondock(?otherp ?todock))
+ (Pre p0 p_ondock(?pile ?todock))
+ (Pre p1 p_ondock(?otherp ?fromdock))
  (VarDifferent ?fromdock ?todock)
  (Pre p2 c_in(?container ?otherp))
  (Pre p3 p_available(?pile ?true))
@@ -366,7 +370,7 @@
  (Constraint BeforeOrMeets(s2,s3))
  (Constraint BeforeOrMeets(s3,s4))
  (Constraint BeforeOrMeets(s4,s5))
- (Ordering s1 s2)
+ (Ordering s1 s3)
  (Ordering s2 s3)
  (Ordering s3 s4)
  (Ordering s4 s5)
