@@ -153,6 +153,6 @@
 #(Task t0 bring(c12 p4))
 (Task t1 bring(c22 p3))
 #(Ordering t0 t1)  # This example is faster without ordering!!!
-(Constraint Deadline[1,200000](t1))
+#(Constraint Deadline[1,200001](t1))
 
 )

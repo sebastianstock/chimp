@@ -46,7 +46,7 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_unload.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_uncover0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_uncover1.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_navigate0.pdl";
+	static String ProblemPath = "domains/dwr/test/test_m_navigate0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_navigate1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_goto0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_goto1.pdl";
@@ -55,7 +55,7 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
 	
 //	static String ProblemPath = "domains/dwr/dwr_problem_straight-connected.pdl";
-	static String ProblemPath = "domains/dwr/example/dwr_bring2_faster_without_ordering.pdl";
+//	static String ProblemPath = "domains/dwr/example/dwr_bring2_faster_without_ordering.pdl";
 
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
@@ -119,9 +119,9 @@ public class TestDWRDomain {
 				mCount++;
 			}
 			
-			if (var.getMarking() == markings.OPEN) {
-				System.out.println(var);
-			}
+//			if (var.getMarking() == markings.OPEN) {
+//				System.out.println(var);
+//			}
 		}
 		System.out.println("#Ops: " + opCount);
 		System.out.println("#Compound Tasks: " + mCount);

@@ -24,6 +24,9 @@ import resourceFluent.ResourceUsageTemplate;
 
 public class HTNMetaConstraint extends MetaConstraint {
 	
+	private static final boolean DEBUG = true;
+	private static int applicationCNT = 1;
+	
 	private static final long serialVersionUID = 4546697317217126280L;
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
 	private final Vector<PlanReportroryItem> methods =new Vector<PlanReportroryItem>();
@@ -89,6 +92,10 @@ public class HTNMetaConstraint extends MetaConstraint {
 				ret.add(nw);
 		}
 //		logger.finest("MetaVariables: " + ret);
+		if (DEBUG) {
+			System.out.println("getMetaVariables-Invocation: " + applicationCNT++);
+			System.out.println("  Meta-Variables: " + ret);
+		}
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
 	}
 	
@@ -140,6 +147,23 @@ public class HTNMetaConstraint extends MetaConstraint {
 		long endTime = System.nanoTime();
 		logger.finest("Computed metaValues for " + problematicNetwork.getVariables().length + " tasks");
 		logger.finest("Found " + ret.size() + " metaValues");
+		if (DEBUG) {
+			System.out.println("  Found " + ret.size() + " metaValues");
+			if(applicationCNT == 2) {
+				for (int i = 0; i < ret.size(); i++) {
+//					System.out.println(ret.get(i));
+					ConstraintNetwork cn = ret.get(i);
+					System.out.println("Constraints: ");
+					for (int j = 0; j < cn.getConstraints().length; j++) {
+						System.out.println(cn.getConstraints()[j]);
+						System.out.println("");
+					}
+					System.out.println("###");
+				}
+				
+			}
+			
+		}
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
 		
 		if (!ret.isEmpty()) 
