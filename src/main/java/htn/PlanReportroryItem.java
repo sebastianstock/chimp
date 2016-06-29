@@ -362,8 +362,12 @@ public abstract class PlanReportroryItem {
 					cn.addConstraint(aCon);
 				}
 				
-				for (Constraint con : createSubDifferents(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
-					cn.addConstraint(con);
+				try {
+					for (Constraint con : createSubDifferents(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+						cn.addConstraint(con);
+					}
+				} catch (IllegalStateException e) {
+					continue;
 				}
 				
 				// add VALUERESTRICTION constraints for task, preconditions and effects
@@ -563,6 +567,11 @@ public abstract class PlanReportroryItem {
 							effKeyToVariableMap);
 						// Create SUBMATCHES constraint
 						int[] connections = new int[] {fromIndex, toEntry.getValue().intValue()};
+						if (fromVar instanceof CompoundSymbolicVariable && toVar instanceof CompoundSymbolicVariable) {
+ 							if (! ((CompoundSymbolicVariable) fromVar).possibleArgumentDifferent((CompoundSymbolicVariable) toVar, connections[0], connections[1])) {
+								throw new IllegalStateException();
+							}
+						}
 						CompoundSymbolicValueConstraint scon = new CompoundSymbolicValueConstraint(
 								CompoundSymbolicValueConstraint.Type.SUBDIFFERENT, 
 								connections);
