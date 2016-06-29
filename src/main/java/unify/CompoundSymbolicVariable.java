@@ -263,6 +263,19 @@ public class CompoundSymbolicVariable extends MultiVariable {
 		}
 		return false;
 	}
+
+	public boolean possibleArgumentDifferent(CompoundSymbolicVariable toVar,
+			int fromId, int toId) {
+		// at the moment we only check if both variables are ground
+		String[] fromSymbols = this.getSymbolsAt(fromId+1);
+		String[] toSymbols = toVar.getSymbolsAt(toId+1);
+		if (fromSymbols.length != 1 || toSymbols.length != 1)
+			return true;
+		if (fromSymbols[0] == toSymbols[0])
+			return false;
+		else
+			return true;
+	}
 	
 
 }
