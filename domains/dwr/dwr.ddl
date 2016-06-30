@@ -130,7 +130,7 @@
  (Pre p1 r_loc(?robot ?wp1))
  (Del p1)
  (Add e1 r_loc(?robot ?wp2))
- (Constraint BeforeOrMeets(p1,e1))
+ (Constraint Meets(p1,e1))
 )
 
 # ?crane holding ?container stacks it on top of ?pile
@@ -301,7 +301,7 @@
  (Sub s2 navigate(?robot ?wp3 ?wp2))
  (Constraint BeforeOrMeets(s1,s2))
  (Ordering s1 s2)
- (Constraint Duration[1,20000](task))
+ (Constraint Duration[1,30000](task))
 )
 
 # ?robot goes to ?dock
