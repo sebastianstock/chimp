@@ -47,7 +47,7 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_uncover0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_uncover1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_navigate0.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_navigate1.pdl";
+	static String ProblemPath = "domains/dwr/test/test_m_navigate1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_goto0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_goto1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring0.pdl";
@@ -61,7 +61,9 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/example/dwr_leave-enter.pdl";
 //	static String ProblemPath = "domains/dwr/example/dwr_robot_bring.pdl";
 //	static String ProblemPath = "domains/dwr/example/dwr_leave_state_scheduling.pdl";
-	static String ProblemPath = "domains/dwr/example/test_state_scheduling_simple.pdl";
+//	static String ProblemPath = "domains/dwr/example/test_state_scheduling_simple.pdl";
+	
+//	static String ProblemPath = "domains/dwr/feature_testing/test_same_negative_effects.pdl";
 
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
@@ -74,8 +76,8 @@ public class TestDWRDomain {
 		HybridDomain domain;
 		try {
 //			domain = new HybridDomain("domains/dwr/dwr_minduration.ddl");
-//			domain = new HybridDomain("domains/dwr/dwr.ddl");
-			domain = new HybridDomain("domains/dwr/dwr_state_scheduling.ddl");
+			domain = new HybridDomain("domains/dwr/dwr.ddl");
+//			domain = new HybridDomain("domains/dwr/dwr_state_scheduling.ddl");
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
 			return;
