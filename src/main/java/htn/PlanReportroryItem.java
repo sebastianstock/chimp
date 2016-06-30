@@ -22,12 +22,15 @@ import com.google.common.collect.Sets;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.SubDifferentDefinition;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
 public abstract class PlanReportroryItem {
+	
+	private static final boolean MULT_ACTION_NEG_EFFECT = false;
 	
 	private static int EXPAND_COUNT = 0;
 	private static long time_sum = 0;
@@ -229,6 +232,16 @@ public abstract class PlanReportroryItem {
 					String oName = openFluent.getCompoundSymbolicVariable().getPredicateName();
 					if(preName.equals(oName)) {
 						if (testArguments(taskFluent, pre, openFluent)) {
+							/// For negative effects the fluent should not be closed
+							if (!MULT_ACTION_NEG_EFFECT) {
+								if (pre.isNegativeEffect()) {
+									if (openFluent.getMarking() == markings.CLOSED) {
+//										System.out.println("Fluent is already closed");
+										continue;
+									}
+								}
+							}
+							
 //							System.out.println("true: " + taskFluent.getCompoundSymbolicVariable() + " " + openFluent.getCompoundSymbolicVariable() + " " + Arrays.toString(pre.getConnections()));
 							// potential match. Add PRE constraint.
 							FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE, 
@@ -332,7 +345,6 @@ public abstract class PlanReportroryItem {
 				ConstraintNetwork cn = new ConstraintNetwork(null);
 				for (FluentConstraint con : comb) {
 					cn.addConstraint(con);
-//					preKeyToFluentMap.put(constraintToPrecondition.get(con), (Fluent) con.getFrom()); // already done earlier
 					
 					// add closes for negative effects
 					if (con.isNegativeEffect() && this instanceof HTNOperator) {
