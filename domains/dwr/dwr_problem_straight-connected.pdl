@@ -142,16 +142,11 @@
 (Constraint Release[0,0](pt4))
 
 
-# tasks
-#(Task t0 goto(r1 d1))
-#(Task t0 !leave(r1 d3 w3))
-#(Task t1 navigate(r1 w3 w1))
-#(Task t1 !move(r1 w3 w5))
-#(Ordering t0 t1)
-#(Constraint Before(t0,t1))
+# tasks:
 
-(Task t0 bring(c12 p4))
-(Task t1 bring(c22 p11))
-#(Ordering t0 t1)  # This example is faster without ordering!!!
+(Task t0 bring(c12 p3))
+#(Constraint Deadline[0,150000](t0))
+(Task t1 bring(c22 p4))
+#(Constraint Deadline[0,150000](t1))
 
 )
