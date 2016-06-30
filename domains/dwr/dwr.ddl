@@ -69,17 +69,16 @@
 )
 
 # TODO DEFINE RESOURCES and STATEVARIABLES
-#(Resource armManCapacity 1)
-(StateVariable r_loc 1 robot1 robot2 robot3)
-(StateVariable d_occupant 1 dock1 dock2 dock3)
-(StateVariable k_attached 1 crane1 crane2 crane3)
-(StateVariable p_ondock 1 pile1 pile2 pile3)
-(StateVariable p_available 1 pile1 pile2 pile3)
-(StateVariable k_grip 1 crane1 crane2 crane3)
-(StateVariable c_in 1 container1 container2 container3)
-(StateVariable c_on 1 container1 container2 container3)
-(StateVariable p_top 1 pile1 pile2 pile3)
-(StateVariable r_freight 1 robot1 robot2 robot3)
+(StateVariable r_loc 1 r1 r2)
+(StateVariable d_occupant 1 d1 d2 d3 d4)
+(StateVariable k_attached 1 k1 k2 k3 k4)
+(StateVariable p_ondock 1 p11 p12 p21 p22 p3 p4)
+(StateVariable p_available 1 p11 p12 p21 p22 p3 p4)
+(StateVariable k_grip 1 k1 k2 k3 k4)
+(StateVariable c_in 1 c11 c12 c21 c22)
+(StateVariable c_on 1 c11 c12 c21 c22)
+(StateVariable p_top 1 p11 p12 p21 p22 p3 p4)
+(StateVariable r_freight 1 r1 r2)
 
 
 ################################
