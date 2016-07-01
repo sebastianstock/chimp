@@ -156,7 +156,7 @@
 
 (Task t0 bring(c12 p4))
 #(Task t0 bring(c12 p21))
-#(Task t1 bring(c22 p3))
+(Task t1 bring(c22 p3))
 #(Ordering t0 t1)
 
 )
