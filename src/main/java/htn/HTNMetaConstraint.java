@@ -32,7 +32,10 @@ public class HTNMetaConstraint extends MetaConstraint {
 
 	//false if we split up HTN algorithm into 3 meta constraints, 
 	// true if we apply preonditions and effects at the same time.
-	private boolean oneShot; 
+	private boolean oneShot;
+	
+	// try to unify tasks with planned tasks?
+	private boolean tryUnification = false;; 
 
 	public HTNMetaConstraint() {
 		this(true);
@@ -129,10 +132,14 @@ public class HTNMetaConstraint extends MetaConstraint {
 		for (Variable var : problematicNetwork.getVariables()) {
 			Fluent taskFluent = (Fluent) var;
 			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
-				ret.addAll(unifyTasks(taskFluent, groundSolver));
+				if (tryUnification) {
+					ret.addAll(unifyTasks(taskFluent, groundSolver));
+				}
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, operators, groundSolver));
 			} else {
+				if (tryUnification) {
 				ret.addAll(unifyTasks(taskFluent, groundSolver));
+				}
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, methods, groundSolver));
 			}
 		}
@@ -363,6 +370,13 @@ public class HTNMetaConstraint extends MetaConstraint {
 			l.add(rt);
 		}
 		return ret;
+	}
+
+	/**
+	 * With this option set it tries to unify tasks to already planned tasks. (Turned off by default.)
+	 */
+	public void enableUnification() {
+		this.tryUnification = true;	
 	}
 
 }
