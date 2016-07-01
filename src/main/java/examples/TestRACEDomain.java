@@ -243,6 +243,7 @@ public class TestRACEDomain {
 		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
+		htnConstraint.enableUnification();
 		htnConstraint.addOperators(domain.getOperators());
 		htnConstraint.addMethods(domain.getMethods());
 		Vector<ResourceUsageTemplate> fluentResourceUsages = domain.getFluentResourceUsages();
