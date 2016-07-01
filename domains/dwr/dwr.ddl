@@ -51,24 +51,24 @@
   r_freight   # r_freight(robot container)
 
 # Operators:
-  !leave   # !leave(robot dock waypoint) leaves a dock to a waypoint
-  !enter   # !enter(robot dock waypoint) enters a dock from a waypoint
-  !move    # !move(robot waypoint waypoint)
-  !stack   # ?crane holding ?container stacks it on top of ?pile
-  !unstack # empty ?crane unstacks ?container from ?pile
-  !put     # ?crane holding ?conrainer puts it on ?robot which was empty
-  !take    # empty ?crane takes ?conrainer from ?robot
+  !leave      # !leave(robot dock waypoint) leaves a dock to a waypoint
+  !enter      # !enter(robot dock waypoint) enters a dock from a waypoint
+  !move       # !move(robot waypoint waypoint)
+  !stack      # ?crane holding ?container stacks it on top of ?pile
+  !unstack    # empty ?crane unstacks ?container from ?pile
+  !put        # ?crane holding ?conrainer puts it on ?robot which was empty
+  !take       # empty ?crane takes ?conrainer from ?robot
 
 # Methods
-  load     # load ?container from ?pile onto ?robot
-  unload   # unload ?container from ?robot onto ?pile
-  uncover  # ?container in ?pile is rearranged onto the top of ?pile
-  navigate # ?robot navigates between two waypoints
-  goto     # ?robot goes to ?dock
-  bring    # bring ?container to ?pile
+  load        # load ?container from ?pile onto ?robot
+  unload      # unload ?container from ?robot onto ?pile
+  uncover     # ?container in ?pile is rearranged onto the top of ?pile
+  navigate    # ?robot navigates between two waypoints
+  goto        # ?robot goes to ?dock
+  bring       # bring ?container to ?pile
+  robot_bring # robot brings container to pile
 )
 
-# TODO DEFINE RESOURCES and STATEVARIABLES
 (StateVariable r_loc 1 r1 r2)
 (StateVariable d_occupant 1 d1 d2 d3 d4)
 (StateVariable k_attached 1 k1 k2 k3 k4)
@@ -80,6 +80,7 @@
 (StateVariable p_top 1 p11 p12 p21 p22 p3 p4)
 (StateVariable r_freight 1 r1 r2)
 
+# TODO DEFINE RESOURCES
 
 ################################
 ####  OPERATORS ################
@@ -364,6 +365,60 @@
 # bring to other dock
 (:method
  (Head bring(?container ?pile))
+ (Pre p0 p_ondock(?pile ?todock))
+ (Pre p1 p_ondock(?otherp ?fromdock))
+ (VarDifferent ?fromdock ?todock)
+ (Pre p2 c_in(?container ?otherp))
+ (Pre p3 p_available(?pile ?true))
+ (Values ?true true)
+ (Pre p4 p_available(?otherp ?true))
+ (Sub s1 goto(?robot ?fromdock))
+ (Sub s2 uncover(?container ?otherp))
+ (Sub s3 load(?container ?robot ?otherp))
+ (Sub s4 goto(?robot ?todock))
+ (Sub s5 unload(?container ?robot ?pile))
+ (Constraint BeforeOrMeets(s1,s3))
+ (Constraint BeforeOrMeets(s2,s3))
+ (Constraint BeforeOrMeets(s3,s4))
+ (Constraint BeforeOrMeets(s4,s5))
+ (Ordering s1 s2)
+ (Ordering s2 s3)
+ (Ordering s3 s4)
+ (Ordering s4 s5)
+)
+
+# bring ?container to ?pile with robot
+# already there
+(:method
+ (Head robot_bring(?robot ?container ?pile))
+ (Pre p0 c_in(?container ?pile))
+ (Constraint During(task,p0))
+ (Constraint Duration[1,1](task))
+)
+
+# alredy at correct dock
+(:method
+ (Head robot_bring(?robot ?container ?pile))
+ (Pre p0 k_attached(?crane ?dock))
+ (Pre p1 p_ondock(?pile ?dock))
+ (Pre p2 p_ondock(?otherp ?dock))
+ (VarDifferent ?pile ?otherp)
+ (Pre p3 c_in(?container ?otherp))
+ (Pre p4 p_available(?pile ?true))
+ (Pre p5 p_available(?otherp ?true))
+ (Values ?true true)
+ (Sub s1 uncover(?container ?otherp))
+ (Sub s2 !unstack(?crane ?container ?otherp))
+ (Sub s3 !stack(?crane ?container ?pile))
+ (Constraint BeforeOrMeets(s1,s2))
+ (Constraint BeforeOrMeets(s2,s3))
+ (Ordering s1 s2)
+ (Ordering s2 s3)
+)
+
+# bring to other dock
+(:method
+ (Head robot_bring(?robot ?container ?pile))
  (Pre p0 p_ondock(?pile ?todock))
  (Pre p1 p_ondock(?otherp ?fromdock))
  (VarDifferent ?fromdock ?todock)
