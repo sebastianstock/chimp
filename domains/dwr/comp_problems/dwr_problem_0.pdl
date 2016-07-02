@@ -49,6 +49,16 @@
 (Constraint Release[0,0](con8))
 (Constraint Release[0,0](con9))
 
+(Fluent con10 connected(w1 w3))
+(Fluent con11 connected(w3 w1))
+(Fluent con12 connected(w2 w4))
+(Fluent con13 connected(w4 w2))
+(Constraint Release[0,0](con10))
+(Constraint Release[0,0](con11))
+(Constraint Release[0,0](con12))
+(Constraint Release[0,0](con13))
+
+
 (Fluent kat1 k_attached(k1 d1))
 (Fluent kat2 k_attached(k2 d2))
 (Fluent kat3 k_attached(k3 d3))
@@ -147,8 +157,8 @@
 
 
 # tasks
-(Task t0 bring(c11 p4))
-(Task t1 bring(c21 p3))
+(Task t0 robot_bring(r1 c11 p3))
+(Task t1 robot_bring(r2 c21 p4))
 #(Ordering t0 t1)
 
 )

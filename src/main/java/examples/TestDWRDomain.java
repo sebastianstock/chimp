@@ -56,24 +56,24 @@ public class TestDWRDomain {
 	
 	// simplified version that combines w5 and w6 into one waypoint: tasks: bring(c12 p4) and bring(c22 p3)
 	// problematic that it tries r2 for both examples and runs into a deadend -> takes about 13 seconds
-	static String ProblemPath = "domains/dwr/dwr_problem_straight-connected.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_problem_straight-connected.pdl"; 
 //	static String ProblemPath = "domains/dwr/example/dwr_bring2_faster_without_ordering.pdl";
 //	static String ProblemPath = "domains/dwr/example/dwr_goto2.pdl";
 //	static String ProblemPath = "domains/dwr/example/dwr_switch_places.pdl";
 //	static String ProblemPath = "domains/dwr/example/dwr_leave-enter.pdl";
 //	static String ProblemPath = "domains/dwr/example/dwr_robot_bring.pdl";
-//	static String ProblemPath = "domains/dwr/example/dwr_leave_state_scheduling.pdl";
-//	static String ProblemPath = "domains/dwr/example/test_state_scheduling_simple.pdl";
 	
-//	static String ProblemPath = "domains/dwr/feature_testing/test_same_negative_effects.pdl";
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_simple.pdl"; // runs into a trap -> 30 seconds runtime
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_2.pdl";
+	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";
 
 	public static void main(String[] args) {
-		Scanner s = new Scanner(System.in);
+//		Scanner s = new Scanner(System.in);
 //		System.out.println(s.nextInt());
 		
 		ProblemParser pp = new ProblemParser(ProblemPath);
-		
-//		ProblemParser pp = new ProblemParser("domains/dwr/dwr_problem0.pdl");
 		
 		HybridDomain domain;
 		try {
