@@ -54,15 +54,6 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_bring1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
 	
-	// simplified version that combines w5 and w6 into one waypoint: tasks: bring(c12 p4) and bring(c22 p3)
-	// problematic that it tries r2 for both examples and runs into a deadend -> takes about 13 seconds
-//	static String ProblemPath = "domains/dwr/dwr_problem_straight-connected.pdl"; 
-//	static String ProblemPath = "domains/dwr/example/dwr_bring2_faster_without_ordering.pdl";
-//	static String ProblemPath = "domains/dwr/example/dwr_goto2.pdl";
-//	static String ProblemPath = "domains/dwr/example/dwr_switch_places.pdl";
-//	static String ProblemPath = "domains/dwr/example/dwr_leave-enter.pdl";
-//	static String ProblemPath = "domains/dwr/example/dwr_robot_bring.pdl";
-	
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_simple.pdl"; // runs into a trap -> 30 seconds runtime
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
