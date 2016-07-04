@@ -58,7 +58,7 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_2.pdl";
-	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";
+	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";  
 
 	public static void main(String[] args) {
 //		Scanner s = new Scanner(System.in);
@@ -68,9 +68,8 @@ public class TestDWRDomain {
 		
 		HybridDomain domain;
 		try {
-//			domain = new HybridDomain("domains/dwr/dwr_minduration.ddl");
-			domain = new HybridDomain("domains/dwr/dwr.ddl");
-//			domain = new HybridDomain("domains/dwr/dwr_state_scheduling.ddl");
+//			domain = new HybridDomain("domains/dwr/dwr.ddl");
+			domain = new HybridDomain("domains/dwr/dwr_resources.ddl");
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
 			return;
