@@ -8,6 +8,7 @@ import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
+import htn.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariable;
 
 public class Fluent extends MultiVariable implements Activity{
@@ -67,20 +68,21 @@ public class Fluent extends MultiVariable implements Activity{
 	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder();
-		ret.append(this.getComponent());
+//		ret.append(this.getComponent());
 		ret.append("(");
 		ret.append(this.getID());
-		ret.append(")::<");
+		ret.append(")::");
 		ret.append(this.getInternalVariables()[0].toString());
-		ret.append(">U<");
-		ret.append(this.getInternalVariables()[1].toString());
-		ret.append(">");
-//		if (this.getMarking() == markings.UNIFIED) {
-//			ret.append("/");
-//			ret.append(this.getMarking());
-//		}
-		ret.append("/");
-		ret.append(this.getMarking());
+//		ret.append(">U<");
+		ret.append(this.getAllenInterval().getDomain());
+//		ret.append(this.getInternalVariables()[1].toString());
+//		ret.append(">");
+		if (this.getMarking() == markings.UNIFIED) {
+			ret.append("/");
+			ret.append(this.getMarking());
+		}
+//		ret.append("/");
+//		ret.append(this.getMarking());
 		return ret.toString();
 //		return "";
 	}
