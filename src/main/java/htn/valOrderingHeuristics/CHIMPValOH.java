@@ -1,4 +1,4 @@
-package htn;
+package htn.valOrderingHeuristics;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -9,41 +9,14 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentConstraint.Type;
 
 /**
- * Compare based on
- * 1. prefer unification
- * 3. prefer fewer subtasks
- * 3. prefer planned task with earlier start time
- * 4. prefer newest precondition bindings
+ * Basic class for different value ordering heuristics.
  * 
  * @author Sebastian Stock
  */
-public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
-
-	@Override
-	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {
-		int matchesChecking = checkMatches(cn0, cn1);
-		if (matchesChecking != 0) {
-			return matchesChecking;
-		}
-		
-		int subtasksChecking = countSubtasks(cn0) - countSubtasks(cn1);
-		if (subtasksChecking != 0) {
-			return subtasksChecking;
-		}
-		
-		long est0 = getPlannedTask(cn0).getAllenInterval().getEST();
-		long est1 = getPlannedTask(cn1).getAllenInterval().getEST();
-		if (est0 == est1) {
-			return comparePreconditions(cn0, cn1);
-		} else if (est0 < est1) {
-			return -1;
-		} else {
-			return 1;
-		}	
-	}
+public abstract class CHIMPValOH extends ValueOrderingH {
 
 	
-	private int countSubtasks(ConstraintNetwork cn) {
+	protected int countSubtasks(ConstraintNetwork cn) {
 		int ret = 0;
 		for (Constraint con : cn.getConstraints()) {
 			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.DC) {
@@ -54,7 +27,7 @@ public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
 		
 	}
 	
-	private int checkMatches(ConstraintNetwork cn0, ConstraintNetwork cn1) {
+	protected int checkMatches(ConstraintNetwork cn0, ConstraintNetwork cn1) {
 		FluentConstraint m0 = searchMatches(cn0);
 		FluentConstraint m1 = searchMatches(cn1);
 		if (m0 == null) {
@@ -72,7 +45,7 @@ public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
 		}
 	}
 	
-	private FluentConstraint searchMatches(ConstraintNetwork cn) {
+	protected FluentConstraint searchMatches(ConstraintNetwork cn) {
 		for (Constraint con : cn.getConstraints()) {
 			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.MATCHES) {
 				return (FluentConstraint) con;
@@ -81,7 +54,7 @@ public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
 		return null;
 	}
 	
-	private int comparePreconditions(ConstraintNetwork cn0, ConstraintNetwork cn1) {
+	protected int comparePreconditions(ConstraintNetwork cn0, ConstraintNetwork cn1) {
 		long cn0ESTSum = calcPreconditionESTSum(cn0);
 		long cn1ESTSum = calcPreconditionESTSum(cn1);
 
@@ -108,7 +81,7 @@ public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
 		}
 	}
 	
-	private Fluent getPlannedTask(ConstraintNetwork cn) {
+	protected Fluent getPlannedTask(ConstraintNetwork cn) {
 		for (Constraint con : cn.getConstraints()) {
 			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
 				return (Fluent) ((FluentConstraint) con).getFrom();
@@ -117,7 +90,7 @@ public class UnifyFewestsubsNewestbindingsValOH extends ValueOrderingH {
 		return null;
 	}
 	
-	private long calcPreconditionESTSum(ConstraintNetwork cn) {
+	protected long calcPreconditionESTSum(ConstraintNetwork cn) {
 		long sum = 0;
 		for(Constraint con : cn.getConstraints()) {
 

@@ -25,7 +25,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
-import htn.UnifyFewestsubsNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
