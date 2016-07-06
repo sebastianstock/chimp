@@ -137,7 +137,28 @@ public class CompoundSymbolicVariable extends MultiVariable {
 			String varStr = internalvars[i].toString();
 			if(varStr.length() > 0 && ! varStr.equals(NONESYMBOL) ) {
 				ret.append(" ");
-				ret.append(internalvars[i].toString());
+				ret.append(varStr);
+			} else {
+				break;
+			}
+			
+		}
+		ret.append(")");
+		return ret.toString();
+	}
+	
+	public String getShortName() {
+		Variable[] internalvars = this.getInternalVariables();
+		StringBuilder ret = new StringBuilder(internalvars[0].toString());
+		ret.append("(");
+		if (internalvars.length > 1 && ((NameVariable) internalvars[1]).toStringShort().length() > 0) {
+			ret.append(((NameVariable) internalvars[1]).toStringShort());
+		}
+		for (int i = 2; i < internalvars.length; i++) {
+			String varStr = ((NameVariable) internalvars[i]).toStringShort();
+			if(varStr.length() > 0 && ! varStr.equals(NONESYMBOL) ) {
+				ret.append(" ");
+				ret.append(varStr);
 			} else {
 				break;
 			}

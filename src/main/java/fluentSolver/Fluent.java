@@ -72,7 +72,8 @@ public class Fluent extends MultiVariable implements Activity{
 		ret.append("(");
 		ret.append(this.getID());
 		ret.append(")::");
-		ret.append(this.getInternalVariables()[0].toString());
+//		ret.append(this.getInternalVariables()[0].toString());
+		ret.append(((CompoundSymbolicVariable) this.getInternalVariables()[0]).getShortName());
 //		ret.append(">U<");
 		ret.append(this.getAllenInterval().getDomain());
 //		ret.append(this.getInternalVariables()[1].toString());

@@ -66,6 +66,15 @@ public class NameVariable extends Variable {
 		}
 	}
 	
+	public String toStringShort() {
+		String[] possibleSymbols = getPossibleSymbols();
+		if (possibleSymbols.length == 1) {
+			return possibleSymbols[0];
+		} else {
+			return "{...}";
+		}
+	}
+	
 	public boolean isGround() {
 		return domain.isGround();
 	}
