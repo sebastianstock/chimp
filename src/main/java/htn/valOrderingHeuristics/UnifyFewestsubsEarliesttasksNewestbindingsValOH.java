@@ -11,7 +11,7 @@ import org.metacsp.framework.ConstraintNetwork;
  * 
  * @author Sebastian Stock
  */
-public class UnifyFewestsubsNewestbindingsValOH extends CHIMPValOH {
+public class UnifyFewestsubsEarliesttasksNewestbindingsValOH extends CHIMPValOH {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {

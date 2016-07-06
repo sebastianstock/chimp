@@ -22,7 +22,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
-import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
@@ -198,7 +198,7 @@ public class TestGeckoDomain {
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());
