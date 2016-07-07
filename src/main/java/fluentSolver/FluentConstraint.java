@@ -35,6 +35,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	private String axiom;
 	private ResourceUsageTemplate resourceIndicator;
 	private Vector<AdditionalConstraintTemplate> additionalConstraints;
+	private int depth; // depth of the task in the decomposition tree (only set for UNARYAPPLIED
+	private boolean depthIsSet = false;
 
 	public FluentConstraint(Type type) {
 		this.type = type;
@@ -217,6 +219,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		ret.axiom = this.axiom;
 		ret.resourceIndicator = this.resourceIndicator;
 		ret.additionalConstraints = this.additionalConstraints;
+		ret.depth = this.depth;
+		ret.depthIsSet = this.depthIsSet;
 		return ret;
 	}
 
@@ -286,6 +290,19 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	
 	public boolean hasAdditionalConstraints() {
 		return additionalConstraints.size() > 0;
+	}
+
+	public int getDepth() throws IllegalAccessException {
+		if (this.depthIsSet) {
+			return depth;
+		} else {
+			throw new IllegalAccessException("Depth has not been set");
+		}
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
+		this.depthIsSet = true;
 	}
 
 }

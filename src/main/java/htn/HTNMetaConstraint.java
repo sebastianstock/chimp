@@ -215,6 +215,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 					new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED);
 			applicationCon.setFrom(task);
 			applicationCon.setTo(task);
+//			applicationCon.setDepth(depth);
 			cn.addConstraint(applicationCon);
 			ret.add(cn);
 		}
@@ -257,6 +258,22 @@ public class HTNMetaConstraint extends MetaConstraint {
 
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
 			Vector<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
+		
+		/// Extract depth:
+		int depth = 0;
+		List<FluentConstraint> inDC = groundSolver.getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.DC);
+		if (inDC.size() > 0) {
+			Fluent from = (Fluent) inDC.get(0).getFrom();
+			List<FluentConstraint> inUA = groundSolver.getFluentConstraintsOfTypeFrom(from, FluentConstraint.Type.UNARYAPPLIED);
+			if (inUA.size() > 0) {
+				try {
+					depth = inUA.get(0).getDepth() + 1;
+				} catch (IllegalAccessException e) {
+					logger.severe("Depth has not been set for UNARYAPPLIED");
+				}
+			}
+		}
+		
 //		Fluent[] openFluents;
 //		if (fl.getComponent().equals("Activity")) {
 //			openFluents = groundSolver.getOpenFluents();
@@ -272,7 +289,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 				
 				logger.finest("Applying preconditions of PlanReportroryItem " + item);
 				if (this.oneShot) {
-					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, groundSolver, openFluents);
+					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, depth, groundSolver, openFluents);
 					ret.addAll(newResolvers);
 				} else {
 					ret.add(item.expandPreconditions(fl, groundSolver));

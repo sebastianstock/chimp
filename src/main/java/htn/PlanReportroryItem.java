@@ -211,7 +211,7 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return The resulting ConstraintNetwork.
 	 */
-	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
+	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
 		long startTime = System.nanoTime();
 		long t;
 		EXPAND_COUNT++;
@@ -392,6 +392,7 @@ public abstract class PlanReportroryItem {
 						new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, this);
 				applicationCon.setFrom(taskFluent);
 				applicationCon.setTo(taskFluent);
+				applicationCon.setDepth(depth);
 				cn.addConstraint(applicationCon);
 
 				// Add constraints for DURATION

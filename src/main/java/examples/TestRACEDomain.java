@@ -22,6 +22,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
@@ -240,7 +241,8 @@ public class TestRACEDomain {
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.enableUnification();

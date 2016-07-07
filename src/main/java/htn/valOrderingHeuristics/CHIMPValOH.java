@@ -15,6 +15,15 @@ import fluentSolver.FluentConstraint.Type;
  */
 public abstract class CHIMPValOH extends ValueOrderingH {
 
+	protected FluentConstraint getPlanned(ConstraintNetwork cn) {
+		for (Constraint con : cn.getConstraints()) {
+			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
+				return (FluentConstraint) con;
+			}
+		}
+		return null;
+		
+	}
 	
 	protected int countSubtasks(ConstraintNetwork cn) {
 		int ret = 0;
@@ -88,6 +97,28 @@ public abstract class CHIMPValOH extends ValueOrderingH {
 			}
 		}
 		return null;
+	}
+	
+	protected FluentConstraint getUnaryApplied(ConstraintNetwork cn) {
+		for (Constraint con : cn.getConstraints()) {
+			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
+				return (FluentConstraint) con;
+			}
+		}
+		return null;
+	}
+	
+	protected int getTaskDepth(ConstraintNetwork cn) {
+		FluentConstraint ua = getUnaryApplied(cn);
+		if (ua != null) {
+			try {
+				return ua.getDepth();
+			} catch (IllegalAccessException e) {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
 	}
 	
 	protected long calcPreconditionESTSum(ConstraintNetwork cn) {
