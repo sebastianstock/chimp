@@ -31,9 +31,9 @@ public class HTNOperator extends PlanReportroryItem {
 
 	
 	public HTNOperator(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
-			EffectTemplate[] effects) {
+			EffectTemplate[] effects, int preferenceWeight) {
 		
-		super(taskname, arguments, preconditions, effects);
+		super(taskname, arguments, preconditions, effects, preferenceWeight);
 
 		this.logger = MetaCSPLogging.getLogger(HTNOperator.class);
 	}

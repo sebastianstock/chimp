@@ -27,7 +27,8 @@ public class MethodParser extends PlanReportroiryItemParser {
 		String headname = HybridDomain.extractName(head);
 		EffectTemplate[] subtasks = createEffectTemplates("Task", HybridDomain.SUBTASK_KEYWORD);
 		Constraint[] orderingCons = parseFluentBeforeConstraints(subtasks);
-		HTNMethod ret = new HTNMethod(headname, argStrings, preconditions, subtasks, orderingCons);
+		int preferenceWeight = parsePreferenceWeight();
+		HTNMethod ret = new HTNMethod(headname, argStrings, preconditions, subtasks, orderingCons, preferenceWeight);
 		ret.setVariableOccurrencesMap(variableOccurrencesMap);
 		
 		// add additional constraints from head to head or between preconditions or effects

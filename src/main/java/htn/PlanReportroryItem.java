@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
@@ -35,7 +36,11 @@ public abstract class PlanReportroryItem {
 	private static int EXPAND_COUNT = 0;
 	private static long time_sum = 0;
 	
+	static final AtomicInteger NEXT_ID = new AtomicInteger(0);
+    final int id = NEXT_ID.getAndIncrement();
+	
 	protected final String taskname;
+	protected final int preferenceWeight;
 	
 	protected final HTNPrecondition[] preconditions;
 
@@ -61,11 +66,12 @@ public abstract class PlanReportroryItem {
 			new ArrayList<ResourceUsageTemplate>();
 	
 	public PlanReportroryItem(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
-			EffectTemplate[] effects) {
+			EffectTemplate[] effects, int preferenceWeight) {
 		this.taskname = taskname;
 		this.arguments = arguments;
 		this.preconditions = preconditions;
 		this.effects = effects;
+		this.preferenceWeight = preferenceWeight;
 	}
 	
 	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
@@ -719,6 +725,14 @@ public abstract class PlanReportroryItem {
 	 */
 	public void setDurationBounds(Bounds durationBounds) {
 		this.durationBounds = durationBounds;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public int getPreferenceWeight() {
+		return preferenceWeight;
 	}
 
 }

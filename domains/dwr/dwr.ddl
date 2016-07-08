@@ -295,13 +295,13 @@
 )
 
 # ?robot navigates between two waypoints
-(:method
+(:method 10
  (Head navigate(?robot ?wp1 ?wp2))
  (Pre p0 connected(?wp1 ?wp2))
  (Sub s1 !move(?robot ?wp1 ?wp2))
 )
 
-(:method
+(:method 0
  (Head navigate(?robot ?wp1 ?wp2))
  (Pre p0 connected(?wp1 ?wp3))
  (VarDifferent ?wp2 ?wp3)

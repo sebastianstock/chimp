@@ -22,9 +22,9 @@ public class HTNMethod extends PlanReportroryItem {
 
 	
 	public HTNMethod(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
-			EffectTemplate[] effects, Constraint[] constraints) {
+			EffectTemplate[] effects, Constraint[] constraints, int preferenceWeight) {
 		
-		super(taskname, arguments, preconditions, effects);
+		super(taskname, arguments, preconditions, effects, preferenceWeight);
 		this.constraints = constraints;
 	}
 	

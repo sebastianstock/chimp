@@ -66,7 +66,7 @@ public class TestFluentNetworkSolver {
 		logger.info("Added fcon21? " + solver.addConstraint(fcon21));
 		
 		
-		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new HTNMethod(null, null, null, null, null));
+		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new HTNMethod(null, null, null, null, null, 0));
 		fcon11.setFrom(fluents[1]);
 		fcon11.setTo(fluents[1]);
 		logger.info("Added fcon11? " + solver.addConstraint(fcon11));

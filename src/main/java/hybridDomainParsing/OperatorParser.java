@@ -20,7 +20,8 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		
 		String headname = HybridDomain.extractName(head);
 		EffectTemplate[] effects = createEffectTemplates("PlannedState", HybridDomain.EFFECT_KEYWORD);
-		HTNOperator op =  new HTNOperator(headname, argStrings, preconditions, effects);
+		int preferenceWeight = parsePreferenceWeight();
+		HTNOperator op =  new HTNOperator(headname, argStrings, preconditions, effects, preferenceWeight);
 		op.setVariableOccurrencesMap(variableOccurrencesMap);
 		
 		// add additional constraints from head to head or between preconditions or effects

@@ -40,7 +40,6 @@ public abstract class PlanReportroiryItemParser {
 	public PlanReportroiryItemParser(String textualSpecification, HTNPlanner planner, 
 			int maxArs) {
 		this.textualSpecification = textualSpecification;
-		
 		this.planner = planner;
 		this.groundSolver = (FluentNetworkSolver) planner.getConstraintSolvers()[0];
 		this.maxArgs = maxArs;
@@ -225,6 +224,16 @@ public abstract class PlanReportroiryItemParser {
 			ret[i++] = createEffectTemplate(component, e.getKey(), e.getValue());
 		}
 		return ret;
+	}
+	
+	protected int parsePreferenceWeight() {
+		
+		String[] splitStr = textualSpecification.split("\\s+");
+		try {
+			return Integer.parseInt(splitStr[0]);
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 	
 	private void parseAllenIntervalConstraints() {
