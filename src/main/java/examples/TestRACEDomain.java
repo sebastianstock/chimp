@@ -22,8 +22,13 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
+import htn.valOrderingHeuristics.DeepestWeightNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyNewestFluentsValOH;
+import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
@@ -240,9 +245,13 @@ public class TestRACEDomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-//		ValueOrderingH valOH = new NewestFluentsValOH();
+		ValueOrderingH valOH = new UnifyNewestFluentsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
-		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.enableUnification();
