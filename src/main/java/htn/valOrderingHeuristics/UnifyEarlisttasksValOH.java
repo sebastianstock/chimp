@@ -2,7 +2,7 @@ package htn.valOrderingHeuristics;
 
 import org.metacsp.framework.ConstraintNetwork;
 
-public class UnifyNewestFluentsValOH extends CHIMPValOH {
+public class UnifyEarlisttasksValOH extends CHIMPValOH {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {

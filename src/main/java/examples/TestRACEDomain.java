@@ -25,7 +25,7 @@ import htn.TaskApplicationMetaConstraint.markings;
 import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestWeightNewestbindingsValOH;
-import htn.valOrderingHeuristics.UnifyNewestFluentsValOH;
+import htn.valOrderingHeuristics.UnifyEarlisttasksValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
@@ -245,7 +245,7 @@ public class TestRACEDomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-		ValueOrderingH valOH = new UnifyNewestFluentsValOH();
+		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
