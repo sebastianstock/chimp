@@ -98,6 +98,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 		if (DEBUG) {
 			System.out.println("getMetaVariables-Invocation: " + applicationCNT++);
 			System.out.println("  Meta-Variables: " + ret);
+//			if (applicationCNT == 300) {
+//				ret.clear();
+//			}
 		}
 		return ret.toArray(new ConstraintNetwork[ret.size()]);
 	}
@@ -156,19 +159,19 @@ public class HTNMetaConstraint extends MetaConstraint {
 		logger.finest("Found " + ret.size() + " metaValues");
 		if (DEBUG) {
 			System.out.println("  Found " + ret.size() + " metaValues");
-			if(applicationCNT == 2) {
-				for (int i = 0; i < ret.size(); i++) {
-//					System.out.println(ret.get(i));
-					ConstraintNetwork cn = ret.get(i);
-					System.out.println("Constraints: ");
-					for (int j = 0; j < cn.getConstraints().length; j++) {
-						System.out.println(cn.getConstraints()[j]);
-						System.out.println("");
-					}
-					System.out.println("###");
-				}
-				
-			}
+//			if(applicationCNT == 47) {
+//				for (int i = 0; i < ret.size(); i++) {
+////					System.out.println(ret.get(i));
+//					ConstraintNetwork cn = ret.get(i);
+//					System.out.println("Constraints: ");
+//					for (int j = 0; j < cn.getConstraints().length; j++) {
+//						System.out.println(cn.getConstraints()[j]);
+//						System.out.println("");
+//					}
+//					System.out.println("###");
+//				}
+//				
+//			}
 			
 		}
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");

@@ -6,7 +6,8 @@ import htn.PlanReportroryItem;
 
 /**
  * 1. Deepest Tasks
- * 2. Newest Bindings
+ * 2. Preference Weight
+ * 3. Newest Bindings
  * @author Sebastian Stock
  *
  */
