@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -103,6 +104,9 @@ public class TestRACEDomain {
 //		ProblemParser pp = new ProblemParser("problems/test_scenario_3_2_3.pdl"); //#43
 		
 		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_1.pdl"); // #0
+		
+//		ProblemParser pp = new ProblemParser("problems/race_testing/move_multiple.pdl"); // #0
+		
 //		ProblemParser pp = new ProblemParser("problems/test_m_serve_coffee_problem_2_fromtable.pdl"); //#44
 //		
 //		ProblemParser pp = new ProblemParser("problems/test_m_get_object_w_arm_debug1.pdl"); //#45
@@ -181,6 +185,17 @@ public class TestRACEDomain {
 		System.out.println("#Compound Tasks: " + mCount);
 		System.out.println("#Fluents: " + fluentSolver.getVariables().length);
 		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
+		
+		System.out.println("---------------------------------------");
+		// print number of applied meta values per metaconstraint:
+		System.out.println("Tried MetaValues: ");
+		int sum = 0;
+		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
+			System.out.println(entry);
+			sum += entry.getValue();
+		}
+		System.out.println("Sum: " + sum);
+		System.out.println("---------------------------------------");
 
 		
 //		System.out.println("---------------------------------------");
@@ -276,13 +291,13 @@ public class TestRACEDomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
+//		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
-//		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.enableUnification();
