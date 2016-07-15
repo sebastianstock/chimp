@@ -24,6 +24,8 @@ import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
+import htn.valOrderingHeuristics.DeepestWeightNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
@@ -218,6 +220,7 @@ public class TestDWRDomain {
 //		ValueOrderingH valOH = new DFSValOH();
 //		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());
