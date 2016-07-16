@@ -37,7 +37,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 public class TestDWRDomain {
 	
 //	static final String ProblemPath = "domains/dwr/test/test_op_leave.pdl";
-	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_move.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_stack.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_unstack.pdl";
@@ -53,7 +53,7 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_goto1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring1.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
+	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
 	
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_simple.pdl"; // runs into a trap -> 30 seconds runtime
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
@@ -230,9 +230,9 @@ public class TestDWRDomain {
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 //		ValueOrderingH valOH = new DFSValOH();
-//		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
+		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
 		
