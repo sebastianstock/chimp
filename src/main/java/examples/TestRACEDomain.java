@@ -11,6 +11,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
+import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
@@ -159,6 +160,12 @@ public class TestRACEDomain {
 				opCount++;
 			} else if (component.equals("Task")) {
 				mCount++;
+			}
+		}
+		
+		for (MetaConstraint mcon : planner.getMetaConstraints()) {
+			if (mcon instanceof HTNMetaConstraint) {
+				System.out.println("#getMetaVariables-Invocations: " + ((HTNMetaConstraint) mcon).getVarsCNT);
 			}
 		}
 		System.out.println("#Ops: " + opCount);

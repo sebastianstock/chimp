@@ -11,6 +11,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
+import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
@@ -98,7 +99,7 @@ public class TestDWRDomain {
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.FINE);
+//		MetaCSPLogging.setLevel(Level.INFO);
 		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		planner.createInitialMeetsFutureConstraints();
@@ -123,6 +124,12 @@ public class TestDWRDomain {
 //			if (var.getMarking() == markings.OPEN) {
 //				System.out.println(var);
 //			}
+		}
+		
+		for (MetaConstraint mcon : planner.getMetaConstraints()) {
+			if (mcon instanceof HTNMetaConstraint) {
+				System.out.println("#getMetaVariables-Invocations: " + ((HTNMetaConstraint) mcon).getVarsCNT);
+			}
 		}
 		System.out.println("#Ops: " + opCount);
 		System.out.println("#Compound Tasks: " + mCount);
