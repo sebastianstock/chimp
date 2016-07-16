@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
@@ -36,7 +37,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 public class TestDWRDomain {
 	
 //	static final String ProblemPath = "domains/dwr/test/test_op_leave.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
+	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_move.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_stack.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_unstack.pdl";
@@ -58,7 +59,7 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_2.pdl";
-	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";  
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";  
 
 	public static void main(String[] args) {
 //		Scanner s = new Scanner(System.in);
@@ -137,6 +138,16 @@ public class TestDWRDomain {
 		System.out.println("#Compound Tasks: " + mCount);
 		System.out.println("#Fluents: " + fluentSolver.getVariables().length);
 		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
+		System.out.println("---------------------------------------");
+		// print number of applied meta values per metaconstraint:
+		System.out.println("Tried MetaValues: ");
+		int sum = 0;
+		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
+			System.out.println(entry);
+			sum += entry.getValue();
+		}
+		System.out.println("Sum: " + sum);
+		System.out.println("---------------------------------------");
 
 		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
 		Arrays.sort(planVector, new Comparator<Variable>() {
