@@ -376,6 +376,7 @@
 # bring to other dock
 (:method
  (Head bring(?container ?pile))
+ (Type ?robot Robot)
  (Pre p0 p_ondock(?pile ?todock))
  (Pre p1 p_ondock(?otherp ?fromdock))
  (VarDifferent ?fromdock ?todock)
@@ -402,6 +403,7 @@
 # already there
 (:method
  (Head robot_bring(?robot ?container ?pile))
+ (Type ?robot Robot)
  (Pre p0 c_in(?container ?pile))
  (Constraint During(task,p0))
  (Constraint Duration[1,1](task))
@@ -410,6 +412,7 @@
 # alredy at correct dock
 (:method
  (Head robot_bring(?robot ?container ?pile))
+ (Type ?robot Robot)
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
  (Pre p2 p_ondock(?otherp ?dock))
@@ -430,6 +433,7 @@
 # bring to other dock
 (:method
  (Head robot_bring(?robot ?container ?pile))
+ (Type ?robot Robot)
  (Pre p0 p_ondock(?pile ?todock))
  (Pre p1 p_ondock(?otherp ?fromdock))
  (VarDifferent ?fromdock ?todock)
