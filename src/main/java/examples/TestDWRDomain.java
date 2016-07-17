@@ -10,9 +10,11 @@ import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
+import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dwr.DWRNavigationMetaConstraint;
@@ -63,11 +65,11 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_2.pdl";
-	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c23.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c21.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
-//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
+	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
 	
 	private static boolean PRINT_PLAN = false;
 	
@@ -111,13 +113,14 @@ public class TestDWRDomain {
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
+		MetaCSPLogging.setLevel(Level.OFF);
 		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
+		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		MetaCSPLogging.setLevel(ConstraintSolver.class, Level.FINE);
 
-		MetaCSPLogging.setLevel(Level.INFO);
+
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);
-//		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		planner.createInitialMeetsFutureConstraints();
 		double planning_time = plan(planner, fluentSolver);
