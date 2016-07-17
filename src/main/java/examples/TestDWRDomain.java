@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
@@ -24,7 +24,11 @@ import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.guessOrdering.GuessOrderingMetaConstraint;
 import htn.guessOrdering.GuessOrderingValOH;
+import htn.valOrderingHeuristics.ShallowFewestsubsNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
@@ -53,15 +57,25 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/test/test_m_goto1.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring0.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_m_bring1.pdl";
-	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
+//	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
 	
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_simple.pdl"; // runs into a trap -> 30 seconds runtime
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_2.pdl";
-//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";  
-
+	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c23.pdl"; 
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c21.pdl"; 
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
+	
+	private static boolean PRINT_PLAN = false;
+	
 	public static void main(String[] args) {
+		plan_dwr(args);
+	}
+
+	public static double plan_dwr(String[] args) {
 //		Scanner s = new Scanner(System.in);
 //		System.out.println(s.nextInt());
 		
@@ -74,7 +88,7 @@ public class TestDWRDomain {
 			domain = new HybridDomain("domains/dwr/dwr_resources2.ddl");
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
-			return;
+			return 0;
 		}
 		int[] ingredients = new int[] {1, domain.getMaxArgs()};
 		String[][] symbols = new String[2][];
@@ -90,7 +104,7 @@ public class TestDWRDomain {
 		} catch (DomainParsingException e) {
 			System.out.println("Error while parsing domain: " + e.getMessage());
 			e.printStackTrace();
-			return;
+			return 0;
 		}
 		
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
@@ -106,7 +120,7 @@ public class TestDWRDomain {
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		planner.createInitialMeetsFutureConstraints();
-		plan(planner, fluentSolver);
+		double planning_time = plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();
 		ArrayList<Variable> plan = new ArrayList<Variable>();
@@ -149,39 +163,39 @@ public class TestDWRDomain {
 		System.out.println("Sum: " + sum);
 		System.out.println("---------------------------------------");
 
-		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
-		Arrays.sort(planVector, new Comparator<Variable>() {
-			@Override
-			public int compare(Variable o1, Variable o2) {
-				// TODO Auto-generated method stub
-				Fluent f1 = (Fluent)o1;
-				Fluent f2 = (Fluent)o2;
-				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+		if (PRINT_PLAN) {
+			Variable[] planVector = plan.toArray(new Variable[plan.size()]);
+			Arrays.sort(planVector, new Comparator<Variable>() {
+				@Override
+				public int compare(Variable o1, Variable o2) {
+					// TODO Auto-generated method stub
+					Fluent f1 = (Fluent)o1;
+					Fluent f2 = (Fluent)o2;
+					return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+				}
+			});
+
+			int c = 0;
+			for (Variable act : planVector) {
+				if (act.getComponent() != null)
+					System.out.println(c++ +".\t" + act);	
 			}
-		});
-		
-		int c = 0;
-		for (Variable act : planVector) {
-			if (act.getComponent() != null)
-				System.out.println(c++ +".\t" + act);	
+
+			extractPlan(fluentSolver);
 		}
 		
-		extractPlan(fluentSolver);
-		
 		////////////////
+		return planning_time;
 		
 	}
 	
-	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {
+	public static double plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		long startTime = System.nanoTime();
 		boolean result = planner.backtrack();
 		long endTime = System.nanoTime();
 		System.out.println("Found a plan? " + result);
-		
-
-		planner.draw();
 		
 		ConstraintNetwork cn = new ConstraintNetwork(null);
 		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
@@ -195,12 +209,11 @@ public class TestDWRDomain {
 				}
 			}
 		}
-		ConstraintNetwork.draw(cn);
 		
-		
-		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-		
-		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		planner.draw();
+//		ConstraintNetwork.draw(cn);
+//		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
+//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
 //		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
@@ -215,7 +228,7 @@ public class TestDWRDomain {
 //		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
 //		System.out.println("Finished");
 		
-		return result;
+		return (endTime - startTime) / 1000000;
 	}
 	
 	public static void extractPlan(FluentNetworkSolver fluentSolver) {
@@ -229,12 +242,15 @@ public class TestDWRDomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-//		ValueOrderingH valOH = new NewestFluentsValOH();
-//		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
-//		ValueOrderingH valOH = new DFSValOH();
 		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestNewestbindingsValOH(); // not working
+//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();	
+//		ValueOrderingH valOH = new ShallowFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyEarlisttasksValOH(); // not working
+//		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
-//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
+//		ValueOrderingH valOH = new UnifyWeightNewestbindingsValOH();	
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());

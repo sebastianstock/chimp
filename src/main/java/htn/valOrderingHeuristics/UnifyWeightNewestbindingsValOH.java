@@ -10,7 +10,7 @@ import htn.PlanReportroryItem;
  * @author Sebastian Stock
  *
  */
-public class UnifyHighestWeightNewestbindingsValOH extends CHIMPValOH {
+public class UnifyWeightNewestbindingsValOH extends CHIMPValOH {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {
@@ -19,18 +19,18 @@ public class UnifyHighestWeightNewestbindingsValOH extends CHIMPValOH {
 			return matchesChecking;
 		}
 		
-		int checkDepth = getTaskDepth(cn1) - getTaskDepth(cn0); // prefer deeper task
-		if (checkDepth != 0) {
-			return checkDepth;
-		}
+//		int checkDepth = getTaskDepth(cn1) - getTaskDepth(cn0); // prefer deeper task
+//		if (checkDepth != 0) {
+//			return checkDepth;
+//		}
 		
 		PlanReportroryItem pi0 = getUnaryApplied(cn0).getPlannedWith();
 		PlanReportroryItem pi1 = getUnaryApplied(cn1).getPlannedWith();
 		if (pi0 != null && pi1 != null) {
 			int w0 = pi0.getPreferenceWeight();
 			int w1 = pi1.getPreferenceWeight();
-			if (w0 != 0 || w1 != 0) 
-				System.out.println("Diff " + "PI0: " + pi0 + " PI1: " + pi1);
+//			if (w0 != 0 || w1 != 0) 
+//				System.out.println("Diff " + "PI0: " + pi0 + " PI1: " + pi1);
 			int weightComp = w1 - w0;
 			if (weightComp != 0) {
 				return weightComp;
