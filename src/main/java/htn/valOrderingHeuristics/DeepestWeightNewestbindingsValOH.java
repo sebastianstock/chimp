@@ -25,8 +25,8 @@ public class DeepestWeightNewestbindingsValOH extends CHIMPValOH {
 		if (pi0 != null && pi1 != null) {
 			int w0 = pi0.getPreferenceWeight();
 			int w1 = pi1.getPreferenceWeight();
-			if (w0 != 0 || w1 != 0) 
-				System.out.println("Diff " + "PI0: " + pi0 + " PI1: " + pi1);
+//			if (w0 != 0 || w1 != 0) 
+//				System.out.println("Diff " + "PI0: " + pi0 + " PI1: " + pi1);
 			int weightComp = w1 - w0;
 			if (weightComp != 0) {
 				return weightComp;
