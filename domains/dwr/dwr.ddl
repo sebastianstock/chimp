@@ -329,6 +329,7 @@
  (Sub s3 !enter(?robot ?dock ?wp2))
  (Constraint BeforeOrMeets(s1,s2))
  (Constraint BeforeOrMeets(s2,s3))
+ (Constraint Starts(s1,task))
  (Ordering s1 s2)
  (Ordering s2 s3)
 )

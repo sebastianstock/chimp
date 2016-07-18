@@ -14,9 +14,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import externalPathPlanning.LookUpTableDurationEstimator;
-import externalPathPlanning.MoveBaseDurationEstimator;
-import externalPathPlanning.MoveBaseMetaConstraint;
+import dwr.DWRNavigationMetaConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
@@ -238,9 +236,9 @@ public class TestDWRDomain {
 			planner.addMetaConstraint(rs);
 		}
 		
-		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
-		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
-		planner.addMetaConstraint(mbConstraint);
+//		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
+		DWRNavigationMetaConstraint navConstraint = new DWRNavigationMetaConstraint();
+		planner.addMetaConstraint(navConstraint);
 		
 		planner.addMetaConstraint(htnConstraint);
 	}
