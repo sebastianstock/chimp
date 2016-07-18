@@ -24,7 +24,7 @@ import resourceFluent.ResourceUsageTemplate;
 
 public class HTNMetaConstraint extends MetaConstraint {
 	
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	public int getVarsCNT = 0;
 	
 	private static final long serialVersionUID = 4546697317217126280L;

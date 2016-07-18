@@ -30,7 +30,6 @@ import htn.valOrderingHeuristics.ShallowFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
-import htn.valOrderingHeuristics.UnifyWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
@@ -113,7 +112,7 @@ public class TestDWRDomain {
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		MetaCSPLogging.setLevel(Level.OFF);
+		MetaCSPLogging.setLevel(Level.INFO);
 		
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
@@ -245,9 +244,9 @@ public class TestDWRDomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestNewestbindingsValOH(); // not working
-//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();	
+		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();	
 //		ValueOrderingH valOH = new ShallowFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyEarlisttasksValOH(); // not working
