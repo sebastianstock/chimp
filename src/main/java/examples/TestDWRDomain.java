@@ -18,6 +18,7 @@ import dwr.DWRNavigationMetaConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import htn.GuessOrderingMetaConstraint;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
@@ -97,8 +98,9 @@ public class TestDWRDomain {
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.INFO);
-		MetaCSPLogging.setLevel(Level.OFF);
+		MetaCSPLogging.setLevel(Level.INFO);
+		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);
+//		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
@@ -235,6 +237,9 @@ public class TestDWRDomain {
 		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
 			planner.addMetaConstraint(rs);
 		}
+		
+		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint();
+		planner.addMetaConstraint(ordConstraint);
 		
 //		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		DWRNavigationMetaConstraint navConstraint = new DWRNavigationMetaConstraint();
