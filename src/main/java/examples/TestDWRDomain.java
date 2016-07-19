@@ -22,6 +22,7 @@ import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.guessOrdering.GuessOrderingMetaConstraint;
+import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
@@ -238,8 +239,8 @@ public class TestDWRDomain {
 			planner.addMetaConstraint(rs);
 		}
 		
-//		ValueOrderingH guessOH = new 
-		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint();
+		ValueOrderingH guessOH = new GuessOrderingValOH();
+		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
 		planner.addMetaConstraint(ordConstraint);
 		
 //		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();

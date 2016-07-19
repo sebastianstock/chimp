@@ -7,6 +7,7 @@ import java.util.List;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
+import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
@@ -16,7 +17,6 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 
-
 public class GuessOrderingMetaConstraint extends MetaConstraint {
 
 
@@ -24,8 +24,8 @@ public class GuessOrderingMetaConstraint extends MetaConstraint {
 	
 	private List<List<Integer>> previousConflicts = new ArrayList<List<Integer>>();
 
-	public GuessOrderingMetaConstraint() {
-		super(null, null);
+	public GuessOrderingMetaConstraint(ValueOrderingH valOH) {
+		super(null, valOH);
 	}
 
 	@Override
