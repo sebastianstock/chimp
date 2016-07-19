@@ -1,4 +1,4 @@
-package examples;
+package htn.guessOrdering;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,32 +33,9 @@ import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
-public class TestDWRDomain {
-	
-//	static final String ProblemPath = "domains/dwr/test/test_op_leave.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_move.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_stack.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_unstack.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_put.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_op_take.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_load.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_unload.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_uncover0.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_uncover1.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_navigate0.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_navigate1.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_goto0.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_goto1.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_bring0.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_bring1.pdl";
-//	static String ProblemPath = "domains/dwr/test/test_m_bring2.pdl";
-	
-//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_simple.pdl"; // runs into a trap -> 30 seconds runtime
-//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_0.pdl";
-//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_1.pdl";
-//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_2.pdl";
-	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";  
+public class TestGuessOrdringDWR {
+
+	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_guess_ordering.pdl";  
 
 	public static void main(String[] args) {
 //		Scanner s = new Scanner(System.in);
@@ -239,18 +216,14 @@ public class TestDWRDomain {
 			planner.addMetaConstraint(rs);
 		}
 		
-//		ValueOrderingH guessOH = new GuessOrderingValOH();
-//		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
-//		planner.addMetaConstraint(ordConstraint);
+		ValueOrderingH guessOH = new GuessOrderingValOH();
+		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
+		planner.addMetaConstraint(ordConstraint);
 		
-//		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
 		DWRNavigationMetaConstraint navConstraint = new DWRNavigationMetaConstraint();
 		planner.addMetaConstraint(navConstraint);
 		
 		planner.addMetaConstraint(htnConstraint);
 	}
 	
-
-
-
 }
