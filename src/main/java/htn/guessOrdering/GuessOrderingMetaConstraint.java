@@ -1,4 +1,4 @@
-package htn;
+package htn.guessOrdering;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

@@ -18,10 +18,10 @@ import dwr.DWRNavigationMetaConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.GuessOrderingMetaConstraint;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.guessOrdering.GuessOrderingMetaConstraint;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
@@ -238,6 +238,7 @@ public class TestDWRDomain {
 			planner.addMetaConstraint(rs);
 		}
 		
+//		ValueOrderingH guessOH = new 
 		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint();
 		planner.addMetaConstraint(ordConstraint);
 		
