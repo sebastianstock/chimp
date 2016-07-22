@@ -26,8 +26,10 @@ import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.guessOrdering.GuessOrderingMetaConstraint;
 import htn.guessOrdering.GuessOrderingValOH;
+import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
 import htn.valOrderingHeuristics.ShallowFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
+import htn.valOrderingHeuristics.UnifyEarlisttasksValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
@@ -40,6 +42,12 @@ import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestDWRDomain {
+	
+	static final boolean LOGGING = false;
+	static final boolean NAVIGATION_PLANNING = true;
+	static final boolean GUESS_ORDERING = false;
+    static final boolean PRINT_PLAN = true;
+    static final boolean DRAW = false;
 	
 //	static final String ProblemPath = "domains/dwr/test/test_op_leave.pdl";
 //	static String ProblemPath = "domains/dwr/test/test_op_enter.pdl";
@@ -68,9 +76,17 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c23.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c21.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
-	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
 	
-	private static boolean PRINT_PLAN = false;
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63.pdl";
+	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_c13_c21.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring2.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring2_c11_c21.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_problem_1_r1-c14-p4_r2-c24-p3.pdl"; 
+	
+	
+	
 	
 	public static void main(String[] args) {
 		plan_dwr(args);
@@ -113,15 +129,13 @@ public class TestDWRDomain {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		MetaCSPLogging.setLevel(Level.INFO);
-		
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-//		MetaCSPLogging.setLevel(ConstraintSolver.class, Level.FINE);
-
+		if (! LOGGING) {
+			MetaCSPLogging.setLevel(Level.OFF);
+		}
 
 		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);
 		
-//		planner.createInitialMeetsFutureConstraints();
 		double planning_time = plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();
@@ -212,10 +226,12 @@ public class TestDWRDomain {
 			}
 		}
 		
-		planner.draw();
-//		ConstraintNetwork.draw(cn);
-//		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		if (DRAW) {
+			planner.draw();
+			ConstraintNetwork.draw(cn);
+			ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
+			ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
+		}
 
 //		System.out.println(planner.getDescription());
 		System.out.println("Took "+((endTime - startTime) / 1000000) + " ms"); 
@@ -244,15 +260,16 @@ public class TestDWRDomain {
 		domain.parseDomain(planner);
 		
 		// init meta constraints based on domain
-//		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
+		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestNewestbindingsValOH(); // not working
-		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();	
+//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();	
 //		ValueOrderingH valOH = new ShallowFewestsubsNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyEarlisttasksValOH(); // not working
 //		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
-//		ValueOrderingH valOH = new UnifyWeightNewestbindingsValOH();	
+//		ValueOrderingH valOH = new UnifyWeightNewestbindingsValOH();
+//		ValueOrderingH valOH = new DeepestWeightOldestbindingsValOH();	
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());
@@ -269,13 +286,16 @@ public class TestDWRDomain {
 			planner.addMetaConstraint(rs);
 		}
 		
-//		ValueOrderingH guessOH = new GuessOrderingValOH();
-//		GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
-//		planner.addMetaConstraint(ordConstraint);
-		
-//		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
-		DWRNavigationMetaConstraint navConstraint = new DWRNavigationMetaConstraint();
-		planner.addMetaConstraint(navConstraint);
+		if (GUESS_ORDERING) {
+			ValueOrderingH guessOH = new GuessOrderingValOH();
+			GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
+			planner.addMetaConstraint(ordConstraint);
+		}
+	
+		if (NAVIGATION_PLANNING) {
+			DWRNavigationMetaConstraint navConstraint = new DWRNavigationMetaConstraint();
+			planner.addMetaConstraint(navConstraint);
+		}
 		
 		planner.addMetaConstraint(htnConstraint);
 	}

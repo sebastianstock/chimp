@@ -1,20 +1,21 @@
 package examples;
 
 public class TestRuntimes {
+	
+	static final int RUNS = 2;
 
 	public static void main(String[] args) {
-		int runs = 1;
-		double[] times = new double[runs];
-		for (int i = 0; i < runs ; i++) {
+		double[] times = new double[RUNS];
+		for (int i = 0; i < RUNS ; i++) {
 			times[i] = TestDWRDomain.plan_dwr(null);
 		}
 		double sum = 0;
 		System.out.println("RESULTS:");
-		for (int i = 0; i < runs; i++) {
+		for (int i = 0; i < RUNS; i++) {
 			System.out.println(i + ": " + times[i]);
 			sum += times[i];
 		}
-		System.out.println("Average: " + sum / runs);
+		System.out.println("Average: " + sum / RUNS);
 	}
 
 }
