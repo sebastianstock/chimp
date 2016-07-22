@@ -23,6 +23,8 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.guessOrdering.GuessOrderingMetaConstraint;
+import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestWeightNewestbindingsValOH;
@@ -40,6 +42,11 @@ import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRACEDomain {
+	
+	static final boolean LOGGING = false;
+	static final boolean GUESS_ORDERING = true;
+    static final boolean PRINT_PLAN = true;
+    static final boolean DRAW = false;
 	
 
 	public static void main(String[] args) {
@@ -141,7 +148,9 @@ public class TestRACEDomain {
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
 //		MetaCSPLogging.setLevel(Level.FINE);
-		MetaCSPLogging.setLevel(Level.OFF);
+		if (! LOGGING) {
+			MetaCSPLogging.setLevel(Level.OFF);
+		}
 		
 //		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
@@ -173,27 +182,42 @@ public class TestRACEDomain {
 		System.out.println("#Fluents: " + fluentSolver.getVariables().length);
 		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
 
-		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
-		Arrays.sort(planVector, new Comparator<Variable>() {
-			@Override
-			public int compare(Variable o1, Variable o2) {
-				// TODO Auto-generated method stub
-				Fluent f1 = (Fluent)o1;
-				Fluent f2 = (Fluent)o2;
-				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+		
+//		System.out.println("---------------------------------------");
+//		// print number of applied meta values per metaconstraint:
+//		System.out.println("Tried MetaValues: ");
+//		int sum = 0;
+//		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
+//			System.out.println(entry);
+//			sum += entry.getValue();
+//		}
+//		System.out.println("Sum: " + sum);
+//		System.out.println("---------------------------------------");
+		
+		if (PRINT_PLAN) {
+
+			Variable[] planVector = plan.toArray(new Variable[plan.size()]);
+			Arrays.sort(planVector, new Comparator<Variable>() {
+				@Override
+				public int compare(Variable o1, Variable o2) {
+					// TODO Auto-generated method stub
+					Fluent f1 = (Fluent)o1;
+					Fluent f2 = (Fluent)o2;
+					return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+				}
+			});
+
+			int c = 0;
+			for (Variable act : planVector) {
+				if (act.getComponent() != null)
+					System.out.println(c++ +".\t" + act);	
 			}
-		});
-		
-		int c = 0;
-		for (Variable act : planVector) {
-			if (act.getComponent() != null)
-				System.out.println(c++ +".\t" + act);	
+
+			extractPlan(fluentSolver);
 		}
-		
-		extractPlan(fluentSolver);
-		
+
 		////////////////
-		
+
 	}
 	
 	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {
@@ -204,24 +228,24 @@ public class TestRACEDomain {
 		System.out.println("Found a plan? " + result);
 		long endTime = System.nanoTime();
 
-		planner.draw();
-		
-		ConstraintNetwork cn = new ConstraintNetwork(null);
-		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
-			if (con instanceof FluentConstraint) {
-				FluentConstraint fc = (FluentConstraint) con;
-				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-					fc.getFrom().setMarking(markings.UNIFIED);
-					cn.addConstraint(fc);
-				} else if (fc.getType() == FluentConstraint.Type.DC) {
-					cn.addConstraint(fc);
+		if (DRAW) {
+			planner.draw();
+
+			ConstraintNetwork cn = new ConstraintNetwork(null);
+			for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
+				if (con instanceof FluentConstraint) {
+					FluentConstraint fc = (FluentConstraint) con;
+					if (fc.getType() == FluentConstraint.Type.MATCHES) {
+						fc.getFrom().setMarking(markings.UNIFIED);
+						cn.addConstraint(fc);
+					} else if (fc.getType() == FluentConstraint.Type.DC) {
+						cn.addConstraint(fc);
+					}
 				}
 			}
+			ConstraintNetwork.draw(cn);
+			ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
 		}
-		ConstraintNetwork.draw(cn);
-		
-		
-		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());
 
@@ -274,6 +298,12 @@ public class TestRACEDomain {
 		
 		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
 			planner.addMetaConstraint(rs);
+		}
+		
+		if (GUESS_ORDERING) {
+			ValueOrderingH guessOH = new GuessOrderingValOH();
+			GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
+			planner.addMetaConstraint(ordConstraint);
 		}
 		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
