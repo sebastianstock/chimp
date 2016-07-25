@@ -52,6 +52,8 @@
 (Resource leftArm1 1)
 (Resource rightArm1 1)
 
+(Resource objMoveCapacity 2)
+
 (StateVariable RobotAt 2 n)
 (StateVariable HasArmPosture 1 leftArm1 rightArm1)
 (StateVariable Holding 1 leftArm1 rightArm1)
@@ -485,6 +487,7 @@
   (Values ?rightPosture ArmToSidePosture)
   (Values ?torsoPosture TorsoUpPosture)
   (Sub s1 adapt_torso(?torsoUpPosture))
+  (Constraint Equals(s1,task))
 )
 
 
@@ -501,6 +504,8 @@
   (Ordering s2 s3)
   (Constraint Before(s1,s3))
   (Constraint Before(s2,s3))
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s3,task))
 )
 
 # first move back to preArea
@@ -551,8 +556,6 @@
   (Constraint Before(s1, s3))
   (Constraint Starts(s1,task))
   (Constraint Finishes(s3,task))
-#  (Constraint Before(s1,s2))
-#  (Constraint Before(s2,s3))
 )
 
 ### GET_OBJECT
@@ -605,6 +608,8 @@
   (Ordering s2 s3)
   (Constraint Before(s1,s2))
   (Constraint Before(s2,s3))
+  (Constraint Starts(s1,task))
+  (Constraint Finishes(s3,task))
 )
 
 # 2. at premanipulationarea
@@ -643,6 +648,8 @@
   (Constraint Before(s1,s2))
   (Constraint Starts(s1,task))
   (Constraint Finishes(s2,task))
+  (Constraint Duration[20000,INF](task))
+  (ResourceUsage (Usage objMoveCapacity 1))
 )
 
 ### SERVE_COFFEE_TO_GUEST
