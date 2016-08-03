@@ -282,13 +282,13 @@
 )
 
 # ?container in ?pile is rearranged onto the top of ?pile
-(:method 
+(:method 10
  (Head uncover(?container ?pile))
  (Pre p0 c_in(?container ?pile))
  (Pre p1 p_top(?pile ?container))
 )
 
-(:method 
+(:method 1
  (Head uncover(?container ?pile))
  (Pre p0 c_in(?container ?pile))
  (Pre p1 p_top(?pile ?prevtop))
@@ -312,13 +312,13 @@
 )
 
 # ?robot navigates between two waypoints
-(:method
+(:method 10
  (Head navigate(?robot ?wp1 ?wp2))
  (Pre p0 connected(?wp1 ?wp2))
  (Sub s1 !move(?robot ?wp1 ?wp2))
 )
 
-(:method
+(:method 0
  (Head navigate(?robot ?wp1 ?wp2))
  (Pre p0 connected(?wp1 ?wp3))
  (VarDifferent ?wp2 ?wp3)
@@ -330,12 +330,12 @@
 )
 
 # ?robot goes to ?dock
-(:method
+(:method 10
  (Head goto(?robot ?dock))
  (Pre p0 r_loc(?robot ?dock))
 )
 
-(:method
+(:method 1
  (Head goto(?robot ?dock))
  (Pre p0 r_loc(?robot ?from))
  (VarDifferent ?from ?dock)
@@ -354,7 +354,7 @@
 
 # bring ?container to ?pile
 # already there
-(:method
+(:method 10
  (Head bring(?container ?pile))
  (Pre p0 c_in(?container ?pile))
  (Constraint During(task,p0))
@@ -362,7 +362,7 @@
 )
 
 # alredy at correct dock
-(:method
+(:method 5
  (Head bring(?container ?pile))
  (Pre p0 k_attached(?crane ?dock))
  (Pre p1 p_ondock(?pile ?dock))
@@ -411,7 +411,7 @@
 
 # bring ?container to ?pile with robot
 # already there
-(:method
+(:method 10
  (Head robot_bring(?robot ?container ?pile))
  (Type ?robot Robot)
  (Pre p0 c_in(?container ?pile))
@@ -420,7 +420,7 @@
 )
 
 # alredy at correct dock
-(:method
+(:method 5
  (Head robot_bring(?robot ?container ?pile))
  (Type ?robot Robot)
  (Pre p0 k_attached(?crane ?dock))
@@ -441,7 +441,7 @@
 )
 
 # bring to other dock
-(:method
+(:method 1
  (Head robot_bring(?robot ?container ?pile))
  (Type ?robot Robot)
  (Pre p0 p_ondock(?pile ?todock))
