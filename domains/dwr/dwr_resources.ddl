@@ -81,7 +81,7 @@
 (StateVariable r_freight 1 r1 r2)
 
 (Resource r1Activity 1)
-(Resource r2Action 1)
+(Resource r2Activity 1)
 
 ################################
 ####  OPERATORS ################
