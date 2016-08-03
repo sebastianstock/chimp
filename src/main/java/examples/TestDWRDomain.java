@@ -69,7 +69,8 @@ public class TestDWRDomain {
 		HybridDomain domain;
 		try {
 //			domain = new HybridDomain("domains/dwr/dwr.ddl");
-			domain = new HybridDomain("domains/dwr/dwr_resources.ddl");
+//			domain = new HybridDomain("domains/dwr/dwr_resources.ddl");
+			domain = new HybridDomain("domains/dwr/dwr_resources2.ddl");
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
 			return;

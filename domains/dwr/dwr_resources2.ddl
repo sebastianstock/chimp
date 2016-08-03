@@ -83,9 +83,10 @@
 (Resource r1Activity 1)
 (Resource r2Activity 1)
 
-#(Resource r1Goto 1)
-#(Resource r2Goto 1)
-#
+(Resource r1Goto 1)
+(Resource r2Goto 1)
+
+# Could lead to longer makespan
 #(Resource rBring 2)
 #(Resource r1RobotBring 1)
 #(Resource r2RobotBring 1)
