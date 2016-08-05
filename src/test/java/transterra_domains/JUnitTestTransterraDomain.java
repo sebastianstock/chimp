@@ -54,7 +54,7 @@ public class JUnitTestTransterraDomain {
 		pp.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		planner.createInitialMeetsFutureConstraints();
+//		planner.createInitialMeetsFutureConstraints();
 
 		assertTrue(planner.backtrack());
 		
