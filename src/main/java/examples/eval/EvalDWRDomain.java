@@ -50,7 +50,7 @@ public class EvalDWRDomain {
 	static final boolean LOGGING = false;
 	static final boolean NAVIGATION_PLANNING = true;
 	static final boolean GUESS_ORDERING = false;
-    static final boolean PRINT_PLAN = false;
+    static final boolean PRINT_PLAN = true;
     static final boolean DRAW = false;
 	
 //	static final String ProblemPath = "domains/dwr/test/test_op_leave.pdl";
@@ -100,10 +100,6 @@ public class EvalDWRDomain {
 //		Scanner s = new Scanner(System.in);
 //		System.out.println(s.nextInt());
 		
-		System.out.println(Arrays.toString(args));
-		
-		String problem_path = args[0];
-		
 //		ProblemParser pp = new ProblemParser(problem_path);
 		ProblemParser pp = new ProblemParser(ProblemPath);
 		
@@ -149,6 +145,8 @@ public class EvalDWRDomain {
 		ArrayList<Variable> plan = new ArrayList<Variable>();
 		int opCount = 0;
 		int mCount = 0;
+		long plan_min_est = Long.MAX_VALUE;
+		long plan_max_eet = -1;
 		for (Variable var : allFluents) {
 			String component = var.getComponent();
 			if (component == null) {
@@ -157,10 +155,17 @@ public class EvalDWRDomain {
 			else if (component.equals("Activity")) {
 				plan.add(var);
 				opCount++;
+				long var_eet = ((Fluent) var).getAllenInterval().getEET();
+				if (plan_max_eet < var_eet)
+					plan_max_eet = var_eet;
+				long var_est = ((Fluent) var).getAllenInterval().getEST();
+				if (plan_min_est > var_est)
+					plan_min_est = var_est;
 			} else if (component.equals("Task")) {
 				mCount++;
 			}
 		}
+		long makespan = plan_max_eet - plan_min_est;
 		
 		int mvarinvocs = -1;
 		for (MetaConstraint mcon : planner.getMetaConstraints()) {
@@ -185,6 +190,7 @@ public class EvalDWRDomain {
 		System.out.println("---------------------------------------");
 		
 		System.out.print(planning_time);
+		System.out.print(" makespan=" + makespan);
 		System.out.print("\t" + opCount);
 		System.out.print("\t" + mCount);
 		System.out.print("\t" + fluentSolver.getVariables().length);

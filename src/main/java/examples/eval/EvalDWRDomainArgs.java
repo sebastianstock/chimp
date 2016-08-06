@@ -168,6 +168,8 @@ public class EvalDWRDomainArgs {
 		ArrayList<Variable> plan = new ArrayList<Variable>();
 		int opCount = 0;
 		int mCount = 0;
+		long plan_min_est = Long.MAX_VALUE;
+		long plan_max_eet = -1;
 		for (Variable var : allFluents) {
 			String component = var.getComponent();
 			if (component == null) {
@@ -176,10 +178,17 @@ public class EvalDWRDomainArgs {
 			else if (component.equals("Activity")) {
 				plan.add(var);
 				opCount++;
+				long var_eet = ((Fluent) var).getAllenInterval().getEET();
+				if (plan_max_eet < var_eet)
+					plan_max_eet = var_eet;
+				long var_est = ((Fluent) var).getAllenInterval().getEST();
+				if (plan_min_est > var_est)
+					plan_min_est = var_est;
 			} else if (component.equals("Task")) {
 				mCount++;
 			}
 		}
+		long makespan = plan_max_eet - plan_min_est;
 		
 		int mvarinvocs = -1;
 		for (MetaConstraint mcon : planner.getMetaConstraints()) {
@@ -209,8 +218,10 @@ public class EvalDWRDomainArgs {
 			System.out.println("---------------------------------------");
 		}
 		
+		
 		System.out.print(problem_path);
 		System.out.print(" " + planning_time);
+		System.out.print(" makespan=" + makespan);
 		System.out.print(" " + opCount);
 		System.out.print(" " + mCount);
 		System.out.print(" " + fluentSolver.getVariables().length);
