@@ -49,7 +49,7 @@ public class EvalDWRDomain {
 	
 	static final boolean LOGGING = false;
 	static final boolean NAVIGATION_PLANNING = true;
-	static final boolean GUESS_ORDERING = false;
+	static final boolean GUESS_ORDERING = true;
     static final boolean PRINT_PLAN = true;
     static final boolean DRAW = false;
 	
@@ -79,15 +79,35 @@ public class EvalDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3.pdl";
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c23.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c11_c21.pdl"; 
-	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
+//	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
 	
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_c13_c21.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring2.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring2_c11_c21.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_problem_1_r1-c14-p4_r2-c24-p3.pdl"; 
+  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63.pdl";
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63_c11_c21.pdl"; 
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63_c13_c21.pdl";         
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_1_r1-c14-p4_r2-c24-p3.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c15_c22_c14_c21.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c12_c22_c11_c21.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c19_c22_c18_c21.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c19_c22_c18_c21_c17.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c19_c23_c18_c22_c17_c21.pdl"; 
+
+/// BRING
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_problem_0_bring.pdl";
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_problem_1_bring.pdl";
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_problem_3_bring.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_problem_3_c19_c22_c18_c21_bring.pdl"; 
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring.pdl";  
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring2.pdl";        
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring2_c11_c21.pdl";  
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring_c11_c21.pdl";  
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring_c13_c21.pdl";         
+
+    /// theoretical
+//    static String ProblemPath = "domains/dwr/dwr_test_examples/theoretical/dwr_switch_places.pdl";
+//    static String ProblemPath = "domains/dwr/dwr_test_examples/theoretical/test_same_negative_effects.pdl";
+//    static String ProblemPath = "domains/dwr/dwr_test_examples/theoretical/test_state_scheduling_simple.pdl";
+//    static String ProblemPath = "domains/dwr/dwr_test_examples/theoretical/dwr_leave-enter.pdl";
 	
 	
 	
