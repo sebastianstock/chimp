@@ -1,6 +1,7 @@
 package resourceFluent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,13 @@ import org.metacsp.framework.VariableOrderingH;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.activity.Activity;
+import org.metacsp.multi.activity.ActivityComparator;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import org.metacsp.time.Bounds;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentResourceUsageScheduler extends Schedulable {
@@ -39,10 +43,10 @@ public class FluentResourceUsageScheduler extends Schedulable {
 	
 	@Override
 	public ConstraintNetwork[] getMetaVariables() {
-		// TODO test if this is fast enough
 		updateUsageMap();
 		activities = new Vector<Activity>(usageMap.keySet());
-		return super.getMetaVariables();
+//		return super.getMetaVariables();
+		return samplingPeakCollection();
 	}
 
 	@Override
@@ -131,6 +135,90 @@ public class FluentResourceUsageScheduler extends Schedulable {
 	public boolean isEquivalent(Constraint c) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	// Finds sets of overlapping activities and assesses whether they are conflicting (e.g., over-consuming a resource)
+	@Override
+	protected ConstraintNetwork[] samplingPeakCollection() {
+
+		long horizon = ((FluentNetworkSolver) this.getGroundSolver()).getHorizon();
+
+		if (activities != null && !activities.isEmpty()) {
+			
+			Activity[] groundVars = activities.toArray(new Activity[activities.size()]);
+			
+			Arrays.sort(groundVars,new ActivityComparator(true));
+			
+			Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
+			
+			HashMap<Activity,ConstraintNetwork> usages = new HashMap<Activity,ConstraintNetwork>();
+			
+			Vector<Vector<Activity>> overlappingAll = new Vector<Vector<Activity>>();
+			
+			// this first block checks whether a single activity is overconsuming 
+			// the resource
+			for (Activity act : activities) {
+				if (isConflicting(new Activity[] {act})) {
+					ConstraintNetwork temp = new ConstraintNetwork(null);
+					temp.addVariable(act.getVariable());
+					ret.add(temp);
+				}
+			}
+	
+			//	groundVars are ordered activities
+			for (int i = 0; i < groundVars.length; i++) {
+				Vector<Activity> overlapping = new Vector<Activity>();
+				overlapping.add(groundVars[i]);
+				long start = (groundVars[i]).getTemporalVariable().getEST();
+				long end = (groundVars[i]).getTemporalVariable().getEET();
+				if ((groundVars[i]).getTemporalVariable().getLET() == horizon) {  // for open fluents we use horizon instead of EET
+					end = horizon;
+				}
+				Bounds intersection = new Bounds(start, end);
+				// starting from act[i] all the forthcoming activities are evaluated to see if they temporally
+				// overlaps with act[i]
+				for (int j = 0; j < groundVars.length; j++) {
+					if (i != j) {
+						start = (groundVars[j]).getTemporalVariable().getEST();
+						end = (groundVars[j]).getTemporalVariable().getEET();
+						if ((groundVars[j]).getTemporalVariable().getLET() == horizon) {     // for open fluents we use horizon instead of EET
+							end = horizon;
+						}
+						Bounds nextInterval = new Bounds(start, end);
+						Bounds intersectionNew = intersection.intersectStrict(nextInterval);
+						// if act[j] overlaps it is added to the temporary (wrt i) set of activities
+						if (intersectionNew != null) {
+							overlapping.add(groundVars[j]);
+							// the current set of overlapping activities is evaluated to see if
+							// the resource capacity is exceeded
+							if (isConflicting(overlapping.toArray(new Activity[overlapping.size()]))) {
+								// if it is exceeded the Vector of activities gathered in this iteration is put
+								// in a Vector<Vector<Activity>>
+								overlappingAll.add(overlapping);
+								break;						
+							}
+							// if they don't exceed the capacity, just the newIntersection is taken into account...
+							else intersection = intersectionNew;
+						}
+					}
+				}
+			}
+	
+			for (Vector<Activity> overlapping : overlappingAll) {
+				if (overlapping.size() > 1) {
+					Activity first = overlapping.get(0);
+					ConstraintNetwork temp = new ConstraintNetwork(null);
+					for (Activity act : overlapping) temp.addVariable(act.getVariable());
+					usages.put(first, temp);
+				}
+			}
+			
+			for (Activity key : usages.keySet()) {
+				if (usages.get(key).getVariables().length > 1) ret.add(usages.get(key));
+			}
+			return ret.toArray(new ConstraintNetwork[ret.size()]);
+		}
+		return (new ConstraintNetwork[0]);		
 	}
 
 }

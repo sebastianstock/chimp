@@ -44,7 +44,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 public class TestRACEDomain {
 	
 	static final boolean LOGGING = false;
-	static final boolean GUESS_ORDERING = true;
+	static final boolean GUESS_ORDERING = false;
     static final boolean PRINT_PLAN = true;
     static final boolean DRAW = false;
 	
