@@ -82,7 +82,7 @@ public class EvalDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
 	
-  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63.pdl";
+//  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63.pdl";
 //  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63_c11_c21.pdl"; 
 //  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_abb63_c13_c21.pdl";         
 //  static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_1_r1-c14-p4_r2-c24-p3.pdl";
@@ -91,6 +91,10 @@ public class EvalDWRDomain {
 //	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c19_c22_c18_c21.pdl"; 
 //	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c19_c22_c18_c21_c17.pdl"; 
 //	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c19_c23_c18_c22_c17_c21.pdl"; 
+    
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c15_c22_c14_c21_c13.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c13_c22_c12_c21_c11.pdl"; 
+	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_3_c10_c24_c19_c23_c18_c22.pdl/"; 
 
 /// BRING
 //  static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_problem_0_bring.pdl";
