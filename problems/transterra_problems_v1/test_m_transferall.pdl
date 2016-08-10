@@ -21,23 +21,25 @@
 (Fluent f1 RobotAt(rover1 b1))
 (Constraint Release[0,0](f1))
 
-(Fluent f2 Attached(sampleContainer1 rover1))
+(Fluent f2 ContainerAt(sampleContainer1 rover1 empty))
 (Constraint Release[0,0](f2))
+(Constraint Duration[1,INF](f2))
 
-(Fluent f3 Attached(sampleContainer2 rover1))
+(Fluent f3 ContainerAt(sampleContainer2 rover1 empty))
 (Constraint Release[0,0](f3))
+(Constraint Duration[1,INF](f3))
 
-(Fluent f4 Attached(sampleContainer3 rover1))
+(Fluent f4 ContainerAt(sampleContainer3 rover1 filled))
 (Constraint Release[0,0](f4))
+(Constraint Duration[1,INF](f4))
 
-(Fluent f5 Attached(sampleContainer4 rover1))
+(Fluent f5 ContainerAt(sampleContainer4 rover1 filled))
 (Constraint Release[0,0](f5))
+(Constraint Duration[1,INF](f5))
 
-(Fluent f6 Attached(sampleContainer5 rover1))
+(Fluent f6 ContainerAt(sampleContainer5 rover1 filled))
 (Constraint Release[0,0](f6))
-
-
-
+(Constraint Duration[1,INF](f6))
 
 (Task t1 transfer_all_samples(rover1 shuttle1))
 (Constraint Release[0,INF](t1))

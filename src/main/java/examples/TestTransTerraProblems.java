@@ -70,9 +70,9 @@ public class TestTransTerraProblems {
 		
 //		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_deposit_samples.pdl");
 //		
-		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transferall.pdl");
+//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/test_m_transferall.pdl");
 		
-//		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl");
+		ProblemParser pp = new ProblemParser("problems/transterra_problems_v1/scenario1.pdl");
 
 		HybridDomain domain;
 		try {

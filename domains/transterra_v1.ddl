@@ -49,9 +49,12 @@
 (Resource FilledSampleStorageCapacityRover 5)
 (Resource FilledSampleStorageCapacityShuttle 5)
 (Resource EmptySampleStorageCapacityShuttle 5)
+(Resource EmptySampleStorageCapacityRover 5)
 
+(Resource ChargedBatteryStorageCapacityRover 5)
 (Resource ChargedBatteryStorageCapacityShuttle 5)
 (Resource DischargedBatteryStorageCapacityRover 5)
+(Resource DischargedBatteryStorageCapacityShuttle 5)
 
 (FluentResourceUsage 
   (Usage FilledSampleStorageCapacityRover 1) 
@@ -68,10 +71,24 @@
 )
 
 (FluentResourceUsage 
+  (Usage EmptySampleStorageCapacityRover 1) 
+  (Fluent ContainerAt)
+  (Param 2 rover1)
+  (Param 3 empty)
+)
+
+(FluentResourceUsage 
   (Usage EmptySampleStorageCapacityShuttle 1) 
   (Fluent ContainerAt)
   (Param 2 shuttle1)
   (Param 3 empty)
+)
+
+(FluentResourceUsage 
+  (Usage ChargedBatteryStorageCapacityRover 1) 
+  (Fluent BatteryAt)
+  (Param 2 rover1)
+  (Param 3 charged)
 )
 
 (FluentResourceUsage 
@@ -88,17 +105,14 @@
   (Param 3 discharged)
 )
 
-
-############ Operators ###############
-
-#### Auxiliry operators:
-(:operator
- (Head !!check_empty())
- (ResourceUsage SampleStorageCapacityRover 5)
- (Constraint Duration[2,INF](task))
+(FluentResourceUsage 
+  (Usage DischargedBatteryStorageCapacityShuttle 1) 
+  (Fluent BatteryAt)
+  (Param 2 shuttle1)
+  (Param 3 discharged)
 )
 
-#### Real operators:
+############ Operators ###############
 
 ### Move to a specified position
 (:operator
@@ -347,23 +361,12 @@
 ### Transfer all samples
 (:method
  (Head transfer_all_samples(?robot1 ?robot2))
- (Pre p0 ContainerAt(?container ?robot1 ?level))
- (Type ?container SampleContainer)
- (Pre p1 RobotAt(?robot1 ?robotArea))
- (Pre p2 RobotAt(?robot2 ?robotArea))
- (Sub s1 !transfer_sample(?robot1 ?robot2 ?container))
+ (Sub s1 transfer_filled_containers(?robot1 ?robot2))
  (Constraint Starts(s1,task))
- (Sub s2 transfer_all_samples(?robot1 ?robot2))
+ (Sub s2 transfer_empty_containers(?robot1 ?robot2))
  (Constraint Finishes(s2,task))
  (Ordering s1 s2)
  (Constraint Before(s1,s2))
-)
-
-(:method
- (Head transfer_all_samples(?robot1 ?robot2))
- (Values ?robot1 rover1)
- (ResourceUsage SampleStorageCapacityRover 5)
- (Constraint Duration[2,INF](task))
 )
 
 ### Transfer filled samples
@@ -415,6 +418,13 @@
  (Head transfer_empty_containers(?robot1 ?robot2))
  (Values ?robot1 shuttle1)
  (ResourceUsage EmptySampleStorageCapacityShuttle 5)
+ (Constraint Duration[2,INF](task))
+)
+
+(:method
+ (Head transfer_empty_containers(?robot1 ?robot2))
+ (Values ?robot1 rover1)
+ (ResourceUsage EmptySampleStorageCapacityRover 5)
  (Constraint Duration[2,INF](task))
 )
 
