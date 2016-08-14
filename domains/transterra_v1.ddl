@@ -46,6 +46,8 @@
 
 ############ Resources ###############
 
+(Resource ManipulationCapacityRover 1)
+(Resource SampleStorageCapacityShuttle 5)
 (Resource FilledSampleStorageCapacityRover 5)
 (Resource FilledSampleStorageCapacityShuttle 5)
 (Resource EmptySampleStorageCapacityShuttle 5)
@@ -151,6 +153,11 @@
  (Constraint During(task,p2))
  (Add e1 ContainerAt(?container ?robot2 ?level))
  (Constraint Meets(task,e1))
+    (Usage ManipulationCapacityRover 1)
+    (Param 1 rover1))
+ (ResourceUsage
+    (Usage ManipulationCapacityRover 1)
+    (Param 2 rover1))
 )
 
 ### Transfer samples from one robot1 to robot2
@@ -165,6 +172,11 @@
  (Constraint During(task,p2))
  (Add e1 BatteryAt(?battery ?robot2 ?status))
  (Constraint Meets(task,e1))
+    (Usage ManipulationCapacityRover 1)
+    (Param 1 rover1))
+ (ResourceUsage
+    (Usage ManipulationCapacityRover 1)
+    (Param 2 rover1))
 )
 
 ### Exchange payload item
@@ -178,6 +190,11 @@
  (Constraint During(task,p2))
  (Add e1 Attached(?payload ?robot2))
  (Constraint Meets(task,e1))
+    (Usage ManipulationCapacityRover 1)
+    (Param 1 rover1))
+ (ResourceUsage
+    (Usage ManipulationCapacityRover 1)
+    (Param 2 rover1))
 )
 
 ### Pick up a BaseCamp from area

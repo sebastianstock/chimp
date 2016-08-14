@@ -106,12 +106,11 @@ public class TestTransTerraProblems {
 		
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-		MetaCSPLogging.setLevel(Level.FINEST);
-//		MetaCSPLogging.setLevel(Level.OFF);
+//		MetaCSPLogging.setLevel(Level.FINEST);
+		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		testScheduling(planner);
 		
-//		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
 		
 		Variable[] allFluents = fluentSolver.getVariables();

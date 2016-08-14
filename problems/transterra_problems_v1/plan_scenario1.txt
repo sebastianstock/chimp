@@ -1,31 +1,139 @@
-0.	Activity(28)::<!move_to(rover1 b1)[[1, 1], [3, 599900]]>
-1.	Activity(27)::<!place_basecamp(rover1 baseCamp1 b1)[[4, 599901], [6, 599903]]>
-2.	Activity(31)::<!sample_regolith(rover1 b1)[[10000, 599904], [10002, 599906]]>
-3.	Activity(34)::<!move_to(rover1 b2)[[20000, 599907], [20002, 599909]]>
-4.	Activity(33)::<!sample_regolith(rover1 b2)[[20003, 599910], [20005, 599912]]>
-5.	Activity(41)::<!move_to(shuttle1 b2)[[30000, 599913], [30002, 599915]]>
-6.	Activity(45)::<!transfer_sample(rover1 shuttle1 sampleContainer1)[[30003, 599916], [30005, 599918]]>
-7.	Activity(50)::<!transfer_sample(rover1 shuttle1 sampleContainer2)[[30006, 599919], [30008, 599921]]>
-8.	Activity(56)::<!transfer_sample(shuttle1 rover1 sampleContainer5)[[30012, 599925], [30014, 599927]]>
-9.	Activity(61)::<!transfer_sample(shuttle1 rover1 sampleContainer4)[[30015, 599928], [30017, 599930]]>
-10.	Activity(66)::<!transfer_sample(shuttle1 rover1 sampleContainer6)[[30018, 599931], [30020, 599933]]>
-11.	Activity(72)::<!transfer_battery(shuttle1 rover1 batteryPayload1)[[30024, 599937], [30026, 599939]]>
-12.	Activity(75)::<!transfer_battery(rover1 shuttle1 batteryPayload2)[[30030, 599943], [30032, 599945]]>
-13.	Activity(77)::<!move_to(rover1 landingSite1)[[50000, 599949], [50002, 599951]]>
-14.	Activity(82)::<!move_to(shuttle1 landingSite1)[[50000, 599965], [50002, 599967]]>
-15.	Activity(78)::<!pickup_basecamp(rover1 baseCamp2)[[50003, 599952], [50003, 599952]]>
-16.	Activity(85)::<!move_to(rover1 b3)[[60000, 599953], [60002, 599955]]>
-17.	Activity(84)::<!sample_regolith(rover1 b3)[[60003, 599956], [60005, 599958]]>
-18.	Activity(89)::<!move_to(rover1 b4)[[60006, 599959], [60008, 599961]]>
-19.	Activity(88)::<!sample_regolith(rover1 b4)[[60009, 599962], [60011, 599964]]>
-20.	Activity(94)::<!move_to(rover1 b6)[[60012, 599965], [60014, 599967]]>
-21.	Activity(93)::<!place_basecamp(rover1 baseCamp2 b6)[[60015, 599992], [60017, 599994]]>
-22.	Activity(100)::<!move_to(shuttle1 b6)[[60015, 599968], [60017, 599970]]>
-23.	Activity(104)::<!transfer_sample(rover1 shuttle1 sampleContainer4)[[60018, 599971], [60020, 599973]]>
-24.	Activity(109)::<!transfer_sample(rover1 shuttle1 sampleContainer6)[[60021, 599974], [60023, 599976]]>
-25.	Activity(115)::<!move_to(shuttle1 landingSite1)[[60036, 599989], [60038, 599991]]>
-26.	Activity(126)::<!sample_regolith(rover1 b6)[[60036, 599991], [60038, 599993]]>
-27.	Activity(117)::<!transfer_sample(shuttle1 lander1 sampleContainer6)[[60039, 599992], [60041, 599994]]>
-28.	Activity(122)::<!transfer_sample(shuttle1 lander1 sampleContainer4)[[60042, 599995], [60044, 599997]]>
-29.	Activity(131)::<!move_to(rover1 b7)[[70000, 599994], [70002, 599996]]>
-30.	Activity(130)::<!sample_regolith(rover1 b7)[[70003, 599997], [70005, 599999]]>
+0.	(26)::!move_to(rover1 b1)[[1, 1], [3, 599900]]
+1.	(27)::!place_basecamp(rover1 baseCamp1 b1)[[4, 599901], [6, 599903]]
+2.	(30)::!sample_regolith(rover1 b1)[[10000, 599904], [10002, 599906]]
+3.	(32)::!move_to(rover1 b2)[[20000, 599907], [20002, 599909]]
+4.	(33)::!sample_regolith(rover1 b2)[[20003, 599910], [20005, 599912]]
+5.	(39)::!move_to(shuttle1 b2)[[30000, 599913], [30002, 599915]]
+6.	(43)::!transfer_sample(rover1 shuttle1 sampleContainer1)[[30003, 599916], [30005, 599918]]
+7.	(46)::!transfer_sample(rover1 shuttle1 sampleContainer2)[[30006, 599919], [30008, 599921]]
+8.	(49)::!transfer_sample(shuttle1 rover1 sampleContainer6)[[30012, 599925], [30014, 599927]]
+9.	(52)::!transfer_sample(shuttle1 rover1 sampleContainer4)[[30015, 599928], [30017, 599930]]
+10.	(55)::!transfer_sample(shuttle1 rover1 sampleContainer5)[[30018, 599931], [30020, 599933]]
+11.	(60)::!transfer_battery(shuttle1 rover1 batteryPayload1)[[30024, 599937], [30026, 599939]]
+12.	(63)::!transfer_battery(rover1 shuttle1 batteryPayload2)[[30030, 599943], [30032, 599945]]
+13.	(66)::!move_to(rover1 landingSite1)[[50000, 599949], [50002, 599951]]
+14.	(70)::!move_to(shuttle1 landingSite1)[[50000, 599960], [50002, 599962]]
+15.	(67)::!pickup_basecamp(rover1 baseCamp2)[[50003, 599952], [50003, 599952]]
+16.	(73)::!transfer_sample(shuttle1 lander1 sampleContainer2)[[50003, 599963], [50005, 599965]]
+17.	(76)::!transfer_sample(shuttle1 lander1 sampleContainer1)[[50006, 599966], [50008, 599968]]
+18.	(79)::!move_to(rover1 b3)[[60000, 599953], [60002, 599955]]
+19.	(80)::!sample_regolith(rover1 b3)[[60003, 599956], [60005, 599958]]
+20.	(83)::!move_to(rover1 b4)[[60006, 599959], [60008, 599961]]
+21.	(84)::!sample_regolith(rover1 b4)[[60009, 599962], [60011, 599964]]
+22.	(87)::!move_to(rover1 b6)[[60012, 599965], [60014, 599967]]
+23.	(88)::!place_basecamp(rover1 baseCamp2 b6)[[60015, 599992], [60017, 599994]]
+24.	(94)::!move_to(shuttle1 b6)[[60015, 599968], [60017, 599970]]
+25.	(98)::!transfer_sample(rover1 shuttle1 sampleContainer4)[[60018, 599971], [60020, 599973]]
+26.	(101)::!transfer_sample(rover1 shuttle1 sampleContainer5)[[60021, 599974], [60023, 599976]]
+27.	(106)::!move_to(shuttle1 landingSite1)[[60036, 599989], [60038, 599991]]
+28.	(115)::!sample_regolith(rover1 b6)[[60036, 599991], [60038, 599993]]
+29.	(109)::!transfer_sample(shuttle1 lander1 sampleContainer5)[[60039, 599992], [60041, 599994]]
+30.	(112)::!transfer_sample(shuttle1 lander1 sampleContainer4)[[60042, 599995], [60044, 599997]]
+31.	(117)::!move_to(rover1 b7)[[70000, 599994], [70002, 599996]]
+32.	(118)::!sample_regolith(rover1 b7)[[70003, 599997], [70005, 599999]]
+
+
+(13)::rendezvous(rover1 shuttle1)[[30000, 599913], [30035, 599948]]
+  (38)::rendezvous_meet(rover1 shuttle1)[[30000, 599913], [30002, 599915]]
+    (39)::!move_to(shuttle1 b2)[[30000, 599913], [30002, 599915]]
+  (36)::rendezvous_exchange_samples(rover1 shuttle1)[[30003, 599916], [30023, 599936]]
+    (41)::transfer_filled_containers(rover1 shuttle1)[[30003, 599916], [30011, 599924]]
+      (43)::!transfer_sample(rover1 shuttle1 sampleContainer1)[[30003, 599916], [30005, 599918]]
+      (44)::transfer_filled_containers(rover1 shuttle1)[[30006, 599919], [30011, 599924]]
+        (46)::!transfer_sample(rover1 shuttle1 sampleContainer2)[[30006, 599919], [30008, 599921]]
+        (47)::transfer_filled_containers(rover1 shuttle1)[[30009, 599922], [30011, 599924]]
+        Before: 46 --> 47
+      Before: 43 --> 44
+    (42)::transfer_empty_containers(shuttle1 rover1)[[30012, 599925], [30023, 599936]]
+      (49)::!transfer_sample(shuttle1 rover1 sampleContainer6)[[30012, 599925], [30014, 599927]]
+      (50)::transfer_empty_containers(shuttle1 rover1)[[30015, 599928], [30023, 599936]]
+        (52)::!transfer_sample(shuttle1 rover1 sampleContainer4)[[30015, 599928], [30017, 599930]]
+        (53)::transfer_empty_containers(shuttle1 rover1)[[30018, 599931], [30023, 599936]]
+          (55)::!transfer_sample(shuttle1 rover1 sampleContainer5)[[30018, 599931], [30020, 599933]]
+          (56)::transfer_empty_containers(shuttle1 rover1)[[30021, 599934], [30023, 599936]]
+          Before: 55 --> 56
+        Before: 52 --> 53
+      Before: 49 --> 50
+    Before: 41 --> 42
+  (37)::rendezvous_exchange_batteries(rover1 shuttle1)[[30024, 599937], [30035, 599948]]
+    (58)::transfer_charged_batteries(shuttle1 rover1)[[30024, 599937], [30029, 599942]]
+      (60)::!transfer_battery(shuttle1 rover1 batteryPayload1)[[30024, 599937], [30026, 599939]]
+      (61)::transfer_charged_batteries(shuttle1 rover1)[[30027, 599940], [30029, 599942]]
+      Before: 60 --> 61
+    (59)::transfer_discharged_batteries(rover1 shuttle1)[[30030, 599943], [30035, 599948]]
+      (63)::!transfer_battery(rover1 shuttle1 batteryPayload2)[[30030, 599943], [30032, 599945]]
+      (64)::transfer_discharged_batteries(rover1 shuttle1)[[30033, 599946], [30035, 599948]]
+      Before: 63 --> 64
+    Before: 58 --> 59
+  Before: 38 --> 36
+  Before: 36 --> 37
+(14)::get_basecamp(rover1 baseCamp2)[[50000, 599949], [50003, 599952]]
+  (66)::!move_to(rover1 landingSite1)[[50000, 599949], [50002, 599951]]
+  (67)::!pickup_basecamp(rover1 baseCamp2)[[50003, 599952], [50003, 599952]]
+  Before: 66 --> 67
+(15)::deposit_samples(shuttle1 lander1)[[50000, 599960], [50011, 599973]]
+  (70)::!move_to(shuttle1 landingSite1)[[50000, 599960], [50002, 599962]]
+  (71)::transfer_filled_containers(shuttle1 lander1)[[50003, 599963], [50011, 599973]]
+    (73)::!transfer_sample(shuttle1 lander1 sampleContainer2)[[50003, 599963], [50005, 599965]]
+    (74)::transfer_filled_containers(shuttle1 lander1)[[50006, 599966], [50011, 599973]]
+      (76)::!transfer_sample(shuttle1 lander1 sampleContainer1)[[50006, 599966], [50008, 599968]]
+      (77)::transfer_filled_containers(shuttle1 lander1)[[50009, 599971], [50011, 599973]]
+      Before: 76 --> 77
+    Before: 73 --> 74
+  Before: 70 --> 71
+(16)::take_samples(rover1 b3)[[60000, 599953], [60005, 599958]]
+  (79)::!move_to(rover1 b3)[[60000, 599953], [60002, 599955]]
+  (80)::!sample_regolith(rover1 b3)[[60003, 599956], [60005, 599958]]
+  Before: 79 --> 80
+(17)::take_samples(rover1 b4)[[60006, 599959], [60011, 599964]]
+  (83)::!move_to(rover1 b4)[[60006, 599959], [60008, 599961]]
+  (84)::!sample_regolith(rover1 b4)[[60009, 599962], [60011, 599964]]
+  Before: 83 --> 84
+(18)::deploy_basecamp(rover1 b6)[[60012, 599965], [60017, 599994]]
+  (87)::!move_to(rover1 b6)[[60012, 599965], [60014, 599967]]
+  (88)::!place_basecamp(rover1 baseCamp2 b6)[[60015, 599992], [60017, 599994]]
+  Before: 87 --> 88
+(19)::rendezvous(rover1 shuttle1)[[60012, 599968], [60035, 599988]]
+  (91)::rendezvous_exchange_samples(rover1 shuttle1)[[60018, 599971], [60029, 599982]]
+    (96)::transfer_filled_containers(rover1 shuttle1)[[60018, 599971], [60026, 599979]]
+      (98)::!transfer_sample(rover1 shuttle1 sampleContainer4)[[60018, 599971], [60020, 599973]]
+      (99)::transfer_filled_containers(rover1 shuttle1)[[60021, 599974], [60026, 599979]]
+        (101)::!transfer_sample(rover1 shuttle1 sampleContainer5)[[60021, 599974], [60023, 599976]]
+        (102)::transfer_filled_containers(rover1 shuttle1)[[60024, 599977], [60026, 599979]]
+        Before: 101 --> 102
+      Before: 98 --> 99
+    (97)::transfer_empty_containers(shuttle1 rover1)[[60027, 599980], [60029, 599982]]
+    Before: 96 --> 97
+  (92)::rendezvous_exchange_batteries(rover1 shuttle1)[[60030, 599983], [60035, 599988]]
+    (104)::transfer_charged_batteries(shuttle1 rover1)[[60030, 599983], [60032, 599985]]
+    (105)::transfer_discharged_batteries(rover1 shuttle1)[[60033, 599986], [60035, 599988]]
+    Before: 104 --> 105
+  (93)::rendezvous_meet(rover1 shuttle1)[[60015, 599968], [60017, 599970]]
+    (94)::!move_to(shuttle1 b6)[[60015, 599968], [60017, 599970]]
+  Before: 91 --> 92
+(20)::take_samples(rover1 b6)[[60036, 599991], [60038, 599993]]
+  (115)::!sample_regolith(rover1 b6)[[60036, 599991], [60038, 599993]]
+(21)::deposit_samples(shuttle1 lander1)[[60036, 599989], [60047, 600000]]
+  (106)::!move_to(shuttle1 landingSite1)[[60036, 599989], [60038, 599991]]
+  (107)::transfer_filled_containers(shuttle1 lander1)[[60039, 599992], [60047, 600000]]
+    (109)::!transfer_sample(shuttle1 lander1 sampleContainer5)[[60039, 599992], [60041, 599994]]
+    (110)::transfer_filled_containers(shuttle1 lander1)[[60042, 599995], [60047, 600000]]
+      (112)::!transfer_sample(shuttle1 lander1 sampleContainer4)[[60042, 599995], [60044, 599997]]
+      (113)::transfer_filled_containers(shuttle1 lander1)[[60045, 599998], [60047, 600000]]
+      Before: 112 --> 113
+    Before: 109 --> 110
+  Before: 106 --> 107
+(22)::take_samples(rover1 b7)[[70000, 599994], [70005, 599999]]
+  (117)::!move_to(rover1 b7)[[70000, 599994], [70002, 599996]]
+  (118)::!sample_regolith(rover1 b7)[[70003, 599997], [70005, 599999]]
+  Before: 117 --> 118
+(23)::deploy_basecamp(rover1 b1)[[1, 1], [6, 599903]]
+  (26)::!move_to(rover1 b1)[[1, 1], [3, 599900]]
+  (27)::!place_basecamp(rover1 baseCamp1 b1)[[4, 599901], [6, 599903]]
+  Before: 26 --> 27
+(24)::take_samples(rover1 b1)[[10000, 599904], [10002, 599906]]
+  (30)::!sample_regolith(rover1 b1)[[10000, 599904], [10002, 599906]]
+(25)::take_samples(rover1 b2)[[20000, 599907], [20005, 599912]]
+  (32)::!move_to(rover1 b2)[[20000, 599907], [20002, 599909]]
+  (33)::!sample_regolith(rover1 b2)[[20003, 599910], [20005, 599912]]
+  Before: 32 --> 33
