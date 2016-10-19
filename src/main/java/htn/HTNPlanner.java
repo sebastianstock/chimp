@@ -21,10 +21,11 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.HybridDomainPlanner;
 import unify.CompoundSymbolicValueConstraint;
 
 
-public class HTNPlanner extends MetaConstraintSolver {
+public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlanner {
 
 	private static final long serialVersionUID = 8031573555691611305L;
 	public static final String FUTURE_STR = "Eternity";
@@ -314,6 +315,11 @@ public class HTNPlanner extends MetaConstraintSolver {
 				}
 			}
 		}
+	}
+
+	@Override
+	public FluentNetworkSolver getFluentNetworkSolver() {
+		return (FluentNetworkSolver) getConstraintSolvers()[0];
 	}
 	
 

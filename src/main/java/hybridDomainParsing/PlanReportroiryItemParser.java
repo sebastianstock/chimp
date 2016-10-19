@@ -15,7 +15,6 @@ import com.google.common.primitives.Ints;
 import fluentSolver.FluentNetworkSolver;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
-import htn.HTNPlanner;
 import htn.HTNPrecondition;
 import htn.PlanReportroryItem;
 import resourceFluent.ResourceUsageTemplate;
@@ -24,7 +23,7 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final String textualSpecification;
 	protected final FluentNetworkSolver groundSolver;
-	protected final HTNPlanner planner;
+	protected final HybridDomainPlanner planner;
 	protected final int maxArgs;
 
 	protected final String head;
@@ -37,11 +36,11 @@ public abstract class PlanReportroiryItemParser {
 	protected final Map<String, Map<String, Integer>> variableOccurrencesMap = 
 			new HashMap<String, Map<String, Integer>>();
 
-	public PlanReportroiryItemParser(String textualSpecification, HTNPlanner planner, 
+	public PlanReportroiryItemParser(String textualSpecification, HybridDomainPlanner planner, 
 			int maxArs) {
 		this.textualSpecification = textualSpecification;
 		this.planner = planner;
-		this.groundSolver = (FluentNetworkSolver) planner.getConstraintSolvers()[0];
+		this.groundSolver = planner.getFluentNetworkSolver();
 		this.maxArgs = maxArs;
 
 		this.head = HybridDomain.parseKeyword(HybridDomain.HEAD_KEYWORD, textualSpecification)[0].trim();

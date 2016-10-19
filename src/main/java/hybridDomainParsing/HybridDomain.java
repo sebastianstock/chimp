@@ -75,7 +75,7 @@ public class HybridDomain{
 	}
 	
 	@Deprecated
-	public HybridDomain(HTNPlanner planner, String filename) throws DomainParsingException {
+	public HybridDomain(HybridDomainPlanner planner, String filename) throws DomainParsingException {
 		this.domainStr = readDomain(filename);
 		maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, domainStr)[0]);
 		predicateSymbols = parsePredicateSymbols(domainStr);
@@ -160,7 +160,7 @@ public class HybridDomain{
 	 * @param fileName Text file containing the domain definition. 
 	 * @throws DomainParsingException 
 	 */
-	public void parseDomain(HTNPlanner planner) throws DomainParsingException {
+	public void parseDomain(HybridDomainPlanner planner) throws DomainParsingException {
 		name = parseKeyword(DOMAIN_KEYWORD, domainStr)[0];
 		
 		// Parse Resources and create ResourceSchedulers

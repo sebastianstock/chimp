@@ -11,12 +11,11 @@ import org.metacsp.framework.VariablePrototype;
 import fluentSolver.FluentConstraint;
 import htn.EffectTemplate;
 import htn.HTNMethod;
-import htn.HTNPlanner;
 import htn.HTNPrecondition;
 
 public class MethodParser extends PlanReportroiryItemParser {
 
-	public MethodParser(String textualSpecification, HTNPlanner planner, int maxArgs) {
+	public MethodParser(String textualSpecification, HybridDomainPlanner planner, int maxArgs) {
 		super(textualSpecification, planner, maxArgs);
 	}
 	

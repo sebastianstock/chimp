@@ -4,13 +4,12 @@ import java.util.Map;
 
 import htn.EffectTemplate;
 import htn.HTNOperator;
-import htn.HTNPlanner;
 import htn.HTNPrecondition;
 
 public class OperatorParser extends PlanReportroiryItemParser {
 	
 
-	public OperatorParser(String textualSpecification, HTNPlanner planner, int maxArgs){
+	public OperatorParser(String textualSpecification, HybridDomainPlanner planner, int maxArgs){
 		super(textualSpecification, planner, maxArgs);
 	}
 	
