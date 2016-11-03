@@ -26,6 +26,7 @@ import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
 import htn.guessOrdering.GuessOrderingMetaConstraint;
 import htn.guessOrdering.GuessOrderingValOH;
+import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
 import htn.valOrderingHeuristics.ShallowFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
