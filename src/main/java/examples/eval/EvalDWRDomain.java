@@ -204,14 +204,14 @@ public class EvalDWRDomain {
 		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
 		System.out.println("---------------------------------------");
 		// print number of applied meta values per metaconstraint:
-		System.out.println("Tried MetaValues: ");
-		int sum = 0;
-		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
-			System.out.println(entry);
-			sum += entry.getValue();
-		}
-		System.out.println("Sum: " + sum);
-		System.out.println("---------------------------------------");
+//		System.out.println("Tried MetaValues: ");
+//		int sum = 0;
+//		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
+//			System.out.println(entry);
+//			sum += entry.getValue();
+//		}
+//		System.out.println("Sum: " + sum);
+//		System.out.println("---------------------------------------");
 		
 		System.out.print(planning_time);
 		System.out.print(" makespan=" + makespan);
@@ -220,7 +220,7 @@ public class EvalDWRDomain {
 		System.out.print("\t" + fluentSolver.getVariables().length);
 		System.out.print("\t" + fluentSolver.getConstraints().length);
 		System.out.print("\t" + mvarinvocs);
-		System.out.println("\t" + sum);
+//		System.out.println("\t" + sum);
 
 		if (PRINT_PLAN) {
 			Variable[] planVector = plan.toArray(new Variable[plan.size()]);

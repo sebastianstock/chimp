@@ -207,16 +207,16 @@ public class EvalDWRDomainArgs {
 			// print number of applied meta values per metaconstraint:
 			System.out.println("Tried MetaValues: ");
 		}
-		int sum = 0;
-		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
-			if (PRINT_DETAILS)
-				System.out.println(entry);
-			sum += entry.getValue();
-		}
-		if (PRINT_DETAILS) {
-			System.out.println("Sum: " + sum);
-			System.out.println("---------------------------------------");
-		}
+//		int sum = 0;
+//		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
+//			if (PRINT_DETAILS)
+//				System.out.println(entry);
+//			sum += entry.getValue();
+//		}
+//		if (PRINT_DETAILS) {
+//			System.out.println("Sum: " + sum);
+//			System.out.println("---------------------------------------");
+//		}
 		
 		
 		System.out.print(problem_path);
@@ -227,7 +227,7 @@ public class EvalDWRDomainArgs {
 		System.out.print(" " + fluentSolver.getVariables().length);
 		System.out.print(" " + fluentSolver.getConstraints().length);
 		System.out.print(" " + mvarinvocs);
-		System.out.print(" " + sum);
+//		System.out.print(" " + sum);
 		System.out.print(" " + valOH.getClass().getName());
 		System.out.print(" " + domain_path);
 		System.out.println(" GuessOrdering=" + GUESS_ORDERING);

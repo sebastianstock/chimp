@@ -171,13 +171,13 @@ public class TestDWRDomain {
 		System.out.println("FluentConstraints: " + fluentSolver.getConstraints().length);
 		System.out.println("---------------------------------------");
 		// print number of applied meta values per metaconstraint:
-		System.out.println("Tried MetaValues: ");
-		int sum = 0;
-		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
-			System.out.println(entry);
-			sum += entry.getValue();
-		}
-		System.out.println("Sum: " + sum);
+//		System.out.println("Tried MetaValues: ");
+//		int sum = 0;
+//		for (Entry<MetaConstraint, Integer> entry: planner.getValCounters().entrySet()) {
+//			System.out.println(entry);
+//			sum += entry.getValue();
+//		}
+//		System.out.println("Sum: " + sum);
 		System.out.println("---------------------------------------");
 
 		if (PRINT_PLAN) {
