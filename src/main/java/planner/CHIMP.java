@@ -18,6 +18,8 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.guessOrdering.GuessOrderingMetaConstraint;
+import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
@@ -51,6 +53,8 @@ public class CHIMP {
 		private final String problemPath;
 		private ValueOrderingH htnValOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		private MoveBaseDurationEstimator mbEstimator;
+		private boolean guessOrdering = false;
+		public boolean htnUnification = false;
 		
 		public CHIMPBuilder(String domainPath, String problemPath) {
 			this.domainPath = domainPath;
@@ -80,6 +84,26 @@ public class CHIMP {
 		public CHIMP build() throws DomainParsingException {
 			return new CHIMP(this);
 		}
+
+		/**
+		 * 
+		 * @param guess Indicates wheter the GuessOrderinMetaConstraint shall be used. Default: false 
+		 * @return
+		 */
+		public CHIMPBuilder guessOrdering(boolean guess) {
+			this.guessOrdering  = guess;
+			return this;
+		}
+		
+		/**
+		 * 
+		 * @param unification With this option set it tries to unify tasks to already planned tasks. Default: false
+		 * @return
+		 */
+		public CHIMPBuilder htnUnification(boolean unification) {
+			this.htnUnification = unification;
+			return this;
+		}
 		
 	}
 	
@@ -97,7 +121,7 @@ public class CHIMP {
 		planner.setTypesInstancesMap(problemParser.getTypesInstancesMap());
 		domain.parseDomain(planner);  // loads the domain into the planner
 		
-		initMetaConstraints(builder.htnValOH, builder.mbEstimator);
+		initMetaConstraints(builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
 		
 		// create initial state:
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
@@ -212,12 +236,15 @@ public class CHIMP {
 		}
 	}
 	
-	private void initMetaConstraints(ValueOrderingH valOH, MoveBaseDurationEstimator mbEstimator) {
+	private void initMetaConstraints(ValueOrderingH valOH, MoveBaseDurationEstimator mbEstimator, boolean guessOrdering, boolean htnUnification) {
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());
 		htnConstraint.addMethods(domain.getMethods());
 		htnConstraint.setResourceUsages(domain.getFluentResourceUsages());
+		if (htnUnification) {
+			htnConstraint.enableUnification();
+		}
 		
 		for (FluentScheduler fs : domain.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);
@@ -225,6 +252,12 @@ public class CHIMP {
 		
 		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
 			planner.addMetaConstraint(rs);
+		}
+		
+		if (guessOrdering) {
+			ValueOrderingH guessOH = new GuessOrderingValOH();
+			GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
+			planner.addMetaConstraint(ordConstraint);
 		}
 		
 		if (mbEstimator != null) {

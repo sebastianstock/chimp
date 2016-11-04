@@ -14,7 +14,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
-import examples.TestRACEDomain;
+import examples.chimp.TestRACEDomain;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
