@@ -10,19 +10,23 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
 import examples.chimp.TestRACEDomain;
+import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.TaskApplicationMetaConstraint.markings;
+import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.ProblemParser;
+import planner.CHIMP;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestFluentDispatching {
@@ -30,60 +34,38 @@ public class TestFluentDispatching {
 	public static void main(String[] args) {
 		
 		// init planner
-		ProblemParser pp = new ProblemParser("problems/test_m_drive_robot_1.pdl");
+		String problemFile = "problems/test_m_drive_robot_1.pdl";
+		String domainFile = "domains/ordered_domain.ddl";
 
-		HybridDomain domain;
+		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+
+		CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+				.valHeuristic(valOH)
+				.mbEstimator(new LookUpTableDurationEstimator())
+				.htnUnification(true);
+		builder.htnUnification(true);
+		CHIMP chimp;
 		try {
-			domain = new HybridDomain("domains/ordered_domain.ddl");
+			chimp = builder.build();
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
 			return;
 		}
-		int[] ingredients = new int[] {1, domain.getMaxArgs()};
-		String[][] symbols = new String[2][];
-		symbols[0] =  domain.getPredicateSymbols();
-		symbols[1] = pp.getArgumentSymbols();
-		Map<String, String[]> typesInstancesMap = pp.getTypesInstancesMap();
-		//+++
 		
-		HTNPlanner planner = new HTNPlanner(0,  600000,  0, symbols, ingredients);
-		planner.setTypesInstancesMap(typesInstancesMap);
-		
-		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		pp.createState(fluentSolver, domain);
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		
-		try {
-			TestRACEDomain.initPlanner(planner, domain);
-		} catch (DomainParsingException e) {
-			System.out.println("Error while parsing domain: " + e.getMessage());
-			e.printStackTrace();
-			return;
-		}
-		
-		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
-		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-//		MetaCSPLogging.setLevel(Level.INFO);
-		
-		planner.createInitialMeetsFutureConstraints();
-		plan(planner, fluentSolver);
+		// generate initial plan
+		System.out.println("Found plan? " + chimp.generatePlan());
+		chimp.printStats(System.out);
 		
 		// Add another task
+		FluentNetworkSolver fluentSolver = chimp.getFluentSolver();
 		String name = "move_object(milkPot1 placingAreaNorthLeftTable2)";
-		String component;
-		if (name.startsWith("!")) {
-			component = "Activity";
-		} else {
-			component = "Task";
-		}
+		String component = "Task";
 		Variable var = fluentSolver.createVariable(component);
 		((Fluent) var).setName(name);
 		var.setMarking(markings.UNPLANNED);
 		
-//		planner.clearResolvers();
-		plan(planner, fluentSolver);
-		
-		TestRACEDomain.extractPlan(fluentSolver);
+		System.out.println("Found plan? " + chimp.generatePlan());
+		chimp.printStats(System.out);
 		
 		// Dispatch the plan
 		System.out.println("Starting Dispatching");
