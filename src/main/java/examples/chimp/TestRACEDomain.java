@@ -20,9 +20,7 @@ public class TestRACEDomain {
 	
 
 	public static void main(String[] args) {
-		
-//		ProblemParser pp = new ProblemParser("problems/test_fluent_scheduling.pdl");
-		
+	
 //		String problemFile = "problems/test_op_tuck_arms.pdl"); // #1
 //		String problemFile = "problems/test_op_move_base.pdl"); // #2
 //		String problemFile = "problems/test_op_move_base_blind.pdl"); // #3
@@ -33,10 +31,6 @@ public class TestRACEDomain {
 //		String problemFile = "problems/test_op_move_arms_to_carryposture.pdl"); //#8
 //		String problemFile = "problems/test_op_observe_objects_on_area.pdl"); //#9
 		
-		// new for debugging:
-//		ProblemParser pp = new ProblemParser("problems/test_m_arms_assume_driving_pose_debug1.pdl"); //#10
-		
-		// new for merge
 //		String problemFile = "problems/test_m_adapt_torso_merge.pdl"; //#11
 //		String problemFile = "problems/test_m_merge_get_object.pdl"; //#12 
 
@@ -72,17 +66,15 @@ public class TestRACEDomain {
 //		String problemFile = "problems/test_m_move_object_3.pdl"; //#42
 //		String problemFile = "problems/test_scenario_3_2_3.pdl"; //#43
 		
-		String problemFile = "problems/test_m_serve_coffee_problem_1.pdl"; // #0
-		
 //		String problemFile = "problems/race_testing/move_multiple.pdl");
 //		String problemFile = "problems/test_m_serve_coffee_problem_2_fromtable.pdl"); //#44
 //		String problemFile = "problems/test_m_get_object_w_arm_debug1.pdl"); //#45
 		// value ordering heuristic debugging:
 //		String problemFile = "problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
 		
-	// IROS
 //		String problemFile = "problems/iros/iros_incremental_merging_initial.pdl");
 		
+		String problemFile = "problems/test_m_serve_coffee_problem_1.pdl"; // #0
 		String domainFile = "domains/ordered_domain.ddl";
 		
 //		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
