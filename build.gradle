@@ -8,7 +8,14 @@ apply plugin: 'maven'
 // your package is used as a binary.
 apply plugin: 'application'
 // The main class that will be executed when you do 'gradle run'
-mainClassName = 'hybridDomainParsing.TestProblemParsing'
+mainClassName = 'examples.ChimpIO'
+
+// e.g., run with:
+// gradle run -Dexec.args="domains/ordered_domain.ddl problems/test_m_serve_coffee_problem_1.pdl"
+run {    
+    systemProperties System.getProperties()
+    args System.getProperty("exec.args").split()    
+}
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
