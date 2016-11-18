@@ -296,8 +296,8 @@ public abstract class PlanReportroiryItemParser {
 		}
 	}
 	
-	private void handleAdditionalConstraints() {
-		
+//	private void handleAdditionalConstraints() {
+//		
 //		class AdditionalConstraint {
 //			AllenIntervalConstraint con;
 //			int from, to;
@@ -363,7 +363,7 @@ public abstract class PlanReportroiryItemParser {
 //		PFD0Operator ret =  new PFD0Operator(head,consFromHeadtoReq,requirementStrings,resourceRequirements);
 //		for (AdditionalConstraint ac : acs) ac.addAdditionalConstraint(ret);
 //		return ret;
-	}
+//	}
 	
 	protected EffectTemplate createEffectTemplate(String component, String subKey, String subString) {
 		String name = HybridDomain.extractName(subString);

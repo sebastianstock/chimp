@@ -116,7 +116,7 @@ public class NameDomain extends Domain {
 	/**
 	 * 
 	 * @param unaryValues Sorted array of values.
-	 * @return
+	 * @return True if an internal variable has been changed.
 	 */
 	protected boolean setUnaryEquals(int[] unaryValues) {
 		// sets each internal variable that is not in unaryValues to false
@@ -139,7 +139,7 @@ public class NameDomain extends Domain {
 	/**
 	 * 
 	 * @param unaryValues Values that cannot be true.
-	 * @return
+	 * @return True if an internal variable has been changed.
 	 */
 	protected boolean setUnaryDifferent(int[] unaryValues) {
 		boolean changed = false; // indicates if a value has been changed

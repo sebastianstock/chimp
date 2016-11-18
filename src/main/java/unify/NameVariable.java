@@ -38,7 +38,7 @@ public class NameVariable extends Variable {
 	
 	/** Makes the variable ground and sets the domain to only that symbol.
 	 * 
-	 * @param name New ground value of the variable.
+	 * @param symbol New ground value of the variable.
 	 */
 	public void setConstant(String symbol) {
 		this.domain.setConstantValue(

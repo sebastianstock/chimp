@@ -64,7 +64,7 @@ public class CHIMP {
 		/**
 		 * 
 		 * @param valOH The heuristic that shall be used by the HTNPlanner. Default: UnifyFewestsubsEarliesttasksNewestbindingsValOH
-		 * @return
+		 * @return This {@link CHIMPBuilder}.
 		 */
 		public CHIMPBuilder valHeuristic(ValueOrderingH valOH) {
 			this.htnValOH = valOH;
@@ -73,8 +73,8 @@ public class CHIMP {
 		
 		/**
 		 * If a MoveBaseDurationEstimator is set, the MoveBaseDurationMetaConstraint will be used by the planner.
-		 * @param mbe
-		 * @return
+		 * @param mbe The {@link MoveBaseDurationEstimator} to estimate the duration of navigation.
+		 * @return This {@link CHIMPBuilder}.
 		 */
 		public CHIMPBuilder mbEstimator(MoveBaseDurationEstimator mbe) {
 			this.mbEstimator = mbe;
@@ -88,7 +88,7 @@ public class CHIMP {
 		/**
 		 * 
 		 * @param guess Indicates wheter the GuessOrderinMetaConstraint shall be used. Default: false 
-		 * @return
+		 * @return This {@link CHIMPBuilder}.
 		 */
 		public CHIMPBuilder guessOrdering(boolean guess) {
 			this.guessOrdering  = guess;
@@ -98,7 +98,7 @@ public class CHIMP {
 		/**
 		 * 
 		 * @param unification With this option set it tries to unify tasks to already planned tasks. Default: false
-		 * @return
+		 * @return This {@link CHIMPBuilder}.
 		 */
 		public CHIMPBuilder htnUnification(boolean unification) {
 			this.htnUnification = unification;
@@ -147,7 +147,8 @@ public class CHIMP {
 	}
 	
 	/**
-	 * Gets a description of the involved constraint solvers.
+	 * 
+	 * @return The description of the involved constraint solvers.
 	 */
 	public String printDescription() {
 		return planner.getDescription();

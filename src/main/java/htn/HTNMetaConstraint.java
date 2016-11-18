@@ -114,7 +114,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private boolean checkPredecessors(Variable var, FluentNetworkSolver groundSolver) {
 		for (FluentConstraint flc : 
 			groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.BEFORE)) {
-			Object marking = flc.getScope()[0].getMarking();
+//			Object marking = flc.getScope()[0].getMarking();
 			if (!checkApplied((Fluent)flc.getScope()[0])) {
 				return false;
 			}	 
@@ -126,7 +126,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	/**
 	 * Get all values for a given {@link MetaVariable}.
 	 * @param metaVariable The {@link MetaVariable} for which we seek meta values.
-	 * @return All meta values for the given{@link MetaVariables}.
+	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
@@ -392,7 +392,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	/**
 	 * Adds resources usages of general fluents.
 	 * When creating effects these will be used to add resource constraints to those fluents.
-	 * @param resourceTemplates
+	 * @param resourceTemplates Indicate the resource usages.
 	 */
 	public void setResourceUsages(List<ResourceUsageTemplate> resourceTemplates) {
 		resourcesTemplatesMap = createResourceUsagesMap(resourceTemplates);
@@ -400,8 +400,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 	
 	/**
 	 * Generate a map from resource types to lists of ResourceUsageTemplates.
-	 * @param resourceTemplates
-	 * @return
+	 * @param resourceTemplates Indicate the resource usages.
+	 * @return Map from resource types to a list of ResourceUsageTemplates.
 	 */
 	public static Map<String, List<ResourceUsageTemplate>> createResourceUsagesMap(List<ResourceUsageTemplate> resourceTemplates) {
 		Map<String, List<ResourceUsageTemplate>> ret = 

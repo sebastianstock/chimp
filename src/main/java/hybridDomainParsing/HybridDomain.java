@@ -155,10 +155,9 @@ public class HybridDomain{
 
 	/**
 	 * Parses a domain file (see domains/testDomain.ddl for an example), instantiates
-	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link SimplePlanner}.
-	 * @param sp The {@link SimplePlanner} that will use this domain.
-	 * @param fileName Text file containing the domain definition. 
-	 * @throws DomainParsingException 
+	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link HybridDomainPlanner}.
+	 * @param planner The {@link HybridDomainPlanner} that will use this domain.
+	 * @throws DomainParsingException Throws this exception if the domain cannot be parsed.
 	 */
 	public void parseDomain(HybridDomainPlanner planner) throws DomainParsingException {
 		name = parseKeyword(DOMAIN_KEYWORD, domainStr)[0];

@@ -214,7 +214,9 @@ public abstract class PlanReportroryItem {
 	/**
 	 * Expands preconditions and effects of a task + Adds Duration constraint
 	 * @param taskFluent The task that has to be expanded.
+	 * @param depth The current depth of the task fluent in the plan's hierarchy.
 	 * @param groundSolver The groundSolver.
+	 * @param openFluents All fluents that are open.
 	 * @return The resulting ConstraintNetwork.
 	 */
 	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {

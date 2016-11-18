@@ -10,8 +10,6 @@ import org.metacsp.framework.multi.MultiConstraintSolver;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
-import org.metacsp.multi.allenInterval.AllenIntervalNetworkUtilities;
-import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
 
 import htn.TaskApplicationMetaConstraint;
@@ -59,7 +57,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	}
 	
 	/**
-	 * @param taskLST The latest start time of the task.
+	 * @param taskInterval The {@link AllenInterval} of the task.
 	 * @return All Fluents that are active in a given interval.
 	 */
 	public Fluent[] getOpenFluents(AllenInterval taskInterval) {

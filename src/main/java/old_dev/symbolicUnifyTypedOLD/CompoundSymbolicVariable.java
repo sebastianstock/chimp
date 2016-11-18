@@ -164,9 +164,9 @@ public class CompoundSymbolicVariable extends MultiVariable {
 	/**
 	 * Checks if it can be possibly be matched to another fluent.
 	 * This is the case when the type and all constant parameters are the same.
-	 * @param fluenttype
-	 * @param arguments
-	 * @return
+	 * @param fluenttype The type of the fluent to compare.
+	 * @param arguments The arguemnts of the fluents to compare.
+	 * @return True if the fluent can match the type and arguments.
 	 */
 	public boolean possibleMatch(String fluenttype, String[] arguments) {
 		if (fluenttype == null) {

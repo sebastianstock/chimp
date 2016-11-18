@@ -66,7 +66,7 @@ public class PreconditionMetaConstraint extends MetaConstraint {
 	 * Put a matches constraint between them and set the marking to SATISFIED.
 	 * 
 	 * @param metaVariable The {@link MetaVariable} for which we seek meta values.
-	 * @return All meta values for the given{@link MetaVariables}.
+	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {

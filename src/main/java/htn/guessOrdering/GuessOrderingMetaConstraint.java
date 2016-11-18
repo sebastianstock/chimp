@@ -105,7 +105,7 @@ public class GuessOrderingMetaConstraint extends MetaConstraint {
 	/**
 	 * Get all values for a given {@link MetaVariable}.
 	 * @param metaVariable The {@link MetaVariable} for which we seek meta values.
-	 * @return All meta values for the given{@link MetaVariables}.
+	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
 	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
