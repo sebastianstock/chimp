@@ -76,11 +76,7 @@ public class GuessOrderingMetaConstraint extends MetaConstraint {
 	 * @return False if the Variable has an unplanned predecessor, otherwise true.
 	 */
 	private boolean checkIsDecomposition(Variable var, FluentNetworkSolver groundSolver) {
-		for (FluentConstraint flc : 
-			groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.DC)) {
-				return true;
-		}
-		return false;
+		return groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.DC).size() > 0;
 	}
 	
 	/**
