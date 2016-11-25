@@ -102,8 +102,13 @@ public class HybridDomain{
 		return fluentResourceUsages;
 	}
 	
-	public static String extractName(String str) {
-		return str.substring(str.indexOf("::")+1,str.indexOf("(")).trim();
+	public static String extractName(String str) throws DomainParsingException {
+		try {
+			return str.substring(str.indexOf("::")+1,str.indexOf("(")).trim();
+		} catch (IndexOutOfBoundsException ie) {
+			throw new DomainParsingException("Error while parsing predicate name from string " + str 
+					+ "\n Should be of format 'name(arg1 ... argn)'");
+		}
 	}
 	
 	public static String[] extractArgs(String str) {

@@ -81,7 +81,7 @@ public abstract class PlanReportroiryItemParser {
 		}
 	}
 	
-	protected HTNPrecondition[] createPreconditions(boolean negativeEffects) {
+	protected HTNPrecondition[] createPreconditions(boolean negativeEffects) throws DomainParsingException {
 		Map<String,String> preconditionStringsMap = parsePreconditionStrings();
 		List<String> negativeEffectsKeyList = parseNegativeEffects();
 		
@@ -102,7 +102,7 @@ public abstract class PlanReportroiryItemParser {
 		return preconditions;
 	}
 	
-	protected HTNPrecondition createPrecondition(String preKey, String preString) {
+	protected HTNPrecondition createPrecondition(String preKey, String preString) throws DomainParsingException {
 		String name = HybridDomain.extractName(preString);
 		String[] args = HybridDomain.extractArgs(preString);
 
@@ -214,7 +214,7 @@ public abstract class PlanReportroiryItemParser {
 		return effectsStringsMap;
 	}
 	
-	protected EffectTemplate[] createEffectTemplates (String component, String keyword) {
+	protected EffectTemplate[] createEffectTemplates (String component, String keyword) throws DomainParsingException {
 		Map<String, String> effectStringsMap = parseEffects(keyword);
 		EffectTemplate[] ret = new EffectTemplate[effectStringsMap.size()];
 		
@@ -365,7 +365,7 @@ public abstract class PlanReportroiryItemParser {
 //		return ret;
 //	}
 	
-	protected EffectTemplate createEffectTemplate(String component, String subKey, String subString) {
+	protected EffectTemplate createEffectTemplate(String component, String subKey, String subString) throws DomainParsingException {
 		String name = HybridDomain.extractName(subString);
 		String[] args = HybridDomain.extractArgs(subString);
 
