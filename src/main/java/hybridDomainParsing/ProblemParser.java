@@ -24,10 +24,11 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.TaskApplicationMetaConstraint.markings;
+import planner.CHIMPProblem;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariable;
 
-public class ProblemParser {
+public class ProblemParser implements CHIMPProblem {
 		
 	public static final String PROBLEM_KEYWORD = "Problem";
 	public static final String FLUENT_KEYWORD = "Fluent";
@@ -51,6 +52,7 @@ public class ProblemParser {
 		parseProblem();
 	}
 	
+	@Override
 	public void createState(FluentNetworkSolver fluentSolver, HybridDomain domain) {
 		Map<String, Variable> varsMap = new HashMap<String, Variable>(fluentElementsMap.size() 
 				+ taskElementsMap.size());
@@ -270,10 +272,12 @@ public class ProblemParser {
 		return ret;
 	}
 
+	@Override
 	public String[] getArgumentSymbols() {
 		return argumentSymbols;
 	}
 
+	@Override
 	public Map<String, String[]> getTypesInstancesMap() {
 		return typesInstancesMap;
 	}

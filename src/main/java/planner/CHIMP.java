@@ -37,7 +37,6 @@ import unify.CompoundSymbolicVariableConstraintSolver;
  */
 public class CHIMP {
 	
-	private ProblemParser problemParser;
 	private HybridDomain domain;
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
@@ -49,16 +48,30 @@ public class CHIMP {
 
 	public static class CHIMPBuilder {
 		
+		private final CHIMPProblem problem;
 		private final String domainPath;
-		private final String problemPath;
 		private ValueOrderingH htnValOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		private MoveBaseDurationEstimator mbEstimator;
 		private boolean guessOrdering = false;
 		public boolean htnUnification = false;
 		
+		/**
+		 * 
+		 * @param domainPath Path to the domain file.
+		 */
+		public CHIMPBuilder(String domainPath, CHIMPProblem problem) {
+			this.domainPath = domainPath;
+			this.problem = problem;
+		}
+		
+		/**
+		 * 
+		 * @param domainPath Path to the domain file.
+		 * @param problemPath Path to the problem file.
+		 */
 		public CHIMPBuilder(String domainPath, String problemPath) {
 			this.domainPath = domainPath;
-			this.problemPath = problemPath;	
+			this.problem = new ProblemParser(problemPath);
 		}
 		
 		/**
@@ -109,23 +122,22 @@ public class CHIMP {
 	
 	private CHIMP(CHIMPBuilder builder) throws DomainParsingException {
 		
-		problemParser = new ProblemParser(builder.problemPath);
 		domain = new HybridDomain(builder.domainPath);
 		
 		int[] ingredients = new int[] {1, domain.getMaxArgs()};
 		String[][] symbols = new String[2][];
 		symbols[0] =  domain.getPredicateSymbols();
-		symbols[1] = problemParser.getArgumentSymbols();
+		symbols[1] = builder.problem.getArgumentSymbols();
 		
 		planner = new HTNPlanner(origin,  horizon,  0, symbols, ingredients);
-		planner.setTypesInstancesMap(problemParser.getTypesInstancesMap());
+		planner.setTypesInstancesMap(builder.problem.getTypesInstancesMap());
 		domain.parseDomain(planner);  // loads the domain into the planner
 		
 		initMetaConstraints(builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
 		
 		// create initial state:
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		problemParser.createState(fluentSolver, domain);
+		builder.problem.createState(fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 	}
 	
