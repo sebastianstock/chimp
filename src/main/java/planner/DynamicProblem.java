@@ -12,6 +12,12 @@ import fluentSolver.FluentNetworkSolver;
 import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.HybridDomain;
 
+/**
+ * CHIMPProblem that is not based on a PDL file.
+ * 
+ * @author Sebastian Stock
+ *
+ */
 public class DynamicProblem implements CHIMPProblem {
 	
 	private class FluentPrototype {
@@ -71,18 +77,26 @@ public class DynamicProblem implements CHIMPProblem {
 			throw new IllegalStateException("State has already been created.");
 		}
 		createdState = true;
+		System.out.println("Creating state");
 		for (FluentPrototype p : stateVars) {
 
 			Fluent fl = (Fluent) fluentSolver.createVariable();
 			fl.setName(p.predicate, p.args);
 			fl.setMarking(markings.OPEN);
+			System.out.println("Created state fluent " + fl.toString());
 		}
 		
 		for (FluentPrototype p : taskVars) {
-
-			Fluent fl = (Fluent) fluentSolver.createVariable();
+			String component;
+			if (p.predicate.startsWith("!")) {
+				component = "Activity";
+			} else {
+				component = "Task";
+			}
+			Fluent fl = (Fluent) fluentSolver.createVariable(component);
 			fl.setName(p.predicate, p.args);
 			fl.setMarking(markings.UNPLANNED);
+			System.out.println("Created fluent: " + fl.toString());
 		}
 		
 		// TODO Create AllenIntervals
