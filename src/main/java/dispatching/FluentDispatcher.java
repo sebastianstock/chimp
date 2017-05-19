@@ -1,15 +1,18 @@
 package dispatching;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
+import org.metacsp.utility.logging.MetaCSPLogging;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import sensing.FluentConstraintNetworkAnimator;
 
 public class FluentDispatcher extends Thread {
 
@@ -21,6 +24,7 @@ public class FluentDispatcher extends Thread {
 	private HashMap<Fluent,AllenIntervalConstraint> overlapFutureConstraints;
 	private HashMap<String,FluentDispatchingFunction> dfs;
 	private Fluent future;
+	private transient Logger logger = MetaCSPLogging.getLogger(this.getClass());
 
 	public FluentDispatcher(FluentNetworkSolver fns, long period, Fluent future) {
 		this.fns = fns;
@@ -35,7 +39,7 @@ public class FluentDispatcher extends Thread {
 	@Override
 	public void run() {
 		while (true) {
-			try { Thread.sleep(period); }
+			try { Thread.sleep(period); }  // TODO put this to the end to prevent sleeping right at the beginning?
 			catch (InterruptedException e) { e.printStackTrace(); }
 
 			synchronized(fns) {
@@ -59,7 +63,7 @@ public class FluentDispatcher extends Thread {
 												to.getCompoundSymbolicVariable().getName().equals(act.getCompoundSymbolicVariable().getName()) && 
 												aic.getTypes()[0].equals(AllenIntervalConstraint.Type.Equals)) {
 											skip = true;
-											System.out.println("IGNORED UNIFICATION " + aic);
+											logger.info("IGNORED UNIFICATION " + aic);
 											break;
 										}
 									}
@@ -78,7 +82,7 @@ public class FluentDispatcher extends Thread {
 									overlapsFuture.setTo(future);
 									boolean ret = fns.addConstraint(overlapsFuture);
 									if(!ret){
-										System.out.println("IGNORED: " + act);
+										logger.info("IGNORED: " + act);
 //										System.out.println("  CONSTRAINTS IN: " + Arrays.toString(fns.getConstraintNetwork().getIncidentEdges(act)));
 //										System.out.println("  CONSTRAINTS OUT: " + Arrays.toString(fns.getConstraintNetwork().getOutgoingEdges(act)));
 //											CopyOfTestProblemParsing.extractPlan(fns);
@@ -110,7 +114,27 @@ public class FluentDispatcher extends Thread {
 					}
 				}
 			}
+			synchronized(this) {
+				if (this.isFinished()) {
+					logger.info("dispatching finished: notifying all waiting threads");
+					this.notifyAll();
+				}
+			}
 		}
+	}
+	
+	/**
+	 * Check if all activities have been finished.
+	 * @return true if all activities have been finished, i.e., no started or planned activites exist, otherwise false
+	 */
+	public boolean isFinished() {
+		for (ACTIVITY_STATE state : acts.values()) {
+			if (state.equals(ACTIVITY_STATE.PLANNED) || state.equals(ACTIVITY_STATE.STARTED) || state.equals(ACTIVITY_STATE.FINISHING)) {
+				return false;
+			}
+		}
+		logger.fine("Acts.size: " + acts.size());
+		return true;
 	}
 
 	public void addDispatchingFunction(String component, FluentDispatchingFunction df) {
