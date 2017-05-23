@@ -38,9 +38,11 @@ public class FluentDispatcher extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (! isInterrupted()) {
 			try { Thread.sleep(period); }  // TODO put this to the end to prevent sleeping right at the beginning?
-			catch (InterruptedException e) { e.printStackTrace(); }
+			catch (InterruptedException e) {
+				interrupt();
+			}
 
 			synchronized(fns) {
 				for (String component : dfs.keySet()) {

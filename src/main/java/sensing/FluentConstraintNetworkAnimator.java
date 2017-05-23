@@ -145,12 +145,14 @@ public class FluentConstraintNetworkAnimator extends Thread {
 	@Override
 	public void run() {
 		int iteration = 0;
-		while (true) {
+		while (! isInterrupted()) {
 			
 			long startSleep = getTimeNow();
 			while (getTimeNow()-startSleep < period) {
 				try { Thread.sleep(10); }
-				catch (InterruptedException e) { e.printStackTrace(); }
+				catch (InterruptedException e) { 
+					interrupt();
+				}
 			}
 
 			if (!paused) {
@@ -188,6 +190,7 @@ public class FluentConstraintNetworkAnimator extends Thread {
 				}
 			}
 		}
+		logger.info("finished");
 	}
 	
 	public Fluent getFuture() {
