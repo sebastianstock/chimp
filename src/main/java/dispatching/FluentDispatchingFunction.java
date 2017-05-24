@@ -28,6 +28,10 @@ public abstract class FluentDispatchingFunction {
 		dis.finish(act);
 	}
 	
+	public void fail(Fluent act) {
+		dis.fail(act);
+	}
+	
 	public ConstraintNetwork getConstraintNetwork() {
 		return dis.getConstraintNetwork();
 	}

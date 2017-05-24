@@ -16,7 +16,7 @@ import sensing.FluentConstraintNetworkAnimator;
 
 public class FluentDispatcher extends Thread {
 
-	public static enum ACTIVITY_STATE {PLANNED, STARTED, FINISHING, FINISHED, SKIP_BECAUSE_UNIFICATION};
+	public static enum ACTIVITY_STATE {PLANNED, STARTED, FINISHING, FINISHED, SKIP_BECAUSE_UNIFICATION, FAILED};
 	private ConstraintNetwork cn;
 	private FluentNetworkSolver fns;
 	private long period;
@@ -121,6 +121,10 @@ public class FluentDispatcher extends Thread {
 					logger.info("dispatching finished: notifying all waiting threads");
 					this.notifyAll();
 				}
+				if (this.failed()) {
+					logger.info("dispatching failed: notifying all waiting threads");
+					this.notifyAll();
+				}
 			}
 		}
 	}
@@ -138,6 +142,19 @@ public class FluentDispatcher extends Thread {
 		logger.fine("Acts.size: " + acts.size());
 		return true;
 	}
+	
+	/**
+	 * Check if any activity has failed.
+	 * @return true if any activity has failed, otherwise false
+	 */
+	public boolean failed() {
+		for (ACTIVITY_STATE state : acts.values()) {
+			if (state.equals(ACTIVITY_STATE.FAILED)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public void addDispatchingFunction(String component, FluentDispatchingFunction df) {
 		df.registerDispatcher(this);
@@ -145,6 +162,8 @@ public class FluentDispatcher extends Thread {
 	}
 
 	public void finish(Fluent act) { acts.put(act, ACTIVITY_STATE.FINISHING); }
+	
+	public void fail(Fluent act) {acts.put(act, ACTIVITY_STATE.FAILED); }
 	
 	public ConstraintNetwork getConstraintNetwork() {
 		return fns.getConstraintNetwork();
