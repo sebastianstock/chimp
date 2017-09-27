@@ -28,7 +28,7 @@ You can start CHIMP from the command line with `gradle run` followed by argument
 
 
 ```
-gradle run -Dexec.args="domains/ordered_domain.ddl problems/test_m_serve_coffee_problem_1.pdl"
+./gradlew run -Dexec.args="domains/ordered_domain.ddl problems/test_m_serve_coffee_problem_1.pdl"
 ```
 
 

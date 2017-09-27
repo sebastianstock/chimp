@@ -13,8 +13,14 @@ mainClassName = 'examples.ChimpIO'
 // e.g., run with:
 // gradle run -Dexec.args="domains/ordered_domain.ddl problems/test_m_serve_coffee_problem_1.pdl"
 run {    
-    systemProperties System.getProperties()
-    args System.getProperty("exec.args").split()    
+  systemProperties System.getProperties()
+  if(System.getProperty("exec.args") != null) {
+    args System.getProperty("exec.args").split()
+  }
+}
+
+task wrapper(type: Wrapper) {
+   gradleVersion = '4.2' 
 }
 
 sourceCompatibility = 1.6
