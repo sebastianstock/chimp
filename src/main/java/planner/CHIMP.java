@@ -173,7 +173,7 @@ public class CHIMP {
 	/**
 	 * Draws the hierarchy of the plan.
 	 */
-	public void drawPlanHierarchy() {
+	public void drawPlanHierarchy(int distx) {
 		Graph<Fluent, FluentConstraint> g = new DirectedSparseMultigraph<Fluent, FluentConstraint>();
 		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
 			if (con instanceof FluentConstraint) {
@@ -183,7 +183,7 @@ public class CHIMP {
 				}
 			}
 		}
-		PlanHierarchyFrame.draw(g);
+		PlanHierarchyFrame.draw(g, distx);
 	}
 	
 	/**

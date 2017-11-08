@@ -18,6 +18,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -164,6 +165,7 @@ public class HierarchicalLayout implements Layout<Fluent, FluentConstraint> {
 			}
     		
     	});
+    	System.out.println("sorted: " + Arrays.asList(tasks));
     	return tasks;
     }
 	
@@ -193,7 +195,9 @@ public class HierarchicalLayout implements Layout<Fluent, FluentConstraint> {
         	}
         }
 
-        size = Math.max(0, size - distX);
+//        int min = f.getName().length() * 5;
+        int min = 0;
+        size = Math.max(min, size - distX);
         basePositions.put(f, size);
 
         return size;

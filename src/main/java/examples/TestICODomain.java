@@ -11,10 +11,10 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.UI.SearchTreeFrame;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import edu.uci.ics.jung.graph.DelegateForest;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.Graph;
 import externalPathPlanning.LookUpTableDurationEstimatorICO;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
@@ -157,27 +157,27 @@ public class TestICODomain {
 
 		planner.draw();
 		
-//		DelegateForest<Fluent, FluentConstraint> f = new DelegateForest<Fluent, FluentConstraint>();
-//		ConstraintNetwork cn = new ConstraintNetwork(null);
-//		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
-//			if (con instanceof FluentConstraint) {
-//				FluentConstraint fc = (FluentConstraint) con;
-//				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-//					fc.getFrom().setMarking(markings.UNIFIED);
-//					cn.addConstraint(fc);
-//				} else if (fc.getType() == FluentConstraint.Type.DC) {
-//					cn.addConstraint(fc);
-//					f.addEdge(fc, (Fluent) fc.getFrom(), (Fluent) fc.getTo());
-//				}
-//			}
-//		}
-////		Fluent f24 = (Fluent) fluentSolver.getConstraintNetwork().getVariable(24);
-////		Fluent f25 = (Fluent) fluentSolver.getConstraintNetwork().getVariable(25);
-////		f.addEdge(new FluentConstraint(FluentConstraint.Type.MATCHES), f24, f25);
-////		ConstraintNetwork.draw(cn);
-//		
-//		
-//		PlanHierarchyFrame.draw(f);
+		Graph<Fluent, FluentConstraint> g = new DirectedSparseMultigraph<Fluent, FluentConstraint>();
+		ConstraintNetwork cn = new ConstraintNetwork(null);
+		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
+			if (con instanceof FluentConstraint) {
+				FluentConstraint fc = (FluentConstraint) con;
+				if (fc.getType() == FluentConstraint.Type.MATCHES) {
+					fc.getFrom().setMarking(markings.UNIFIED);
+					cn.addConstraint(fc);
+				} else if (fc.getType() == FluentConstraint.Type.DC) {
+					cn.addConstraint(fc);
+					g.addEdge(fc, (Fluent) fc.getFrom(), (Fluent) fc.getTo());
+				}
+			}
+		}
+//		Fluent f24 = (Fluent) fluentSolver.getConstraintNetwork().getVariable(24);
+//		Fluent f25 = (Fluent) fluentSolver.getConstraintNetwork().getVariable(25);
+//		f.addEdge(new FluentConstraint(FluentConstraint.Type.MATCHES), f24, f25);
+//		ConstraintNetwork.draw(cn);
+		
+		
+		PlanHierarchyFrame.draw(g, 100);
 		
 //		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
 		

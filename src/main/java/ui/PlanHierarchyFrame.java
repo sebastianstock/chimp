@@ -17,8 +17,6 @@ import javax.swing.JPanel;
 
 import org.apache.commons.collections15.Transformer;
 
-import edu.uci.ics.jung.algorithms.layout.TreeLayout;
-import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
@@ -44,15 +42,11 @@ public class PlanHierarchyFrame extends JFrame {
 
 	VisualizationViewer<Fluent,FluentConstraint> vv;
 
-	String root;
-
-	TreeLayout<Fluent,FluentConstraint> treeLayout;
-
-	public PlanHierarchyFrame(Graph<Fluent,FluentConstraint> graph) {
+	public PlanHierarchyFrame(Graph<Fluent,FluentConstraint> graph, int distx) {
 
 		this.graph = graph;
 		
-		HierarchicalLayout hLayout = new HierarchicalLayout(graph, 100);
+		HierarchicalLayout hLayout = new HierarchicalLayout(graph, distx);
 		vv =  new VisualizationViewer<Fluent, FluentConstraint>(hLayout, new Dimension(600,600));
 
 		vv.setBackground(Color.white);
@@ -121,8 +115,8 @@ public class PlanHierarchyFrame extends JFrame {
 	}
 
 
-	public static void draw(Graph<Fluent,FluentConstraint> graph) {
-		PlanHierarchyFrame stf = new PlanHierarchyFrame(graph);
+	public static void draw(Graph<Fluent,FluentConstraint> graph, int distx) {
+		PlanHierarchyFrame stf = new PlanHierarchyFrame(graph, distx);
 		stf.setTitle(PlanHierarchyFrame.class.getSimpleName());
 		stf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		stf.pack();
