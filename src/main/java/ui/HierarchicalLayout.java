@@ -165,7 +165,6 @@ public class HierarchicalLayout implements Layout<Fluent, FluentConstraint> {
 			}
     		
     	});
-    	System.out.println("sorted: " + Arrays.asList(tasks));
     	return tasks;
     }
 	
