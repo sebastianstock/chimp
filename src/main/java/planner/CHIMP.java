@@ -10,6 +10,9 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 
+import edu.uci.ics.jung.graph.DelegateForest;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.Graph;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
 import fluentSolver.Fluent;
@@ -27,6 +30,7 @@ import hybridDomainParsing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
+import ui.PlanHierarchyFrame;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 /**
@@ -167,9 +171,25 @@ public class CHIMP {
 	}
 	
 	/**
+	 * Draws the hierarchy of the plan.
+	 */
+	public void drawPlanHierarchy() {
+		Graph<Fluent, FluentConstraint> g = new DirectedSparseMultigraph<Fluent, FluentConstraint>();
+		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
+			if (con instanceof FluentConstraint) {
+				FluentConstraint fc = (FluentConstraint) con;
+				if (fc.getType() == FluentConstraint.Type.DC) {
+					g.addEdge(fc, (Fluent) fc.getFrom(), (Fluent) fc.getTo());
+				}
+			}
+		}
+		PlanHierarchyFrame.draw(g);
+	}
+	
+	/**
 	 * Draws the plan hierarchy as a constraint network.
 	 */
-	public void drawHierarchy() {
+	public void drawHierarchyNetwork() {
 		ConstraintNetwork cn = new ConstraintNetwork(null);
 		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
 			if (con instanceof FluentConstraint) {

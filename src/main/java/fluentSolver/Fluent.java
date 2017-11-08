@@ -87,7 +87,10 @@ public class Fluent extends MultiVariable implements Activity{
 		return ret.toString();
 //		return "";
 	}
-
+	
+	public String getName() {
+		return this.getID() + " " + ((CompoundSymbolicVariable) this.getInternalVariables()[0]).getShortName();
+	}
 
 	@Override
 	public AllenInterval getTemporalVariable() {
