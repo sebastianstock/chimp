@@ -1,5 +1,6 @@
 package planner;
 
+import java.awt.Color;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,6 +183,12 @@ public class CHIMP {
 					g.addEdge(fc, (Fluent) fc.getFrom(), (Fluent) fc.getTo());
 				}
 			}
+		}
+		for (Fluent f : g.getVertices()) {
+			if (!f.getName().startsWith("!"))
+				f.setColor(Color.BLUE);
+			else
+				f.setColor(Color.RED);
 		}
 		PlanHierarchyFrame.draw(g, distx);
 	}

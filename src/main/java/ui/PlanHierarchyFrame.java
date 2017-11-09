@@ -16,6 +16,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.apache.commons.collections15.Transformer;
+import org.metacsp.framework.Constraint;
+import org.metacsp.framework.Variable;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
@@ -72,6 +74,24 @@ public class PlanHierarchyFrame extends JFrame {
 			}
 		});
 		
+		
+		//draw edge labels
+		Transformer<FluentConstraint,String> stringer = new Transformer<FluentConstraint,String>(){
+			@Override
+			public String transform(FluentConstraint e) {
+				try { return e.getEdgeLabel(); }
+				catch (NullPointerException ex) { return ""; }
+			}
+		};
+
+		Transformer<Fluent,Paint> vertexPaint = new Transformer<Fluent,Paint>() {
+			public Paint transform(Fluent v) {
+				return v.getColor();
+			}
+		};
+		
+		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+		vv.getRenderContext().setEdgeLabelTransformer(stringer);
 
 		Container content = getContentPane();
 		final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
