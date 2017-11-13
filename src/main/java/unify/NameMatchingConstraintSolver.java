@@ -162,7 +162,7 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 		List<NameMatchingConstraint> ret = new ArrayList<NameMatchingConstraint>();
 		for (Constraint con : this.getConstraints()) {
 			if (con instanceof NameMatchingConstraint) {
-				if (con.getScope()[0].equals(var) || con.getScope().equals(var)) {
+				if (con.getScope()[0].equals(var) || con.getScope()[1].equals(var)) {
 					if (! con.equals(except)) {
 						ret.add((NameMatchingConstraint) con);
 					}
