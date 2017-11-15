@@ -1,5 +1,7 @@
 package dispatching;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -47,7 +49,26 @@ public class FluentDispatcher extends Thread {
 			synchronized(fns) {
 				for (String component : dfs.keySet()) {
 					// go through all activity fluents
-					for (Variable var : cn.getVariables(component)) {
+					Variable[] vars = cn.getVariables(component);
+					Arrays.sort(vars, new Comparator<Variable>() {
+
+						@Override
+						public int compare(Variable o1, Variable o2) {
+							if (o1 instanceof Fluent && o2 instanceof Fluent) {
+								long o1_est = ((Fluent) o1).getAllenInterval().getEST();
+								long o2_est = ((Fluent) o2).getAllenInterval().getEST();
+								int c = Long.compare(o1_est, o2_est);
+								if (c == 0) {
+									c = o1.compareTo(o2);
+								}
+								return c;
+							} else {
+								return o1.compareTo(o2);
+							}
+						}
+					});
+					
+					for (Variable var : vars) {
 						if (var instanceof Fluent) {
 							Fluent act = (Fluent)var;
 							if (dfs.get(component).skip(act)) continue;
