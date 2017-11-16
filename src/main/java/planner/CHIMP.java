@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import javax.swing.JFrame;
+
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
@@ -47,6 +49,7 @@ public class CHIMP {
 	private FluentNetworkSolver fluentSolver;
 	private boolean foundPlan = false;
 	private long planningTime = -1;
+	private PlanHierarchyFrame planHierarchyFrame = null;
 	
 	private static long origin = 0; // TODO: parse from problem file
 	private static long horizon = 600000; // TODO: parse from problem file
@@ -175,6 +178,9 @@ public class CHIMP {
 	 * Draws the hierarchy of the plan.
 	 */
 	public void drawPlanHierarchy(int distx) {
+		if (this.planHierarchyFrame != null) { // close the old frame
+			this.disposePlanHierarchyFrame();
+		}
 		Graph<Fluent, FluentConstraint> g = new DirectedSparseMultigraph<Fluent, FluentConstraint>();
 		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
 			if (con instanceof FluentConstraint) {
@@ -190,7 +196,21 @@ public class CHIMP {
 			else
 				f.setColor(Color.RED);
 		}
-		PlanHierarchyFrame.draw(g, distx);
+		try {
+			this.planHierarchyFrame = PlanHierarchyFrame.draw(g, distx);
+		} catch (Exception e) {
+			System.err.println("Caught exception while drawing plan-hierarchy: " + e.toString());
+		}
+	}
+	
+	public void disposePlanHierarchyFrame() {
+		if (this.planHierarchyFrame != null) { // close the old frame
+			this.planHierarchyFrame.setVisible(false);
+			this.planHierarchyFrame.dispose();
+			System.out.println("Disposed planHierarchyFrame");
+		} else {
+			System.out.println("no active planHierarchyFrame");
+		}
 	}
 	
 	/**

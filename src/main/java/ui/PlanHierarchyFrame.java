@@ -135,12 +135,13 @@ public class PlanHierarchyFrame extends JFrame {
 	}
 
 
-	public static void draw(Graph<Fluent,FluentConstraint> graph, int distx) {
+	public static PlanHierarchyFrame draw(Graph<Fluent,FluentConstraint> graph, int distx) {
 		PlanHierarchyFrame stf = new PlanHierarchyFrame(graph, distx);
 		stf.setTitle(PlanHierarchyFrame.class.getSimpleName());
 		stf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		stf.pack();
 		stf.setVisible(true);
+		return stf;
 	}
 
 }
