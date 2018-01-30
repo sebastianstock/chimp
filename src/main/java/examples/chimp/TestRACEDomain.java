@@ -120,6 +120,9 @@ public class TestRACEDomain {
 			}
 
 			chimp.printFullPlan();
+			chimp.drawPlanHierarchy(100);
+			chimp.drawHierarchyNetwork();
+			chimp.drawSearchSpace();
 		}
 
 	}

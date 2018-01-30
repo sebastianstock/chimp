@@ -54,6 +54,8 @@ public class TestIncrementalMerging {
 		((Fluent) var).setName(name);
 		var.setMarking(markings.UNPLANNED);
 		
+		chimp.drawSearchSpace();
+		
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);
 		
@@ -65,5 +67,6 @@ public class TestIncrementalMerging {
 		}
 
 		chimp.printFullPlan();
+		chimp.drawSearchSpace();
 	}
 }
