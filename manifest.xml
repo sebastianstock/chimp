@@ -6,8 +6,9 @@ Furthermore, CHIMP can also dispatch the plans actions based on its temporal rep
 
   </description>
   <author>Sebastian Stock/sebastian.stock@dfki.de</author>
+  <maintainer>Sebastian Stock/sebastian.stock@dfki.de</maintainer>
   <license>MIT</license>
-  <url>http://sebastianstock.github.io/chimp/</url>
+  <url>https://github.com/sebastianstock/chimp</url>
   <depend package="meta_csp_framework"/>
 
   <keywords>
@@ -16,8 +17,10 @@ Furthermore, CHIMP can also dispatch the plans actions based on its temporal rep
     <keyword>Hybrid task planning</keyword>
     <keyword>Hierarchical planning</keyword>
   </keywords>
+  <stage>0</stage>
+  <use>multi project</use>
   <activity>active</activity>
-    <classifiers>
+  <classifiers>
     <classifier>java</classifier>
     <classifier>ubuntu</classifier>
   </classifiers>
