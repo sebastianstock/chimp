@@ -1,12 +1,10 @@
 package htn;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import java.util.logging.Logger;
-
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import htn.TaskApplicationMetaConstraint.markings;
+import hybridDomainParsing.HybridDomainPlanner;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
@@ -14,15 +12,12 @@ import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
-import hybridDomainParsing.HybridDomainPlanner;
 import unify.CompoundSymbolicValueConstraint;
+
+import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 
 public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlanner {
