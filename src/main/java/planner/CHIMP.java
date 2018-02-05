@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.JFrame;
-
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 
-import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 import externalPathPlanning.MoveBaseDurationEstimator;
@@ -58,7 +55,7 @@ public class CHIMP {
 		private ValueOrderingH htnValOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		private MoveBaseDurationEstimator mbEstimator;
 		private boolean guessOrdering = false;
-		public boolean htnUnification = false;
+		boolean htnUnification = false;
 		private long origin = 0;
 		private long horizon = 600000;
 		
@@ -106,7 +103,7 @@ public class CHIMP {
 			return this;
 		}
 
-		public CHIMPBuilder horizon(long horion) {
+		public CHIMPBuilder horizon(long horizon) {
 			this.horizon = horizon;
 			return this;
 		}
