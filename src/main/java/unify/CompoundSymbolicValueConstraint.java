@@ -20,9 +20,9 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 1697594290767658650L;
 
-	public static enum Type {MATCHES, SUBMATCHES, POSITIVEVALUERESTRICTION, NEGATIVEVALUERESTRICTION, SUBDIFFERENT};
-	
-	private Type type;
+	public enum Type {MATCHES, SUBMATCHES, POSITIVEVALUERESTRICTION, NEGATIVEVALUERESTRICTION, SUBDIFFERENT}
+
+    private Type type;
 	private int[] connections;
 	private int[] restrictionIndices;
 	private String[][] restrictions;

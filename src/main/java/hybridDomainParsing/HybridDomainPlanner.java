@@ -6,9 +6,9 @@ import fluentSolver.FluentNetworkSolver;
 
 public interface HybridDomainPlanner {
 	
-	public FluentNetworkSolver getFluentNetworkSolver();
+	FluentNetworkSolver getFluentNetworkSolver();
 	
-	public Map<String, String[]> getTypesInstancesMap();
+	Map<String, String[]> getTypesInstancesMap();
 	
 
 }

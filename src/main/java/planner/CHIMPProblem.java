@@ -7,10 +7,10 @@ import hybridDomainParsing.HybridDomain;
 
 public interface CHIMPProblem {
 
-	public String[] getArgumentSymbols();
+	String[] getArgumentSymbols();
 
-	public Map<String, String[]> getTypesInstancesMap();
+	Map<String, String[]> getTypesInstancesMap();
 	
-	public void createState(FluentNetworkSolver fluentSolver, HybridDomain domain);
+	void createState(FluentNetworkSolver fluentSolver, HybridDomain domain);
 	
 }

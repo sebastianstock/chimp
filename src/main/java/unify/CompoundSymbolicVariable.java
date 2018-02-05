@@ -240,13 +240,8 @@ public class CompoundSymbolicVariable extends MultiVariable {
 				break;
 			}
 		}
-		if (!found) {
-			return false;
-		}
-		// TODO use full checking of arguments to reduce branching factor
-
-		return true;
-	}
+        return found;
+    }
 	
 	public String[] getSymbolsAt(int position) {
 		if (position >= internalVarsCount) {
@@ -292,10 +287,7 @@ public class CompoundSymbolicVariable extends MultiVariable {
 		String[] toSymbols = toVar.getSymbolsAt(toId+1);
 		if (fromSymbols.length != 1 || toSymbols.length != 1)
 			return true;
-		if (fromSymbols[0] == toSymbols[0])
-			return false;
-		else
-			return true;
+        return fromSymbols[0] != toSymbols[0];
 	}
 	
 

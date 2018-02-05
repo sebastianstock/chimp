@@ -27,12 +27,8 @@ public class AdditionalConstraintTemplate {
 	}
 
 	public boolean involvesHeadAndKey(String key) {
-		if ((fromKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING) && (toKey.equals(key))) ||
-				(toKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING) && (fromKey.equals(key))) ) {
-			return true;
-		} else {
-			return false;
-		}
+        return (fromKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING) && (toKey.equals(key))) ||
+                (toKey.equals(PlanReportroryItem.HEAD_KEYWORD_STRING) && (fromKey.equals(key)));
 	}
 	
 	public boolean startsFromHead() {

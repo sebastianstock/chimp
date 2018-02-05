@@ -43,7 +43,7 @@ public class TestNameMatchingConstraintSolver {
 		NameMatchingConstraint con23Different = new NameMatchingConstraint(Type.DIFFERENT);
 		con23Different.setFrom(vars[2]);
 		con23Different.setTo(vars[3]);
-		System.out.println("Add con12 + con23?" + solver.addConstraints(new Constraint[] {con12, con23Different}));
+		System.out.println("Add con12 + con23?" + solver.addConstraints(con12, con23Different));
 		
 		// Test domain restriction
 		NameMatchingConstraint con44 = new NameMatchingConstraint(Type.UNARYEQUALS);
@@ -51,7 +51,7 @@ public class TestNameMatchingConstraintSolver {
 		con44.setTo(vars[4]);
 		con44.setUnaryValues(new int [] {1, 2});
 		System.out.println("vars[4] before: " + vars[4]);
-		System.out.println("Add con44?" + solver.addConstraints(new Constraint[] {con44}));
+		System.out.println("Add con44?" + solver.addConstraints(con44));
 		System.out.println("vars[4] after: " + vars[4]);
 	}
 

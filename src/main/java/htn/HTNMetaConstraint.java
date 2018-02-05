@@ -38,9 +38,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private boolean oneShot;
 	
 	// try to unify tasks with planned tasks?
-	private boolean tryUnification = false;; 
+	private boolean tryUnification = false;
 
-	public HTNMetaConstraint() {
+    public HTNMetaConstraint() {
 		this(true);
 	}
 	

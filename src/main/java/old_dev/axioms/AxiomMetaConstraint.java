@@ -65,9 +65,7 @@ public class AxiomMetaConstraint extends MetaConstraint {
 	private boolean checkViolation(Fluent fl) {
 		CompoundSymbolicVariable compVar = fl.getCompoundSymbolicVariable();
 		if (compVar.getPredicateName().equals("On")) {
-			if (compVar.getGroundSymbolAt(2).equals("placingAreaWestRightTable1")) {
-				return true;
-			}
+            return compVar.getGroundSymbolAt(2).equals("placingAreaWestRightTable1");
 		}
 		return false;
 	}

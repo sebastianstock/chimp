@@ -18,8 +18,9 @@ import sensing.FluentConstraintNetworkAnimator;
 
 public class FluentDispatcher extends Thread {
 
-	public static enum ACTIVITY_STATE {PLANNED, STARTED, FINISHING, FINISHED, SKIP_BECAUSE_UNIFICATION, FAILED};
-	private ConstraintNetwork cn;
+	public enum ACTIVITY_STATE {PLANNED, STARTED, FINISHING, FINISHED, SKIP_BECAUSE_UNIFICATION, FAILED}
+
+    private ConstraintNetwork cn;
 	private FluentNetworkSolver fns;
 	private long period;
 	private HashMap<Fluent,ACTIVITY_STATE> acts;

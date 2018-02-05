@@ -18,9 +18,9 @@ public class SimpleBooleanValueConstraint extends MultiBinaryConstraint {
 	
 	private transient Logger logger = MetaCSPLogging.getLogger(this.getClass());
 	
-	public static enum Type {EQUALS, UNARYTRUE, UNARYFALSE};
-	
-	private Type type;
+	public enum Type {EQUALS, UNARYTRUE, UNARYFALSE}
+
+    private Type type;
 	
 	public SimpleBooleanValueConstraint(Type type) {
 		this.type = type;

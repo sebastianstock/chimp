@@ -123,8 +123,7 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 			return false;
 		if (! (con.getType().equals(NameMatchingConstraint.Type.UNARYEQUALS) ||
 					 con.getType().equals(NameMatchingConstraint.Type.UNARYDIFFERENT))) {
-			if (! ((NameVariable) con.getScope()[1]).hasModel())
-				return false;
+            return ((NameVariable) con.getScope()[1]).hasModel();
 		}
 		return true;
 	}

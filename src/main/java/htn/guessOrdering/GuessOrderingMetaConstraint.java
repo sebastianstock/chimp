@@ -46,7 +46,7 @@ public class GuessOrderingMetaConstraint extends MetaConstraint {
 				if (!checkIsDecomposition(var, groundSolver)) {
 					if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
 						nw.addVariable(var);
-						varIds.add(((Fluent) var).getID());
+						varIds.add(var.getID());
 					}
 				}
 			}

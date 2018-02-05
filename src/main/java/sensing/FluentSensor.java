@@ -87,7 +87,7 @@ public class FluentSensor implements Serializable {
 				meetsFuture.setTo(future);
 				currentAct = act;
 				currentMeetsFuture = meetsFuture;
-				boolean ret = fns.addConstraints(new Constraint[] {rel,meetsFuture});
+				boolean ret = fns.addConstraints(rel,meetsFuture);
 				//if (!ret) throw new NetworkMaintenanceError(rel,meetsFuture);
 				if (!ret) throw new NetworkMaintenanceError(future.getTemporalVariable().getEST(),timeNow);
 				logger.info("" + currentAct);

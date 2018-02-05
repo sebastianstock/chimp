@@ -9,9 +9,9 @@ public class NameMatchingConstraint extends BinaryConstraint {
 
 	private static final long serialVersionUID = 7531778878497168468L;
 
-	public static enum Type {EQUALS, DIFFERENT, UNARYEQUALS, UNARYDIFFERENT};
-	
-	private Type type;
+	public enum Type {EQUALS, DIFFERENT, UNARYEQUALS, UNARYDIFFERENT}
+
+    private Type type;
 	private int[] unaryValues;
 	
 	public NameMatchingConstraint(Type type) {

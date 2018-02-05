@@ -24,10 +24,10 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	 */
 	private static final long serialVersionUID = 137380711080409334L;
 
-	public static enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED, MOVEDURATION, 
-		AXIOM, RESOURCEUSAGE};
+	public enum Type {MATCHES, DC, PRE, OPENS, CLOSES, BEFORE, UNARYAPPLIED, MOVEDURATION,
+		AXIOM, RESOURCEUSAGE}
 
-	private Type type;
+    private Type type;
 	private int[] connections;
 	private PlanReportroryItem plannedWith; // The operator or method that has been used for planning the task.
 	private boolean isNegativeEffect;

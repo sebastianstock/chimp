@@ -73,11 +73,8 @@ public class TestIncrementalMergingDispatching {
 
 			@Override
 			public boolean skip(Fluent act) {
-				if (act.getMarking() == markings.UNIFIED) {
-					return true; // unified with another activity
-				}
-				return false;
-			}
+                return act.getMarking() == markings.UNIFIED;
+            }
 
 			@Override
 			public void dispatch(Fluent act) {
