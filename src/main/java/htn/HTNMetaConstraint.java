@@ -34,8 +34,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
 
 	//false if we split up HTN algorithm into 3 meta constraints, 
-	// true if we apply preonditions and effects at the same time.
-	private boolean oneShot;
+	// true if we apply preconditions and effects at the same time.
+	private final boolean oneShot;
 	
 	// try to unify tasks with planned tasks?
 	private boolean tryUnification = false;
@@ -52,8 +52,6 @@ public class HTNMetaConstraint extends MetaConstraint {
 	public HTNMetaConstraint(boolean oneShot) {
 		super(null, null);
 		this.oneShot = oneShot;
-//		operators = new Vector<PlanReportroryItem>();
-//		methods = new Vector<PlanReportroryItem>();
 	}
 	
 	private boolean checkApplied(Fluent task) {
@@ -114,7 +112,6 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private boolean checkPredecessors(Variable var, FluentNetworkSolver groundSolver) {
 		for (FluentConstraint flc : 
 			groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.BEFORE)) {
-//			Object marking = flc.getScope()[0].getMarking();
 			if (!checkApplied((Fluent)flc.getScope()[0])) {
 				return false;
 			}	 
@@ -160,20 +157,6 @@ public class HTNMetaConstraint extends MetaConstraint {
 		logger.finest("Found " + ret.size() + " metaValues");
 		if (DEBUG) {
 			logger.info("  Found " + ret.size() + " metaValues");
-//			if(applicationCNT == 47) {
-//				for (int i = 0; i < ret.size(); i++) {
-////					System.out.println(ret.get(i));
-//					ConstraintNetwork cn = ret.get(i);
-//					System.out.println("Constraints: ");
-//					for (int j = 0; j < cn.getConstraints().length; j++) {
-//						System.out.println(cn.getConstraints()[j]);
-//						System.out.println("");
-//					}
-//					System.out.println("###");
-//				}
-//				
-//			}
-			
 		}
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
 		
@@ -195,7 +178,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 					
 					if (checkTime(task.getAllenInterval(), ((Fluent) var).getAllenInterval())) {
 
-						//					possibleMatchingTasks.add((Fluent) var);
+						// possibleMatchingTasks.add((Fluent) var);
 
 						// compare full name
 						if (compareWithGetName(task, (Fluent) var)) {
@@ -277,16 +260,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 				}
 			}
 		}
-		
-//		Fluent[] openFluents;
-//		if (fl.getComponent().equals("Activity")) {
-//			openFluents = groundSolver.getOpenFluents();
-//		} else {
-//			openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
-//		}
+
 		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
-//		Fluent[] openFluents = groundSolver.getOpenFluents();
-//		logger.fine("OPEN FLUENTS: " + Arrays.toString(openFluents));
+
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
