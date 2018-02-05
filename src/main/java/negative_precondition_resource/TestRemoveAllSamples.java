@@ -53,8 +53,6 @@ public class TestRemoveAllSamples {
 				// methods
 				"deploy_basecamp", "take_samples", "get_basecamp",
 				"transfer_all_samples",
-				// other
-				HTNPlanner.FUTURE_STR
 				};	
 		// race:Kitchenware		
 		// index: 1, 2
@@ -112,8 +110,6 @@ public class TestRemoveAllSamples {
 //		MetaCSPLogging.setLevel(Level.OFF);
 		
 //		testScheduling(planner);
-		
-		planner.createInitialMeetsFutureConstraints();
 		
 		plan(planner, fluentSolver);
 		

@@ -311,9 +311,7 @@ public class HybridDomain{
 		String[] parsed = parseKeyword(PREDICATE_SYMBOLS_KEYWORD, everything);
 		if (parsed.length > 0 ) {
 			String[] parsedSymbols = parsed[0].split("\\s+");
-			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
-			ret[ret.length - 1] = HTNPlanner.FUTURE_STR;
-			return ret;
+			return parsedSymbols;
 		} else  {
 			MetaCSPLogging.getLogger(HybridDomain.class).warning("Warning: No predicate symbols specified in domain!");
 			return new String[]{};
