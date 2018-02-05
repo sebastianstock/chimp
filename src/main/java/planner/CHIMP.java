@@ -50,9 +50,6 @@ public class CHIMP {
 	private boolean foundPlan = false;
 	private long planningTime = -1;
 	private PlanHierarchyFrame planHierarchyFrame = null;
-	
-	private static long origin = 0; // TODO: parse from problem file
-	private static long horizon = 600000; // TODO: parse from problem file
 
 	public static class CHIMPBuilder {
 		
@@ -62,6 +59,8 @@ public class CHIMP {
 		private MoveBaseDurationEstimator mbEstimator;
 		private boolean guessOrdering = false;
 		public boolean htnUnification = false;
+		private long origin = 0;
+		private long horizon = 600000;
 		
 		/**
 		 * 
@@ -101,6 +100,16 @@ public class CHIMP {
 			this.mbEstimator = mbe;
 			return this;
 		}
+
+		public CHIMPBuilder origin(long origin) {
+			this.origin = origin;
+			return this;
+		}
+
+		public CHIMPBuilder horizon(long horion) {
+			this.horizon = horizon;
+			return this;
+		}
 		
 		public CHIMP build() throws DomainParsingException {
 			return new CHIMP(this);
@@ -137,7 +146,7 @@ public class CHIMP {
 		symbols[0] =  domain.getPredicateSymbols();
 		symbols[1] = builder.problem.getArgumentSymbols();
 		
-		planner = new HTNPlanner(origin,  horizon,  0, symbols, ingredients);
+		planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(builder.problem.getTypesInstancesMap());
 		domain.parseDomain(planner);  // loads the domain into the planner
 		
