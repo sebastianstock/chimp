@@ -307,8 +307,8 @@ public class HybridDomain{
 				resourceRequirements, usageLevel);
 	}
 
-	private static String[] parsePredicateSymbols(String everyting) {
-		String[] parsed = parseKeyword(PREDICATE_SYMBOLS_KEYWORD, everyting);
+	private static String[] parsePredicateSymbols(String everything) {
+		String[] parsed = parseKeyword(PREDICATE_SYMBOLS_KEYWORD, everything);
 		if (parsed.length > 0 ) {
 			String[] parsedSymbols = parsed[0].split("\\s+");
 			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
