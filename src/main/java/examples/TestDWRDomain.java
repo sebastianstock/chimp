@@ -79,12 +79,12 @@ public class TestDWRDomain {
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18.pdl"; 
 //	static String ProblemPath = "domains/dwr/comp_problems/dwr_problem_3_c19_c23_c18_c22.pdl"; 
 	
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63.pdl";
-	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_c13_c21.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring2.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_abb63_bring2_c11_c21.pdl";
-//	static String ProblemPath = "domains/dwr/dwr_test_examples/dwr_problem_1_r1-c14-p4_r2-c24-p3.pdl"; 
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring.pdl";
+	static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring_c13_c21.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring2.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/bring/dwr_abb63_bring2_c11_c21.pdl";
+//	static String ProblemPath = "domains/dwr/dwr_test_examples/move/dwr_problem_1_r1-c14-p4_r2-c24-p3.pdl";
 	
 	
 	
