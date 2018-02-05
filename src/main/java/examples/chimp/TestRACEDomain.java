@@ -12,15 +12,15 @@ import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
 
 public class TestRACEDomain {
-	
+
 	static final boolean LOGGING = false;
 	static final boolean GUESS_ORDERING = false;
     static final boolean PRINT_PLAN = true;
     static final boolean DRAW = false;
-	
+
 
 	public static void main(String[] args) {
-	
+
 //		String problemFile = "problems/test_op_tuck_arms.pdl"); // #1
 //		String problemFile = "problems/test_op_move_base.pdl"); // #2
 //		String problemFile = "problems/test_op_move_base_blind.pdl"); // #3
@@ -30,9 +30,9 @@ public class TestRACEDomain {
 //		String problemFile = "problems/test_op_move_arm_to_side.pdl"); // #7
 //		String problemFile = "problems/test_op_move_arms_to_carryposture.pdl"); //#8
 //		String problemFile = "problems/test_op_observe_objects_on_area.pdl"); //#9
-		
+
 //		String problemFile = "problems/test_m_adapt_torso_merge.pdl"; //#11
-//		String problemFile = "problems/test_m_merge_get_object.pdl"; //#12 
+//		String problemFile = "problems/test_m_merge_get_object.pdl"; //#12
 
 //		String problemFile = "problems/test_m_adapt_torso.pdl"; //#13
 //		String problemFile = "problems/test_m_torso_assume_driving_pose0.pdl"; //#14
@@ -65,18 +65,18 @@ public class TestRACEDomain {
 //		String problemFile = "problems/test_m_move_object_2.pdl"; //#41
 //		String problemFile = "problems/test_m_move_object_3.pdl"; //#42
 //		String problemFile = "problems/test_scenario_3_2_3.pdl"; //#43
-		
+
 //		String problemFile = "problems/race_testing/move_multiple.pdl");
 //		String problemFile = "problems/test_m_serve_coffee_problem_2_fromtable.pdl"); //#44
 //		String problemFile = "problems/test_m_get_object_w_arm_debug1.pdl"); //#45
 		// value ordering heuristic debugging:
 //		String problemFile = "problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
-		
+
 //		String problemFile = "problems/iros/iros_incremental_merging_initial.pdl");
-		
+
 		String problemFile = "problems/test_m_serve_coffee_problem_1.pdl"; // #0
 		String domainFile = "domains/ordered_domain.ddl";
-		
+
 //		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
@@ -84,7 +84,7 @@ public class TestRACEDomain {
 //		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
 		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
-		
+
 		CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
 				.valHeuristic(valOH)
 				.mbEstimator(new LookUpTableDurationEstimator())
@@ -99,15 +99,15 @@ public class TestRACEDomain {
 			e.printStackTrace();
 			return;
 		}
-		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
+
+//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
 //		MetaCSPLogging.setLevel(Level.FINE);
 		if (! LOGGING) {
 			MetaCSPLogging.setLevel(Level.OFF);
 		}
-		
+
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);
 
@@ -116,7 +116,7 @@ public class TestRACEDomain {
 			int c = 0;
 			for (Variable act : planVector) {
 				if (act.getComponent() != null)
-					System.out.println(c++ +".\t" + act);	
+					System.out.println(c++ +".\t" + act);
 			}
 
 			chimp.printFullPlan();
