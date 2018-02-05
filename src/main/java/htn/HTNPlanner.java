@@ -30,13 +30,12 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 
 	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols, 
-			int[] symbolicingredients) {
+			int[] symbolicIngredients) {
 		// Currently only FluentConstraints. Other constraint should be added later.
 		super(new Class[] {FluentConstraint.class}, 
 				animationTime, 
-				new FluentNetworkSolver(origin, horizon, symbols, symbolicingredients));
-		
-		logger = MetaCSPLogging.getLogger(HTNPlanner.class);
+				new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients));
+
 		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 	}
 
@@ -83,7 +82,6 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 					Variable vReal = metaValue.getSubstitution((VariablePrototype)v);
 					if (vReal != null) {
 							varsToRemove.add(vReal);
-//							System.out.println("GONNA REMOVE  " + vReal);
 					}
 				}
 			}
