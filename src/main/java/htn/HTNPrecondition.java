@@ -25,12 +25,6 @@ public class HTNPrecondition {
 	
 	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
 			new Vector<AdditionalConstraintTemplate>();
-
-	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections) {
-		this.fluenttype = fluenttype;
-		this.arguments = arguments;
-		this.connections = connections;
-	}
 	
 	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections, 
 			int maxargs, String emptyStr, String key) {
@@ -76,30 +70,6 @@ public class HTNPrecondition {
 	
 	public Vector<AdditionalConstraintTemplate> getAdditionalConstraints() {
 		return additionalConstraints;
-	}
-
-	@Deprecated // Only used when using three variables
-	/** Creates a constraint for this precondition.
-	 * A precondition prototype will be created. This prototype will later be 
-	 * connected via NameMatchingConstraints to the open fluents.
-	 * 
-	 * @param taskfluent The task that is expanded.
-	 * @param groundSolver The fluentnetworksolver acting as a ground solver.
-	 * @return New PRE constraint between new prototypes and taskfluent.
-	 */
-	public FluentConstraint createPreconditionConstraint(Fluent taskfluent, 
-			FluentNetworkSolver groundSolver) {
-		VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
-				fluenttype, arguments);
-		newFluent.setMarking(HTNMetaConstraint.markings.UNJUSTIFIED);
-		FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
-				connections);
-		preconstr.setFrom(newFluent);
-		preconstr.setTo(taskfluent);
-		if (isNegativeEffect) {
-			preconstr.setNegativeEffect(true);
-		}
-		return preconstr;
 	}
 	
 }
