@@ -34,26 +34,16 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private final Vector<PlanReportroryItem> methods =new Vector<PlanReportroryItem>();
 
 	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
-
-	//false if we split up HTN algorithm into 3 meta constraints, 
-	// true if we apply preconditions and effects at the same time.
-	private final boolean oneShot;
 	
 	// try to unify tasks with planned tasks?
 	private boolean tryUnification = false;
-
-    public HTNMetaConstraint() {
-		this(true);
-	}
 	
 	public HTNMetaConstraint(ValueOrderingH valOH) {
 		super(null, valOH);
-		this.oneShot = true;
 	}
 	
 	public HTNMetaConstraint(boolean oneShot) {
 		super(null, null);
-		this.oneShot = oneShot;
 	}
 	
 	private boolean checkApplied(Fluent task) {
@@ -133,9 +123,6 @@ public class HTNMetaConstraint extends MetaConstraint {
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		// TODO propagation probably not needed here
-//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagateAllSub();
-		//		((CompoundSymbolicVariableConstraintSolver) groundSolver.getConstraintSolvers()[0]).propagatePredicateNames();
 			
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		
@@ -268,14 +255,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
-				
-				logger.finest("Applying preconditions of PlanReportroryItem " + item);
-				if (this.oneShot) {
-					List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, depth, groundSolver, openFluents);
-					ret.addAll(newResolvers);
-				} else {
-					ret.add(item.expandPreconditions(fl, groundSolver));
-				}
+                List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, depth, groundSolver, openFluents);
+                ret.addAll(newResolvers);
 			}
 		}
 		
@@ -300,27 +281,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 		
 		return ret;
 	}
-	
 
-	/**
-	 * Sets the marking of the task to SELECTED
-	 */
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-		// not needed anymore as we only use the unaryapplied
-//		for (Constraint con : metaValue.getConstraints()) {
-//			if (con instanceof FluentConstraint
-//					&& ((FluentConstraint) con).getType().equals(FluentConstraint.Type.UNARYAPPLIED)) {
-//				Variable task = ((FluentConstraint) con).getFrom();
-//				if(this.oneShot) {
-//					task.setMarking(markings.PLANNED);
-//				} else {
-//					task.setMarking(markings.SELECTED);
-//				}
-//			}
-//		}
-
-	}
+	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) { }
 
 	@Override
 	public void draw(ConstraintNetwork network) {

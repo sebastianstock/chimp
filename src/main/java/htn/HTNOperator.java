@@ -36,63 +36,7 @@ public class HTNOperator extends PlanReportroryItem {
 
 		this.logger = MetaCSPLogging.getLogger(HTNOperator.class);
 	}
-	
-	// Only used by TaskApplicationMetaConstraint when we have three different meta-constraints.
-	@Deprecated
-	@Override
-	public ConstraintNetwork expandOnlyTail(Fluent taskfluent,
-			FluentNetworkSolver groundSolver) {
-		ConstraintNetwork ret = new ConstraintNetwork(null);
-		
-		Vector<Variable> newFluents = new Vector<Variable>();
-		Vector<FluentConstraint> newConstraints = new Vector<FluentConstraint>();
-		
-		// close negative effects
-		for (FluentConstraint con : 
-				groundSolver.getFluentConstraintsOfTypeTo(taskfluent, FluentConstraint.Type.PRE) ) {
-			if (con.isNegativeEffect()) {
-				Fluent dummyPre = (Fluent) con.getFrom();
-				List<FluentConstraint> matches = 
-						groundSolver.getFluentConstraintsOfTypeTo(dummyPre, FluentConstraint.Type.MATCHES);
-				if (matches.size() == 1) {
-					Fluent matchingFluent = (Fluent) matches.get(0).getFrom();
-					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-					closes.setFrom(taskfluent);
-					closes.setTo(matchingFluent);
-					newConstraints.add(closes);
-				} else if (matches.size() == 0) {
-					logger.info("Trying to set negative effect but" +  dummyPre.toString() 
-							+ " has no matches.");
-				} else if (matches.size() > 1){
-					logger.info("Trying to set negative effect but found more than one matching fluents for precondition " + dummyPre.toString());
-				}
-			}
-		}
-		
-		// add positive effects
-		if (effects != null) {
-			for(EffectTemplate et : effects) {
-				VariablePrototype p = et.getPrototype();
-				p.setMarking(HTNMetaConstraint.markings.OPEN);
-				newFluents.add(p);
-				String[] arguments = (String[])p.getParameters()[2];
-				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 
-						createConnections(arguments));
-				opens.setFrom(taskfluent);
-				opens.setTo(p);
-				if (et.hasAdditionalConstraints()) {
-					opens.setAdditionalConstraints(et.getAdditionalConstraints());
-				}
-				newConstraints.add(opens);
-			}
-		}
-		
-		// add constraints to the network
-		for (FluentConstraint con : newConstraints)
-			ret.addConstraint(con);
-		
-		return ret;		
-	}
+
 	
 	@Override
 	public List<Constraint> expandEffectsOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {

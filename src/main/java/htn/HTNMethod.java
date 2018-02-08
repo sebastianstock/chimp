@@ -26,17 +26,6 @@ public class HTNMethod extends PlanReportroryItem {
 		super(taskname, arguments, preconditions, effects, preferenceWeight);
 		this.constraints = constraints;
 	}
-	
-	
-	@Override
-	public ConstraintNetwork expandOnlyTail(Fluent taskfluent, FluentNetworkSolver groundSolver) {
-		ConstraintNetwork ret = new ConstraintNetwork(null);
-		
-		for (Constraint con : this.expandEffectsOneShot(taskfluent, groundSolver))
-			ret.addConstraint(con);
-
-		return ret;
-	}
 
 
 	@Override
