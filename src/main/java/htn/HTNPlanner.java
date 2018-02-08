@@ -3,7 +3,6 @@ package htn;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.HybridDomainPlanner;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -75,7 +74,7 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 		for(Constraint c : metaValue.getConstraints()) {
 			if ((c instanceof FluentConstraint) && 
 					(((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
-				((FluentConstraint) c).getTo().setMarking(markings.OPEN);
+				((FluentConstraint) c).getTo().setMarking(HTNMetaConstraint.markings.OPEN);
 			}
 		}
 		
@@ -145,7 +144,7 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 		for (Constraint con : metaValue.getConstraints()) {
 			if (con instanceof FluentConstraint) {
 				if (((FluentConstraint) con).getType() == FluentConstraint.Type.CLOSES) {
-					((FluentConstraint) con).getTo().setMarking(markings.CLOSED); // TODO These markings are not really used and could be removed
+					((FluentConstraint) con).getTo().setMarking(HTNMetaConstraint.markings.CLOSED); // TODO These markings are not really used and could be removed
 				}
 			}
 		}

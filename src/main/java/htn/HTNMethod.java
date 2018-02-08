@@ -13,7 +13,6 @@ import org.metacsp.framework.VariablePrototype;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 
 
 public class HTNMethod extends PlanReportroryItem {
@@ -53,7 +52,7 @@ public class HTNMethod extends PlanReportroryItem {
 		if (effects != null) {
 			for (EffectTemplate et : effects) {
 				VariablePrototype subPrototype = et.getPrototype();
-				subPrototype.setMarking(markings.UNPLANNED);
+				subPrototype.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 				// create dc constraint
 				String[] arguments = (String[])subPrototype.getParameters()[2];
 				FluentConstraint dc = 

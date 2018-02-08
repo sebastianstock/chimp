@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import org.metacsp.framework.Constraint;
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.activity.Activity;
@@ -19,7 +19,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentSensor implements Serializable {
 
@@ -70,7 +69,7 @@ public class FluentSensor implements Serializable {
 					deadline.setTo(currentAct.getVariable());
 					fns.removeConstraint(currentMeetsFuture);
 					boolean ret = fns.addConstraint(deadline);
-					currentAct.getVariable().setMarking(markings.CLOSED);
+					currentAct.getVariable().setMarking(HTNMetaConstraint.markings.CLOSED);
 					if (!ret) throw new NetworkMaintenanceError(deadline);
 					//if (!ret) throw new NetworkMaintenanceError(future.getTemporalVariable().getEST(),timeNow);
 					makeNew = true;
@@ -141,7 +140,7 @@ public class FluentSensor implements Serializable {
 	protected Activity createNewActivity(String value) {
 		Fluent act = (Fluent)fns.createVariable(this.name);
 		act.setName(value);
-		act.setMarking(markings.OPEN);
+		act.setMarking(HTNMetaConstraint.markings.OPEN);
 		return act;
 	}
 	

@@ -3,6 +3,7 @@ package dwr;
 import java.util.List;
 import java.util.Vector;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
@@ -18,7 +19,6 @@ import edu.uci.ics.jung.graph.Graph;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.HybridDomain;
 import unify.CompoundSymbolicVariable;
 
@@ -139,7 +139,7 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 				args[3] = HybridDomain.EMPTYSTRING;
 				args[4] = HybridDomain.EMPTYSTRING;
 				VariablePrototype vp = new VariablePrototype(this.getGroundSolver(), "Activity", "!move", args);
-				vp.setMarking(markings.UNPLANNED);
+				vp.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 				prototypes[j] = vp;
 				FluentConstraint dc = new FluentConstraint(FluentConstraint.Type.DC);
 				dc.setFrom(nav);

@@ -14,11 +14,9 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 public class TaskApplicationMetaConstraint extends MetaConstraint {
-	
 
-	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}
 
-    public TaskApplicationMetaConstraint() {
+	public TaskApplicationMetaConstraint() {
 		super(null, null);
 	}
 
@@ -40,7 +38,7 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 		// a ConstraintNetwork is built.
 		// this becomes a task.
 		for (Variable var : groundSolver.getVariables()) {
-			if (var.getMarking() != null && var.getMarking().equals(markings.SELECTED)) {
+			if (var.getMarking() != null && var.getMarking().equals(HTNMetaConstraint.markings.SELECTED)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
 					ConstraintNetwork nw = new ConstraintNetwork(null);
 					nw.addVariable(var);
@@ -62,7 +60,7 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 			FluentNetworkSolver groundSolver) {
 		for (FluentConstraint flc : groundSolver.getFluentConstraintsOfTypeTo(var, FluentConstraint.Type.BEFORE)) {
 			Object marking = flc.getScope()[0].getMarking();
-			if ( (marking == markings.UNPLANNED) || (marking == markings.SELECTED) ){
+			if ( (marking == HTNMetaConstraint.markings.UNPLANNED) || (marking == HTNMetaConstraint.markings.SELECTED) ){
 				return false;
 			}	 
 		}
@@ -114,7 +112,7 @@ public class TaskApplicationMetaConstraint extends MetaConstraint {
 	public void markResolvedSub(MetaVariable metaVariable,
 			ConstraintNetwork metaValue) {
 		// TODO if it is a primitive task, set the marking to PLANNED
-		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(markings.PLANNED);
+		metaVariable.getConstraintNetwork().getVariables()[0].setMarking(HTNMetaConstraint.markings.PLANNED);
 	}
 
 	@Override

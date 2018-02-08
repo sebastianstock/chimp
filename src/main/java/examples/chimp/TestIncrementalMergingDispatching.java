@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -15,7 +16,6 @@ import dispatching.FluentDispatchingFunction;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
@@ -73,7 +73,7 @@ public class TestIncrementalMergingDispatching {
 
 			@Override
 			public boolean skip(Fluent act) {
-                return act.getMarking() == markings.UNIFIED;
+                return act.getMarking() == HTNMetaConstraint.markings.UNIFIED;
             }
 
 			@Override
@@ -116,7 +116,7 @@ public class TestIncrementalMergingDispatching {
 				}
 				Variable var = fns.createVariable(component);
 				((Fluent) var).setName(name);
-				var.setMarking(markings.UNPLANNED);
+				var.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 
 				//			planner.clearResolvers();
 				System.out.println("Trying to merge in new task.");

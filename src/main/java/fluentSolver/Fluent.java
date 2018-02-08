@@ -1,5 +1,6 @@
 package fluentSolver;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
@@ -8,7 +9,6 @@ import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.allenInterval.AllenInterval;
 
-import htn.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariable;
 
 public class Fluent extends MultiVariable implements Activity{
@@ -78,7 +78,7 @@ public class Fluent extends MultiVariable implements Activity{
 		ret.append(this.getAllenInterval().getDomain());
 //		ret.append(this.getInternalVariables()[1].toString());
 //		ret.append(">");
-		if (this.getMarking() == markings.UNIFIED) {
+		if (this.getMarking() == HTNMetaConstraint.markings.UNIFIED) {
 			ret.append("/");
 			ret.append(this.getMarking());
 		}

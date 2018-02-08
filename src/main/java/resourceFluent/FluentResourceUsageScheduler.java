@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
@@ -22,7 +23,6 @@ import org.metacsp.time.Bounds;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentResourceUsageScheduler extends Schedulable {
 	
@@ -62,7 +62,7 @@ public class FluentResourceUsageScheduler extends Schedulable {
 			for(Constraint c : cn.getConstraints()) {
 				if (c instanceof AllenIntervalConstraint) {
 					Fluent from = (Fluent) ((AllenIntervalConstraint) c).getFrom();
-					if (from.getMarking() != markings.OPEN) {
+					if (from.getMarking() != HTNMetaConstraint.markings.OPEN) {
 						filtered.add(cn);
 					}
 				}

@@ -2,6 +2,7 @@ package old_dev.axioms;
 
 import java.util.logging.Level;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -10,7 +11,6 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestAxiomMetaConstraint {
@@ -95,12 +95,12 @@ public class TestAxiomMetaConstraint {
 		((Fluent) stateVars[8]).setName("Connected(placingAreaNorthRightTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
 		((Fluent) stateVars[9]).setName("Connected(placingAreaSouthLeftTable2 manipulationAreaWestTable2 preManipulationAreaWestTable2)");
 		((Fluent) stateVars[10]).setName("Connected(placingAreaSouthRightTable2 manipulationAreaEastTable2 preManipulationAreaEastTable2)");
-		for(Variable v : stateVars) {v.setMarking(markings.OPEN);}
+		for(Variable v : stateVars) {v.setMarking(HTNMetaConstraint.markings.OPEN);}
 		
 		// task
 		Fluent taskFluent = (Fluent) groundSolver.createVariable("Task1");
 		taskFluent.setName("!pick_up_object(mug1 ?area ?manArea leftArm1)");
-		taskFluent.setMarking(markings.UNPLANNED);
+		taskFluent.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 		
 		// Axiom constraint:
 		FluentConstraint axiomConstraint = new FluentConstraint(FluentConstraint.Type.AXIOM, "TODO");

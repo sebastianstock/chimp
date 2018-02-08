@@ -4,28 +4,20 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dispatching.FluentDispatchingFunction;
-import examples.chimp.TestRACEDomain;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.ProblemParser;
 import planner.CHIMP;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
@@ -62,7 +54,7 @@ public class TestFluentDispatching {
 		String component = "Task";
 		Variable var = fluentSolver.createVariable(component);
 		((Fluent) var).setName(name);
-		var.setMarking(markings.UNPLANNED);
+		var.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 		
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);

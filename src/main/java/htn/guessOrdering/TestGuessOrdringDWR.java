@@ -20,9 +20,6 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
-import htn.guessOrdering.GuessOrderingMetaConstraint;
-import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
@@ -153,7 +150,7 @@ public class TestGuessOrdringDWR {
 			if (con instanceof FluentConstraint) {
 				FluentConstraint fc = (FluentConstraint) con;
 				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-					fc.getFrom().setMarking(markings.UNIFIED);
+					fc.getFrom().setMarking(HTNMetaConstraint.markings.UNIFIED);
 					cn.addConstraint(fc);
 				} else if (fc.getType() == FluentConstraint.Type.DC) {
 					cn.addConstraint(fc);

@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 import hybridDomainParsing.SubDifferentDefinition;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
@@ -243,7 +242,7 @@ public abstract class PlanReportroryItem {
 							/// For negative effects the fluent should not be closed
 							if (!MULT_ACTION_NEG_EFFECT) {
 								if (pre.isNegativeEffect()) {
-									if (openFluent.getMarking() == markings.CLOSED) {
+									if (openFluent.getMarking() == HTNMetaConstraint.markings.CLOSED) {
 //										System.out.println("Fluent is already closed");
 										continue;
 									}

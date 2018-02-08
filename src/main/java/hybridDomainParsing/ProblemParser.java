@@ -23,7 +23,6 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
-import htn.TaskApplicationMetaConstraint.markings;
 import planner.CHIMPProblem;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicVariable;
@@ -61,7 +60,7 @@ public class ProblemParser implements CHIMPProblem {
 		for (Entry<String, String> e : fluentElementsMap.entrySet()) {
 			Variable var = fluentSolver.createVariable();
 			((Fluent) var).setName(e.getValue());
-			var.setMarking(markings.OPEN);
+			var.setMarking(HTNMetaConstraint.markings.OPEN);
 			varsMap.put(e.getKey(), var);
 		}
 		
@@ -76,7 +75,7 @@ public class ProblemParser implements CHIMPProblem {
 			}
 			Variable var = fluentSolver.createVariable(component);
 			((Fluent) var).setName(name);
-			var.setMarking(markings.UNPLANNED);
+			var.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 			varsMap.put(e.getKey(), var);
 		}
 		

@@ -46,11 +46,11 @@ public class JUnitTestFluentNetworkSolver {
 	@Test
 	public void testGetOpenFluents() {
 		Fluent[] fluents = (Fluent[]) solver.createVariables(5);
-		fluents[0].setMarking(TaskApplicationMetaConstraint.markings.OPEN);
-		fluents[1].setMarking(TaskApplicationMetaConstraint.markings.CLOSED);
-		fluents[2].setMarking(TaskApplicationMetaConstraint.markings.UNPLANNED);
-		fluents[3].setMarking(TaskApplicationMetaConstraint.markings.OPEN);
-		fluents[4].setMarking(TaskApplicationMetaConstraint.markings.PLANNED);
+		fluents[0].setMarking(HTNMetaConstraint.markings.OPEN);
+		fluents[1].setMarking(HTNMetaConstraint.markings.CLOSED);
+		fluents[2].setMarking(HTNMetaConstraint.markings.UNPLANNED);
+		fluents[3].setMarking(HTNMetaConstraint.markings.OPEN);
+		fluents[4].setMarking(HTNMetaConstraint.markings.PLANNED);
 		assertArrayEquals(new Fluent[] {fluents[0],  fluents[3]}, solver.getOpenFluents());
 	}
 

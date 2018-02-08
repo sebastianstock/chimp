@@ -14,7 +14,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 
 public class HTNOperator extends PlanReportroryItem {
 
@@ -74,7 +73,7 @@ public class HTNOperator extends PlanReportroryItem {
 		if (effects != null) {
 			for(EffectTemplate et : effects) {
 				VariablePrototype p = et.getPrototype();
-				p.setMarking(markings.OPEN);
+				p.setMarking(HTNMetaConstraint.markings.OPEN);
 				newFluents.add(p);
 				String[] arguments = (String[])p.getParameters()[2];
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 
@@ -103,7 +102,7 @@ public class HTNOperator extends PlanReportroryItem {
 		if (effects != null) {
 			for(EffectTemplate et : effects) {
 				VariablePrototype p = et.getPrototype();
-				p.setMarking(markings.OPEN);
+				p.setMarking(HTNMetaConstraint.markings.OPEN);
 				newFluents.add(p);
 				String[] arguments = (String[])p.getParameters()[2];
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 

@@ -23,7 +23,9 @@ import resourceFluent.ResourceUsageTemplate;
 
 
 public class HTNMetaConstraint extends MetaConstraint {
-	
+
+	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}
+
 	private static final boolean DEBUG = true;
 	public int getVarsCNT = 0;
 	

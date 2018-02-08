@@ -2,6 +2,7 @@ package examples.chimp;
 
 import java.util.logging.Level;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -9,7 +10,6 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
@@ -52,7 +52,7 @@ public class TestIncrementalMerging {
 		String component = "Task";
 		Variable var = fluentSolver.createVariable(component);
 		((Fluent) var).setName(name);
-		var.setMarking(markings.UNPLANNED);
+		var.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 		
 		chimp.drawSearchSpace();
 		

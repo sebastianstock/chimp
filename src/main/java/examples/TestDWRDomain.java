@@ -4,17 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import dwr.DWRNavigationMetaConstraint;
@@ -23,16 +20,9 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
-import htn.TaskApplicationMetaConstraint.markings;
 import htn.guessOrdering.GuessOrderingMetaConstraint;
 import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
-import htn.valOrderingHeuristics.DeepestNewestbindingsValOH;
-import htn.valOrderingHeuristics.ShallowFewestsubsNewestbindingsValOH;
-import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
-import htn.valOrderingHeuristics.UnifyEarlisttasksValOH;
-import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
-import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
@@ -219,7 +209,7 @@ public class TestDWRDomain {
 			if (con instanceof FluentConstraint) {
 				FluentConstraint fc = (FluentConstraint) con;
 				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-					fc.getFrom().setMarking(markings.UNIFIED);
+					fc.getFrom().setMarking(HTNMetaConstraint.markings.UNIFIED);
 					cn.addConstraint(fc);
 				} else if (fc.getType() == FluentConstraint.Type.DC) {
 					cn.addConstraint(fc);

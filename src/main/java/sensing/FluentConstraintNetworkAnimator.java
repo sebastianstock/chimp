@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.sensing.Controllable;
@@ -16,7 +17,6 @@ import dispatching.FluentDispatcher;
 import dispatching.FluentDispatchingFunction;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 
 public class FluentConstraintNetworkAnimator extends Thread {
 
@@ -68,7 +68,7 @@ public class FluentConstraintNetworkAnimator extends Thread {
 			// Create variable representing future
 			future = (Fluent)fns.createVariable("Time");
 			future.setName(FUTURE_STR, NO_STRINGS);
-			future.setMarking(markings.JUSTIFIED);
+			future.setMarking(HTNMetaConstraint.markings.JUSTIFIED);
 			long timeNow = getTimeNow();
 			AllenIntervalConstraint releaseFuture = new AllenIntervalConstraint(
 					AllenIntervalConstraint.Type.Release, new Bounds(timeNow, timeNow));

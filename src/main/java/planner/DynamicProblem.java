@@ -9,7 +9,7 @@ import java.util.Set;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
+import htn.HTNMetaConstraint;
 import hybridDomainParsing.HybridDomain;
 
 /**
@@ -82,7 +82,7 @@ public class DynamicProblem implements CHIMPProblem {
 
 			Fluent fl = (Fluent) fluentSolver.createVariable();
 			fl.setName(p.predicate, p.args);
-			fl.setMarking(markings.OPEN);
+			fl.setMarking(HTNMetaConstraint.markings.OPEN);
 			System.out.println("Created state fluent " + fl.toString());
 		}
 		
@@ -95,7 +95,7 @@ public class DynamicProblem implements CHIMPProblem {
 			}
 			Fluent fl = (Fluent) fluentSolver.createVariable(component);
 			fl.setName(p.predicate, p.args);
-			fl.setMarking(markings.UNPLANNED);
+			fl.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 			System.out.println("Created fluent: " + fl.toString());
 		}
 		

@@ -3,6 +3,7 @@ package fluentSolver;
 import java.util.ArrayList;
 import java.util.List;
 
+import htn.HTNMetaConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
@@ -12,7 +13,6 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 import org.metacsp.time.Bounds;
 
-import htn.TaskApplicationMetaConstraint;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class FluentNetworkSolver extends MultiConstraintSolver {
@@ -49,7 +49,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	public Fluent[] getOpenFluents() {
 		ArrayList<Fluent> ret = new ArrayList<Fluent>();
 		for (Variable var: getVariables()) {
-			if (var.getMarking() == TaskApplicationMetaConstraint.markings.OPEN) {
+			if (var.getMarking() == HTNMetaConstraint.markings.OPEN) {
 				ret.add((Fluent) var);
 			}
 		}

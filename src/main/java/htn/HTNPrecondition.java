@@ -7,7 +7,6 @@ import org.metacsp.framework.VariablePrototype;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import htn.TaskApplicationMetaConstraint.markings;
 
 
 public class HTNPrecondition {
@@ -92,7 +91,7 @@ public class HTNPrecondition {
 			FluentNetworkSolver groundSolver) {
 		VariablePrototype newFluent = new VariablePrototype(groundSolver, component, 
 				fluenttype, arguments);
-		newFluent.setMarking(markings.UNJUSTIFIED);
+		newFluent.setMarking(HTNMetaConstraint.markings.UNJUSTIFIED);
 		FluentConstraint preconstr = new FluentConstraint(FluentConstraint.Type.PRE, 
 				connections);
 		preconstr.setFrom(newFluent);
