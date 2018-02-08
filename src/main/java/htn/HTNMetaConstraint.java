@@ -307,7 +307,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
 		// not needed anymore as we only use the unaryapplied
 //		for (Constraint con : metaValue.getConstraints()) {
-//			if (con instanceof FluentConstraint 
+//			if (con instanceof FluentConstraint
 //					&& ((FluentConstraint) con).getType().equals(FluentConstraint.Type.UNARYAPPLIED)) {
 //				Variable task = ((FluentConstraint) con).getFrom();
 //				if(this.oneShot) {
