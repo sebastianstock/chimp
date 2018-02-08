@@ -1,25 +1,15 @@
 package htn;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import org.metacsp.framework.*;
+import org.metacsp.framework.meta.MetaConstraint;
+import org.metacsp.framework.meta.MetaVariable;
+import org.metacsp.multi.allenInterval.AllenInterval;
 import resourceFluent.ResourceUsageTemplate;
+
+import java.util.*;
 
 
 public class HTNMetaConstraint extends MetaConstraint {
@@ -42,7 +32,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		super(null, valOH);
 	}
 	
-	public HTNMetaConstraint(boolean oneShot) {
+	public HTNMetaConstraint() {
 		super(null, null);
 	}
 	
@@ -66,13 +56,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors 
 		// add it to the ConstraintNetwork network
 		ConstraintNetwork nw = new ConstraintNetwork(null);
-		ArrayList<Variable> tasks = new ArrayList<Variable>();
-		for (Variable var : groundSolver.getVariables("Activity")) {
-			tasks.add(var);
-		}
-		for (Variable var : groundSolver.getVariables("Task")) {
-			tasks.add(var);
-		}
+		List<Variable> tasks = new LinkedList<Variable>(Arrays.asList(groundSolver.getVariables("Activity")));
+		tasks.addAll(Arrays.asList(groundSolver.getVariables("Task")));
 		for (Variable var : tasks) {
 			if (!checkApplied((Fluent)var)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
