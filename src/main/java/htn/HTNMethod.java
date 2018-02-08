@@ -29,7 +29,7 @@ public class HTNMethod extends PlanReportroryItem {
 
 
 	@Override
-	public List<Constraint> expandEffectsOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 		
 		// before constraints from that goal task to another task at the same level.

@@ -339,7 +339,7 @@ public abstract class PlanReportroryItem {
 				}
 
 				// add positive effects/decomposition
-				for (Constraint con : expandEffectsOneShot(taskFluent, groundSolver)) {
+				for (Constraint con : expandEffects(taskFluent, groundSolver)) {
 					cn.addConstraint(con);
 				}
 				
@@ -644,8 +644,8 @@ public abstract class PlanReportroryItem {
 	 * @param groundSolver The groundSolver.
 	 * @return Constraints representing the decompositions or positive effects
 	 */
-	public abstract List<Constraint> expandEffectsOneShot(Fluent taskfluent, 
-			FluentNetworkSolver groundSolver);
+	public abstract List<Constraint> expandEffects(Fluent taskfluent,
+                                                   FluentNetworkSolver groundSolver);
 	
 	/**
 	 * Creates the connections array for the opens constraint.

@@ -39,7 +39,7 @@ public class HTNOperator extends PlanReportroryItem {
 
 	
 	@Override
-	public List<Constraint> expandEffectsOneShot(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
 		Vector<Variable> newFluents = new Vector<Variable>();
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 
