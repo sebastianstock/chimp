@@ -448,7 +448,8 @@ public abstract class PlanReportroryItem {
 	/**
 	 * Goes trough templates of additional constraints, creates cloned versions of the constraints and sets the variables.
 	 * @param taskFluent The fluent of the current task.
-	 * @param keyToFluentMap Map of keys to fluent variables.
+	 * @param preKeyToFluentMap Map of precondition keys to fluent variables.
+	 * @param effKeyToVariableMap Map of effect keys to variables
 	 */
 	private List<AllenIntervalConstraint> setVarsInAdditionalConstraints(Fluent taskFluent, 
 			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
