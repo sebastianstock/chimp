@@ -36,7 +36,7 @@ public abstract class PlanReportroryItem {
 	private static long time_sum = 0;
 	
 	static final AtomicInteger NEXT_ID = new AtomicInteger(0);
-    final int id = NEXT_ID.getAndIncrement();
+    private final int id = NEXT_ID.getAndIncrement();
 	
 	protected final String taskname;
 	protected final int preferenceWeight;
@@ -185,9 +185,9 @@ public abstract class PlanReportroryItem {
 	 * @param openFluents All fluents that are open.
 	 * @return The resulting ConstraintNetwork.
 	 */
-	public List<ConstraintNetwork> expandOneShot(Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
-		long startTime = System.nanoTime();
-		long t;
+	public List<ConstraintNetwork> expand(Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
+//		long startTime = System.nanoTime();
+//		long t;
 		EXPAND_COUNT++;
 //		System.out.println("ExpandCount: " + EXPAND_COUNT);
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
@@ -227,9 +227,6 @@ public abstract class PlanReportroryItem {
 							possiblePreconditions.add(preCon);
 							constraintToPrecondition.put(preCon, pre.getKey());
 						}
-//						else {
-////							System.out.println("false" + taskFluent.getCompoundSymbolicVariable() + " " + openFluent.getCompoundSymbolicVariable() + " " + Arrays.toString(pre.getConnections()));
-//						}
 					}
 				}
 				if (possiblePreconditions.size() > 0) {
@@ -296,7 +293,7 @@ public abstract class PlanReportroryItem {
 						}
 					}
 					if (possibleValues != null) {
-						// subtract impossiblesymbols
+						// subtract impossibleSymbols
 						if (variablesImpossibleValuesMap != null && variablesImpossibleValuesMap.size() > 0) {
 							String[] negativeValues = variablesImpossibleValuesMap.get(occs.getKey());
 							if (negativeValues != null) {

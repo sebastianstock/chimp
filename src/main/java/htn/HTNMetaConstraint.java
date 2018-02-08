@@ -255,7 +255,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
 			if (item.checkApplicability(fl) && item.checkPreconditions(openFluents)) {
-                List<ConstraintNetwork> newResolvers = item.expandOneShot(fl, depth, groundSolver, openFluents);
+                List<ConstraintNetwork> newResolvers = item.expand(fl, depth, groundSolver, openFluents);
                 ret.addAll(newResolvers);
 			}
 		}

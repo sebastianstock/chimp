@@ -1,18 +1,16 @@
 package htn;
 
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import org.metacsp.framework.Constraint;
+import org.metacsp.framework.Variable;
+import org.metacsp.framework.VariablePrototype;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
 
 
 public class HTNMethod extends PlanReportroryItem {
@@ -20,21 +18,21 @@ public class HTNMethod extends PlanReportroryItem {
 	private Constraint[] constraints;
 
 	
-	public HTNMethod(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
+	public HTNMethod(String taskName, String[] arguments, HTNPrecondition[] preconditions,
 			EffectTemplate[] effects, Constraint[] constraints, int preferenceWeight) {
 		
-		super(taskname, arguments, preconditions, effects, preferenceWeight);
+		super(taskName, arguments, preconditions, effects, preferenceWeight);
 		this.constraints = constraints;
 	}
 
 
 	@Override
-	public List<Constraint> expandEffects(Fluent taskfluent, FluentNetworkSolver groundSolver) {
+	public List<Constraint> expandEffects(Fluent taskFluent, FluentNetworkSolver groundSolver) {
 		List<Constraint> newConstraints = new ArrayList<Constraint>();
 		
 		// before constraints from that goal task to another task at the same level.
 		List<FluentConstraint> tasksBeforeConstrs = 
-				groundSolver.getFluentConstraintsOfTypeFrom(taskfluent, FluentConstraint.Type.BEFORE);
+				groundSolver.getFluentConstraintsOfTypeFrom(taskFluent, FluentConstraint.Type.BEFORE);
 		Set<Variable> subtasksWithoutSuccessor = new HashSet<Variable>();
 		
 		// create prototypes and decomposition constraints
@@ -46,7 +44,7 @@ public class HTNMethod extends PlanReportroryItem {
 				String[] arguments = (String[])subPrototype.getParameters()[2];
 				FluentConstraint dc = 
 						new FluentConstraint(FluentConstraint.Type.DC, createConnections(arguments));
-				dc.setFrom(taskfluent);
+				dc.setFrom(taskFluent);
 				dc.setTo(subPrototype);
 				if (et.hasAdditionalConstraints()) {
 					dc.setAdditionalConstraints(et.getAdditionalConstraints());
