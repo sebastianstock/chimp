@@ -161,11 +161,8 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			}
 			
 		} else if (this.type.equals(Type.BEFORE)) {
-//			AllenIntervalConstraint befCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
-//			befCon.setFrom(((Fluent) f).getAllenInterval());
-//			befCon.setTo(((Fluent) t).getAllenInterval());
-//			retList.add(befCon);
-			
+			// Only used for ordering. No temporal constraints to set
+
 		} else if (this.type.equals(Type.CLOSES)) { 
 			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
 				// Additional constraints are added in pre at the moment.
@@ -195,7 +192,6 @@ public class FluentConstraint extends MultiBinaryConstraint {
 			retList.add(createSubmatches(f, t));
 		}
 		return retList.toArray(new Constraint[retList.size()]);
-//		return null;
 	}
 	
 	private CompoundSymbolicValueConstraint createSubmatches(Variable f, Variable t) {

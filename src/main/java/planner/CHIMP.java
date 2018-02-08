@@ -62,6 +62,8 @@ public class CHIMP {
 		/**
 		 * 
 		 * @param domainPath Path to the domain file.
+		 * @param problem Problem to plan.
+		 *
 		 */
 		public CHIMPBuilder(String domainPath, CHIMPProblem problem) {
 			this.domainPath = domainPath;
@@ -254,7 +256,6 @@ public class CHIMP {
 			Arrays.sort(planVector, new Comparator<Variable>() {
 				@Override
 				public int compare(Variable o1, Variable o2) {
-					// TODO Auto-generated method stub
 					Fluent f1 = (Fluent)o1;
 					Fluent f2 = (Fluent)o2;
 					return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
