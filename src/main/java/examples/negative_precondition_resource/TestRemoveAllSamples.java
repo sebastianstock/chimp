@@ -1,4 +1,4 @@
-package negative_precondition_resource;
+package examples.negative_precondition_resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,8 +75,8 @@ public class TestRemoveAllSamples {
 	public static void main(String[] args) {
 		
 		// Testproblems for TransTerrA
-//		ProblemParser pp = new ProblemParser("testing/negative_precondition_resource/test_op_check_empty.pdl");
-		ProblemParser pp = new ProblemParser("testing/negative_precondition_resource/test_add_remove.pdl");
+//		ProblemParser pp = new ProblemParser("testing/examples.negative_precondition_resource/test_op_check_empty.pdl");
+		ProblemParser pp = new ProblemParser("testing/examples.negative_precondition_resource/test_add_remove.pdl");
 		
 		// value ordering heuristic debugging:
 //		ProblemParser pp = new ProblemParser("problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
@@ -95,7 +95,7 @@ public class TestRemoveAllSamples {
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 
-		HybridDomain domain = initPlanner(planner, "testing/negative_precondition_resource/negative_test_domain.ddl");
+		HybridDomain domain = initPlanner(planner, "testing/examples.negative_precondition_resource/negative_test_domain.ddl");
 
 		pp.createState(fluentSolver, domain);
 		
