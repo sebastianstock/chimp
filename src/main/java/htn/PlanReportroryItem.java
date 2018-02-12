@@ -1,39 +1,28 @@
 package htn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Sets;
+import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.SubDifferentDefinition;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
-
-import com.google.common.collect.Sets;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import hybridDomainParsing.SubDifferentDefinition;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
+
 public abstract class PlanReportroryItem {
 	
 	private static final boolean MULT_ACTION_NEG_EFFECT = false;
-	
-	private static int EXPAND_COUNT = 0;
-	private static long time_sum = 0;
 	
 	static final AtomicInteger NEXT_ID = new AtomicInteger(0);
     private final int id = NEXT_ID.getAndIncrement();
@@ -186,10 +175,6 @@ public abstract class PlanReportroryItem {
 	 * @return The resulting ConstraintNetwork.
 	 */
 	public List<ConstraintNetwork> expand(Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
-//		long startTime = System.nanoTime();
-//		long t;
-		EXPAND_COUNT++;
-//		System.out.println("ExpandCount: " + EXPAND_COUNT);
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
@@ -389,11 +374,6 @@ public abstract class PlanReportroryItem {
 				logger.finest("Ommitting non-feasible CN");
 			}
 		}
-//		System.out.println("td_add = " + td_add / 1000000 + " ms");
-//		long diff = System.nanoTime() - startTime;
-//		System.out.println("Full Took "+((diff) / 1000000) + " ms"); 
-//		time_sum += diff;
-//		System.out.println("Full Took in sum "+((time_sum) / 1000000) + " ms"); 
 		return ret;		
 	}
 	
