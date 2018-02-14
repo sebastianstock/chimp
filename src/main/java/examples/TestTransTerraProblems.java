@@ -218,7 +218,8 @@ public class TestTransTerraProblems {
 		// load domain
 		HybridDomain dom;
 		try {
-			dom = new HybridDomain(planner, domainPath);
+			dom = new HybridDomain(domainPath);
+			dom.parseDomain(planner);
 		} catch (DomainParsingException e) {
 			System.out.println("Error while parsing domain: " + e.getMessage());
 			e.printStackTrace();

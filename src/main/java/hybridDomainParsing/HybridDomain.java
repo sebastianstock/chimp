@@ -11,12 +11,10 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.meta.simplePlanner.SimplePlanner;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
 import htn.HTNMethod;
 import htn.HTNOperator;
-import htn.HTNPlanner;
 import htn.PlanReportroryItem;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
@@ -74,14 +72,6 @@ public class HybridDomain{
 		predicateSymbols = parsePredicateSymbols(domainStr);
 	}
 	
-	@Deprecated
-	public HybridDomain(HybridDomainPlanner planner, String filename) throws DomainParsingException {
-		this.domainStr = readDomain(filename);
-		maxArgs = Integer.parseInt(parseKeyword(MAXARGS_KEYWORD, domainStr)[0]);
-		predicateSymbols = parsePredicateSymbols(domainStr);
-		parseDomain(planner);
-	}
-	
 	public Vector<PlanReportroryItem> getOperators() {
 		return operators;
 	}
@@ -119,7 +109,6 @@ public class HybridDomain{
 			return NO_STRINGS;
 		}
 	}
-	
 
 	private void createFluentSchedulers(String stateStr) {
 		// Parse Head	
