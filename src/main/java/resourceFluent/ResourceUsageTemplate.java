@@ -11,7 +11,7 @@ public class ResourceUsageTemplate {
 	/** The indices of the NameVariables that need to be testet. */
 	private final int[] resourceRequirementPositions;
 	
-	/** The Strings the NameVariables schould be grounded to. */
+	/** The Strings the NameVariables should be grounded to. */
 	private final String[] resourceRequirements;
 	
 	/**  The amount of capacity the resource uses */

@@ -45,7 +45,6 @@ public class FluentResourceUsageScheduler extends Schedulable {
 	public ConstraintNetwork[] getMetaVariables() {
 		updateUsageMap();
 		activities = new Vector<Activity>(usageMap.keySet());
-//		return super.getMetaVariables();
 		return samplingPeakCollection();
 	}
 
@@ -88,7 +87,7 @@ public class FluentResourceUsageScheduler extends Schedulable {
 	@Override
 	public boolean isConflicting(Activity[] peak) {
 //		if (peak.length == 1 && peak[0].getVariable().getUsageAmount() > this.capacity) return true;
-		//sum; if sum > cap retrun true;
+		//sum; if sum > cap return true;
 		int sum = 0;
 		for (Activity act : peak) {
 			sum += usageMap.get(act);
@@ -112,7 +111,7 @@ public class FluentResourceUsageScheduler extends Schedulable {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("FluentResouceUsageScheduler ");
+		StringBuilder sb = new StringBuilder("FluentResourceUsageScheduler ");
 		sb.append(name);
 		sb.append(" : ");
 		sb.append(capacity);
@@ -155,7 +154,7 @@ public class FluentResourceUsageScheduler extends Schedulable {
 			
 			Vector<Vector<Activity>> overlappingAll = new Vector<Vector<Activity>>();
 			
-			// this first block checks whether a single activity is overconsuming 
+			// this first block checks whether a single activity is over-consuming
 			// the resource
 			for (Activity act : activities) {
 				if (isConflicting(new Activity[] {act})) {

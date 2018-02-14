@@ -1,10 +1,7 @@
 package dispatching;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
@@ -12,9 +9,10 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import sensing.FluentConstraintNetworkAnimator;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 public class FluentDispatcher extends Thread {
 
