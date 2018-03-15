@@ -36,6 +36,7 @@
 # static relations
   adjacent # adjacent(dock waypoint)
   connected
+  Future
   
   
 # predicates
