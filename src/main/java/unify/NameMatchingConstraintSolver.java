@@ -26,8 +26,11 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 	public static final int MAX_VARS = 1000000;
 	private String[] symbols;
 	private Map<String, Integer> symbols2Index;
+	private final Map<Variable, List<NameMatchingConstraint>> var2Constraints = new HashMap<>();
 	
 	private long propagationTime = 0;
+	private int invocationCNT = 0;
+	private long invocGetConstraintsOfVarCNT = 0;
 
 	// TODO check if really needed:
 	private HashMap<Integer, String> getVaribaleById = new HashMap<Integer, String>();
@@ -62,11 +65,11 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 
 	@Override
 	public boolean propagate() {
-		long startTime = System.nanoTime();
-		
-		Variable[] vars = this.getVariables();
-		
+//		long startTime = System.nanoTime();
+		buildVar2Constraints();
+
 		// create backup of old domains
+		Variable[] vars = this.getVariables();
 		NameDomain[] backUpDomains = new NameDomain[this.getVariables().length];
 		for (int i = 0; i < vars.length; i++) {
 			NameDomain domain = (NameDomain) vars[i].getDomain();
@@ -84,10 +87,10 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 			}
 			logger.info("NameFailure");
 		}
-		long endTime = System.nanoTime();
-		propagationTime += endTime - startTime;
-		logger.fine("Name Propagation took "+((endTime - startTime) / 1000000) + " ms");
-		logger.fine("Name Propagation took in sum "+((propagationTime) / 1000000) + " ms");
+//		long endTime = System.nanoTime();
+//		propagationTime += endTime - startTime;
+//		System.out.println(invocationCNT++ + "Name Propagation took "+((endTime - startTime) / 1000000.) + " ms");
+//		System.out.println("Name Propagation took in sum "+((propagationTime) / 1000000) + " ms");
 		return success;
 	}
 	
@@ -155,84 +158,40 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 		}
 		return ret;
 	}
-	
-	private List<NameMatchingConstraint> getConstraintsOfVarExcept(Variable var, Constraint except) {
-		// TODO Could be improved if we had a Map from var to list of constraints
-		List<NameMatchingConstraint> ret = new ArrayList<NameMatchingConstraint>();
+
+	private void buildVar2Constraints() {
+		var2Constraints.clear();
 		for (Constraint con : this.getConstraints()) {
 			if (con instanceof NameMatchingConstraint) {
-				if (con.getScope()[0].equals(var) || con.getScope()[1].equals(var)) {
-					if (! con.equals(except)) {
-						ret.add((NameMatchingConstraint) con);
-					}
+				Variable[] scope = con.getScope();
+				addToVar2Constraints(scope[0], (NameMatchingConstraint) con);
+				addToVar2Constraints(scope[1], (NameMatchingConstraint) con);
+			}
+		}
+	}
+
+	private void addToVar2Constraints(Variable var, NameMatchingConstraint con) {
+		try {
+			var2Constraints.get(var).add(con);
+		} catch (NullPointerException e) {
+			List<NameMatchingConstraint> l = new LinkedList<>();
+			l.add(con);
+			var2Constraints.put(var, l);
+		}
+	}
+
+	private List<NameMatchingConstraint> getConstraintsOfVarExcept(Variable var, Constraint except) {
+		List<NameMatchingConstraint> ret = new LinkedList<>();
+		List<NameMatchingConstraint> allConsOfVar = this.var2Constraints.get(var);
+		if (allConsOfVar != null) {
+			for (NameMatchingConstraint con : allConsOfVar) {
+				if (con != except) {
+					ret.add(con);
 				}
 			}
 		}
 		return ret;
 	}
-	
-	
-//	private boolean calcPropagationOLD() {
-//		if(this.getConstraints().length == 0) return true;
-//		for (int i = 0; i < this.getVariables().length; i++) {
-//			getVaribaleById.put(this.getVariables()[i].getID(), 
-//					((NameVariable) this.getVariables()[i]).getPossibleSymbols());
-//		}
-//		
-//		Constraint[] cons = this.getConstraints();
-//		boolean updated= true;
-//		boolean changedvars = false;
-//		while (updated == true) {
-//			updated = false;
-//			for (Constraint c : cons) {
-//				int fromId = ((NameMatchingConstraint) c).getFrom().getID();
-//				int toId = ((NameMatchingConstraint) c).getTo().getID();
-//				String fromStr = getVaribaleById.get(fromId);
-//				String toStr = getVaribaleById.get(toId);
-//				if (fromStr == null && toStr == null) {
-//					continue;
-//				}
-//				if (fromStr == null || toStr == null) {
-//					return false;
-//				}
-//				if (fromStr.charAt(0) == '?') {
-//					// fromStr is unground
-//					if(toStr.charAt(0) == '?') {
-//						// both unground
-//						// nothing to do
-//					} else {
-//						// change from to toStr
-//						getVaribaleById.put(fromId, toStr);
-//						updated = true;
-//					}
-//				} else {
-//					// fromStr is ground
-//					if(toStr.charAt(0) == '?') {
-//						// change to to fromStr
-//						getVaribaleById.put(toId, fromStr);
-//						updated = true;
-//					} else {
-//						if(fromStr.equals(toStr)) {
-//							// nothing to do
-//							// TODO constraint is satisfied and does not need to be checked next time.
-//						} else {
-//							return false;  // ground names do not match
-//						}
-//					}
-//				}
-//			}
-//			if (updated == true) {
-//				changedvars = true;
-//			}
-//		}
-//		if (changedvars == true) {
-//			for (Entry<Integer, String> e : getVaribaleById.entrySet()) {
-//				((NameVariable) getVariable(e.getKey())).setName(e.getValue());
-//			}
-//		}
-//		
-//		return true;
-//	}
 
 	@Override
 	public void registerValueChoiceFunctions() {
