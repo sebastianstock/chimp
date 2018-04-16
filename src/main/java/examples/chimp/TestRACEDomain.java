@@ -90,7 +90,7 @@ public class TestRACEDomain {
 				.mbEstimator(new LookUpTableDurationEstimator())
 				.htnUnification(true);
 		if (GUESS_ORDERING) {
-			builder.htnUnification(true);
+			builder.guessOrdering(true);
 		}
 		CHIMP chimp;
 		try {
