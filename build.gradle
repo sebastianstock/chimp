@@ -8,6 +8,7 @@ apply plugin: 'maven'
 // The Application plugin and mainClassName attribute are only required if
 // your package is used as a binary.
 apply plugin: 'application'
+
 // The main class that will be executed when you do 'gradle run'
 mainClassName = 'examples.ChimpIO'
 
@@ -47,6 +48,16 @@ dependencies {
 
   compile group: 'com.google.guava', name: 'guava', version: '18.0'
 
+}
+
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'examples.ChimpIO'
+    }
+    baseName = 'all-in-one-jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 defaultTasks 'install'
