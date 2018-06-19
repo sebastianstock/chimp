@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.logging.Level;
 
+import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
@@ -46,7 +47,8 @@ public class ChimpIO {
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+		//ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 		
 		for (FluentScheduler fs : domain.getFluentSchedulers()) {
 			planner.addMetaConstraint(fs);

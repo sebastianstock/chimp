@@ -89,7 +89,7 @@ public class Fluent extends MultiVariable implements Activity{
 	}
 	
 	public String getName() {
-		return this.getID() + " " + ((CompoundSymbolicVariable) this.getInternalVariables()[0]).getShortName();
+		return ((CompoundSymbolicVariable) this.getInternalVariables()[0]).getShortName();
 	}
 
 	@Override
