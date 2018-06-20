@@ -9,7 +9,6 @@ Furthermore, CHIMP can also dispatch the plans actions based on its temporal rep
   <maintainer>Sebastian Stock/sebastian.stock@dfki.de</maintainer>
   <license>MIT</license>
   <url>https://github.com/sebastianstock/chimp</url>
-  <depend package="meta_csp_framework"/>
 
   <keywords>
     <keyword>Planning</keyword>
