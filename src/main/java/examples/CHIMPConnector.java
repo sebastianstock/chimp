@@ -1,6 +1,7 @@
 package examples;
 
 import fluentSolver.Fluent;
+import fluentSolver.FluentConstraint;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import org.metacsp.framework.ValueOrderingH;
@@ -11,7 +12,7 @@ import planner.CHIMP;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+// import java.util.logging.Level;
 
 /**
  * A simple wrapper that makes calling CHIMP via JNI more convenient.
@@ -27,6 +28,11 @@ public class CHIMPConnector {
 
     /**
      * Simple collection of the relative properties of a fluent to simplify information exchange via JNI.
+     * Note:
+     * In the PlanResult, the FluentStruct[] "fluents" contains only the operations to be executed,
+     * while each operation uses the FluentStruct[] "preconditions" to list only the symbolic
+     * preconditions (like On(Object1 Table1)), but does not reference other operations that are to
+     * be executed before this one.
      */
     public static class FluentStruct {
         public String name;
@@ -36,6 +42,7 @@ public class CHIMPConnector {
         public long lst;
         public long eet;
         public long let;
+        public FluentStruct[] preconditions;
 
         public FluentStruct(Fluent fluent) {
             name = fluent.getName();
@@ -45,6 +52,7 @@ public class CHIMPConnector {
             lst = ai.getLST();
             eet = ai.getEET();
             let = ai.getLET();
+            preconditions = null;
         }
     }
 
@@ -81,7 +89,20 @@ public class CHIMPConnector {
         for (int i = 0; i < planVector.length; ++i) {
             Variable fl = planVector[i];
             if (fl.getComponent() != null) {
-                taskList.add(new FluentStruct((Fluent) planVector[i]));
+                FluentStruct operation = new FluentStruct((Fluent) fl);
+
+                // get the preconditions of this fluent
+                List<FluentConstraint> preConstraints =
+                    chimp.getFluentSolver()
+                         .getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.PRE);
+                List<FluentStruct> preFluents = new ArrayList<FluentStruct>();
+                for (FluentConstraint constraint : preConstraints)
+                {
+                    // Todo: check with fluent.getComponent() != null?
+                    preFluents.add(new FluentStruct((Fluent) constraint.getFrom()));
+                }
+                operation.preconditions = preFluents.toArray(new FluentStruct[preFluents.size()]);
+                taskList.add(operation);
             }
         }
         result.fluents = taskList.toArray(new FluentStruct[taskList.size()]);
