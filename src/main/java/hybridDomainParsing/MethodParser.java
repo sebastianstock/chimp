@@ -33,7 +33,7 @@ public class MethodParser extends PlanReportroiryItemParser {
 		// add additional constraints from head to head or between preconditions or effects
 		ret.setAdditionalConstraints(filterAdditionalConstraints());
 		
-		Map<String,String[]> variablesPossibleValuesMap = parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD);
+		variablesPossibleValuesMap.putAll(parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD));
 		ret.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		
 		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD, HybridDomain.NOT_TYPE_KEYWORD);

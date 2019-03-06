@@ -26,7 +26,8 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		// add additional constraints from head to head or between preconditions or effects
 		op.setAdditionalConstraints(filterAdditionalConstraints());
 		
-		Map<String,String[]> variablesPossibleValuesMap = parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD);
+		variablesPossibleValuesMap.putAll(
+				parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD));
 		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
 		
 		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD, HybridDomain.NOT_TYPE_KEYWORD);

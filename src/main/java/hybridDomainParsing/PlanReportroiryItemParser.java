@@ -36,6 +36,8 @@ public abstract class PlanReportroiryItemParser {
 	protected final Map<String, Map<String, Integer>> variableOccurrencesMap = 
 			new HashMap<String, Map<String, Integer>>();
 
+	protected final Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
+
 	public PlanReportroiryItemParser(String textualSpecification, HybridDomainPlanner planner, 
 			int maxArs) {
 		this.textualSpecification = textualSpecification;
@@ -77,6 +79,13 @@ public abstract class PlanReportroiryItemParser {
 					variableOccurrencesMap.put(argStrings[i], occ);
 				}
 				occ.put(key, new Integer(i));
+			} else {
+				// It is a constant -> create dummy variable name to insert it into variableOccurrencesMap and add it to possible values
+				String dummyVarName = key + "_v" + i;
+				Map<String, Integer> occ = new HashMap<>();
+				occ.put(key, new Integer(i));
+				variableOccurrencesMap.put(dummyVarName, occ);
+				variablesPossibleValuesMap.put(dummyVarName, new String[] {argStrings[i]});
 			}
 		}
 	}
@@ -142,14 +151,15 @@ public abstract class PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	protected Map<String,String[]> parseValueRestrictions(String valueKeyword, String typeKeyword) throws DomainParsingException {
-		Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
+	protected Map<String,String[]> parseValueRestrictions(String valueKeyword, String typeKeyword)
+			throws DomainParsingException {
+		Map<String,String[]> ret = new HashMap<String, String[]>();
 		// Parse variable definitions
 		String[] varElements = HybridDomain.parseKeyword(valueKeyword, textualSpecification);
 		for (String varElement : varElements) {
 			String varName = varElement.substring(0, varElement.indexOf(" ")).trim();
 			String[] values = varElement.substring(varElement.indexOf(" ")).trim().split(" ");
-			variablesPossibleValuesMap.put(varName, values);
+			ret.put(varName, values);
 		}
 		
 		String[] typeElements = HybridDomain.parseKeyword(typeKeyword, textualSpecification);
@@ -159,7 +169,7 @@ public abstract class PlanReportroiryItemParser {
 		}
 		for (String typeElement : typeElements) {
 			String varName = typeElement.substring(0, typeElement.indexOf(" ")).trim();
-			if (!variablesPossibleValuesMap.containsKey(varName)) {        // only add type restriction if ValueRestriction not used.
+			if (!ret.containsKey(varName)) {        // only add type restriction if ValueRestriction not used.
 				
 				String[] types = typeElement.substring(typeElement.indexOf(" ")).trim().split(" ");
 				List<String> values = new ArrayList<String>();
@@ -173,12 +183,12 @@ public abstract class PlanReportroiryItemParser {
 						throw new DomainParsingException("Type " + type + " specified but not in typesInstancesMap");
 					}
 				}
-				variablesPossibleValuesMap.put(varName, values.toArray(new String[values.size()]));
+				ret.put(varName, values.toArray(new String[values.size()]));
 			}
 			
 		}
 		
-		return variablesPossibleValuesMap;
+		return ret;
 	}
 	
 	protected Map<String,String> parsePreconditionStrings() {
