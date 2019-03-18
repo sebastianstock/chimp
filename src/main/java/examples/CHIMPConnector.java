@@ -2,8 +2,10 @@ package examples;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
+import fluentSolver.FluentNetworkSolver;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
+import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 
@@ -56,8 +58,27 @@ public class CHIMPConnector {
         }
     }
 
+    public static class FluentConstraintStruct {
+
+        public int id;
+        public int fromId;
+        public int toId;
+        public FluentConstraint.Type type;
+        public boolean negativeEffect;
+
+        public FluentConstraintStruct(FluentConstraint fc) {
+            id = fc.getID();
+            fromId = fc.getFrom().getID();
+            toId = fc.getTo().getID();
+            type = fc.getType();
+            negativeEffect = fc.isNegativeEffect();
+        }
+    }
+
     public static class PlanResult {
         public FluentStruct[] fluents;
+        public FluentConstraintStruct[] fluentConstraints;
+        public FluentStruct[] allFluents;
         public boolean foundPlan = true;
     }
 
@@ -85,27 +106,10 @@ public class CHIMPConnector {
         chimp.printStats(System.out);
 
         Variable[] planVector = chimp.extractActions();
-        List<FluentStruct> taskList = new ArrayList<FluentStruct>();
-        for (int i = 0; i < planVector.length; ++i) {
-            Variable fl = planVector[i];
-            if (fl.getComponent() != null) {
-                FluentStruct operation = new FluentStruct((Fluent) fl);
+        result.fluents = extractActions(planVector, chimp.getFluentSolver());
 
-                // get the preconditions of this fluent
-                List<FluentConstraint> preConstraints =
-                    chimp.getFluentSolver()
-                         .getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.PRE);
-                List<FluentStruct> preFluents = new ArrayList<FluentStruct>();
-                for (FluentConstraint constraint : preConstraints)
-                {
-                    // Todo: check with fluent.getComponent() != null?
-                    preFluents.add(new FluentStruct((Fluent) constraint.getFrom()));
-                }
-                operation.preconditions = preFluents.toArray(new FluentStruct[preFluents.size()]);
-                taskList.add(operation);
-            }
-        }
-        result.fluents = taskList.toArray(new FluentStruct[taskList.size()]);
+        result.fluentConstraints = extractConstraints(chimp.getFluentSolver());
+        result.allFluents = extractAllFluents(chimp.getFluentSolver());
 
         if (PRINT_PLAN) {
             int c = 0;
@@ -117,6 +121,48 @@ public class CHIMPConnector {
         }
 
         return result;
+    }
+
+    private static FluentStruct[] extractActions(Variable[] planVector, FluentNetworkSolver fluentSolver) {
+        List<FluentStruct> taskList = new ArrayList<FluentStruct>(planVector.length);
+        for (int i = 0; i < planVector.length; ++i) {
+            Variable fl = planVector[i];
+            if (fl.getComponent() != null) {
+                FluentStruct operation = new FluentStruct((Fluent) fl);
+
+                // get the preconditions of this fluent
+                List<FluentConstraint> preConstraints =
+                        fluentSolver.getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.PRE);
+                List<FluentStruct> preFluents = new ArrayList<FluentStruct>();
+                for (FluentConstraint constraint : preConstraints)
+                {
+                    // Todo: check with fluent.getComponent() != null?
+                    preFluents.add(new FluentStruct((Fluent) constraint.getFrom()));
+                }
+                operation.preconditions = preFluents.toArray(new FluentStruct[preFluents.size()]);
+                taskList.add(operation);
+            }
+        }
+        return taskList.toArray(new FluentStruct[taskList.size()]);
+    }
+
+    private static FluentConstraintStruct[] extractConstraints(FluentNetworkSolver fluentSolver) {
+        List<FluentConstraintStruct> fluentConstraints = new ArrayList<>();
+
+        for (Constraint con : fluentSolver.getConstraints()) {
+            if (con instanceof FluentConstraint) {
+                fluentConstraints.add(new FluentConstraintStruct((FluentConstraint) con));
+            }
+        }
+        return fluentConstraints.toArray(new FluentConstraintStruct[fluentConstraints.size()]);
+    }
+
+    private static FluentStruct[] extractAllFluents(FluentNetworkSolver fluentSolver) {
+        FluentStruct[] fluentStructs = new FluentStruct[fluentSolver.getVariables().length];
+        for (int i = 0; i < fluentSolver.getVariables().length; i++) {
+            fluentStructs[i] = new FluentStruct((Fluent) fluentSolver.getVariables()[i]);
+        }
+        return  fluentStructs;
     }
 
 }
