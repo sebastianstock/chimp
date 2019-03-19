@@ -8,7 +8,6 @@ import hybridDomainParsing.DomainParsingException;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-
 import org.metacsp.multi.allenInterval.AllenInterval;
 import planner.CHIMP;
 
@@ -38,7 +37,7 @@ public class CHIMPConnector {
      */
     public static class FluentStruct {
         public String name;
-        public String type = "action";
+        public String type;
         public int id;
         public long est;
         public long lst;
@@ -48,6 +47,7 @@ public class CHIMPConnector {
 
         public FluentStruct(Fluent fluent) {
             name = fluent.getName();
+            type = fluent.getTypeStr();
             id = fluent.getID();
             AllenInterval ai = fluent.getAllenInterval();
             est = ai.getEST();
@@ -107,7 +107,7 @@ public class CHIMPConnector {
         result.fluents = extractActions(planVector, chimp.getFluentSolver());
 
         result.fluentConstraints = extractConstraints(chimp.getFluentSolver());
-        result.allFluents = extractAllFluents(chimp.getFluentSolver());
+        result.allFluents = convertFluentsToFluentStructs(chimp.getFluentSolver().getVariables());
 
         if (PRINT_PLAN) {
             int c = 0;
@@ -122,26 +122,24 @@ public class CHIMPConnector {
     }
 
     private static FluentStruct[] extractActions(Variable[] planVector, FluentNetworkSolver fluentSolver) {
-        List<FluentStruct> taskList = new ArrayList<FluentStruct>(planVector.length);
+        FluentStruct[] result = new FluentStruct[planVector.length];
         for (int i = 0; i < planVector.length; ++i) {
             Variable fl = planVector[i];
-            if (fl.getComponent() != null) {
-                FluentStruct operation = new FluentStruct((Fluent) fl);
 
-                // get the preconditions of this fluent
-                List<FluentConstraint> preConstraints =
-                        fluentSolver.getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.PRE);
-                List<FluentStruct> preFluents = new ArrayList<FluentStruct>();
-                for (FluentConstraint constraint : preConstraints)
-                {
-                    // Todo: check with fluent.getComponent() != null?
-                    preFluents.add(new FluentStruct((Fluent) constraint.getFrom()));
-                }
-                operation.preconditions = preFluents.toArray(new FluentStruct[preFluents.size()]);
-                taskList.add(operation);
+            FluentStruct operation = new FluentStruct((Fluent) fl);
+
+            // get the preconditions of this fluent
+            List<FluentConstraint> preConstraints =
+                    fluentSolver.getFluentConstraintsOfTypeTo(fl, FluentConstraint.Type.PRE);
+            List<FluentStruct> preFluents = new ArrayList<FluentStruct>();
+            for (FluentConstraint constraint : preConstraints)
+            {
+                preFluents.add(new FluentStruct((Fluent) constraint.getFrom()));
             }
+            operation.preconditions = preFluents.toArray(new FluentStruct[preFluents.size()]);
+            result[i] = operation;
         }
-        return taskList.toArray(new FluentStruct[taskList.size()]);
+        return result;
     }
 
     private static FluentConstraintStruct[] extractConstraints(FluentNetworkSolver fluentSolver) {
@@ -155,10 +153,14 @@ public class CHIMPConnector {
         return fluentConstraints.toArray(new FluentConstraintStruct[fluentConstraints.size()]);
     }
 
-    private static FluentStruct[] extractAllFluents(FluentNetworkSolver fluentSolver) {
-        FluentStruct[] fluentStructs = new FluentStruct[fluentSolver.getVariables().length];
-        for (int i = 0; i < fluentSolver.getVariables().length; i++) {
-            fluentStructs[i] = new FluentStruct((Fluent) fluentSolver.getVariables()[i]);
+    private static FluentStruct[] convertFluentsToFluentStructs(Variable[] vars) {
+        FluentStruct[] fluentStructs = new FluentStruct[vars.length];
+        for (int i = 0; i < vars.length; i++) {
+            try {
+                fluentStructs[i] = new FluentStruct((Fluent) vars[i]);
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException("Variables that shall be converted to FluentStructs must be Fluents");
+            }
         }
         return  fluentStructs;
     }
