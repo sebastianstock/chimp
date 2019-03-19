@@ -60,17 +60,15 @@ public class CHIMPConnector {
 
     public static class FluentConstraintStruct {
 
-        public int id;
         public int fromId;
         public int toId;
-        public FluentConstraint.Type type;
+        public String type;
         public boolean negativeEffect;
 
         public FluentConstraintStruct(FluentConstraint fc) {
-            id = fc.getID();
             fromId = fc.getFrom().getID();
             toId = fc.getTo().getID();
-            type = fc.getType();
+            type = fc.getType().toString();
             negativeEffect = fc.isNegativeEffect();
         }
     }
