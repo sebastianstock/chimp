@@ -243,12 +243,11 @@ public class CHIMP {
 		if (foundPlan) {
 			ArrayList<Variable> plan = new ArrayList<Variable>();
 			for (Variable var : fluentSolver.getVariables()) {
-				String component = var.getComponent();
-				if (component == null) {
-					plan.add(var);
-				}
-				else if (component.equals("Activity")) {
-					plan.add(var);
+				if (var instanceof Fluent) {
+					String fluentType = ((Fluent) var).getTypeStr();
+					if (fluentType.equals(Fluent.ACTIVITY_TYPE_STR)) {
+						plan.add(var);
+					}
 				}
 			}
 			Variable[] planVector = plan.toArray(new Variable[plan.size()]);

@@ -13,6 +13,11 @@ import unify.CompoundSymbolicVariable;
 
 public class Fluent extends MultiVariable implements Activity{
 
+	public static String ACTIVITY_TYPE_STR = "Activity";
+	public static String STATE_TYPE_STR = "State";
+	public static String PLANNED_STATE_TYPE_STR = "PlannedState";
+	public static String TASK_TYPE_STR = "Task";
+
 	/**
 	 * 
 	 */
@@ -107,6 +112,15 @@ public class Fluent extends MultiVariable implements Activity{
 	@Override
 	public String[] getSymbols() {
 		return new String[] {this.getInternalVariables()[0].toString()};
+	}
+
+	public String getTypeStr() {
+		String component = this.getComponent();
+		if (component != null) {
+			return component;
+		} else {
+			return STATE_TYPE_STR;
+		}
 	}
 
 }
