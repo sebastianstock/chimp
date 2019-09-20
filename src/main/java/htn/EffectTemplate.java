@@ -64,4 +64,8 @@ public class EffectTemplate {
 		return key;
 	}
 
+	public String[] getInputArgs() {
+		return args;
+	}
+
 }

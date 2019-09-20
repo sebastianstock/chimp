@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -37,7 +38,7 @@ public abstract class PlanReportroryItem {
 	protected AdditionalConstraintTemplate[] additionalConstraints;
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
-	protected Map<String,String[]> variablesPossibleValuesMap;
+	protected Map<String,String[]> variablesPossibleValuesMap = new HashMap<>();
 	protected Map<String,String[]> variablesImpossibleValuesMap;
 	protected SubDifferentDefinition[] subDifferentDefinitions;
 	
@@ -60,6 +61,7 @@ public abstract class PlanReportroryItem {
 		this.preconditions = preconditions;
 		this.effects = effects;
 		this.preferenceWeight = preferenceWeight;
+		createVariableOccurrencesMap();
 	}
 	
 	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
@@ -82,7 +84,38 @@ public abstract class PlanReportroryItem {
 	public String toString() {
 		return getName();
 	}
-	
+
+	private void createVariableOccurrencesMap() {
+		variableOccurrencesMap = new HashMap<>();
+		addVariableOccurrences(arguments, HEAD_KEYWORD_STRING);
+		for (HTNPrecondition pre : preconditions) {
+			addVariableOccurrences(pre.getArguments(), pre.getKey());
+		}
+		for (EffectTemplate et : effects) {
+			addVariableOccurrences(et.getInputArgs(), et.getKey());
+		}
+	}
+
+	protected void addVariableOccurrences(String[] argStrings, String key) {
+		for (int i = 0; i < argStrings.length;  i++) {
+			if (argStrings[i].startsWith(HybridDomain.VARIABLE_INDICATOR)) {
+				Map<String, Integer> occ = variableOccurrencesMap.get(argStrings[i]);
+				if (occ == null) {
+					occ = new HashMap<String, Integer>();
+					variableOccurrencesMap.put(argStrings[i], occ);
+				}
+				occ.put(key, new Integer(i));
+			} else {
+				// It is a constant -> create dummy variable name to insert it into variableOccurrencesMap and add it to possible values
+				String dummyVarName = key + "_v" + i;
+				Map<String, Integer> occ = new HashMap<>();
+				occ.put(key, new Integer(i));
+				variableOccurrencesMap.put(dummyVarName, occ);
+				variablesPossibleValuesMap.put(dummyVarName, new String[] {argStrings[i]});
+			}
+		}
+	}
+
 	public void setVariableOccurrencesMap(
 			Map<String, Map<String, Integer>> variableOccurrencesMap) {
 		this.variableOccurrencesMap = variableOccurrencesMap;
@@ -90,6 +123,10 @@ public abstract class PlanReportroryItem {
 	
 	public void setVariablesPossibleValuesMap(Map<String,String[]> map) {
 		this.variablesPossibleValuesMap = map;
+	}
+
+	public void addVariablesPossibleValues(Map<String, String[]> map) {
+		this.variablesPossibleValuesMap.putAll(map);
 	}
 	
 	public void setVariablesImpossibleValuesMap(Map<String,String[]> map) {

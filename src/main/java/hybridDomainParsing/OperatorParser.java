@@ -28,7 +28,7 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		
 		variablesPossibleValuesMap.putAll(
 				parseValueRestrictions(HybridDomain.VALUE_RESTRICTION_KEYWORD, HybridDomain.TYPE_KEYWORD));
-		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap);
+		op.setVariablesPossibleValuesMap(variablesPossibleValuesMap); // TODO this is not necessary, anymore, as it is set in the constructor
 		
 		Map<String,String[]> variablesImpossibleValuesMap = parseValueRestrictions(HybridDomain.NEGATED_VALUE_RESTRICTION_KEYWORD, HybridDomain.NOT_TYPE_KEYWORD);
 		op.setVariablesImpossibleValuesMap(variablesImpossibleValuesMap);
