@@ -21,7 +21,7 @@ import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 
 
-public class HybridDomain{
+public class HybridDomain implements ClassicHybridDomain {
 
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
 	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();

@@ -9,6 +9,7 @@ import htn.HTNMethod;
 import htn.HTNOperator;
 import htn.HTNPrecondition;
 import htn.PlanReportroryItem;
+import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -31,7 +32,7 @@ import java.util.Map;
 
 public class ChimpClassicReader implements ChimpClassicVisitor {
 
-    public class ClassicDomain {
+    public class ParsedDomain implements ClassicHybridDomain {
         public final List<PlanReportroryItem> operators = new ArrayList<PlanReportroryItem>();
         public final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
         public final List<FluentScheduler> fluentSchedulers = new ArrayList<FluentScheduler>();
@@ -43,6 +44,41 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
 
         public int maxArgs; // Maximum number of arguments of a fluent.
         public final List<String> predicateSymbols = new ArrayList<>();
+
+        @Override
+        public List<PlanReportroryItem> getOperators() {
+            return operators;
+        }
+
+        @Override
+        public List<PlanReportroryItem> getMethods() {
+            return methods;
+        }
+
+        @Override
+        public List<FluentScheduler> getFluentSchedulers() {
+            return fluentSchedulers;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public List<FluentResourceUsageScheduler> getResourceSchedulers() {
+            return resourceSchedulers;
+        }
+
+        @Override
+        public List<ResourceUsageTemplate> getFluentResourceUsages() {
+            return fluentResourceUsages;
+        }
+
+        @Override
+        public int getMaxArgs() {
+            return maxArgs;
+        }
     }
 
     public static final String HEAD_KEYWORD_STRING = "task";
@@ -59,8 +95,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ClassicDomain visitDomain(ChimpClassicParser.DomainContext ctx) {
-        ClassicDomain ret = new ClassicDomain();
+    public ParsedDomain visitDomain(ChimpClassicParser.DomainContext ctx) {
+        ParsedDomain ret = new ParsedDomain();
         ret.name = visitDomain_name_def(ctx.domain_name_def());
         ret.maxArgs = visitMaxargs_def(ctx.maxargs_def());
         maxArgs = ret.maxArgs;

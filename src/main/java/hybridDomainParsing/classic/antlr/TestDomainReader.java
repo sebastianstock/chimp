@@ -31,7 +31,7 @@ public class TestDomainReader {
 
         ChimpClassicReader visitor = new ChimpClassicReader(createDummyFluentNetworkSolver());
         try {
-            ChimpClassicReader.ClassicDomain domain = visitor.visitDomain(parser.domain());
+            ChimpClassicReader.ParsedDomain domain = visitor.visitDomain(parser.domain());
             System.out.println(domain.toString());
         } catch (Exception e) {
             e.printStackTrace();
