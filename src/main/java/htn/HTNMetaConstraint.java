@@ -20,8 +20,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 	public int getVarsCNT = 0;
 	
 	private static final long serialVersionUID = 4546697317217126280L;
-	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
-	private final Vector<PlanReportroryItem> methods =new Vector<PlanReportroryItem>();
+	private final List<PlanReportroryItem> operators = new ArrayList<PlanReportroryItem>();
+	private final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
 
 	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
 	
@@ -218,7 +218,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	}
 
 	private Vector<ConstraintNetwork> applyPlanrepoirtroryItems(Fluent fl,
-			Vector<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
+			List<PlanReportroryItem> items, FluentNetworkSolver groundSolver) {
 		
 		/// Extract depth:
 		int depth = 0;
@@ -299,11 +299,11 @@ public class HTNMetaConstraint extends MetaConstraint {
 		return false;
 	}
 
-	public void addOperators(Vector<PlanReportroryItem> operators) {
+	public void addOperators(List<PlanReportroryItem> operators) {
 		this.operators.addAll(operators);
 	}
 	
-	public void addMethods(Vector<PlanReportroryItem> methods) {
+	public void addMethods(List<PlanReportroryItem> methods) {
 		this.methods.addAll(methods);
 	}
 	

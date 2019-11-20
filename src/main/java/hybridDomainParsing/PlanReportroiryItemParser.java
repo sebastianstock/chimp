@@ -23,7 +23,7 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final String textualSpecification;
 	protected final FluentNetworkSolver groundSolver;
-	protected final HybridDomainPlanner planner;
+	protected final Map<String, String[]> typesInstancesMap;
 	protected final int maxArgs;
 
 	protected final String head;
@@ -38,11 +38,11 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
 
-	public PlanReportroiryItemParser(String textualSpecification, HybridDomainPlanner planner, 
-			int maxArs) {
+	public PlanReportroiryItemParser(String textualSpecification, Map<String, String[]> typesInstancesMap,
+			FluentNetworkSolver groundSolver, int maxArs) {
 		this.textualSpecification = textualSpecification;
-		this.planner = planner;
-		this.groundSolver = planner.getFluentNetworkSolver();
+		this.typesInstancesMap = typesInstancesMap;
+		this.groundSolver = groundSolver;
 		this.maxArgs = maxArs;
 
 		this.head = HybridDomain.parseKeyword(HybridDomain.HEAD_KEYWORD, textualSpecification)[0].trim();
@@ -163,7 +163,6 @@ public abstract class PlanReportroiryItemParser {
 		}
 		
 		String[] typeElements = HybridDomain.parseKeyword(typeKeyword, textualSpecification);
-		Map<String, String[]> typesInstancesMap = planner.getTypesInstancesMap();
 		if (typesInstancesMap == null && typeElements.length > 0) {
 			throw new DomainParsingException("Specified types in the domain but the planner does not know the instances.");
 		}

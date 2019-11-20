@@ -5,7 +5,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-
+import hybridDomainParsing.ClassicHybridDomain;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
@@ -40,7 +40,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
  */
 public class CHIMP {
 	
-	private HybridDomain domain;
+	private ClassicHybridDomain domain;
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
 	private boolean foundPlan = false;
@@ -146,7 +146,7 @@ public class CHIMP {
 		
 		planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(builder.problem.getTypesInstancesMap());
-		domain.parseDomain(planner);  // loads the domain into the planner
+		((HybridDomain) domain).parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver()); // TODO remove cast
 		
 		initMetaConstraints(builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
 		
@@ -304,7 +304,7 @@ public class CHIMP {
 	private void initMetaConstraints(ValueOrderingH valOH, MoveBaseDurationEstimator mbEstimator, boolean guessOrdering, boolean htnUnification) {
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
-		htnConstraint.addOperators(domain.getOperators());
+		htnConstraint.addOperators( domain.getOperators());
 		htnConstraint.addMethods(domain.getMethods());
 		htnConstraint.setResourceUsages(domain.getFluentResourceUsages());
 		if (htnUnification) {

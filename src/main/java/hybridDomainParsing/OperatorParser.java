@@ -2,6 +2,7 @@ package hybridDomainParsing;
 
 import java.util.Map;
 
+import fluentSolver.FluentNetworkSolver;
 import htn.EffectTemplate;
 import htn.HTNOperator;
 import htn.HTNPrecondition;
@@ -9,8 +10,9 @@ import htn.HTNPrecondition;
 public class OperatorParser extends PlanReportroiryItemParser {
 	
 
-	public OperatorParser(String textualSpecification, HybridDomainPlanner planner, int maxArgs){
-		super(textualSpecification, planner, maxArgs);
+	public OperatorParser(String textualSpecification, Map<String, String[]> typesInstancesMap,
+						  FluentNetworkSolver groundSolver, int maxArgs){
+		super(textualSpecification, typesInstancesMap, groundSolver, maxArgs);
 	}
 	
 	@Override

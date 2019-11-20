@@ -10,6 +10,7 @@ import java.util.Set;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
+import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.HybridDomain;
 
 /**
@@ -72,7 +73,7 @@ public class DynamicProblem implements CHIMPProblem {
 	}
 
 	@Override
-	public void createState(FluentNetworkSolver fluentSolver, HybridDomain domain) {
+	public void createState(FluentNetworkSolver fluentSolver, ClassicHybridDomain domain) {
 		if (createdState) {
 			throw new IllegalStateException("State has already been created.");
 		}

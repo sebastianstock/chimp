@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
 
@@ -15,8 +16,9 @@ import htn.HTNPrecondition;
 
 public class MethodParser extends PlanReportroiryItemParser {
 
-	public MethodParser(String textualSpecification, HybridDomainPlanner planner, int maxArgs) {
-		super(textualSpecification, planner, maxArgs);
+	public MethodParser(String textualSpecification, Map<String, String[]> typesInstancesMap,
+						FluentNetworkSolver groundSolver, int maxArgs) {
+		super(textualSpecification, typesInstancesMap, groundSolver, maxArgs);
 	}
 	
 	@Override

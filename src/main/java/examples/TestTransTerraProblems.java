@@ -219,7 +219,7 @@ public class TestTransTerraProblems {
 		HybridDomain dom;
 		try {
 			dom = new HybridDomain(domainPath);
-			dom.parseDomain(planner);
+			dom.parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver());
 		} catch (DomainParsingException e) {
 			System.out.println("Error while parsing domain: " + e.getMessage());
 			e.printStackTrace();
@@ -301,7 +301,7 @@ public class TestTransTerraProblems {
 	
 	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
 		// load domain
-		domain.parseDomain(planner);
+		domain.parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver());
 		
 		// init meta constraints based on domain
 		ValueOrderingH valOH = new UnifyEarlisttasksValOH();

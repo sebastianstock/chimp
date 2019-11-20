@@ -3,6 +3,7 @@ package planner;
 import java.util.Map;
 
 import fluentSolver.FluentNetworkSolver;
+import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.HybridDomain;
 
 public interface CHIMPProblem {
@@ -11,6 +12,6 @@ public interface CHIMPProblem {
 
 	Map<String, String[]> getTypesInstancesMap();
 	
-	void createState(FluentNetworkSolver fluentSolver, HybridDomain domain);
+	void createState(FluentNetworkSolver fluentSolver, ClassicHybridDomain domain);
 	
 }

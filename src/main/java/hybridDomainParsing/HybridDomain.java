@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
@@ -148,12 +149,12 @@ public class HybridDomain implements ClassicHybridDomain {
 	}
 
 	/**
-	 * Parses a domain file (see domains/testDomain.ddl for an example), instantiates
-	 * the necessary {@link MetaConstraint}s and adds them to the provided {@link HybridDomainPlanner}.
-	 * @param planner The {@link HybridDomainPlanner} that will use this domain.
+	 * Parses a domain file (see domains/testDomain.ddl for an example) and instantiates
+	 * the necessary {@link MetaConstraint}s.
 	 * @throws DomainParsingException Throws this exception if the domain cannot be parsed.
 	 */
-	public void parseDomain(HybridDomainPlanner planner) throws DomainParsingException {
+	public void parseDomain(Map<String, String[]> typesInstancesMap,
+							FluentNetworkSolver groundSolver) throws DomainParsingException {
 		name = parseKeyword(DOMAIN_KEYWORD, domainStr)[0];
 		
 		// Parse Resources and create ResourceSchedulers
@@ -181,7 +182,7 @@ public class HybridDomain implements ClassicHybridDomain {
 		
 		String[] planningOperators = parseKeyword(OPERATOR_KEYWORD, domainStr);
 		for (String operatorstr : planningOperators) {
-			OperatorParser oParser = new OperatorParser(operatorstr, planner, maxArgs);
+			OperatorParser oParser = new OperatorParser(operatorstr, typesInstancesMap, groundSolver, maxArgs);
 			HTNOperator op = oParser.create();
 //			System.out.println("Created Operator: " + op);
 			this.operators.addElement(op);
@@ -189,7 +190,7 @@ public class HybridDomain implements ClassicHybridDomain {
 		
 		String[] planningMethods = parseKeyword(METHOD_KEYWORD, domainStr);
 		for (String methodStr : planningMethods) {
-			MethodParser mParser = new MethodParser(methodStr, planner, maxArgs);
+			MethodParser mParser = new MethodParser(methodStr, typesInstancesMap, groundSolver, maxArgs);
 			HTNMethod m = mParser.create();
 //			System.out.println("Created Method: " + m);
 			this.methods.addElement(m);

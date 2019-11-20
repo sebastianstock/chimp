@@ -26,6 +26,7 @@ import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,11 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         @Override
         public int getMaxArgs() {
             return maxArgs;
+        }
+
+        @Override
+        public String[] getPredicateSymbols() {
+            return predicateSymbols.toArray(new String[predicateSymbols.size()]);
         }
     }
 

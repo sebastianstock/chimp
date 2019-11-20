@@ -52,7 +52,7 @@ public class ProblemParser implements CHIMPProblem {
 	}
 	
 	@Override
-	public void createState(FluentNetworkSolver fluentSolver, HybridDomain domain) {
+	public void createState(FluentNetworkSolver fluentSolver, ClassicHybridDomain domain) {
 		Map<String, Variable> varsMap = new HashMap<String, Variable>(fluentElementsMap.size() 
 				+ taskElementsMap.size());
 		
@@ -95,7 +95,7 @@ public class ProblemParser implements CHIMPProblem {
 	}
 
 	private Constraint[] createResourceUsageConstraints(
-			Vector<ResourceUsageTemplate> fluentResourceUsages,
+			List<ResourceUsageTemplate> fluentResourceUsages,
 			Collection<Variable> vars) {
 		List<Constraint> ret = new ArrayList<Constraint>();
 		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = HTNMetaConstraint.createResourceUsagesMap(fluentResourceUsages);
