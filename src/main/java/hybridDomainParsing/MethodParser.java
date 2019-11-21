@@ -5,20 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.VariablePrototype;
-
-import fluentSolver.FluentConstraint;
+import htn.OrderingConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
 import htn.HTNPrecondition;
 
 public class MethodParser extends PlanReportroiryItemParser {
 
-	public MethodParser(String textualSpecification, Map<String, String[]> typesInstancesMap,
-						FluentNetworkSolver groundSolver, int maxArgs) {
-		super(textualSpecification, typesInstancesMap, groundSolver, maxArgs);
+	public MethodParser(String textualSpecification, Map<String, String[]> typesInstancesMap, int maxArgs) {
+		super(textualSpecification, typesInstancesMap, maxArgs);
 	}
 	
 	@Override
@@ -27,7 +22,7 @@ public class MethodParser extends PlanReportroiryItemParser {
 
 		String headname = HybridDomain.extractName(head);
 		EffectTemplate[] subtasks = createEffectTemplates("Task", HybridDomain.SUBTASK_KEYWORD);
-		Constraint[] orderingCons = parseFluentBeforeConstraints(subtasks);
+		OrderingConstraintTemplate[] orderingCons = parseOrderingConstraints(subtasks);
 		int preferenceWeight = parsePreferenceWeight();
 		HTNMethod ret = new HTNMethod(headname, argStrings, preconditions, subtasks, orderingCons, preferenceWeight);
 		ret.setVariableOccurrencesMap(variableOccurrencesMap);
@@ -48,24 +43,22 @@ public class MethodParser extends PlanReportroiryItemParser {
 		return ret;
 	}
 	
-	private Constraint[] parseFluentBeforeConstraints(EffectTemplate[] subtasks) {
-		Map<String, VariablePrototype> keyToPrototypesMap = new HashMap<String, VariablePrototype>();
+	private OrderingConstraintTemplate[] parseOrderingConstraints(EffectTemplate[] subtasks) {
+		Map<String, EffectTemplate> keyToEffectTemplatesMap = new HashMap<>();
 		for (EffectTemplate et : subtasks) {
-			keyToPrototypesMap.put(et.getKey(), et.getPrototype());
+			keyToEffectTemplatesMap.put(et.getKey(), et);
 		}
 		
 		String[] orderingElements = 
 				HybridDomain.parseKeyword(HybridDomain.ORDERING_CONSTRAINT_KEYWORD, textualSpecification);
-		List<Constraint> cons = new ArrayList<Constraint>();
+		List<OrderingConstraintTemplate> ret = new ArrayList<OrderingConstraintTemplate>();
 		for (String orderingElement : orderingElements) {
 			String fromKey = orderingElement.substring(0,orderingElement.indexOf(" ")).trim();
 			String toKey = orderingElement.substring(orderingElement.indexOf(" ")).trim();
-			FluentConstraint con = new FluentConstraint(FluentConstraint.Type.BEFORE);
-			con.setFrom(keyToPrototypesMap.get(fromKey));
-			con.setTo(keyToPrototypesMap.get(toKey));
-			cons.add(con);
+			ret.add(new OrderingConstraintTemplate(keyToEffectTemplatesMap.get(fromKey),
+					keyToEffectTemplatesMap.get(toKey)));
 		}
-		return cons.toArray(new Constraint[cons.size()]);
+		return ret.toArray(new OrderingConstraintTemplate[ret.size()]);
 	}
 	
 }

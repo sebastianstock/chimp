@@ -255,7 +255,7 @@ public class EvalRACEDomain {
 	
 	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
 		// load domain
-		domain.parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver());
+		domain.parseDomain(planner.getTypesInstancesMap());
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new UnifyEarlisttasksValOH();

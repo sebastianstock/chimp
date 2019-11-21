@@ -10,9 +10,8 @@ import htn.HTNPrecondition;
 public class OperatorParser extends PlanReportroiryItemParser {
 	
 
-	public OperatorParser(String textualSpecification, Map<String, String[]> typesInstancesMap,
-						  FluentNetworkSolver groundSolver, int maxArgs){
-		super(textualSpecification, typesInstancesMap, groundSolver, maxArgs);
+	public OperatorParser(String textualSpecification, Map<String, String[]> typesInstancesMap, int maxArgs){
+		super(textualSpecification, typesInstancesMap, maxArgs);
 	}
 	
 	@Override

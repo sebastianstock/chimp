@@ -201,7 +201,7 @@ public class TestRemoveAllSamples {
 		HybridDomain dom;
 		try {
 			dom = new HybridDomain(domainPath);
-			dom.parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver());
+			dom.parseDomain(planner.getTypesInstancesMap());
 		} catch (DomainParsingException e) {
 			System.out.println("Error while parsing domain: " + e.getMessage());
 			e.printStackTrace();

@@ -274,7 +274,7 @@ public abstract class PlanReportroryItem {
 			Map<String, Variable> effKeyToVariableMap = new HashMap<String, Variable>();
 //			keyToFluentMap.put(HEAD_STRING, taskFluent);
 			for (EffectTemplate et : effects) {
-				effKeyToVariableMap.put(et.getKey(), et.getPrototype());
+				effKeyToVariableMap.put(et.getKey(), et.getPrototype(groundSolver));
 			}
 			
 			for (FluentConstraint con : comb) {

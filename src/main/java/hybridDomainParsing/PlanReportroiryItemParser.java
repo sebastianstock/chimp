@@ -22,7 +22,6 @@ import resourceFluent.ResourceUsageTemplate;
 public abstract class PlanReportroiryItemParser {
 
 	protected final String textualSpecification;
-	protected final FluentNetworkSolver groundSolver;
 	protected final Map<String, String[]> typesInstancesMap;
 	protected final int maxArgs;
 
@@ -38,11 +37,9 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final Map<String,String[]> variablesPossibleValuesMap = new HashMap<String, String[]>();
 
-	public PlanReportroiryItemParser(String textualSpecification, Map<String, String[]> typesInstancesMap,
-			FluentNetworkSolver groundSolver, int maxArs) {
+	public PlanReportroiryItemParser(String textualSpecification, Map<String, String[]> typesInstancesMap, int maxArs) {
 		this.textualSpecification = textualSpecification;
 		this.typesInstancesMap = typesInstancesMap;
-		this.groundSolver = groundSolver;
 		this.maxArgs = maxArs;
 
 		this.head = HybridDomain.parseKeyword(HybridDomain.HEAD_KEYWORD, textualSpecification)[0].trim();
@@ -380,7 +377,7 @@ public abstract class PlanReportroiryItemParser {
 
 		addVariableOccurrences(args, subKey);
 		
-		EffectTemplate et = new EffectTemplate(subKey, name, args, maxArgs, groundSolver, component);
+		EffectTemplate et = new EffectTemplate(subKey, name, args, maxArgs, component);
 		// Add additional AllenIntervalConstraints
 		for (AdditionalConstraintTemplate additionalCon : additionalAIConstraints) {
 			if (additionalCon.involvesHeadAndKey(subKey)) {

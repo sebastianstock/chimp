@@ -15,14 +15,14 @@ import java.util.Set;
 
 public class HTNMethod extends PlanReportroryItem {
 	
-	private Constraint[] constraints;
+	private OrderingConstraintTemplate[] orderings;
 
 	
 	public HTNMethod(String taskName, String[] arguments, HTNPrecondition[] preconditions,
-			EffectTemplate[] effects, Constraint[] constraints, int preferenceWeight) {
+			EffectTemplate[] effects, OrderingConstraintTemplate[] orderings, int preferenceWeight) {
 		
 		super(taskName, arguments, preconditions, effects, preferenceWeight);
-		this.constraints = constraints;
+		this.orderings = orderings;
 	}
 
 
@@ -38,7 +38,7 @@ public class HTNMethod extends PlanReportroryItem {
 		// create prototypes and decomposition constraints
 		if (effects != null) {
 			for (EffectTemplate et : effects) {
-				VariablePrototype subPrototype = et.getPrototype();
+				VariablePrototype subPrototype = et.getPrototype(groundSolver);
 				subPrototype.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 				// create dc constraint
 				String[] arguments = (String[])subPrototype.getParameters()[2];
@@ -54,14 +54,11 @@ public class HTNMethod extends PlanReportroryItem {
 				subtasksWithoutSuccessor.add(subPrototype);
 			}
 		}
-		if (constraints != null) {
-			for (Constraint c : constraints) {
-				newConstraints.add(c);
-				
-				if(c instanceof FluentConstraint 
-						&& ((FluentConstraint) c).getType() == FluentConstraint.Type.BEFORE) {
-					subtasksWithoutSuccessor.remove(c.getScope()[0]);
-				}
+		if (orderings != null) {
+			for (OrderingConstraintTemplate ordering : orderings) {
+				FluentConstraint fc = ordering.getConstraint(groundSolver);
+				newConstraints.add(fc);
+				subtasksWithoutSuccessor.remove(fc.getScope()[0]);
 			}
 		}
 		

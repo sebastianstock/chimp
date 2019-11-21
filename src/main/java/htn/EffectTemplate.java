@@ -12,27 +12,28 @@ public class EffectTemplate {
 	private final String key;
 	private final String name;
 	private final String[] args;
+	private final String comp;
+	private int maxArgs;
 	
 	private static final String ACTIVITY_STR = "Activity";
 	
-	private final VariablePrototype prototype;
+	private VariablePrototype prototype = null;
 	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
 			new Vector<AdditionalConstraintTemplate>();
 	
-	public EffectTemplate(String key, String name, String[] args, int maxArgs, FluentNetworkSolver groundSolver, String component) {
+	public EffectTemplate(String key, String name, String[] args, int maxArgs, String component) {
 		this.key = key;
 		this.name = name;
 		this.args = args;
-		String comp;
+		this.maxArgs = maxArgs;
 		if (component.equals("Task") && name.startsWith("!")) {
 			comp = ACTIVITY_STR;
 		} else {
 			comp = component;
 		}
-		this.prototype = createPrototype(comp, maxArgs, groundSolver);
 	}
 	
-	private VariablePrototype createPrototype(String component, int maxArgs, FluentNetworkSolver groundSolver) {
+	private void createPrototype(FluentNetworkSolver groundSolver) {
 		// fill arguments array up to maxargs
 		String[] filledArgs = new String[maxArgs];
 		for (int i = 0; i < args.length; i++) {
@@ -41,10 +42,13 @@ public class EffectTemplate {
 		for (int i = args.length; i < maxArgs; i++) {
 			filledArgs[i] = HybridDomain.EMPTYSTRING;
 		}
-		return new VariablePrototype(groundSolver, component, name, filledArgs);
+		this.prototype = new VariablePrototype(groundSolver, comp, name, filledArgs);
 	}
 
-	public VariablePrototype getPrototype() {
+	public VariablePrototype getPrototype(FluentNetworkSolver groundSolver) {
+		if (this.prototype == null) {
+			createPrototype(groundSolver);
+		}
 		return prototype;
 	}
 

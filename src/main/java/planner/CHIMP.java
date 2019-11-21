@@ -146,7 +146,7 @@ public class CHIMP {
 		
 		planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(builder.problem.getTypesInstancesMap());
-		((HybridDomain) domain).parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver()); // TODO remove cast
+		((HybridDomain) domain).parseDomain(planner.getTypesInstancesMap()); // TODO remove cast
 		
 		initMetaConstraints(builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
 		

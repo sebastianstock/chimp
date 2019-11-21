@@ -312,7 +312,7 @@ public class EvalDWRDomainArgs {
 	
 	public static void initPlanner(HTNPlanner planner, HybridDomain domain, ValueOrderingH valOH) throws DomainParsingException {
 		// load domain
-		domain.parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver());
+		domain.parseDomain(planner.getTypesInstancesMap());
 		
 		// init meta constraints based on domain
 		

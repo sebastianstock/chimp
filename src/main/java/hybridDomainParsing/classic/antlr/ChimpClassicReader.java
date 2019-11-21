@@ -1,13 +1,12 @@
 package hybridDomainParsing.classic.antlr;
 
 import com.google.common.primitives.Ints;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
 import htn.HTNOperator;
 import htn.HTNPrecondition;
+import htn.OrderingConstraintTemplate;
 import htn.PlanReportroryItem;
 import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.HybridDomain;
@@ -16,8 +15,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
@@ -26,7 +23,6 @@ import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,10 +90,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     public static final int DEFAULT_PREFERENCE_WEIGHT = 1;
 
     private int maxArgs = -1;
-    private final FluentNetworkSolver groundSolver;
 
-    public ChimpClassicReader(FluentNetworkSolver groundSolver) {
-        this.groundSolver = groundSolver;
+    public ChimpClassicReader() {
     }
 
     @Override
@@ -237,7 +231,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         EffectTemplate[] effectTemplates = createEffectTemplates(parsedSubtasks, SUBTASK_COMPONENT);
         addTemporalConstraintsToEffects(temporalConstraintTemplates, effectTemplates);
 
-        Constraint[] orderingConstraints = createOrderingConstraints(parsedOrderingConstraints, effectTemplates);
+        OrderingConstraintTemplate[] orderingConstraints = createOrderingConstraints(parsedOrderingConstraints, effectTemplates);
         HTNMethod method = new HTNMethod(head.name, head.args.toArray(new String[head.args.size()]),
                 htnPreconditions, effectTemplates, orderingConstraints, preferenceWeight);
 
@@ -253,28 +247,29 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         return method;
     }
 
-    Constraint[] createOrderingConstraints(List<ParsedOrdering> parsedOrderings, EffectTemplate[] subtasks) {
-        Map<String, VariablePrototype> keyToPrototypesMap = new HashMap<String, VariablePrototype>();
+    private OrderingConstraintTemplate[] createOrderingConstraints(List<ParsedOrdering> parsedOrderings,
+                                                           EffectTemplate[] subtasks) {
+        Map<String, EffectTemplate> keyToEffectTemplatesMap = new HashMap<String, EffectTemplate>();
         for (EffectTemplate et : subtasks) {
-            keyToPrototypesMap.put(et.getKey(), et.getPrototype());
+            keyToEffectTemplatesMap.put(et.getKey(), et);
         }
 
-        List<Constraint> cons = new ArrayList<Constraint>();
+        List<OrderingConstraintTemplate> ret = new ArrayList<OrderingConstraintTemplate>();
         for (ParsedOrdering parsedOrdering : parsedOrderings) {
 
-            if (!keyToPrototypesMap.containsKey(parsedOrdering.fromKey)) {
-                throw new IllegalStateException("Error while parsing 'Ordering': (from) key " + parsedOrdering.fromKey + " is not a subtask of the method");
+            if (!keyToEffectTemplatesMap.containsKey(parsedOrdering.fromKey)) {
+                throw new IllegalStateException("Error while parsing 'Ordering': (from) key " +
+                        parsedOrdering.fromKey + " is not a subtask of the method");
             }
-            if (!keyToPrototypesMap.containsKey(parsedOrdering.toKey)) {
-                throw new IllegalStateException("Error while parsing 'Ordering': (to) key " + parsedOrdering.toKey + " is not a subtask of the method");
+            if (!keyToEffectTemplatesMap.containsKey(parsedOrdering.toKey)) {
+                throw new IllegalStateException("Error while parsing 'Ordering': (to) key " +
+                        parsedOrdering.toKey + " is not a subtask of the method");
             }
 
-            FluentConstraint con = new FluentConstraint(FluentConstraint.Type.BEFORE);
-            con.setFrom(keyToPrototypesMap.get(parsedOrdering.fromKey));
-            con.setTo(keyToPrototypesMap.get(parsedOrdering.toKey));
-            cons.add(con);
+            ret.add(new OrderingConstraintTemplate(keyToEffectTemplatesMap.get(parsedOrdering.fromKey),
+                            keyToEffectTemplatesMap.get(parsedOrdering.toKey)));
         }
-        return cons.toArray(new Constraint[cons.size()]);
+        return ret.toArray(new OrderingConstraintTemplate[ret.size()]);
     }
 
     /**
@@ -401,7 +396,6 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             effectTemplates[i] = new EffectTemplate(p.id, p.predicate.name,
                     p.predicate.args.toArray(new String[p.predicate.args.size()]),
                     maxArgs,
-                    groundSolver,
                     component);
         } return effectTemplates;
     }

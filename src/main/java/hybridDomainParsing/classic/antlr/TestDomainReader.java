@@ -29,7 +29,7 @@ public class TestDomainReader {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ChimpClassicParser parser = new ChimpClassicParser(tokens);
 
-        ChimpClassicReader visitor = new ChimpClassicReader(createDummyFluentNetworkSolver());
+        ChimpClassicReader visitor = new ChimpClassicReader();
         try {
             ChimpClassicReader.ParsedDomain domain = visitor.visitDomain(parser.domain());
             System.out.println(domain.toString());

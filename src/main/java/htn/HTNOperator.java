@@ -28,7 +28,7 @@ public class HTNOperator extends PlanReportroryItem {
 
 		if (effects != null) {
 			for(EffectTemplate et : effects) {
-				VariablePrototype p = et.getPrototype();
+				VariablePrototype p = et.getPrototype(groundSolver);
 				p.setMarking(HTNMetaConstraint.markings.OPEN);
 				String[] arguments = (String[])p.getParameters()[2];
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 

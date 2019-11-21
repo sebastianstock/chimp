@@ -43,7 +43,7 @@ public class ChimpIO {
 	}
 	
 	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
-		domain.parseDomain(planner.getTypesInstancesMap(), planner.getFluentNetworkSolver());
+		domain.parseDomain(planner.getTypesInstancesMap());
 		
 		// init meta constraints based on domain
 //		ValueOrderingH valOH = new NewestFluentsValOH();
