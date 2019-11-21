@@ -24,19 +24,18 @@ public class TestIncrementalMerging {
 		String domainFile = "domains/ordered_domain.ddl";
 		
 		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
-		
-		CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
-				.valHeuristic(valOH)
-				.mbEstimator(new LookUpTableDurationEstimator())
-				.htnUnification(true);
-		builder.htnUnification(true);
-		CHIMP chimp;
+
+		CHIMP.CHIMPBuilder builder = null;
 		try {
-			chimp = builder.build();
+			builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+					.valHeuristic(valOH)
+					.mbEstimator(new LookUpTableDurationEstimator())
+					.htnUnification(true);
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
-			return;
 		}
+		builder.htnUnification(true);
+		CHIMP chimp = builder.build();
 		
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);

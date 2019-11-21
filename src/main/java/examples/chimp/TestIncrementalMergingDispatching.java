@@ -34,19 +34,19 @@ public class TestIncrementalMergingDispatching {
 		String domainFile = "domains/ordered_domain.ddl";
 		
 		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
-		
-		CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
-				.valHeuristic(valOH)
-				.mbEstimator(new LookUpTableDurationEstimator())
-				.htnUnification(true);
-		builder.htnUnification(true);
-		CHIMP chimp;
+
+		CHIMP.CHIMPBuilder builder;
 		try {
-			chimp = builder.build();
+			builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+					.valHeuristic(valOH)
+					.mbEstimator(new LookUpTableDurationEstimator())
+					.htnUnification(true);
 		} catch (DomainParsingException e) {
 			e.printStackTrace();
 			return;
 		}
+		builder.htnUnification(true);
+		CHIMP chimp = builder.build();
 		
 		System.out.println("Found plan? " + chimp.generatePlan());
 		FluentNetworkSolver fluentSolver = chimp.getFluentSolver();	

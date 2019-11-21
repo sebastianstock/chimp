@@ -30,14 +30,12 @@ public class TestFluentDispatching {
 		String domainFile = "domains/ordered_domain.ddl";
 
 		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
-
-		CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
-				.valHeuristic(valOH)
-				.mbEstimator(new LookUpTableDurationEstimator())
-				.htnUnification(true);
-		builder.htnUnification(true);
 		CHIMP chimp;
 		try {
+			CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+					.valHeuristic(valOH)
+					.mbEstimator(new LookUpTableDurationEstimator())
+					.htnUnification(true);
 			chimp = builder.build();
 		} catch (DomainParsingException e) {
 			e.printStackTrace();

@@ -39,8 +39,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
  *
  */
 public class CHIMP {
-	
-	private ClassicHybridDomain domain;
+
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
 	private boolean foundPlan = false;
@@ -50,7 +49,7 @@ public class CHIMP {
 	public static class CHIMPBuilder {
 		
 		private final CHIMPProblem problem;
-		private final String domainPath;
+		private final ClassicHybridDomain domain;
 		private ValueOrderingH htnValOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		private MoveBaseDurationEstimator mbEstimator;
 		private boolean guessOrdering = false;
@@ -60,23 +59,24 @@ public class CHIMP {
 		
 		/**
 		 * 
-		 * @param domainPath Path to the domain file.
+		 * @param domain Planning domain.
 		 * @param problem Problem to plan.
 		 *
 		 */
-		public CHIMPBuilder(String domainPath, CHIMPProblem problem) {
-			this.domainPath = domainPath;
+		public CHIMPBuilder(ClassicHybridDomain domain, CHIMPProblem problem) {
+			this.domain = domain;
 			this.problem = problem;
 		}
 		
 		/**
-		 * 
+		 * This version still uses the old HybridDomain instead of the parser based on antlr.
 		 * @param domainPath Path to the domain file.
 		 * @param problemPath Path to the problem file.
 		 */
-		public CHIMPBuilder(String domainPath, String problemPath) {
-			this.domainPath = domainPath;
+		public CHIMPBuilder(String domainPath, String problemPath) throws DomainParsingException {
 			this.problem = new ProblemParser(problemPath);
+			this.domain = new HybridDomain(domainPath);
+			((HybridDomain) domain).parseDomain(problem.getTypesInstancesMap());
 		}
 		
 		/**
@@ -109,7 +109,7 @@ public class CHIMP {
 			return this;
 		}
 		
-		public CHIMP build() throws DomainParsingException {
+		public CHIMP build() {
 			return new CHIMP(this);
 		}
 
@@ -135,24 +135,21 @@ public class CHIMP {
 		
 	}
 	
-	private CHIMP(CHIMPBuilder builder) throws DomainParsingException {
+	private CHIMP(CHIMPBuilder builder) {
 		
-		domain = new HybridDomain(builder.domainPath);
-		
-		int[] ingredients = new int[] {1, domain.getMaxArgs()};
+		int[] ingredients = new int[] {1, builder.domain.getMaxArgs()};
 		String[][] symbols = new String[2][];
-		symbols[0] =  domain.getPredicateSymbols();
+		symbols[0] =  builder.domain.getPredicateSymbols();
 		symbols[1] = builder.problem.getArgumentSymbols();
 		
 		planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(builder.problem.getTypesInstancesMap());
-		((HybridDomain) domain).parseDomain(planner.getTypesInstancesMap()); // TODO remove cast
 		
-		initMetaConstraints(builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
+		initMetaConstraints(builder.domain, builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
 		
 		// create initial state:
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		builder.problem.createState(fluentSolver, domain);
+		builder.problem.createState(fluentSolver, builder.domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 	}
 	
@@ -301,8 +298,9 @@ public class CHIMP {
 		}
 	}
 	
-	private void initMetaConstraints(ValueOrderingH valOH, MoveBaseDurationEstimator mbEstimator, boolean guessOrdering, boolean htnUnification) {
-		
+	private void initMetaConstraints(ClassicHybridDomain domain, ValueOrderingH valOH,
+									 MoveBaseDurationEstimator mbEstimator, boolean guessOrdering,
+									 boolean htnUnification) {
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators( domain.getOperators());
 		htnConstraint.addMethods(domain.getMethods());

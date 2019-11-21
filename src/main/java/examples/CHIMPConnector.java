@@ -83,13 +83,12 @@ public class CHIMPConnector {
     public PlanResult plan(String problemFile, String domainFile) {
 
         ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
-        CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
-                .valHeuristic(valOH)
-                .htnUnification(USE_HTN_UNIFICATION)
-                .guessOrdering(GUESS_ORDERING);
-
         CHIMP chimp;
         try {
+            CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+                    .valHeuristic(valOH)
+                    .htnUnification(USE_HTN_UNIFICATION)
+                    .guessOrdering(GUESS_ORDERING);
             chimp = builder.build();
         } catch (DomainParsingException e) {
             e.printStackTrace();

@@ -13,13 +13,13 @@ import planner.CHIMP;
 
 public class TestRACEDomain {
 
-	static final boolean LOGGING = false;
-	static final boolean GUESS_ORDERING = false;
+    static final boolean LOGGING = false;
+    static final boolean GUESS_ORDERING = false;
     static final boolean PRINT_PLAN = true;
     static final boolean DRAW = false;
 
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
 //		String problemFile = "problems/test_op_tuck_arms.pdl"); // #1
 //		String problemFile = "problems/test_op_move_base.pdl"); // #2
@@ -69,13 +69,13 @@ public class TestRACEDomain {
 //		String problemFile = "problems/race_testing/move_multiple.pdl");
 //		String problemFile = "problems/test_m_serve_coffee_problem_2_fromtable.pdl"); //#44
 //		String problemFile = "problems/test_m_get_object_w_arm_debug1.pdl"); //#45
-		// value ordering heuristic debugging:
+        // value ordering heuristic debugging:
 //		String problemFile = "problems/debug_m_put_object1.pdl"); // very slow with UnifyFewestsubsNewestbindingsValOH
 
 //		String problemFile = "problems/iros/iros_incremental_merging_initial.pdl");
 
-		String problemFile = "problems/test_m_serve_coffee_problem_1.pdl"; // #0
-		String domainFile = "domains/ordered_domain.ddl";
+        String problemFile = "problems/test_m_serve_coffee_problem_1.pdl"; // #0
+        String domainFile = "domains/ordered_domain.ddl";
 
 //		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
 //		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
@@ -83,48 +83,50 @@ public class TestRACEDomain {
 //		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
 //		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
-		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
-		CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
-				.valHeuristic(valOH)
-				.mbEstimator(new LookUpTableDurationEstimator())
-				.htnUnification(true);
-		if (GUESS_ORDERING) {
-			builder.guessOrdering(true);
-		}
-		CHIMP chimp;
-		try {
-			chimp = builder.build();
-		} catch (DomainParsingException e) {
-			e.printStackTrace();
-			return;
-		}
+        CHIMP.CHIMPBuilder builder;
+
+        try {
+            builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+                    .valHeuristic(valOH)
+                    .mbEstimator(new LookUpTableDurationEstimator())
+                    .htnUnification(true);
+            if (GUESS_ORDERING) {
+                builder.guessOrdering(true);
+            }
+
+        } catch (DomainParsingException e) {
+            e.printStackTrace();
+            return;
+        }
+        CHIMP chimp = builder.build();
 
 //		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
 //		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
 //		MetaCSPLogging.setLevel(Level.FINE);
-		if (! LOGGING) {
-			MetaCSPLogging.setLevel(Level.OFF);
-		}
+        if (!LOGGING) {
+            MetaCSPLogging.setLevel(Level.OFF);
+        }
 
-		System.out.println("Found plan? " + chimp.generatePlan());
-		chimp.printStats(System.out);
+        System.out.println("Found plan? " + chimp.generatePlan());
+        chimp.printStats(System.out);
 
-		if (PRINT_PLAN) {
-			Variable[] planVector = chimp.extractActions();
-			int c = 0;
-			for (Variable act : planVector) {
-				if (act.getComponent() != null)
-					System.out.println(c++ +".\t" + act);
-			}
+        if (PRINT_PLAN) {
+            Variable[] planVector = chimp.extractActions();
+            int c = 0;
+            for (Variable act : planVector) {
+                if (act.getComponent() != null)
+                    System.out.println(c++ + ".\t" + act);
+            }
 
-			chimp.printFullPlan();
-			chimp.drawPlanHierarchy(100);
-			chimp.drawHierarchyNetwork();
-			chimp.drawSearchSpace();
-		}
+            chimp.printFullPlan();
+            chimp.drawPlanHierarchy(100);
+            chimp.drawHierarchyNetwork();
+            chimp.drawSearchSpace();
+        }
 
-	}
+    }
 
 }
