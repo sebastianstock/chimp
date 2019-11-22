@@ -24,6 +24,13 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDomain_item_resource(ChimpClassicParser.Domain_item_resourceContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code domain_item_fluentresourceusage}
+	 * labeled alternative in {@link ChimpClassicParser#domain_item}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDomain_item_fluentresourceusage(ChimpClassicParser.Domain_item_fluentresourceusageContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code domain_item_statevariable}
 	 * labeled alternative in {@link ChimpClassicParser#domain_item}.
 	 * @param ctx the parse tree
@@ -119,6 +126,13 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTemporal_constraint_m_element(ChimpClassicParser.Temporal_constraint_m_elementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code resource_usage_m_element}
+	 * labeled alternative in {@link ChimpClassicParser#method_element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitResource_usage_m_element(ChimpClassicParser.Resource_usage_m_elementContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code value_restriction_m_element}
 	 * labeled alternative in {@link ChimpClassicParser#method_element}.
 	 * @param ctx the parse tree
@@ -139,6 +153,13 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTypevalue_restriction_m_element(ChimpClassicParser.Typevalue_restriction_m_elementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nottypevalue_restriction_m_element}
+	 * labeled alternative in {@link ChimpClassicParser#method_element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNottypevalue_restriction_m_element(ChimpClassicParser.Nottypevalue_restriction_m_elementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code vardifferent_m_element}
 	 * labeled alternative in {@link ChimpClassicParser#method_element}.
@@ -216,6 +237,13 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTypevalue_restriction_op_element(ChimpClassicParser.Typevalue_restriction_op_elementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nottypevalue_restriction_op_element}
+	 * labeled alternative in {@link ChimpClassicParser#op_element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNottypevalue_restriction_op_element(ChimpClassicParser.Nottypevalue_restriction_op_elementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code vardifferent_op_element}
 	 * labeled alternative in {@link ChimpClassicParser#op_element}.
@@ -314,6 +342,24 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitResource_usage_def(ChimpClassicParser.Resource_usage_defContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#fluentresourceusage_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFluentresourceusage_def(ChimpClassicParser.Fluentresourceusage_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#fluent_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFluent_def(ChimpClassicParser.Fluent_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#usage_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUsage_def(ChimpClassicParser.Usage_defContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ChimpClassicParser#param_item}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -337,6 +383,12 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTypevalue_restriction_def(ChimpClassicParser.Typevalue_restriction_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#nottypevalue_restriction_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNottypevalue_restriction_def(ChimpClassicParser.Nottypevalue_restriction_defContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ChimpClassicParser#vardifferent_def}.
 	 * @param ctx the parse tree

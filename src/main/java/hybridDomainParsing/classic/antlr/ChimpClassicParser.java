@@ -25,7 +25,8 @@ public class ChimpClassicParser extends Parser {
 		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
 		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52, 
 		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59, 
-		T__59=60, VAR_NAME=61, OP_NAME=62, NAME=63, Comment=64, WS=65, NUMBER=66;
+		T__59=60, T__60=61, T__61=62, T__62=63, VAR_NAME=64, NAME=65, Comment=66, 
+		WS=67, NUMBER=68;
 	public static final int
 		RULE_domain = 0, RULE_domain_item = 1, RULE_domain_name_def = 2, RULE_maxargs_def = 3, 
 		RULE_predicatesymbols_def = 4, RULE_predicate_symbol = 5, RULE_resource_def = 6, 
@@ -36,10 +37,11 @@ public class ChimpClassicParser extends Parser {
 		RULE_unary_temporal_constraint_def = 20, RULE_unary_temporal_constraint_type = 21, 
 		RULE_binary_temporal_constraint_def = 22, RULE_binary_temporal_constraint_type = 23, 
 		RULE_bounds_list = 24, RULE_bounds = 25, RULE_bound = 26, RULE_id_or_task = 27, 
-		RULE_resource_usage_def = 28, RULE_param_item = 29, RULE_value_restriction_def = 30, 
-		RULE_notvalue_restriction_def = 31, RULE_typevalue_restriction_def = 32, 
-		RULE_vardifferent_def = 33, RULE_constant_list = 34, RULE_predicate = 35, 
-		RULE_predicate_args = 36, RULE_id = 37, RULE_var_or_const = 38;
+		RULE_resource_usage_def = 28, RULE_fluentresourceusage_def = 29, RULE_fluent_def = 30, 
+		RULE_usage_def = 31, RULE_param_item = 32, RULE_value_restriction_def = 33, 
+		RULE_notvalue_restriction_def = 34, RULE_typevalue_restriction_def = 35, 
+		RULE_nottypevalue_restriction_def = 36, RULE_vardifferent_def = 37, RULE_constant_list = 38, 
+		RULE_predicate = 39, RULE_predicate_args = 40, RULE_id = 41, RULE_var_or_const = 42;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"domain", "domain_item", "domain_name_def", "maxargs_def", "predicatesymbols_def", 
@@ -49,7 +51,8 @@ public class ChimpClassicParser extends Parser {
 			"ordering_constraint_def", "temporal_constraint_def", "unary_temporal_constraint_def", 
 			"unary_temporal_constraint_type", "binary_temporal_constraint_def", "binary_temporal_constraint_type", 
 			"bounds_list", "bounds", "bound", "id_or_task", "resource_usage_def", 
-			"param_item", "value_restriction_def", "notvalue_restriction_def", "typevalue_restriction_def", 
+			"fluentresourceusage_def", "fluent_def", "usage_def", "param_item", "value_restriction_def", 
+			"notvalue_restriction_def", "typevalue_restriction_def", "nottypevalue_restriction_def", 
 			"vardifferent_def", "constant_list", "predicate", "predicate_args", "id", 
 			"var_or_const"
 		};
@@ -69,8 +72,9 @@ public class ChimpClassicParser extends Parser {
 			"'MeetsOrOverlapsOrBefore'", "'DuringOrEquals'", "'DuringOrEqualsOrStartsOrFinishes'", 
 			"'MeetsOrOverlapsOrFinishedByOrContains'", "'ContainsOrStartedByOrOverlappedByOrMetBy'", 
 			"'EndsDuring'", "'EndsOrEndedBy'", "'StartsOrStartedBy'", "'NotBeforeAndNotAfter'", 
-			"'['", "']'", "'INF'", "'task'", "'(ResourceUsage'", "'(Usage'", "'(Param'", 
-			"'(Values'", "'(NotValues'", "'(Type'", "'(VarDifferent'"
+			"'['", "']'", "'INF'", "'task'", "'(ResourceUsage'", "'(Usage'", "'(FluentResourceUsage'", 
+			"'(Fluent'", "'(Param'", "'(Values'", "'(NotValues'", "'(Type'", "'(NotType'", 
+			"'(VarDifferent'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -81,7 +85,7 @@ public class ChimpClassicParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, "VAR_NAME", "OP_NAME", "NAME", "Comment", "WS", "NUMBER"
+			null, null, null, null, "VAR_NAME", "NAME", "Comment", "WS", "NUMBER"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -169,23 +173,23 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(78);
+			setState(86);
 			domain_name_def();
-			setState(79);
+			setState(87);
 			maxargs_def();
-			setState(80);
+			setState(88);
 			predicatesymbols_def();
-			setState(84);
+			setState(92);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__55))) != 0)) {
 				{
 				{
-				setState(81);
+				setState(89);
 				domain_item();
 				}
 				}
-				setState(86);
+				setState(94);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -246,6 +250,17 @@ public class ChimpClassicParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class Domain_item_fluentresourceusageContext extends Domain_itemContext {
+		public Fluentresourceusage_defContext fluentresourceusage_def() {
+			return getRuleContext(Fluentresourceusage_defContext.class,0);
+		}
+		public Domain_item_fluentresourceusageContext(Domain_itemContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitDomain_item_fluentresourceusage(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class Domain_item_methodContext extends Domain_itemContext {
 		public Method_defContext method_def() {
 			return getRuleContext(Method_defContext.class,0);
@@ -262,38 +277,46 @@ public class ChimpClassicParser extends Parser {
 		Domain_itemContext _localctx = new Domain_itemContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_domain_item);
 		try {
-			setState(91);
+			setState(100);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__4:
 				_localctx = new Domain_item_resourceContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(87);
+				setState(95);
 				resource_def();
+				}
+				break;
+			case T__55:
+				_localctx = new Domain_item_fluentresourceusageContext(_localctx);
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(96);
+				fluentresourceusage_def();
 				}
 				break;
 			case T__5:
 				_localctx = new Domain_item_statevariableContext(_localctx);
-				enterOuterAlt(_localctx, 2);
+				enterOuterAlt(_localctx, 3);
 				{
-				setState(88);
+				setState(97);
 				statevariable_def();
 				}
 				break;
 			case T__7:
 				_localctx = new Domain_item_operatorContext(_localctx);
-				enterOuterAlt(_localctx, 3);
+				enterOuterAlt(_localctx, 4);
 				{
-				setState(89);
+				setState(98);
 				operator_def();
 				}
 				break;
 			case T__6:
 				_localctx = new Domain_item_methodContext(_localctx);
-				enterOuterAlt(_localctx, 4);
+				enterOuterAlt(_localctx, 5);
 				{
-				setState(90);
+				setState(99);
 				method_def();
 				}
 				break;
@@ -331,11 +354,11 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(93);
+			setState(102);
 			match(T__0);
-			setState(94);
+			setState(103);
 			match(NAME);
-			setState(95);
+			setState(104);
 			match(T__1);
 			}
 		}
@@ -369,11 +392,11 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(97);
+			setState(106);
 			match(T__2);
-			setState(98);
+			setState(107);
 			match(NUMBER);
-			setState(99);
+			setState(108);
 			match(T__1);
 			}
 		}
@@ -413,23 +436,23 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(101);
+			setState(110);
 			match(T__3);
-			setState(105);
+			setState(114);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==OP_NAME || _la==NAME) {
+			while (_la==NAME) {
 				{
 				{
-				setState(102);
+				setState(111);
 				predicate_symbol();
 				}
 				}
-				setState(107);
+				setState(116);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(108);
+			setState(117);
 			match(T__1);
 			}
 		}
@@ -446,7 +469,6 @@ public class ChimpClassicParser extends Parser {
 
 	public static class Predicate_symbolContext extends ParserRuleContext {
 		public TerminalNode NAME() { return getToken(ChimpClassicParser.NAME, 0); }
-		public TerminalNode OP_NAME() { return getToken(ChimpClassicParser.OP_NAME, 0); }
 		public Predicate_symbolContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -461,20 +483,11 @@ public class ChimpClassicParser extends Parser {
 	public final Predicate_symbolContext predicate_symbol() throws RecognitionException {
 		Predicate_symbolContext _localctx = new Predicate_symbolContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_predicate_symbol);
-		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(110);
-			_la = _input.LA(1);
-			if ( !(_la==OP_NAME || _la==NAME) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
+			setState(119);
+			match(NAME);
 			}
 		}
 		catch (RecognitionException re) {
@@ -508,13 +521,13 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(112);
+			setState(121);
 			match(T__4);
-			setState(113);
+			setState(122);
 			match(NAME);
-			setState(114);
+			setState(123);
 			match(NUMBER);
-			setState(115);
+			setState(124);
 			match(T__1);
 			}
 		}
@@ -556,27 +569,27 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(117);
+			setState(126);
 			match(T__5);
-			setState(118);
+			setState(127);
 			statevariable_name();
-			setState(119);
+			setState(128);
 			match(NUMBER);
-			setState(121); 
+			setState(130); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(120);
+				setState(129);
 				match(NAME);
 				}
 				}
-				setState(123); 
+				setState(132); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==NAME );
-			setState(125);
+			setState(134);
 			match(T__1);
 			}
 		}
@@ -610,7 +623,7 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(127);
+			setState(136);
 			match(NAME);
 			}
 		}
@@ -654,35 +667,35 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(129);
+			setState(138);
 			match(T__6);
-			setState(131);
+			setState(140);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==NUMBER) {
 				{
-				setState(130);
+				setState(139);
 				match(NUMBER);
 				}
 			}
 
-			setState(133);
+			setState(142);
 			head();
-			setState(137);
+			setState(146);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__11) | (1L << T__14) | (1L << T__15) | (1L << T__56) | (1L << T__57) | (1L << T__58) | (1L << T__59))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__11) | (1L << T__14) | (1L << T__15) | (1L << T__53) | (1L << T__58) | (1L << T__59) | (1L << T__60) | (1L << T__61) | (1L << T__62))) != 0)) {
 				{
 				{
-				setState(134);
+				setState(143);
 				method_element();
 				}
 				}
-				setState(139);
+				setState(148);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(140);
+			setState(149);
 			match(T__1);
 			}
 		}
@@ -726,35 +739,35 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(142);
+			setState(151);
 			match(T__7);
-			setState(144);
+			setState(153);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==NUMBER) {
 				{
-				setState(143);
+				setState(152);
 				match(NUMBER);
 				}
 			}
 
-			setState(146);
+			setState(155);
 			head();
-			setState(150);
+			setState(159);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__12) | (1L << T__13) | (1L << T__15) | (1L << T__53) | (1L << T__56) | (1L << T__57) | (1L << T__58) | (1L << T__59))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__12) | (1L << T__13) | (1L << T__15) | (1L << T__53) | (1L << T__58) | (1L << T__59) | (1L << T__60) | (1L << T__61) | (1L << T__62))) != 0)) {
 				{
 				{
-				setState(147);
+				setState(156);
 				op_element();
 				}
 				}
-				setState(152);
+				setState(161);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(153);
+			setState(162);
 			match(T__1);
 			}
 		}
@@ -770,7 +783,9 @@ public class ChimpClassicParser extends Parser {
 	}
 
 	public static class HeadContext extends ParserRuleContext {
-		public TerminalNode OP_NAME() { return getToken(ChimpClassicParser.OP_NAME, 0); }
+		public Predicate_symbolContext predicate_symbol() {
+			return getRuleContext(Predicate_symbolContext.class,0);
+		}
 		public Predicate_argsContext predicate_args() {
 			return getRuleContext(Predicate_argsContext.class,0);
 		}
@@ -791,17 +806,17 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(155);
+			setState(164);
 			match(T__8);
-			setState(156);
-			match(OP_NAME);
-			setState(157);
+			setState(165);
+			predicate_symbol();
+			setState(166);
 			match(T__9);
-			setState(158);
+			setState(167);
 			predicate_args();
-			setState(159);
+			setState(168);
 			match(T__1);
-			setState(160);
+			setState(169);
 			match(T__1);
 			}
 		}
@@ -838,6 +853,17 @@ public class ChimpClassicParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class Nottypevalue_restriction_m_elementContext extends Method_elementContext {
+		public Nottypevalue_restriction_defContext nottypevalue_restriction_def() {
+			return getRuleContext(Nottypevalue_restriction_defContext.class,0);
+		}
+		public Nottypevalue_restriction_m_elementContext(Method_elementContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitNottypevalue_restriction_m_element(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class Temporal_constraint_m_elementContext extends Method_elementContext {
 		public Temporal_constraint_defContext temporal_constraint_def() {
 			return getRuleContext(Temporal_constraint_defContext.class,0);
@@ -846,6 +872,17 @@ public class ChimpClassicParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitTemporal_constraint_m_element(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class Resource_usage_m_elementContext extends Method_elementContext {
+		public Resource_usage_defContext resource_usage_def() {
+			return getRuleContext(Resource_usage_defContext.class,0);
+		}
+		public Resource_usage_m_elementContext(Method_elementContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitResource_usage_m_element(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -920,14 +957,14 @@ public class ChimpClassicParser extends Parser {
 		Method_elementContext _localctx = new Method_elementContext(_ctx, getState());
 		enterRule(_localctx, 24, RULE_method_element);
 		try {
-			setState(170);
+			setState(181);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__10:
 				_localctx = new Precondition_m_elementContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(162);
+				setState(171);
 				precondition_def();
 				}
 				break;
@@ -935,55 +972,71 @@ public class ChimpClassicParser extends Parser {
 				_localctx = new Temporal_constraint_m_elementContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(163);
+				setState(172);
 				temporal_constraint_def();
 				}
 				break;
-			case T__56:
-				_localctx = new Value_restriction_m_elementContext(_localctx);
+			case T__53:
+				_localctx = new Resource_usage_m_elementContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(164);
-				value_restriction_def();
-				}
-				break;
-			case T__57:
-				_localctx = new Notvalue_restriction_m_elementContext(_localctx);
-				enterOuterAlt(_localctx, 4);
-				{
-				setState(165);
-				notvalue_restriction_def();
+				setState(173);
+				resource_usage_def();
 				}
 				break;
 			case T__58:
-				_localctx = new Typevalue_restriction_m_elementContext(_localctx);
-				enterOuterAlt(_localctx, 5);
+				_localctx = new Value_restriction_m_elementContext(_localctx);
+				enterOuterAlt(_localctx, 4);
 				{
-				setState(166);
-				typevalue_restriction_def();
+				setState(174);
+				value_restriction_def();
 				}
 				break;
 			case T__59:
-				_localctx = new Vardifferent_m_elementContext(_localctx);
+				_localctx = new Notvalue_restriction_m_elementContext(_localctx);
+				enterOuterAlt(_localctx, 5);
+				{
+				setState(175);
+				notvalue_restriction_def();
+				}
+				break;
+			case T__60:
+				_localctx = new Typevalue_restriction_m_elementContext(_localctx);
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(167);
+				setState(176);
+				typevalue_restriction_def();
+				}
+				break;
+			case T__61:
+				_localctx = new Nottypevalue_restriction_m_elementContext(_localctx);
+				enterOuterAlt(_localctx, 7);
+				{
+				setState(177);
+				nottypevalue_restriction_def();
+				}
+				break;
+			case T__62:
+				_localctx = new Vardifferent_m_elementContext(_localctx);
+				enterOuterAlt(_localctx, 8);
+				{
+				setState(178);
 				vardifferent_def();
 				}
 				break;
 			case T__11:
 				_localctx = new Subtask_def_m_elementContext(_localctx);
-				enterOuterAlt(_localctx, 7);
+				enterOuterAlt(_localctx, 9);
 				{
-				setState(168);
+				setState(179);
 				subtask_def();
 				}
 				break;
 			case T__14:
 				_localctx = new Ordering_def_m_elementContext(_localctx);
-				enterOuterAlt(_localctx, 8);
+				enterOuterAlt(_localctx, 10);
 				{
-				setState(169);
+				setState(180);
 				ordering_constraint_def();
 				}
 				break;
@@ -1090,6 +1143,17 @@ public class ChimpClassicParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class Nottypevalue_restriction_op_elementContext extends Op_elementContext {
+		public Nottypevalue_restriction_defContext nottypevalue_restriction_def() {
+			return getRuleContext(Nottypevalue_restriction_defContext.class,0);
+		}
+		public Nottypevalue_restriction_op_elementContext(Op_elementContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitNottypevalue_restriction_op_element(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class Typevalue_restriction_op_elementContext extends Op_elementContext {
 		public Typevalue_restriction_defContext typevalue_restriction_def() {
 			return getRuleContext(Typevalue_restriction_defContext.class,0);
@@ -1117,14 +1181,14 @@ public class ChimpClassicParser extends Parser {
 		Op_elementContext _localctx = new Op_elementContext(_ctx, getState());
 		enterRule(_localctx, 26, RULE_op_element);
 		try {
-			setState(181);
+			setState(193);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__10:
 				_localctx = new Precondition_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(172);
+				setState(183);
 				precondition_def();
 				}
 				break;
@@ -1132,7 +1196,7 @@ public class ChimpClassicParser extends Parser {
 				_localctx = new Temporal_constraint_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(173);
+				setState(184);
 				temporal_constraint_def();
 				}
 				break;
@@ -1140,7 +1204,7 @@ public class ChimpClassicParser extends Parser {
 				_localctx = new Positive_effect_def_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(174);
+				setState(185);
 				positive_effect_def();
 				}
 				break;
@@ -1148,7 +1212,7 @@ public class ChimpClassicParser extends Parser {
 				_localctx = new Negative_effect_def_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(175);
+				setState(186);
 				negative_effect_def();
 				}
 				break;
@@ -1156,39 +1220,47 @@ public class ChimpClassicParser extends Parser {
 				_localctx = new Resource_usage_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(176);
+				setState(187);
 				resource_usage_def();
 				}
 				break;
-			case T__56:
+			case T__58:
 				_localctx = new Value_restriction_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(177);
+				setState(188);
 				value_restriction_def();
 				}
 				break;
-			case T__57:
+			case T__59:
 				_localctx = new Notvalue_restriction_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(178);
+				setState(189);
 				notvalue_restriction_def();
 				}
 				break;
-			case T__58:
+			case T__60:
 				_localctx = new Typevalue_restriction_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(179);
+				setState(190);
 				typevalue_restriction_def();
 				}
 				break;
-			case T__59:
-				_localctx = new Vardifferent_op_elementContext(_localctx);
+			case T__61:
+				_localctx = new Nottypevalue_restriction_op_elementContext(_localctx);
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(180);
+				setState(191);
+				nottypevalue_restriction_def();
+				}
+				break;
+			case T__62:
+				_localctx = new Vardifferent_op_elementContext(_localctx);
+				enterOuterAlt(_localctx, 10);
+				{
+				setState(192);
 				vardifferent_def();
 				}
 				break;
@@ -1231,13 +1303,13 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(183);
+			setState(195);
 			match(T__10);
-			setState(184);
+			setState(196);
 			id();
-			setState(185);
+			setState(197);
 			predicate();
-			setState(186);
+			setState(198);
 			match(T__1);
 			}
 		}
@@ -1276,13 +1348,13 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(188);
+			setState(200);
 			match(T__11);
-			setState(189);
+			setState(201);
 			id();
-			setState(190);
+			setState(202);
 			predicate();
-			setState(191);
+			setState(203);
 			match(T__1);
 			}
 		}
@@ -1321,13 +1393,13 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(193);
+			setState(205);
 			match(T__12);
-			setState(194);
+			setState(206);
 			id();
-			setState(195);
+			setState(207);
 			predicate();
-			setState(196);
+			setState(208);
 			match(T__1);
 			}
 		}
@@ -1363,11 +1435,11 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(198);
+			setState(210);
 			match(T__13);
-			setState(199);
+			setState(211);
 			id();
-			setState(200);
+			setState(212);
 			match(T__1);
 			}
 		}
@@ -1406,13 +1478,13 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(202);
+			setState(214);
 			match(T__14);
-			setState(203);
+			setState(215);
 			id();
-			setState(204);
+			setState(216);
 			id();
-			setState(205);
+			setState(217);
 			match(T__1);
 			}
 		}
@@ -1449,20 +1521,20 @@ public class ChimpClassicParser extends Parser {
 		Temporal_constraint_defContext _localctx = new Temporal_constraint_defContext(_ctx, getState());
 		enterRule(_localctx, 38, RULE_temporal_constraint_def);
 		try {
-			setState(209);
+			setState(221);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(207);
+				setState(219);
 				unary_temporal_constraint_def();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(208);
+				setState(220);
 				binary_temporal_constraint_def();
 				}
 				break;
@@ -1506,19 +1578,19 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(211);
+			setState(223);
 			match(T__15);
-			setState(212);
+			setState(224);
 			unary_temporal_constraint_type();
-			setState(213);
+			setState(225);
 			bounds_list();
-			setState(214);
+			setState(226);
 			match(T__9);
-			setState(215);
+			setState(227);
 			id_or_task();
-			setState(216);
+			setState(228);
 			match(T__1);
-			setState(217);
+			setState(229);
 			match(T__1);
 			}
 		}
@@ -1552,7 +1624,7 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(219);
+			setState(231);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -1605,23 +1677,23 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(221);
+			setState(233);
 			match(T__15);
-			setState(222);
+			setState(234);
 			binary_temporal_constraint_type();
-			setState(223);
+			setState(235);
 			bounds_list();
-			setState(224);
+			setState(236);
 			match(T__9);
-			setState(225);
+			setState(237);
 			id_or_task();
-			setState(226);
+			setState(238);
 			match(T__21);
-			setState(227);
+			setState(239);
 			id_or_task();
-			setState(228);
+			setState(240);
 			match(T__1);
-			setState(229);
+			setState(241);
 			match(T__1);
 			}
 		}
@@ -1655,7 +1727,7 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(231);
+			setState(243);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -1703,17 +1775,17 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(236);
+			setState(248);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__49) {
 				{
 				{
-				setState(233);
+				setState(245);
 				bounds();
 				}
 				}
-				setState(238);
+				setState(250);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -1754,15 +1826,15 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(239);
+			setState(251);
 			match(T__49);
-			setState(240);
+			setState(252);
 			bound();
-			setState(241);
+			setState(253);
 			match(T__21);
-			setState(242);
+			setState(254);
 			bound();
-			setState(243);
+			setState(255);
 			match(T__50);
 			}
 		}
@@ -1797,7 +1869,7 @@ public class ChimpClassicParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(245);
+			setState(257);
 			_la = _input.LA(1);
 			if ( !(_la==T__51 || _la==NUMBER) ) {
 			_errHandler.recoverInline(this);
@@ -1839,20 +1911,20 @@ public class ChimpClassicParser extends Parser {
 		Id_or_taskContext _localctx = new Id_or_taskContext(_ctx, getState());
 		enterRule(_localctx, 54, RULE_id_or_task);
 		try {
-			setState(249);
+			setState(261);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case NAME:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(247);
+				setState(259);
 				id();
 				}
 				break;
 			case T__52:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(248);
+				setState(260);
 				match(T__52);
 				}
 				break;
@@ -1896,53 +1968,198 @@ public class ChimpClassicParser extends Parser {
 		enterRule(_localctx, 56, RULE_resource_usage_def);
 		int _la;
 		try {
-			setState(267);
+			setState(279);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,14,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(251);
+				setState(263);
 				match(T__53);
-				setState(252);
+				setState(264);
 				match(NAME);
-				setState(253);
+				setState(265);
 				match(NUMBER);
-				setState(254);
+				setState(266);
 				match(T__1);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(255);
+				setState(267);
 				match(T__53);
-				setState(256);
+				setState(268);
 				match(T__54);
-				setState(257);
+				setState(269);
 				match(NAME);
-				setState(258);
+				setState(270);
 				match(NUMBER);
-				setState(259);
+				setState(271);
 				match(T__1);
-				setState(263);
+				setState(275);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==T__55) {
+				while (_la==T__57) {
 					{
 					{
-					setState(260);
+					setState(272);
 					param_item();
 					}
 					}
-					setState(265);
+					setState(277);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(266);
+				setState(278);
 				match(T__1);
 				}
 				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Fluentresourceusage_defContext extends ParserRuleContext {
+		public Usage_defContext usage_def() {
+			return getRuleContext(Usage_defContext.class,0);
+		}
+		public Fluent_defContext fluent_def() {
+			return getRuleContext(Fluent_defContext.class,0);
+		}
+		public List<Param_itemContext> param_item() {
+			return getRuleContexts(Param_itemContext.class);
+		}
+		public Param_itemContext param_item(int i) {
+			return getRuleContext(Param_itemContext.class,i);
+		}
+		public Fluentresourceusage_defContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_fluentresourceusage_def; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitFluentresourceusage_def(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final Fluentresourceusage_defContext fluentresourceusage_def() throws RecognitionException {
+		Fluentresourceusage_defContext _localctx = new Fluentresourceusage_defContext(_ctx, getState());
+		enterRule(_localctx, 58, RULE_fluentresourceusage_def);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(281);
+			match(T__55);
+			setState(282);
+			usage_def();
+			setState(283);
+			fluent_def();
+			setState(287);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while (_la==T__57) {
+				{
+				{
+				setState(284);
+				param_item();
+				}
+				}
+				setState(289);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
+			setState(290);
+			match(T__1);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Fluent_defContext extends ParserRuleContext {
+		public TerminalNode NAME() { return getToken(ChimpClassicParser.NAME, 0); }
+		public Fluent_defContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_fluent_def; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitFluent_def(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final Fluent_defContext fluent_def() throws RecognitionException {
+		Fluent_defContext _localctx = new Fluent_defContext(_ctx, getState());
+		enterRule(_localctx, 60, RULE_fluent_def);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(292);
+			match(T__56);
+			setState(293);
+			match(NAME);
+			setState(294);
+			match(T__1);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Usage_defContext extends ParserRuleContext {
+		public TerminalNode NAME() { return getToken(ChimpClassicParser.NAME, 0); }
+		public TerminalNode NUMBER() { return getToken(ChimpClassicParser.NUMBER, 0); }
+		public Usage_defContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_usage_def; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitUsage_def(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final Usage_defContext usage_def() throws RecognitionException {
+		Usage_defContext _localctx = new Usage_defContext(_ctx, getState());
+		enterRule(_localctx, 62, RULE_usage_def);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(296);
+			match(T__54);
+			setState(297);
+			match(NAME);
+			setState(298);
+			match(NUMBER);
+			setState(299);
+			match(T__1);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1972,17 +2189,17 @@ public class ChimpClassicParser extends Parser {
 
 	public final Param_itemContext param_item() throws RecognitionException {
 		Param_itemContext _localctx = new Param_itemContext(_ctx, getState());
-		enterRule(_localctx, 58, RULE_param_item);
+		enterRule(_localctx, 64, RULE_param_item);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(269);
-			match(T__55);
-			setState(270);
+			setState(301);
+			match(T__57);
+			setState(302);
 			match(NUMBER);
-			setState(271);
+			setState(303);
 			match(NAME);
-			setState(272);
+			setState(304);
 			match(T__1);
 			}
 		}
@@ -2015,17 +2232,17 @@ public class ChimpClassicParser extends Parser {
 
 	public final Value_restriction_defContext value_restriction_def() throws RecognitionException {
 		Value_restriction_defContext _localctx = new Value_restriction_defContext(_ctx, getState());
-		enterRule(_localctx, 60, RULE_value_restriction_def);
+		enterRule(_localctx, 66, RULE_value_restriction_def);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(274);
-			match(T__56);
-			setState(275);
+			setState(306);
+			match(T__58);
+			setState(307);
 			match(VAR_NAME);
-			setState(276);
+			setState(308);
 			constant_list();
-			setState(277);
+			setState(309);
 			match(T__1);
 			}
 		}
@@ -2058,17 +2275,17 @@ public class ChimpClassicParser extends Parser {
 
 	public final Notvalue_restriction_defContext notvalue_restriction_def() throws RecognitionException {
 		Notvalue_restriction_defContext _localctx = new Notvalue_restriction_defContext(_ctx, getState());
-		enterRule(_localctx, 62, RULE_notvalue_restriction_def);
+		enterRule(_localctx, 68, RULE_notvalue_restriction_def);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(279);
-			match(T__57);
-			setState(280);
+			setState(311);
+			match(T__59);
+			setState(312);
 			match(VAR_NAME);
-			setState(281);
+			setState(313);
 			constant_list();
-			setState(282);
+			setState(314);
 			match(T__1);
 			}
 		}
@@ -2085,7 +2302,9 @@ public class ChimpClassicParser extends Parser {
 
 	public static class Typevalue_restriction_defContext extends ParserRuleContext {
 		public TerminalNode VAR_NAME() { return getToken(ChimpClassicParser.VAR_NAME, 0); }
-		public TerminalNode NAME() { return getToken(ChimpClassicParser.NAME, 0); }
+		public Constant_listContext constant_list() {
+			return getRuleContext(Constant_listContext.class,0);
+		}
 		public Typevalue_restriction_defContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2099,17 +2318,60 @@ public class ChimpClassicParser extends Parser {
 
 	public final Typevalue_restriction_defContext typevalue_restriction_def() throws RecognitionException {
 		Typevalue_restriction_defContext _localctx = new Typevalue_restriction_defContext(_ctx, getState());
-		enterRule(_localctx, 64, RULE_typevalue_restriction_def);
+		enterRule(_localctx, 70, RULE_typevalue_restriction_def);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(284);
-			match(T__58);
-			setState(285);
+			setState(316);
+			match(T__60);
+			setState(317);
 			match(VAR_NAME);
-			setState(286);
-			match(NAME);
-			setState(287);
+			setState(318);
+			constant_list();
+			setState(319);
+			match(T__1);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Nottypevalue_restriction_defContext extends ParserRuleContext {
+		public TerminalNode VAR_NAME() { return getToken(ChimpClassicParser.VAR_NAME, 0); }
+		public Constant_listContext constant_list() {
+			return getRuleContext(Constant_listContext.class,0);
+		}
+		public Nottypevalue_restriction_defContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_nottypevalue_restriction_def; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ChimpClassicVisitor ) return ((ChimpClassicVisitor<? extends T>)visitor).visitNottypevalue_restriction_def(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final Nottypevalue_restriction_defContext nottypevalue_restriction_def() throws RecognitionException {
+		Nottypevalue_restriction_defContext _localctx = new Nottypevalue_restriction_defContext(_ctx, getState());
+		enterRule(_localctx, 72, RULE_nottypevalue_restriction_def);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(321);
+			match(T__61);
+			setState(322);
+			match(VAR_NAME);
+			setState(323);
+			constant_list();
+			setState(324);
 			match(T__1);
 			}
 		}
@@ -2142,17 +2404,17 @@ public class ChimpClassicParser extends Parser {
 
 	public final Vardifferent_defContext vardifferent_def() throws RecognitionException {
 		Vardifferent_defContext _localctx = new Vardifferent_defContext(_ctx, getState());
-		enterRule(_localctx, 66, RULE_vardifferent_def);
+		enterRule(_localctx, 74, RULE_vardifferent_def);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(289);
-			match(T__59);
-			setState(290);
+			setState(326);
+			match(T__62);
+			setState(327);
 			match(VAR_NAME);
-			setState(291);
+			setState(328);
 			match(VAR_NAME);
-			setState(292);
+			setState(329);
 			match(T__1);
 			}
 		}
@@ -2185,22 +2447,22 @@ public class ChimpClassicParser extends Parser {
 
 	public final Constant_listContext constant_list() throws RecognitionException {
 		Constant_listContext _localctx = new Constant_listContext(_ctx, getState());
-		enterRule(_localctx, 68, RULE_constant_list);
+		enterRule(_localctx, 76, RULE_constant_list);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(295); 
+			setState(332); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(294);
+				setState(331);
 				match(NAME);
 				}
 				}
-				setState(297); 
+				setState(334); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==NAME );
@@ -2235,17 +2497,17 @@ public class ChimpClassicParser extends Parser {
 
 	public final PredicateContext predicate() throws RecognitionException {
 		PredicateContext _localctx = new PredicateContext(_ctx, getState());
-		enterRule(_localctx, 70, RULE_predicate);
+		enterRule(_localctx, 78, RULE_predicate);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(299);
+			setState(336);
 			match(NAME);
-			setState(300);
+			setState(337);
 			match(T__9);
-			setState(301);
+			setState(338);
 			predicate_args();
-			setState(302);
+			setState(339);
 			match(T__1);
 			}
 		}
@@ -2280,22 +2542,22 @@ public class ChimpClassicParser extends Parser {
 
 	public final Predicate_argsContext predicate_args() throws RecognitionException {
 		Predicate_argsContext _localctx = new Predicate_argsContext(_ctx, getState());
-		enterRule(_localctx, 72, RULE_predicate_args);
+		enterRule(_localctx, 80, RULE_predicate_args);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(307);
+			setState(344);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==VAR_NAME || _la==NAME) {
 				{
 				{
-				setState(304);
+				setState(341);
 				var_or_const();
 				}
 				}
-				setState(309);
+				setState(346);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -2327,11 +2589,11 @@ public class ChimpClassicParser extends Parser {
 
 	public final IdContext id() throws RecognitionException {
 		IdContext _localctx = new IdContext(_ctx, getState());
-		enterRule(_localctx, 74, RULE_id);
+		enterRule(_localctx, 82, RULE_id);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(310);
+			setState(347);
 			match(NAME);
 			}
 		}
@@ -2362,12 +2624,12 @@ public class ChimpClassicParser extends Parser {
 
 	public final Var_or_constContext var_or_const() throws RecognitionException {
 		Var_or_constContext _localctx = new Var_or_constContext(_ctx, getState());
-		enterRule(_localctx, 76, RULE_var_or_const);
+		enterRule(_localctx, 84, RULE_var_or_const);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(312);
+			setState(349);
 			_la = _input.LA(1);
 			if ( !(_la==VAR_NAME || _la==NAME) ) {
 			_errHandler.recoverInline(this);
@@ -2391,106 +2653,119 @@ public class ChimpClassicParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3D\u013d\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3F\u0162\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
 		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\4 \t \4!"+
-		"\t!\4\"\t\"\4#\t#\4$\t$\4%\t%\4&\t&\4\'\t\'\4(\t(\3\2\3\2\3\2\3\2\7\2"+
-		"U\n\2\f\2\16\2X\13\2\3\3\3\3\3\3\3\3\5\3^\n\3\3\4\3\4\3\4\3\4\3\5\3\5"+
-		"\3\5\3\5\3\6\3\6\7\6j\n\6\f\6\16\6m\13\6\3\6\3\6\3\7\3\7\3\b\3\b\3\b\3"+
-		"\b\3\b\3\t\3\t\3\t\3\t\6\t|\n\t\r\t\16\t}\3\t\3\t\3\n\3\n\3\13\3\13\5"+
-		"\13\u0086\n\13\3\13\3\13\7\13\u008a\n\13\f\13\16\13\u008d\13\13\3\13\3"+
-		"\13\3\f\3\f\5\f\u0093\n\f\3\f\3\f\7\f\u0097\n\f\f\f\16\f\u009a\13\f\3"+
-		"\f\3\f\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\5\16\u00ad\n\16\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\5\17"+
-		"\u00b8\n\17\3\20\3\20\3\20\3\20\3\20\3\21\3\21\3\21\3\21\3\21\3\22\3\22"+
-		"\3\22\3\22\3\22\3\23\3\23\3\23\3\23\3\24\3\24\3\24\3\24\3\24\3\25\3\25"+
-		"\5\25\u00d4\n\25\3\26\3\26\3\26\3\26\3\26\3\26\3\26\3\26\3\27\3\27\3\30"+
-		"\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\31\3\31\3\32\7\32\u00ed"+
-		"\n\32\f\32\16\32\u00f0\13\32\3\33\3\33\3\33\3\33\3\33\3\33\3\34\3\34\3"+
-		"\35\3\35\5\35\u00fc\n\35\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36"+
-		"\3\36\7\36\u0108\n\36\f\36\16\36\u010b\13\36\3\36\5\36\u010e\n\36\3\37"+
-		"\3\37\3\37\3\37\3\37\3 \3 \3 \3 \3 \3!\3!\3!\3!\3!\3\"\3\"\3\"\3\"\3\""+
-		"\3#\3#\3#\3#\3#\3$\6$\u012a\n$\r$\16$\u012b\3%\3%\3%\3%\3%\3&\7&\u0134"+
-		"\n&\f&\16&\u0137\13&\3\'\3\'\3(\3(\3(\2\2)\2\4\6\b\n\f\16\20\22\24\26"+
-		"\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLN\2\7\3\2@A\3\2\23\27\3\2"+
-		"\31\63\4\2\66\66DD\4\2??AA\2\u0135\2P\3\2\2\2\4]\3\2\2\2\6_\3\2\2\2\b"+
-		"c\3\2\2\2\ng\3\2\2\2\fp\3\2\2\2\16r\3\2\2\2\20w\3\2\2\2\22\u0081\3\2\2"+
-		"\2\24\u0083\3\2\2\2\26\u0090\3\2\2\2\30\u009d\3\2\2\2\32\u00ac\3\2\2\2"+
-		"\34\u00b7\3\2\2\2\36\u00b9\3\2\2\2 \u00be\3\2\2\2\"\u00c3\3\2\2\2$\u00c8"+
-		"\3\2\2\2&\u00cc\3\2\2\2(\u00d3\3\2\2\2*\u00d5\3\2\2\2,\u00dd\3\2\2\2."+
-		"\u00df\3\2\2\2\60\u00e9\3\2\2\2\62\u00ee\3\2\2\2\64\u00f1\3\2\2\2\66\u00f7"+
-		"\3\2\2\28\u00fb\3\2\2\2:\u010d\3\2\2\2<\u010f\3\2\2\2>\u0114\3\2\2\2@"+
-		"\u0119\3\2\2\2B\u011e\3\2\2\2D\u0123\3\2\2\2F\u0129\3\2\2\2H\u012d\3\2"+
-		"\2\2J\u0135\3\2\2\2L\u0138\3\2\2\2N\u013a\3\2\2\2PQ\5\6\4\2QR\5\b\5\2"+
-		"RV\5\n\6\2SU\5\4\3\2TS\3\2\2\2UX\3\2\2\2VT\3\2\2\2VW\3\2\2\2W\3\3\2\2"+
-		"\2XV\3\2\2\2Y^\5\16\b\2Z^\5\20\t\2[^\5\26\f\2\\^\5\24\13\2]Y\3\2\2\2]"+
-		"Z\3\2\2\2][\3\2\2\2]\\\3\2\2\2^\5\3\2\2\2_`\7\3\2\2`a\7A\2\2ab\7\4\2\2"+
-		"b\7\3\2\2\2cd\7\5\2\2de\7D\2\2ef\7\4\2\2f\t\3\2\2\2gk\7\6\2\2hj\5\f\7"+
-		"\2ih\3\2\2\2jm\3\2\2\2ki\3\2\2\2kl\3\2\2\2ln\3\2\2\2mk\3\2\2\2no\7\4\2"+
-		"\2o\13\3\2\2\2pq\t\2\2\2q\r\3\2\2\2rs\7\7\2\2st\7A\2\2tu\7D\2\2uv\7\4"+
-		"\2\2v\17\3\2\2\2wx\7\b\2\2xy\5\22\n\2y{\7D\2\2z|\7A\2\2{z\3\2\2\2|}\3"+
-		"\2\2\2}{\3\2\2\2}~\3\2\2\2~\177\3\2\2\2\177\u0080\7\4\2\2\u0080\21\3\2"+
-		"\2\2\u0081\u0082\7A\2\2\u0082\23\3\2\2\2\u0083\u0085\7\t\2\2\u0084\u0086"+
-		"\7D\2\2\u0085\u0084\3\2\2\2\u0085\u0086\3\2\2\2\u0086\u0087\3\2\2\2\u0087"+
-		"\u008b\5\30\r\2\u0088\u008a\5\32\16\2\u0089\u0088\3\2\2\2\u008a\u008d"+
-		"\3\2\2\2\u008b\u0089\3\2\2\2\u008b\u008c\3\2\2\2\u008c\u008e\3\2\2\2\u008d"+
-		"\u008b\3\2\2\2\u008e\u008f\7\4\2\2\u008f\25\3\2\2\2\u0090\u0092\7\n\2"+
-		"\2\u0091\u0093\7D\2\2\u0092\u0091\3\2\2\2\u0092\u0093\3\2\2\2\u0093\u0094"+
-		"\3\2\2\2\u0094\u0098\5\30\r\2\u0095\u0097\5\34\17\2\u0096\u0095\3\2\2"+
-		"\2\u0097\u009a\3\2\2\2\u0098\u0096\3\2\2\2\u0098\u0099\3\2\2\2\u0099\u009b"+
-		"\3\2\2\2\u009a\u0098\3\2\2\2\u009b\u009c\7\4\2\2\u009c\27\3\2\2\2\u009d"+
-		"\u009e\7\13\2\2\u009e\u009f\7@\2\2\u009f\u00a0\7\f\2\2\u00a0\u00a1\5J"+
-		"&\2\u00a1\u00a2\7\4\2\2\u00a2\u00a3\7\4\2\2\u00a3\31\3\2\2\2\u00a4\u00ad"+
-		"\5\36\20\2\u00a5\u00ad\5(\25\2\u00a6\u00ad\5> \2\u00a7\u00ad\5@!\2\u00a8"+
-		"\u00ad\5B\"\2\u00a9\u00ad\5D#\2\u00aa\u00ad\5 \21\2\u00ab\u00ad\5&\24"+
-		"\2\u00ac\u00a4\3\2\2\2\u00ac\u00a5\3\2\2\2\u00ac\u00a6\3\2\2\2\u00ac\u00a7"+
-		"\3\2\2\2\u00ac\u00a8\3\2\2\2\u00ac\u00a9\3\2\2\2\u00ac\u00aa\3\2\2\2\u00ac"+
-		"\u00ab\3\2\2\2\u00ad\33\3\2\2\2\u00ae\u00b8\5\36\20\2\u00af\u00b8\5(\25"+
-		"\2\u00b0\u00b8\5\"\22\2\u00b1\u00b8\5$\23\2\u00b2\u00b8\5:\36\2\u00b3"+
-		"\u00b8\5> \2\u00b4\u00b8\5@!\2\u00b5\u00b8\5B\"\2\u00b6\u00b8\5D#\2\u00b7"+
-		"\u00ae\3\2\2\2\u00b7\u00af\3\2\2\2\u00b7\u00b0\3\2\2\2\u00b7\u00b1\3\2"+
-		"\2\2\u00b7\u00b2\3\2\2\2\u00b7\u00b3\3\2\2\2\u00b7\u00b4\3\2\2\2\u00b7"+
-		"\u00b5\3\2\2\2\u00b7\u00b6\3\2\2\2\u00b8\35\3\2\2\2\u00b9\u00ba\7\r\2"+
-		"\2\u00ba\u00bb\5L\'\2\u00bb\u00bc\5H%\2\u00bc\u00bd\7\4\2\2\u00bd\37\3"+
-		"\2\2\2\u00be\u00bf\7\16\2\2\u00bf\u00c0\5L\'\2\u00c0\u00c1\5H%\2\u00c1"+
-		"\u00c2\7\4\2\2\u00c2!\3\2\2\2\u00c3\u00c4\7\17\2\2\u00c4\u00c5\5L\'\2"+
-		"\u00c5\u00c6\5H%\2\u00c6\u00c7\7\4\2\2\u00c7#\3\2\2\2\u00c8\u00c9\7\20"+
-		"\2\2\u00c9\u00ca\5L\'\2\u00ca\u00cb\7\4\2\2\u00cb%\3\2\2\2\u00cc\u00cd"+
-		"\7\21\2\2\u00cd\u00ce\5L\'\2\u00ce\u00cf\5L\'\2\u00cf\u00d0\7\4\2\2\u00d0"+
-		"\'\3\2\2\2\u00d1\u00d4\5*\26\2\u00d2\u00d4\5.\30\2\u00d3\u00d1\3\2\2\2"+
-		"\u00d3\u00d2\3\2\2\2\u00d4)\3\2\2\2\u00d5\u00d6\7\22\2\2\u00d6\u00d7\5"+
-		",\27\2\u00d7\u00d8\5\62\32\2\u00d8\u00d9\7\f\2\2\u00d9\u00da\58\35\2\u00da"+
-		"\u00db\7\4\2\2\u00db\u00dc\7\4\2\2\u00dc+\3\2\2\2\u00dd\u00de\t\3\2\2"+
-		"\u00de-\3\2\2\2\u00df\u00e0\7\22\2\2\u00e0\u00e1\5\60\31\2\u00e1\u00e2"+
-		"\5\62\32\2\u00e2\u00e3\7\f\2\2\u00e3\u00e4\58\35\2\u00e4\u00e5\7\30\2"+
-		"\2\u00e5\u00e6\58\35\2\u00e6\u00e7\7\4\2\2\u00e7\u00e8\7\4\2\2\u00e8/"+
-		"\3\2\2\2\u00e9\u00ea\t\4\2\2\u00ea\61\3\2\2\2\u00eb\u00ed\5\64\33\2\u00ec"+
-		"\u00eb\3\2\2\2\u00ed\u00f0\3\2\2\2\u00ee\u00ec\3\2\2\2\u00ee\u00ef\3\2"+
-		"\2\2\u00ef\63\3\2\2\2\u00f0\u00ee\3\2\2\2\u00f1\u00f2\7\64\2\2\u00f2\u00f3"+
-		"\5\66\34\2\u00f3\u00f4\7\30\2\2\u00f4\u00f5\5\66\34\2\u00f5\u00f6\7\65"+
-		"\2\2\u00f6\65\3\2\2\2\u00f7\u00f8\t\5\2\2\u00f8\67\3\2\2\2\u00f9\u00fc"+
-		"\5L\'\2\u00fa\u00fc\7\67\2\2\u00fb\u00f9\3\2\2\2\u00fb\u00fa\3\2\2\2\u00fc"+
-		"9\3\2\2\2\u00fd\u00fe\78\2\2\u00fe\u00ff\7A\2\2\u00ff\u0100\7D\2\2\u0100"+
-		"\u010e\7\4\2\2\u0101\u0102\78\2\2\u0102\u0103\79\2\2\u0103\u0104\7A\2"+
-		"\2\u0104\u0105\7D\2\2\u0105\u0109\7\4\2\2\u0106\u0108\5<\37\2\u0107\u0106"+
-		"\3\2\2\2\u0108\u010b\3\2\2\2\u0109\u0107\3\2\2\2\u0109\u010a\3\2\2\2\u010a"+
-		"\u010c\3\2\2\2\u010b\u0109\3\2\2\2\u010c\u010e\7\4\2\2\u010d\u00fd\3\2"+
-		"\2\2\u010d\u0101\3\2\2\2\u010e;\3\2\2\2\u010f\u0110\7:\2\2\u0110\u0111"+
-		"\7D\2\2\u0111\u0112\7A\2\2\u0112\u0113\7\4\2\2\u0113=\3\2\2\2\u0114\u0115"+
-		"\7;\2\2\u0115\u0116\7?\2\2\u0116\u0117\5F$\2\u0117\u0118\7\4\2\2\u0118"+
-		"?\3\2\2\2\u0119\u011a\7<\2\2\u011a\u011b\7?\2\2\u011b\u011c\5F$\2\u011c"+
-		"\u011d\7\4\2\2\u011dA\3\2\2\2\u011e\u011f\7=\2\2\u011f\u0120\7?\2\2\u0120"+
-		"\u0121\7A\2\2\u0121\u0122\7\4\2\2\u0122C\3\2\2\2\u0123\u0124\7>\2\2\u0124"+
-		"\u0125\7?\2\2\u0125\u0126\7?\2\2\u0126\u0127\7\4\2\2\u0127E\3\2\2\2\u0128"+
-		"\u012a\7A\2\2\u0129\u0128\3\2\2\2\u012a\u012b\3\2\2\2\u012b\u0129\3\2"+
-		"\2\2\u012b\u012c\3\2\2\2\u012cG\3\2\2\2\u012d\u012e\7A\2\2\u012e\u012f"+
-		"\7\f\2\2\u012f\u0130\5J&\2\u0130\u0131\7\4\2\2\u0131I\3\2\2\2\u0132\u0134"+
-		"\5N(\2\u0133\u0132\3\2\2\2\u0134\u0137\3\2\2\2\u0135\u0133\3\2\2\2\u0135"+
-		"\u0136\3\2\2\2\u0136K\3\2\2\2\u0137\u0135\3\2\2\2\u0138\u0139\7A\2\2\u0139"+
-		"M\3\2\2\2\u013a\u013b\t\6\2\2\u013bO\3\2\2\2\23V]k}\u0085\u008b\u0092"+
-		"\u0098\u00ac\u00b7\u00d3\u00ee\u00fb\u0109\u010d\u012b\u0135";
+		"\t!\4\"\t\"\4#\t#\4$\t$\4%\t%\4&\t&\4\'\t\'\4(\t(\4)\t)\4*\t*\4+\t+\4"+
+		",\t,\3\2\3\2\3\2\3\2\7\2]\n\2\f\2\16\2`\13\2\3\3\3\3\3\3\3\3\3\3\5\3g"+
+		"\n\3\3\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\3\6\3\6\7\6s\n\6\f\6\16\6v\13\6\3"+
+		"\6\3\6\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\3\t\6\t\u0085\n\t\r\t\16"+
+		"\t\u0086\3\t\3\t\3\n\3\n\3\13\3\13\5\13\u008f\n\13\3\13\3\13\7\13\u0093"+
+		"\n\13\f\13\16\13\u0096\13\13\3\13\3\13\3\f\3\f\5\f\u009c\n\f\3\f\3\f\7"+
+		"\f\u00a0\n\f\f\f\16\f\u00a3\13\f\3\f\3\f\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3"+
+		"\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u00b8\n\16\3\17"+
+		"\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\5\17\u00c4\n\17\3\20\3\20"+
+		"\3\20\3\20\3\20\3\21\3\21\3\21\3\21\3\21\3\22\3\22\3\22\3\22\3\22\3\23"+
+		"\3\23\3\23\3\23\3\24\3\24\3\24\3\24\3\24\3\25\3\25\5\25\u00e0\n\25\3\26"+
+		"\3\26\3\26\3\26\3\26\3\26\3\26\3\26\3\27\3\27\3\30\3\30\3\30\3\30\3\30"+
+		"\3\30\3\30\3\30\3\30\3\30\3\31\3\31\3\32\7\32\u00f9\n\32\f\32\16\32\u00fc"+
+		"\13\32\3\33\3\33\3\33\3\33\3\33\3\33\3\34\3\34\3\35\3\35\5\35\u0108\n"+
+		"\35\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36\7\36\u0114\n\36"+
+		"\f\36\16\36\u0117\13\36\3\36\5\36\u011a\n\36\3\37\3\37\3\37\3\37\7\37"+
+		"\u0120\n\37\f\37\16\37\u0123\13\37\3\37\3\37\3 \3 \3 \3 \3!\3!\3!\3!\3"+
+		"!\3\"\3\"\3\"\3\"\3\"\3#\3#\3#\3#\3#\3$\3$\3$\3$\3$\3%\3%\3%\3%\3%\3&"+
+		"\3&\3&\3&\3&\3\'\3\'\3\'\3\'\3\'\3(\6(\u014f\n(\r(\16(\u0150\3)\3)\3)"+
+		"\3)\3)\3*\7*\u0159\n*\f*\16*\u015c\13*\3+\3+\3,\3,\3,\2\2-\2\4\6\b\n\f"+
+		"\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTV\2\6\3"+
+		"\2\23\27\3\2\31\63\4\2\66\66FF\3\2BC\2\u015b\2X\3\2\2\2\4f\3\2\2\2\6h"+
+		"\3\2\2\2\bl\3\2\2\2\np\3\2\2\2\fy\3\2\2\2\16{\3\2\2\2\20\u0080\3\2\2\2"+
+		"\22\u008a\3\2\2\2\24\u008c\3\2\2\2\26\u0099\3\2\2\2\30\u00a6\3\2\2\2\32"+
+		"\u00b7\3\2\2\2\34\u00c3\3\2\2\2\36\u00c5\3\2\2\2 \u00ca\3\2\2\2\"\u00cf"+
+		"\3\2\2\2$\u00d4\3\2\2\2&\u00d8\3\2\2\2(\u00df\3\2\2\2*\u00e1\3\2\2\2,"+
+		"\u00e9\3\2\2\2.\u00eb\3\2\2\2\60\u00f5\3\2\2\2\62\u00fa\3\2\2\2\64\u00fd"+
+		"\3\2\2\2\66\u0103\3\2\2\28\u0107\3\2\2\2:\u0119\3\2\2\2<\u011b\3\2\2\2"+
+		">\u0126\3\2\2\2@\u012a\3\2\2\2B\u012f\3\2\2\2D\u0134\3\2\2\2F\u0139\3"+
+		"\2\2\2H\u013e\3\2\2\2J\u0143\3\2\2\2L\u0148\3\2\2\2N\u014e\3\2\2\2P\u0152"+
+		"\3\2\2\2R\u015a\3\2\2\2T\u015d\3\2\2\2V\u015f\3\2\2\2XY\5\6\4\2YZ\5\b"+
+		"\5\2Z^\5\n\6\2[]\5\4\3\2\\[\3\2\2\2]`\3\2\2\2^\\\3\2\2\2^_\3\2\2\2_\3"+
+		"\3\2\2\2`^\3\2\2\2ag\5\16\b\2bg\5<\37\2cg\5\20\t\2dg\5\26\f\2eg\5\24\13"+
+		"\2fa\3\2\2\2fb\3\2\2\2fc\3\2\2\2fd\3\2\2\2fe\3\2\2\2g\5\3\2\2\2hi\7\3"+
+		"\2\2ij\7C\2\2jk\7\4\2\2k\7\3\2\2\2lm\7\5\2\2mn\7F\2\2no\7\4\2\2o\t\3\2"+
+		"\2\2pt\7\6\2\2qs\5\f\7\2rq\3\2\2\2sv\3\2\2\2tr\3\2\2\2tu\3\2\2\2uw\3\2"+
+		"\2\2vt\3\2\2\2wx\7\4\2\2x\13\3\2\2\2yz\7C\2\2z\r\3\2\2\2{|\7\7\2\2|}\7"+
+		"C\2\2}~\7F\2\2~\177\7\4\2\2\177\17\3\2\2\2\u0080\u0081\7\b\2\2\u0081\u0082"+
+		"\5\22\n\2\u0082\u0084\7F\2\2\u0083\u0085\7C\2\2\u0084\u0083\3\2\2\2\u0085"+
+		"\u0086\3\2\2\2\u0086\u0084\3\2\2\2\u0086\u0087\3\2\2\2\u0087\u0088\3\2"+
+		"\2\2\u0088\u0089\7\4\2\2\u0089\21\3\2\2\2\u008a\u008b\7C\2\2\u008b\23"+
+		"\3\2\2\2\u008c\u008e\7\t\2\2\u008d\u008f\7F\2\2\u008e\u008d\3\2\2\2\u008e"+
+		"\u008f\3\2\2\2\u008f\u0090\3\2\2\2\u0090\u0094\5\30\r\2\u0091\u0093\5"+
+		"\32\16\2\u0092\u0091\3\2\2\2\u0093\u0096\3\2\2\2\u0094\u0092\3\2\2\2\u0094"+
+		"\u0095\3\2\2\2\u0095\u0097\3\2\2\2\u0096\u0094\3\2\2\2\u0097\u0098\7\4"+
+		"\2\2\u0098\25\3\2\2\2\u0099\u009b\7\n\2\2\u009a\u009c\7F\2\2\u009b\u009a"+
+		"\3\2\2\2\u009b\u009c\3\2\2\2\u009c\u009d\3\2\2\2\u009d\u00a1\5\30\r\2"+
+		"\u009e\u00a0\5\34\17\2\u009f\u009e\3\2\2\2\u00a0\u00a3\3\2\2\2\u00a1\u009f"+
+		"\3\2\2\2\u00a1\u00a2\3\2\2\2\u00a2\u00a4\3\2\2\2\u00a3\u00a1\3\2\2\2\u00a4"+
+		"\u00a5\7\4\2\2\u00a5\27\3\2\2\2\u00a6\u00a7\7\13\2\2\u00a7\u00a8\5\f\7"+
+		"\2\u00a8\u00a9\7\f\2\2\u00a9\u00aa\5R*\2\u00aa\u00ab\7\4\2\2\u00ab\u00ac"+
+		"\7\4\2\2\u00ac\31\3\2\2\2\u00ad\u00b8\5\36\20\2\u00ae\u00b8\5(\25\2\u00af"+
+		"\u00b8\5:\36\2\u00b0\u00b8\5D#\2\u00b1\u00b8\5F$\2\u00b2\u00b8\5H%\2\u00b3"+
+		"\u00b8\5J&\2\u00b4\u00b8\5L\'\2\u00b5\u00b8\5 \21\2\u00b6\u00b8\5&\24"+
+		"\2\u00b7\u00ad\3\2\2\2\u00b7\u00ae\3\2\2\2\u00b7\u00af\3\2\2\2\u00b7\u00b0"+
+		"\3\2\2\2\u00b7\u00b1\3\2\2\2\u00b7\u00b2\3\2\2\2\u00b7\u00b3\3\2\2\2\u00b7"+
+		"\u00b4\3\2\2\2\u00b7\u00b5\3\2\2\2\u00b7\u00b6\3\2\2\2\u00b8\33\3\2\2"+
+		"\2\u00b9\u00c4\5\36\20\2\u00ba\u00c4\5(\25\2\u00bb\u00c4\5\"\22\2\u00bc"+
+		"\u00c4\5$\23\2\u00bd\u00c4\5:\36\2\u00be\u00c4\5D#\2\u00bf\u00c4\5F$\2"+
+		"\u00c0\u00c4\5H%\2\u00c1\u00c4\5J&\2\u00c2\u00c4\5L\'\2\u00c3\u00b9\3"+
+		"\2\2\2\u00c3\u00ba\3\2\2\2\u00c3\u00bb\3\2\2\2\u00c3\u00bc\3\2\2\2\u00c3"+
+		"\u00bd\3\2\2\2\u00c3\u00be\3\2\2\2\u00c3\u00bf\3\2\2\2\u00c3\u00c0\3\2"+
+		"\2\2\u00c3\u00c1\3\2\2\2\u00c3\u00c2\3\2\2\2\u00c4\35\3\2\2\2\u00c5\u00c6"+
+		"\7\r\2\2\u00c6\u00c7\5T+\2\u00c7\u00c8\5P)\2\u00c8\u00c9\7\4\2\2\u00c9"+
+		"\37\3\2\2\2\u00ca\u00cb\7\16\2\2\u00cb\u00cc\5T+\2\u00cc\u00cd\5P)\2\u00cd"+
+		"\u00ce\7\4\2\2\u00ce!\3\2\2\2\u00cf\u00d0\7\17\2\2\u00d0\u00d1\5T+\2\u00d1"+
+		"\u00d2\5P)\2\u00d2\u00d3\7\4\2\2\u00d3#\3\2\2\2\u00d4\u00d5\7\20\2\2\u00d5"+
+		"\u00d6\5T+\2\u00d6\u00d7\7\4\2\2\u00d7%\3\2\2\2\u00d8\u00d9\7\21\2\2\u00d9"+
+		"\u00da\5T+\2\u00da\u00db\5T+\2\u00db\u00dc\7\4\2\2\u00dc\'\3\2\2\2\u00dd"+
+		"\u00e0\5*\26\2\u00de\u00e0\5.\30\2\u00df\u00dd\3\2\2\2\u00df\u00de\3\2"+
+		"\2\2\u00e0)\3\2\2\2\u00e1\u00e2\7\22\2\2\u00e2\u00e3\5,\27\2\u00e3\u00e4"+
+		"\5\62\32\2\u00e4\u00e5\7\f\2\2\u00e5\u00e6\58\35\2\u00e6\u00e7\7\4\2\2"+
+		"\u00e7\u00e8\7\4\2\2\u00e8+\3\2\2\2\u00e9\u00ea\t\2\2\2\u00ea-\3\2\2\2"+
+		"\u00eb\u00ec\7\22\2\2\u00ec\u00ed\5\60\31\2\u00ed\u00ee\5\62\32\2\u00ee"+
+		"\u00ef\7\f\2\2\u00ef\u00f0\58\35\2\u00f0\u00f1\7\30\2\2\u00f1\u00f2\5"+
+		"8\35\2\u00f2\u00f3\7\4\2\2\u00f3\u00f4\7\4\2\2\u00f4/\3\2\2\2\u00f5\u00f6"+
+		"\t\3\2\2\u00f6\61\3\2\2\2\u00f7\u00f9\5\64\33\2\u00f8\u00f7\3\2\2\2\u00f9"+
+		"\u00fc\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00fb\3\2\2\2\u00fb\63\3\2\2"+
+		"\2\u00fc\u00fa\3\2\2\2\u00fd\u00fe\7\64\2\2\u00fe\u00ff\5\66\34\2\u00ff"+
+		"\u0100\7\30\2\2\u0100\u0101\5\66\34\2\u0101\u0102\7\65\2\2\u0102\65\3"+
+		"\2\2\2\u0103\u0104\t\4\2\2\u0104\67\3\2\2\2\u0105\u0108\5T+\2\u0106\u0108"+
+		"\7\67\2\2\u0107\u0105\3\2\2\2\u0107\u0106\3\2\2\2\u01089\3\2\2\2\u0109"+
+		"\u010a\78\2\2\u010a\u010b\7C\2\2\u010b\u010c\7F\2\2\u010c\u011a\7\4\2"+
+		"\2\u010d\u010e\78\2\2\u010e\u010f\79\2\2\u010f\u0110\7C\2\2\u0110\u0111"+
+		"\7F\2\2\u0111\u0115\7\4\2\2\u0112\u0114\5B\"\2\u0113\u0112\3\2\2\2\u0114"+
+		"\u0117\3\2\2\2\u0115\u0113\3\2\2\2\u0115\u0116\3\2\2\2\u0116\u0118\3\2"+
+		"\2\2\u0117\u0115\3\2\2\2\u0118\u011a\7\4\2\2\u0119\u0109\3\2\2\2\u0119"+
+		"\u010d\3\2\2\2\u011a;\3\2\2\2\u011b\u011c\7:\2\2\u011c\u011d\5@!\2\u011d"+
+		"\u0121\5> \2\u011e\u0120\5B\"\2\u011f\u011e\3\2\2\2\u0120\u0123\3\2\2"+
+		"\2\u0121\u011f\3\2\2\2\u0121\u0122\3\2\2\2\u0122\u0124\3\2\2\2\u0123\u0121"+
+		"\3\2\2\2\u0124\u0125\7\4\2\2\u0125=\3\2\2\2\u0126\u0127\7;\2\2\u0127\u0128"+
+		"\7C\2\2\u0128\u0129\7\4\2\2\u0129?\3\2\2\2\u012a\u012b\79\2\2\u012b\u012c"+
+		"\7C\2\2\u012c\u012d\7F\2\2\u012d\u012e\7\4\2\2\u012eA\3\2\2\2\u012f\u0130"+
+		"\7<\2\2\u0130\u0131\7F\2\2\u0131\u0132\7C\2\2\u0132\u0133\7\4\2\2\u0133"+
+		"C\3\2\2\2\u0134\u0135\7=\2\2\u0135\u0136\7B\2\2\u0136\u0137\5N(\2\u0137"+
+		"\u0138\7\4\2\2\u0138E\3\2\2\2\u0139\u013a\7>\2\2\u013a\u013b\7B\2\2\u013b"+
+		"\u013c\5N(\2\u013c\u013d\7\4\2\2\u013dG\3\2\2\2\u013e\u013f\7?\2\2\u013f"+
+		"\u0140\7B\2\2\u0140\u0141\5N(\2\u0141\u0142\7\4\2\2\u0142I\3\2\2\2\u0143"+
+		"\u0144\7@\2\2\u0144\u0145\7B\2\2\u0145\u0146\5N(\2\u0146\u0147\7\4\2\2"+
+		"\u0147K\3\2\2\2\u0148\u0149\7A\2\2\u0149\u014a\7B\2\2\u014a\u014b\7B\2"+
+		"\2\u014b\u014c\7\4\2\2\u014cM\3\2\2\2\u014d\u014f\7C\2\2\u014e\u014d\3"+
+		"\2\2\2\u014f\u0150\3\2\2\2\u0150\u014e\3\2\2\2\u0150\u0151\3\2\2\2\u0151"+
+		"O\3\2\2\2\u0152\u0153\7C\2\2\u0153\u0154\7\f\2\2\u0154\u0155\5R*\2\u0155"+
+		"\u0156\7\4\2\2\u0156Q\3\2\2\2\u0157\u0159\5V,\2\u0158\u0157\3\2\2\2\u0159"+
+		"\u015c\3\2\2\2\u015a\u0158\3\2\2\2\u015a\u015b\3\2\2\2\u015bS\3\2\2\2"+
+		"\u015c\u015a\3\2\2\2\u015d\u015e\7C\2\2\u015eU\3\2\2\2\u015f\u0160\t\5"+
+		"\2\2\u0160W\3\2\2\2\24^ft\u0086\u008e\u0094\u009b\u00a1\u00b7\u00c3\u00df"+
+		"\u00fa\u0107\u0115\u0119\u0121\u0150\u015a";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

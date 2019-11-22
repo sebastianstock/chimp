@@ -3,6 +3,7 @@ grammar ChimpClassic;
 domain : domain_name_def maxargs_def predicatesymbols_def domain_item*;
 
 domain_item : resource_def #domain_item_resource
+              | fluentresourceusage_def #domain_item_fluentresourceusage
               | statevariable_def #domain_item_statevariable
               | operator_def #domain_item_operator
               | method_def #domain_item_method
@@ -14,7 +15,7 @@ maxargs_def : '(MaxArgs' NUMBER ')';
 
 predicatesymbols_def : '(PredicateSymbols' predicate_symbol* ')';
 
-predicate_symbol : NAME | OP_NAME;
+predicate_symbol : NAME;
 
 resource_def : '(Resource' NAME NUMBER ')';
 
@@ -26,13 +27,15 @@ method_def : '(:method' NUMBER? head method_element* ')';
 
 operator_def : '(:operator' NUMBER? head op_element* ')';
 
-head : '(Head' OP_NAME '(' predicate_args ')' ')';
+head : '(Head' predicate_symbol '(' predicate_args ')' ')';
 
 method_element : precondition_def #precondition_m_element
              | temporal_constraint_def #temporal_constraint_m_element
+             | resource_usage_def #resource_usage_m_element
              | value_restriction_def #value_restriction_m_element
              | notvalue_restriction_def #notvalue_restriction_m_element
              | typevalue_restriction_def #typevalue_restriction_m_element
+             | nottypevalue_restriction_def #nottypevalue_restriction_m_element
              | vardifferent_def #vardifferent_m_element
              | subtask_def #subtask_def_m_element
              | ordering_constraint_def #ordering_def_m_element
@@ -46,6 +49,7 @@ op_element : precondition_def #precondition_op_element
              | value_restriction_def #value_restriction_op_element
              | notvalue_restriction_def #notvalue_restriction_op_element
              | typevalue_restriction_def #typevalue_restriction_op_element
+             | nottypevalue_restriction_def #nottypevalue_restriction_op_element
              | vardifferent_def #vardifferent_op_element
              ;
 
@@ -86,13 +90,21 @@ id_or_task : id | 'task';
 resource_usage_def : '(ResourceUsage' NAME NUMBER ')'
                    | '(ResourceUsage' '(Usage' NAME NUMBER ')' param_item* ')';
 
+fluentresourceusage_def : '(FluentResourceUsage' usage_def fluent_def param_item* ')';
+
+fluent_def : '(Fluent' NAME ')';
+
+usage_def : '(Usage' NAME NUMBER ')';
+
 param_item : '(Param' NUMBER NAME ')';
 
 value_restriction_def : '(Values' VAR_NAME constant_list ')';
 
 notvalue_restriction_def : '(NotValues' VAR_NAME constant_list ')';
 
-typevalue_restriction_def : '(Type' VAR_NAME NAME ')';
+typevalue_restriction_def : '(Type' VAR_NAME constant_list ')';
+
+nottypevalue_restriction_def : '(NotType' VAR_NAME constant_list ')';
 
 vardifferent_def : '(VarDifferent' VAR_NAME VAR_NAME ')';
 
@@ -111,9 +123,8 @@ var_or_const : NAME | VAR_NAME;
 */
 
 VAR_NAME : '?'NAME;
-OP_NAME : '!'NAME;
 
-NAME : [a-zA-Z][a-zA-Z0-9\-_]* ;
+NAME : [a-zA-Z!][a-zA-Z0-9\-_!]* ;
 /*COMMENT : ('#' ~[\r\n]* ('\r'|'\n') ('\r'|'\n')? ) -> skip ; */
 Comment
   :  '#' ~( '\r' | '\n' )* -> skip

@@ -9,6 +9,7 @@ import htn.HTNPrecondition;
 import htn.OrderingConstraintTemplate;
 import htn.PlanReportroryItem;
 import hybridDomainParsing.ClassicHybridDomain;
+import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -90,8 +91,10 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     public static final int DEFAULT_PREFERENCE_WEIGHT = 1;
 
     private int maxArgs = -1;
+    private Map<String, String[]> typesInstancesMap;
 
-    public ChimpClassicReader() {
+    public ChimpClassicReader(Map<String, String[]> typesInstancesMap) {
+        this.typesInstancesMap = typesInstancesMap;
     }
 
     @Override
@@ -113,6 +116,9 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                         visitDomain_item_statevariable((ChimpClassicParser.Domain_item_statevariableContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_methodContext) {
                 ret.methods.add(visitDomain_item_method((ChimpClassicParser.Domain_item_methodContext) d));
+            } else if (d instanceof ChimpClassicParser.Domain_item_fluentresourceusageContext) {
+                ret.fluentResourceUsages.add(visitDomain_item_fluentresourceusage(
+                        (ChimpClassicParser.Domain_item_fluentresourceusageContext) d));
             }
         }
         return ret;
@@ -121,6 +127,12 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     @Override
     public FluentResourceUsageScheduler visitDomain_item_resource(ChimpClassicParser.Domain_item_resourceContext ctx) {
         return visitResource_def(ctx.resource_def());
+    }
+
+    @Override
+    public ResourceUsageTemplate visitDomain_item_fluentresourceusage(
+            ChimpClassicParser.Domain_item_fluentresourceusageContext ctx) {
+        return visitFluentresourceusage_def(ctx.fluentresourceusage_def());
     }
 
     @Override
@@ -199,6 +211,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<SubDifferentDefinition> subDifferentDefinitions = new ArrayList<>();
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
         List<ParsedOrdering> parsedOrderingConstraints = new ArrayList<>();
+        List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
         for (ChimpClassicParser.Method_elementContext d : ctx.method_element()) {
             if (d instanceof ChimpClassicParser.Precondition_m_elementContext) {
                 parsedPreconditions.add(visitPrecondition_m_element(
@@ -209,7 +222,13 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             } else if (d instanceof ChimpClassicParser.Notvalue_restriction_m_elementContext) {
                 parsedNotvalueRestrictions.add(visitNotvalue_restriction_m_element(
                         (ChimpClassicParser.Notvalue_restriction_m_elementContext) d));
-            } else if (d instanceof ChimpClassicParser.Vardifferent_m_elementContext) {
+            } else if (d instanceof ChimpClassicParser.Typevalue_restriction_m_elementContext) {
+                parsedValueRestrictions.add(visitTypevalue_restriction_m_element(
+                        (ChimpClassicParser.Typevalue_restriction_m_elementContext) d));
+            } else if (d instanceof ChimpClassicParser.Nottypevalue_restriction_m_elementContext) {
+                parsedNotvalueRestrictions.add(visitNottypevalue_restriction_m_element(
+                        (ChimpClassicParser.Nottypevalue_restriction_m_elementContext) d));
+            }else if (d instanceof ChimpClassicParser.Vardifferent_m_elementContext) {
                 subDifferentDefinitions.add(visitVardifferent_m_element(
                         (ChimpClassicParser.Vardifferent_m_elementContext) d));
             } else if (d instanceof ChimpClassicParser.Temporal_constraint_m_elementContext) {
@@ -221,7 +240,10 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             } else if (d instanceof ChimpClassicParser.Ordering_def_m_elementContext) {
                 parsedOrderingConstraints.add(
                         visitOrdering_def_m_element((ChimpClassicParser.Ordering_def_m_elementContext) d));
-            }
+            } else if (d instanceof ChimpClassicParser.Resource_usage_m_elementContext) {
+                resourceUsageTemplates.add(visitResource_usage_m_element(
+                    (ChimpClassicParser.Resource_usage_m_elementContext) d));
+        }
         }
 
         HTNPrecondition[] htnPreconditions = createHTNPreconditionsAndNegativeEffects(head,
@@ -236,13 +258,15 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                 htnPreconditions, effectTemplates, orderingConstraints, preferenceWeight);
 
         method.addVariablesPossibleValues(createVariablesValuesMap(parsedValueRestrictions));
-        method.setVariablesImpossibleValuesMap(createVariablesValuesMap(parsedValueRestrictions));
+        method.setVariablesImpossibleValuesMap(createVariablesValuesMap(parsedNotvalueRestrictions));
 
         method.setSubDifferentDefinitions(
                 subDifferentDefinitions.toArray(new SubDifferentDefinition[subDifferentDefinitions.size()]));
 
         // set additional constraints from head to head or between preconditions and effects
         method.setAdditionalConstraints(filterAdditionalConstraints(temporalConstraintTemplates));
+
+        method.addResourceUsageTemplates(resourceUsageTemplates);
 
         return method;
     }
@@ -315,6 +339,12 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             } else if (d instanceof ChimpClassicParser.Notvalue_restriction_op_elementContext) {
                 parsedNotvalueRestrictions.add(visitNotvalue_restriction_op_element(
                         (ChimpClassicParser.Notvalue_restriction_op_elementContext) d));
+            } else if (d instanceof ChimpClassicParser.Typevalue_restriction_op_elementContext) {
+                parsedValueRestrictions.add(visitTypevalue_restriction_op_element(
+                        (ChimpClassicParser.Typevalue_restriction_op_elementContext) d));
+            } else if (d instanceof ChimpClassicParser.Nottypevalue_restriction_op_elementContext) {
+                parsedNotvalueRestrictions.add(visitNottypevalue_restriction_op_element(
+                        (ChimpClassicParser.Nottypevalue_restriction_op_elementContext) d));
             } else if (d instanceof ChimpClassicParser.Vardifferent_op_elementContext) {
                 subDifferentDefinitions.add(visitVardifferent_op_element(
                         (ChimpClassicParser.Vardifferent_op_elementContext) d));
@@ -338,7 +368,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                 htnPreconditions, effectTemplates, preferenceWeight);
 
         op.addVariablesPossibleValues(createVariablesValuesMap(parsedValueRestrictions));
-        op.setVariablesImpossibleValuesMap(createVariablesValuesMap(parsedValueRestrictions));
+        op.setVariablesImpossibleValuesMap(createVariablesValuesMap(parsedNotvalueRestrictions));
 
         op.setSubDifferentDefinitions(
                 subDifferentDefinitions.toArray(new SubDifferentDefinition[subDifferentDefinitions.size()]));
@@ -426,7 +456,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     @Override
     public Predicate visitHead(ChimpClassicParser.HeadContext ctx) {
         Predicate head = new Predicate();
-        head.name = ctx.OP_NAME().getText();
+        head.name = visitPredicate_symbol(ctx.predicate_symbol());
         head.args = visitPredicate_args(ctx.predicate_args());
         return head;
     }
@@ -442,6 +472,11 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
+    public ResourceUsageTemplate visitResource_usage_m_element(ChimpClassicParser.Resource_usage_m_elementContext ctx) {
+        return visitResource_usage_def(ctx.resource_usage_def());
+    }
+
+    @Override
     public ValueRestriction  visitValue_restriction_m_element(ChimpClassicParser.Value_restriction_m_elementContext ctx) {
         return visitValue_restriction_def(ctx.value_restriction_def());
     }
@@ -452,8 +487,13 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public Object visitTypevalue_restriction_m_element(ChimpClassicParser.Typevalue_restriction_m_elementContext ctx) {
-        throw new IllegalStateException("Type restrictions are not implemented");
+    public ValueRestriction visitTypevalue_restriction_m_element(ChimpClassicParser.Typevalue_restriction_m_elementContext ctx) {
+        return visitTypevalue_restriction_def(ctx.typevalue_restriction_def());
+    }
+
+    @Override
+    public ValueRestriction visitNottypevalue_restriction_m_element(ChimpClassicParser.Nottypevalue_restriction_m_elementContext ctx) {
+        return visitNottypevalue_restriction_def(ctx.nottypevalue_restriction_def());
     }
 
     @Override
@@ -507,8 +547,13 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public Object visitTypevalue_restriction_op_element(ChimpClassicParser.Typevalue_restriction_op_elementContext ctx) {
-        throw new IllegalStateException("Type restrictions are not implemented");
+    public ValueRestriction visitTypevalue_restriction_op_element(ChimpClassicParser.Typevalue_restriction_op_elementContext ctx) {
+        return visitTypevalue_restriction_def(ctx.typevalue_restriction_def());
+    }
+
+    @Override
+    public ValueRestriction visitNottypevalue_restriction_op_element(ChimpClassicParser.Nottypevalue_restriction_op_elementContext ctx) {
+        return visitNottypevalue_restriction_def(ctx.nottypevalue_restriction_def());
     }
 
     @Override
@@ -631,7 +676,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         } else {
             con = new AllenIntervalConstraint(constraintType);
         }
-        return new AdditionalConstraintTemplate(con, from, from);
+        return new AdditionalConstraintTemplate(con, from, to);
     }
 
     @Override
@@ -704,6 +749,45 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                 resourceRequirements, usageLevel);
     }
 
+    @Override
+    public ResourceUsageTemplate visitFluentresourceusage_def(ChimpClassicParser.Fluentresourceusage_defContext ctx) {
+        String fluentType = visitFluent_def(ctx.fluent_def());
+
+        String resourceName = ctx.usage_def().NAME().getText();
+        int usageLevel = numberToInt(ctx.usage_def().NUMBER());
+
+        int[] resourceRequirementPositions = new int[ctx.param_item().size()];
+        String[] resourceRequirements = new String[ctx.param_item().size()];
+
+        for (int i = 0; i < ctx.param_item().size(); ++i) {
+            UsageParam param = visitParam_item(ctx.param_item(i));
+            resourceRequirementPositions[i] = param.position;
+            resourceRequirements[i] = param.paramName;
+        }
+        return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions,
+                resourceRequirements, usageLevel);
+    }
+
+    @Override
+    public String visitFluent_def(ChimpClassicParser.Fluent_defContext ctx) {
+        return ctx.NAME().getText();
+    }
+
+    class ParsedUsage {
+        int usageLevel;
+        String resourceName;
+
+        public ParsedUsage(String resourceName, int usageLevel) {
+            this.resourceName = resourceName;
+            this.usageLevel = usageLevel;
+        }
+    }
+
+    @Override
+    public ParsedUsage visitUsage_def(ChimpClassicParser.Usage_defContext ctx) {
+        return new ParsedUsage(ctx.NAME().getText(), numberToInt(ctx.NUMBER()));
+    }
+
     public class UsageParam {
         public UsageParam(int position, String paramName) {
             this.position = position;
@@ -746,8 +830,41 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public Object visitTypevalue_restriction_def(ChimpClassicParser.Typevalue_restriction_defContext ctx) {
-        throw new IllegalStateException("Type restrictions are not implemented");
+    public ValueRestriction visitTypevalue_restriction_def(ChimpClassicParser.Typevalue_restriction_defContext ctx) {
+        String varName = ctx.VAR_NAME().toString();
+        List<String> types = visitConstant_list(ctx.constant_list());
+        List<String> values = new ArrayList<>();
+        for (String type : types) {
+            String[] instances = typesInstancesMap.get(type);
+            if (instances != null) {
+                for (String instance : instances) {
+                    values.add(instance);
+                }
+            } else {
+                System.err.println("Type " + type + " specified but not in typesInstancesMap");
+//                throw new DomainParsingException("Type " + type + " specified but not in typesInstancesMap");
+            }
+        }
+        return new ValueRestriction(varName, values);
+    }
+
+    @Override
+    public ValueRestriction visitNottypevalue_restriction_def(ChimpClassicParser.Nottypevalue_restriction_defContext ctx) {
+        String varName = ctx.VAR_NAME().toString();
+        List<String> types = visitConstant_list(ctx.constant_list());
+        List<String> values = new ArrayList<>();
+        for (String type : types) {
+            String[] instances = typesInstancesMap.get(type);
+            if (instances != null) {
+                for (String instance : instances) {
+                    values.add(instance);
+                }
+            } else {
+                System.err.println("Type " + type + " specified but not in typesInstancesMap");
+//                throw new DomainParsingException("Type " + type + " specified but not in typesInstancesMap");
+            }
+        }
+        return new ValueRestriction(varName, values);
     }
 
     @Override

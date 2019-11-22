@@ -1,8 +1,20 @@
 package hybridDomainParsing.classic.antlr;
 
+import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNPlanner;
+import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
+import hybridDomainParsing.ProblemParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.metacsp.framework.ValueOrderingH;
+import org.metacsp.utility.logging.MetaCSPLogging;
+import planner.CHIMP;
+import planner.CHIMPProblem;
+
+import java.io.IOException;
+import java.util.logging.Level;
 
 public class TestDomainReader {
 
@@ -25,14 +37,52 @@ public class TestDomainReader {
                 "  (Param 2 leftArm1))\n" +
                 ")";
 
-        ChimpClassicLexer lexer = new ChimpClassicLexer(CharStreams.fromString(testDomain));
+        String testDomain2 = "(HybridHTNDomain testDomain) (MaxArgs 5) (PredicateSymbols table n !pick) " +
+                "(StateVariable sv 1 n)" +
+                "(Resource resource1 7)" +
+                "(:method\n" +
+                " (Head adapt_torso(?newPose))\n" +
+                " (Pre p1 HasTorsoPosture(?oldPose))\n" +
+                " (VarDifferent ?newPose ?oldPose) \n" +
+                " (Sub s1 !move_torso(?newPose))\n" +
+                " (Constraint Equals(s1,task))\n" +
+                " )";
+
+        String problemFile = "problems/test_m_serve_coffee_problem_1.pdl";
+        String domainFile = "domains/ordered_domain.ddl";
+        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+
+//        ChimpClassicLexer lexer = new ChimpClassicLexer(CharStreams.fromString(testDomain2));
+        ChimpClassicLexer lexer = null;
+        try {
+            lexer = new ChimpClassicLexer(CharStreams.fromFileName(domainFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ChimpClassicParser parser = new ChimpClassicParser(tokens);
 
-        ChimpClassicReader visitor = new ChimpClassicReader();
         try {
+            CHIMPProblem problem = new ProblemParser(problemFile);
+
+            ChimpClassicReader visitor = new ChimpClassicReader(problem.getTypesInstancesMap());
             ChimpClassicReader.ParsedDomain domain = visitor.visitDomain(parser.domain());
             System.out.println(domain.toString());
+
+
+//            CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
+            CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domain, problem)
+                    .valHeuristic(valOH)
+                    .mbEstimator(new LookUpTableDurationEstimator())
+                    .htnUnification(true);
+            CHIMP chimp = builder.build();
+
+            MetaCSPLogging.setLevel(HTNPlanner.class, Level.FINEST);
+            MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+
+            System.out.println("Found plan? " + chimp.generatePlan());
+            chimp.printStats(System.out);
         } catch (Exception e) {
             e.printStackTrace();
         }
