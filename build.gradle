@@ -49,6 +49,8 @@ dependencies {
 
   compile group: 'com.google.guava', name: 'guava', version: '18.0'
 
+  compile group: 'org.choco-solver', name: 'choco-solver', version: '4.10.2'
+
   // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
   compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
 }
