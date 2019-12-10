@@ -16,7 +16,7 @@ public class IntegerConstraintSolver extends ConstraintSolver {
     private final int minIntValue;
     private final int maxIntValue;
 
-    protected IntegerConstraintSolver(int minIntValue, int maxIntValue) {
+    public IntegerConstraintSolver(int minIntValue, int maxIntValue) {
         super(new Class[] {IntegerConstraint.class}, IntegerVariable.class);
         this.minIntValue = minIntValue;
         this.maxIntValue = maxIntValue;
@@ -25,7 +25,6 @@ public class IntegerConstraintSolver extends ConstraintSolver {
 
     @Override
     public boolean propagate() {
-        System.out.println("IntegerConstraintSolver.propagate()");
         Map<Integer, IntVar> idToIntVarsMap = new HashMap<>();
         Model model = new Model();
 
@@ -42,11 +41,11 @@ public class IntegerConstraintSolver extends ConstraintSolver {
         }
 
         Solver chocoSolver = model.getSolver();
-        chocoSolver.showStatistics();
+//        chocoSolver.showStatistics();
         Solution solution = chocoSolver.findSolution();
 
         if (solution != null) {
-            System.out.println("Choco " + solution.toString());
+            logger.info("Choco " + solution.toString());
             updateDomains(idToIntVarsMap);
             return solution.exists();
         } else {

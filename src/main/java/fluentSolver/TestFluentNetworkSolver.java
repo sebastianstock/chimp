@@ -2,10 +2,13 @@ package fluentSolver;
 
 import java.util.logging.Logger;
 
+import integers.IntegerConstraint;
+import integers.IntegerVariable;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import htn.HTNMethod;
+import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestFluentNetworkSolver {
 
@@ -23,14 +26,14 @@ public class TestFluentNetworkSolver {
 		symbols[3] = symbolsManAreas;
 		symbols[4] = symbolsPreAreas;
 		logger.info("Test1");
-		FluentNetworkSolver solver = new FluentNetworkSolver(0, 500, symbols, new int[] {1,1,1,1,1});
+		FluentNetworkSolver solver = new FluentNetworkSolver(0, 500, symbols, new int[] {1,1,1,1,1}, 0, 1000, 2);
 		logger.info("Test2");
 		Fluent[] fluents = (Fluent[]) solver.createVariables(3);
 		logger.info("Test3");
 		ConstraintNetwork.draw(solver.getConstraintNetwork());
 		
 		fluents[0].setName("get_mug(mug1 pl1 none none)");
-		fluents[1].setName("get_mug(mug1 pl1 none none)");
+		fluents[1].setName("get_mug(mug1 ?pl1 none none)");
 		fluents[2].setName("robotat(none ?pl none none)");
 		
 
@@ -46,36 +49,52 @@ public class TestFluentNetworkSolver {
 //		con1.setFrom(fluents[0]);
 //		con1.setTo(fluents[1]);
 //		logger.info("Added con1? " + bsolver.addConstraint(con1));
+
+		logger.info(fluents[0].toString());
+		logger.info(fluents[1].toString());
 		
-//		CompoundNameMatchingConstraint ncon0 = 
-//				new CompoundNameMatchingConstraint(CompoundNameMatchingConstraint.Type.MATCHES);
-//		ncon0.setFrom(fluents[0].getCompoundNameVariable());
-//		ncon0.setTo(fluents[1].getCompoundNameVariable());
-//		CompoundNameMatchingConstraintSolver nsolver = 
-//				(CompoundNameMatchingConstraintSolver) solver.getConstraintSolvers()[0];
-//		logger.info("Added ncon0? " + nsolver.addConstraint(ncon0));
+		CompoundSymbolicValueConstraint ncon0 =
+				new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
+		ncon0.setFrom(fluents[0].getCompoundSymbolicVariable());
+		ncon0.setTo(fluents[1].getCompoundSymbolicVariable());
+		CompoundSymbolicVariableConstraintSolver nsolver =
+				(CompoundSymbolicVariableConstraintSolver) solver.getConstraintSolvers()[0];
+		logger.info("Added ncon0? " + nsolver.addConstraint(ncon0));
+
+		logger.info(fluents[0].toString());
+		logger.info(fluents[1].toString());
 		
 		FluentConstraint fcon01 = new FluentConstraint(FluentConstraint.Type.MATCHES);
 		fcon01.setFrom(fluents[0]);
 		fcon01.setTo(fluents[1]);
 		logger.info("Added fcon01? " + solver.addConstraint(fcon01));
+
+		logger.info(fluents[0].toString());
+		logger.info(fluents[1].toString());
 		
 		FluentConstraint fcon21 = new FluentConstraint(FluentConstraint.Type.PRE, new int[] {1,1, 2, 2});
 		fcon21.setFrom(fluents[2]);
 		fcon21.setTo(fluents[1]);
 		logger.info("Added fcon21? " + solver.addConstraint(fcon21));
+
+		IntegerConstraint ic01 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+				new IntegerVariable[]{fluents[0].getIntegerVariables()[0], fluents[1].getIntegerVariables()[0]},
+				"=", "+", 23);
+		logger.info("Added ic01? " + solver.getConstraintSolvers()[2].addConstraint(ic01));
+		logger.info(fluents[0].toString());
+		logger.info(fluents[1].toString());
 		
 		
-		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new HTNMethod(null, null, null, null, null, 0));
-		fcon11.setFrom(fluents[1]);
-		fcon11.setTo(fluents[1]);
-		logger.info("Added fcon11? " + solver.addConstraint(fcon11));
-		
-		logger.info("Removing fcon11");
-		solver.removeConstraint(fcon11);
-		
-		logger.info("Removing fcon21");
-		solver.removeConstraint(fcon21);
+//		FluentConstraint fcon11 = new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, new HTNMethod(null, null, null, null, null, 0));
+//		fcon11.setFrom(fluents[1]);
+//		fcon11.setTo(fluents[1]);
+//		logger.info("Added fcon11? " + solver.addConstraint(fcon11));
+//
+//		logger.info("Removing fcon11");
+//		solver.removeConstraint(fcon11);
+//
+//		logger.info("Removing fcon21");
+//		solver.removeConstraint(fcon21);
 		
 	}
 

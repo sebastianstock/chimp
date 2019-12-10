@@ -1,6 +1,7 @@
 package fluentSolver;
 
 import htn.HTNMetaConstraint;
+import integers.IntegerVariable;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Domain;
@@ -43,6 +44,16 @@ public class Fluent extends MultiVariable implements Activity{
 	public AllenInterval getAllenInterval() {
 		return (AllenInterval)this.getInternalVariables()[1];
 	}
+
+	public IntegerVariable[] getIntegerVariables() {
+		int integerVariableStartIndex = ((FluentNetworkSolver) solver).getIntegerVariableStartIndex();
+		int integerVariablesCnt = ((FluentNetworkSolver) solver).getIntegerVariablesCnt();
+		IntegerVariable[] ret = new IntegerVariable[integerVariablesCnt];
+		for (int i = 0; i < integerVariablesCnt; i++) {
+			ret[i] = (IntegerVariable) getInternalVariables()[i + integerVariableStartIndex];
+		}
+		return ret;
+	}
 	
 	public void setName(String name) {
 		this.getCompoundSymbolicVariable().setFullName(name);
@@ -79,6 +90,17 @@ public class Fluent extends MultiVariable implements Activity{
 		ret.append(")::");
 //		ret.append(this.getInternalVariables()[0].toString());
 		ret.append(((CompoundSymbolicVariable) this.getInternalVariables()[0]).getShortName());
+
+		IntegerVariable[] integerVariables = getIntegerVariables();
+		if (integerVariables.length > 0) {
+			ret.append("(");
+			ret.append(integerVariables[0].toString());
+			for (int i = 1; i < integerVariables.length; i++) {
+				ret.append(", ").append(integerVariables[i].toString());
+			}
+			ret.append("(");
+		}
+
 //		ret.append(">U<");
 		ret.append(this.getAllenInterval().getDomain());
 //		ret.append(this.getInternalVariables()[1].toString());

@@ -28,6 +28,10 @@ public class TestIntegerConstraintSolver {
 				"+", ">=", 100);
 		System.out.println("Add ic01: " + solver.addConstraint(ic01));
 
+		IntegerConstraint ic01b = new IntegerConstraint(IntegerConstraint.Type.ARITHM, new IntegerVariable[] {vars[0], vars[1]},
+				"=", "+", 105);
+		System.out.println("Add ic01b: " + solver.addConstraint(ic01b));
+
 		IntegerConstraint ic123 = new IntegerConstraint(IntegerConstraint.Type.ARITHM, new IntegerVariable[] {vars[1], vars[2], vars[3]},
 				"+", "<");
 		System.out.println("Add ic123: " + solver.addConstraint(ic123));

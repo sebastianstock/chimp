@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import htn.HTNMetaConstraint;
+import integers.IntegerConstraint;
+import integers.IntegerConstraintSolver;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
@@ -29,17 +31,55 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 		this.horizon = horizon;
 	}
 
+	/**
+	 * Create a FluentNetworkSolver with internal IntegerVariables.
+	 * @param origin Origin for AllenIntervalNetworkSolver
+	 * @param horizon Horizon for AllenIntervalNetworkSolver
+	 * @param symbols
+	 * @param symbolicingredients Number of internal variables per Fluent created by the CompoundSymbolicVariableConstraintSolver
+	 * @param minIntValue Minimum value for the integer variables
+	 * @param maxIntValue Maximum value for the integer variables
+	 * @param numIntVars Number of IntegerVariables per fluent created by the IntegerConstraintSolver
+	 */
+	public FluentNetworkSolver(long origin, long horizon, String[][] symbols, int[] symbolicingredients,
+							   int minIntValue, int maxIntValue, int numIntVars) {
+		super(new Class[] {FluentConstraint.class, AllenIntervalConstraint.class}, Fluent.class,
+				createConstraintSolvers(origin, horizon, symbols, symbolicingredients, minIntValue, maxIntValue), new int[] {1, 1, numIntVars});
+		this.origin = origin;
+		this.horizon = horizon;
+	}
+
 	@Override
 	public boolean propagate() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	public int getIntegerVariableStartIndex() {
+		return ingredients[0] + ingredients[1];
+	}
+
+	public int getIntegerVariablesCnt() {
+		if (ingredients.length < 3) {
+			return 0;
+		}
+		return ingredients[2];
+	}
+
+	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon,
+															  String[][] symbols, int[] symbolicingredients) {
+		ConstraintSolver[] ret = new ConstraintSolver[] {
+				new CompoundSymbolicVariableConstraintSolver(symbols, symbolicingredients),
+				new AllenIntervalNetworkSolver(origin, horizon)};
+		return ret;
+	}
+
 	private static ConstraintSolver[] createConstraintSolvers(long origin, long horizon, 
-			String[][] symbols, int[] symbolicingredients) {
+			String[][] symbols, int[] symbolicingredients, int minIntValue, int maxIntValue) {
 		ConstraintSolver[] ret = new ConstraintSolver[] { 
 				new CompoundSymbolicVariableConstraintSolver(symbols, symbolicingredients), 
-				new AllenIntervalNetworkSolver(origin, horizon)};
+				new AllenIntervalNetworkSolver(origin, horizon),
+				new IntegerConstraintSolver(minIntValue, maxIntValue)};
 		return ret;
 	}
 
