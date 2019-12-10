@@ -111,8 +111,15 @@ public class IntegerConstraintSolver extends ConstraintSolver {
             IntegerVariable integerVariable = (IntegerVariable) vars[i];
             intVars[i] = idToIntVarsMap.get(integerVariable.getID());
             if (intVars[i] == null) {
-                intVars[i] = model.intVar("i" + integerVariable.getID(),
-                        minIntValue, maxIntValue, false);
+                if(integerVariable.isConstant()) {
+                    IntegerDomain iDomain = (IntegerDomain) integerVariable.getDomain();
+                    intVars[i] = model.intVar("i" + integerVariable.getID(), iDomain.getValue());
+                } else {
+                    intVars[i] = model.intVar("i" + integerVariable.getID(),
+                            minIntValue, maxIntValue, false);
+                }
+
+
                 idToIntVarsMap.put(integerVariable.getID(), intVars[i]);
             }
         }

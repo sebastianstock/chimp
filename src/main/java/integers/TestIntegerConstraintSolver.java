@@ -24,6 +24,8 @@ public class TestIntegerConstraintSolver {
 //		vars[0].setValue(); // TODO how to deal with constants
 //		vars[0].setConstant("mug1");
 
+		vars[1].setConstantValue(80);
+
 		IntegerConstraint ic01 = new IntegerConstraint(IntegerConstraint.Type.ARITHM, new IntegerVariable[] {vars[0], vars[1]},
 				"+", ">=", 100);
 		System.out.println("Add ic01: " + solver.addConstraint(ic01));

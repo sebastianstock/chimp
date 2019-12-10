@@ -37,7 +37,13 @@ public class IntegerVariable extends Variable {
         this.domain.setValue(value);
     }
 
+    public void setConstantValue(int value) {this.domain.setConstantValue(value);}
+
     public boolean isInstantiated() {
         return this.domain.isInstantiated();
+    }
+
+    public boolean isConstant() {
+        return this.domain.isConstant();
     }
 }

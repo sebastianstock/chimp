@@ -98,7 +98,7 @@ public class Fluent extends MultiVariable implements Activity{
 			for (int i = 1; i < integerVariables.length; i++) {
 				ret.append(", ").append(integerVariables[i].toString());
 			}
-			ret.append("(");
+			ret.append(")");
 		}
 
 //		ret.append(">U<");

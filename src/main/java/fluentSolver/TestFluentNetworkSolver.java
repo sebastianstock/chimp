@@ -77,6 +77,8 @@ public class TestFluentNetworkSolver {
 		fcon21.setTo(fluents[1]);
 		logger.info("Added fcon21? " + solver.addConstraint(fcon21));
 
+		fluents[1].getIntegerVariables()[0].setConstantValue(17);
+		fluents[1].getIntegerVariables()[1].setConstantValue(18);
 		IntegerConstraint ic01 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
 				new IntegerVariable[]{fluents[0].getIntegerVariables()[0], fluents[1].getIntegerVariables()[0]},
 				"=", "+", 23);
