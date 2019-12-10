@@ -56,7 +56,10 @@ public class CHIMP {
 		boolean htnUnification = false;
 		private long origin = 0;
 		private long horizon = 600000;
-		
+		private int minIntValue = 0;
+		private int maxIntValue = 0;
+		private int intIngredeients = 0;
+
 		/**
 		 * 
 		 * @param domain Planning domain.
@@ -108,6 +111,13 @@ public class CHIMP {
 			this.horizon = horizon;
 			return this;
 		}
+
+		public CHIMPBuilder integerConstraintSolverParameters(int minIntValue, int maxIntValue, int intIngredients) {
+			this.minIntValue = minIntValue;
+			this.maxIntValue = maxIntValue;
+			this.intIngredeients = intIngredients;
+			return this;
+		}
 		
 		public CHIMP build() {
 			return new CHIMP(this);
@@ -141,8 +151,14 @@ public class CHIMP {
 		String[][] symbols = new String[2][];
 		symbols[0] =  builder.domain.getPredicateSymbols();
 		symbols[1] = builder.problem.getArgumentSymbols();
-		
-		planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients);
+
+		if (builder.intIngredeients > 0) {
+			planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients,
+					builder.minIntValue, builder.maxIntValue, builder.intIngredeients);
+		} else {
+			planner = new HTNPlanner(builder.origin,  builder.horizon,  0, symbols, ingredients);
+		}
+
 		planner.setTypesInstancesMap(builder.problem.getTypesInstancesMap());
 		
 		initMetaConstraints(builder.domain, builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);

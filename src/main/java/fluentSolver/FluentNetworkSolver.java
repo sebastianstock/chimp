@@ -26,7 +26,8 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 
 	public FluentNetworkSolver(long origin, long horizon, String[][] symbols, int[] symbolicingredients) {
 		super(new Class[] {FluentConstraint.class, AllenIntervalConstraint.class}, Fluent.class, 
-				createConstraintSolvers(origin, horizon, symbols, symbolicingredients), new int[] {1, 1});
+				createConstraintSolvers(origin, horizon, symbols, symbolicingredients),
+				new int[] {1, 1});
 		this.origin = origin;
 		this.horizon = horizon;
 	}
@@ -44,7 +45,8 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	public FluentNetworkSolver(long origin, long horizon, String[][] symbols, int[] symbolicingredients,
 							   int minIntValue, int maxIntValue, int numIntVars) {
 		super(new Class[] {FluentConstraint.class, AllenIntervalConstraint.class}, Fluent.class,
-				createConstraintSolvers(origin, horizon, symbols, symbolicingredients, minIntValue, maxIntValue), new int[] {1, 1, numIntVars});
+				createConstraintSolvers(origin, horizon, symbols, symbolicingredients, minIntValue, maxIntValue),
+				new int[] {1, 1, numIntVars});
 		this.origin = origin;
 		this.horizon = horizon;
 	}

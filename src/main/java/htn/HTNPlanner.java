@@ -33,7 +33,27 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 		// Currently only FluentConstraints. Other constraint should be added later.
 		super(new Class[] {FluentConstraint.class}, 
 				animationTime, 
-				new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients));
+				new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients));//, 0, 1000, 2));
+
+		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
+	}
+
+	/**
+	 * HTNPlanner with internal IntegerConstraintSolver.
+	 * @param origin Origin for AllenIntervalNetworkSolver
+	 * @param horizon Horizon for AllenIntervalNetworkSolver
+	 * @param symbols Symbols of the CompoundSymbolicVariableConstraintSolver
+	 * @param symbolicIngredients Number of internal variables per Fluent created by the CompoundSymbolicVariableConstraintSolver
+	 * @param minIntValue Minimum value for the integer variables
+	 * @param maxIntValue Maximum value for the integer variables
+	 * @param numIntVars Number of IntegerVariables per fluent created by the IntegerConstraintSolver
+	 */
+	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols,
+					  int[] symbolicIngredients, int minIntValue, int maxIntValue, int numIntVars ) {
+		// Currently only FluentConstraints. Other constraint should be added later.
+		super(new Class[] {FluentConstraint.class},
+				animationTime,
+				new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients, minIntValue, maxIntValue, numIntVars));
 
 		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
 	}

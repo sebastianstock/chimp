@@ -45,7 +45,7 @@ public class IntegerConstraintSolver extends ConstraintSolver {
         Solution solution = chocoSolver.findSolution();
 
         if (solution != null) {
-            logger.info("Choco " + solution.toString());
+//            logger.info("Choco " + solution.toString());
             updateDomains(idToIntVarsMap);
             return solution.exists();
         } else {
