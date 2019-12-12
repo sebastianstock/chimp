@@ -1,6 +1,6 @@
 grammar ChimpClassic;
 
-domain : domain_name_def maxargs_def predicatesymbols_def domain_item*;
+domain : domain_name_def maxargs_def maxintargs_def? predicatesymbols_def domain_item*;
 
 domain_item : resource_def #domain_item_resource
               | fluentresourceusage_def #domain_item_fluentresourceusage
@@ -12,6 +12,8 @@ domain_item : resource_def #domain_item_resource
 domain_name_def : '(HybridHTNDomain' NAME ')';
 
 maxargs_def : '(MaxArgs' NUMBER ')';
+
+maxintargs_def : '(MaxIntegerArgs' NUMBER ')';
 
 predicatesymbols_def : '(PredicateSymbols' predicate_symbol* ')';
 
@@ -27,7 +29,9 @@ method_def : '(:method' NUMBER? head method_element* ')';
 
 operator_def : '(:operator' NUMBER? head op_element* ')';
 
-head : '(Head' predicate_symbol '(' predicate_args ')' ')';
+head : '(Head' predicate_symbol '(' predicate_args ')' int_args_def? ')';
+
+int_args_def : '(' int_args ')';
 
 method_element : precondition_def #precondition_m_element
              | temporal_constraint_def #temporal_constraint_m_element
@@ -39,6 +43,7 @@ method_element : precondition_def #precondition_m_element
              | vardifferent_def #vardifferent_m_element
              | subtask_def #subtask_def_m_element
              | ordering_constraint_def #ordering_def_m_element
+             | integer_constraint_def #integer_constraint_m_element
              ;
 
 op_element : precondition_def #precondition_op_element
@@ -51,6 +56,7 @@ op_element : precondition_def #precondition_op_element
              | typevalue_restriction_def #typevalue_restriction_op_element
              | nottypevalue_restriction_def #nottypevalue_restriction_op_element
              | vardifferent_def #vardifferent_op_element
+             | integer_constraint_def #integer_constraint_op_element
              ;
 
 precondition_def : '(Pre' id predicate ')';
@@ -62,6 +68,16 @@ positive_effect_def : '(Add' id predicate ')';
 negative_effect_def : '(Del' id ')';
 
 ordering_constraint_def : '(Ordering' id id ')';
+
+integer_constraint_def : integer_constraint1_def | integer_constraint2_def;
+
+integer_constraint1_def : '(IC' VAR_NAME integer_operator1 var_or_int ')';
+
+integer_constraint2_def : '(IC' VAR_NAME integer_operator1 VAR_NAME integer_operator2 var_or_int ')';
+
+integer_operator1 : '=' | '!=' | '>' | '<' | '>=' | '<=';
+
+integer_operator2 : '=' | '!=' | '>' | '<' | '>=' | '<=' | '+' | '-' | '*' | '/';
 
 temporal_constraint_def : unary_temporal_constraint_def | binary_temporal_constraint_def;
 
@@ -110,9 +126,13 @@ vardifferent_def : '(VarDifferent' VAR_NAME VAR_NAME ')';
 
 constant_list : NAME+;
 
-predicate : NAME '(' predicate_args ')';
+predicate : NAME '(' predicate_args ')' int_args_def?;
 
 predicate_args : var_or_const*;
+
+int_args : var_or_int*;
+
+var_or_int : VAR_NAME | NUMBER;
 
 id : NAME;
 

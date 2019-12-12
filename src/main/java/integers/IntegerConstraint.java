@@ -1,6 +1,7 @@
 package integers;
 
 import org.metacsp.framework.Constraint;
+import org.metacsp.framework.Variable;
 
 public class IntegerConstraint extends Constraint {
 
@@ -11,7 +12,7 @@ public class IntegerConstraint extends Constraint {
     private String op2;
     private int cste;
 
-    public IntegerConstraint(Type type, IntegerVariable[] scope, String op1, String op2, int cste) {
+    public IntegerConstraint(Type type, Variable[] scope, String op1, String op2, int cste) {
         this.type = type;
         this.setScope(scope);
         this.op1 = op1;
@@ -19,15 +20,15 @@ public class IntegerConstraint extends Constraint {
         this.cste = cste;
     }
 
-    public IntegerConstraint(Type type, IntegerVariable[] scope) {
+    public IntegerConstraint(Type type, Variable[] scope) {
         this(type, scope, null, null, 0);
     }
 
-    public IntegerConstraint(Type type, IntegerVariable[] scope, String op1, int cste) {
+    public IntegerConstraint(Type type, Variable[] scope, String op1, int cste) {
         this(type, scope, op1, null, cste);
     }
 
-    public IntegerConstraint(Type type, IntegerVariable[] scope, String op1, String op2) {
+    public IntegerConstraint(Type type, Variable[] scope, String op1, String op2) {
         this(type, scope, op1, op2, 0);
     }
 
@@ -45,7 +46,7 @@ public class IntegerConstraint extends Constraint {
 
     @Override
     public Object clone() {
-        IntegerConstraint ic = new IntegerConstraint(this.type, (IntegerVariable[])this.getScope(),
+        IntegerConstraint ic = new IntegerConstraint(this.type, this.getScope(),
                 this.op1, this.op2, this.cste);
         ic.autoRemovable = this.autoRemovable;
         return ic;

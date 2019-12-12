@@ -6,9 +6,12 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
+import integers.IntegerConstraint;
+import integers.IntegerVariable;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
+import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -34,8 +37,10 @@ public abstract class PlanReportroryItem {
 	protected final HTNPrecondition[] preconditions;
 
 	protected final String[] arguments;
+	protected final IntArg[] integerArguments;
 	protected final EffectTemplate[] effects;
 	protected AdditionalConstraintTemplate[] additionalConstraints;
+	protected IntegerConstraintTemplate[] integerConstraintTemplates;
 	
 	protected Map<String, Map<String, Integer>> variableOccurrencesMap;
 	protected Map<String,String[]> variablesPossibleValuesMap = new HashMap<>();
@@ -53,15 +58,21 @@ public abstract class PlanReportroryItem {
 	
 	protected final List<ResourceUsageTemplate> resourceUsageIndicators = 
 			new ArrayList<ResourceUsageTemplate>();
-	
-	public PlanReportroryItem(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
-			EffectTemplate[] effects, int preferenceWeight) {
+
+	public PlanReportroryItem(String taskname, String[] arguments, IntArg[] intArgs, HTNPrecondition[] preconditions,
+							  EffectTemplate[] effects, int preferenceWeight) {
 		this.taskname = taskname;
 		this.arguments = arguments;
+		this.integerArguments = intArgs;
 		this.preconditions = preconditions;
 		this.effects = effects;
 		this.preferenceWeight = preferenceWeight;
 		createVariableOccurrencesMap();
+	}
+
+	public PlanReportroryItem(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
+			EffectTemplate[] effects, int preferenceWeight) {
+		this(taskname, arguments, new IntArg[0], preconditions, effects, preferenceWeight);
 	}
 	
 	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
@@ -74,6 +85,10 @@ public abstract class PlanReportroryItem {
 	
 	public void setAdditionalConstraints(AdditionalConstraintTemplate[] additionalConstraints) {
 		this.additionalConstraints = additionalConstraints;
+	}
+
+	public void setIntegerConstraintTemplates(IntegerConstraintTemplate[] integerConstraintTemplates) {
+		this.integerConstraintTemplates = integerConstraintTemplates;
 	}
 
 	public String getName() {
@@ -404,6 +419,28 @@ public abstract class PlanReportroryItem {
 					resourceCon.setFrom(taskFluent);
 					resourceCon.setTo(taskFluent);
 					cn.addConstraint(resourceCon);
+				}
+
+				// add some integer constraints only for testing
+				if (taskFluent.getIntegerVariables().length > 0) {
+					IntegerConstraint ic0 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+							new IntegerVariable[]{taskFluent.getIntegerVariables()[0]},
+							"=", 77);
+					cn.addConstraint(ic0);
+					IntegerConstraint ic1 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+							new IntegerVariable[]{taskFluent.getIntegerVariables()[0], taskFluent.getIntegerVariables()[1]},
+							"+", ">=", 100);
+					cn.addConstraint(ic1);
+					// between first int variable of the task and third int variable of first effect
+					for (Entry<String, Variable> e: effKeyToVariableMap.entrySet()) {
+						VariablePrototype effectIntVar3 = new VariablePrototype(groundSolver, e.getValue(), 2);
+						IntegerConstraint icEffect = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+								new Variable[]{taskFluent.getIntegerVariables()[0], effectIntVar3},
+								"+", ">=", 1000);
+						cn.addConstraint(icEffect);
+						break;
+					}
+
 				}
 
 				ret.add(cn);

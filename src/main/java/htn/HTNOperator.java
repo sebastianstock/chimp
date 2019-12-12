@@ -13,12 +13,17 @@ import java.util.List;
 public class HTNOperator extends PlanReportroryItem {
 
 	
-	public HTNOperator(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
+	public HTNOperator(String taskname, String[] arguments, IntArg[] intArgs, HTNPrecondition[] preconditions,
 			EffectTemplate[] effects, int preferenceWeight) {
 		
-		super(taskname, arguments, preconditions, effects, preferenceWeight);
+		super(taskname, arguments, intArgs, preconditions, effects, preferenceWeight);
 
 		this.logger = MetaCSPLogging.getLogger(HTNOperator.class);
+	}
+
+	public HTNOperator(String taskname, String[] arguments, HTNPrecondition[] preconditions,
+					   EffectTemplate[] effects, int preferenceWeight) {
+		this(taskname, arguments, new IntArg[0], preconditions, effects, preferenceWeight);
 	}
 
 	

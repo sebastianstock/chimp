@@ -2,12 +2,6 @@ package htn;
 
 import java.util.Vector;
 
-import org.metacsp.framework.VariablePrototype;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-
 
 public class HTNPrecondition {
 	
@@ -16,6 +10,8 @@ public class HTNPrecondition {
 	private String fluenttype;
 	
 	private String[] arguments;
+
+	private IntArg[] integerArguments;
 	
 	private int[] connections;
 	
@@ -26,7 +22,7 @@ public class HTNPrecondition {
 	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
 			new Vector<AdditionalConstraintTemplate>();
 	
-	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections, 
+	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections, IntArg[] intArgs,
 			int maxargs, String emptyStr, String key) {
 		this.fluenttype = fluenttype;
 		this.arguments = new String[maxargs];
@@ -37,7 +33,13 @@ public class HTNPrecondition {
 			this.arguments[i] = emptyStr;
 		}
 		this.connections = connections;
+		this.integerArguments = intArgs;
 		this.key = key;
+	}
+
+	public HTNPrecondition(String fluenttype, String[] arguments, int[] connections,
+						   int maxargs, String emptyStr, String key) {
+		this(fluenttype, arguments, connections, new IntArg[0], maxargs, emptyStr, key);
 	}
 	
 	public void setNegativeEffect(boolean isNegativeEffect) {
@@ -71,5 +73,8 @@ public class HTNPrecondition {
 	public Vector<AdditionalConstraintTemplate> getAdditionalConstraints() {
 		return additionalConstraints;
 	}
-	
+
+	public IntArg[] getIntegerArguments() {
+		return integerArguments;
+	}
 }

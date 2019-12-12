@@ -12,6 +12,7 @@ public class EffectTemplate {
 	private final String key;
 	private final String name;
 	private final String[] args;
+	private final IntArg[] intArgs;
 	private final String comp;
 	private int maxArgs;
 	
@@ -21,16 +22,21 @@ public class EffectTemplate {
 	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
 			new Vector<AdditionalConstraintTemplate>();
 	
-	public EffectTemplate(String key, String name, String[] args, int maxArgs, String component) {
+	public EffectTemplate(String key, String name, String[] args, IntArg[] intArgs, int maxArgs, String component) {
 		this.key = key;
 		this.name = name;
 		this.args = args;
+		this.intArgs = intArgs;
 		this.maxArgs = maxArgs;
 		if (component.equals("Task") && name.startsWith("!")) {
 			comp = ACTIVITY_STR;
 		} else {
 			comp = component;
 		}
+	}
+
+	public EffectTemplate(String key, String name, String[] args, int maxArgs, String component) {
+		this(key, name, args, new IntArg[0], maxArgs, component);
 	}
 	
 	private void createPrototype(FluentNetworkSolver groundSolver) {
@@ -71,5 +77,7 @@ public class EffectTemplate {
 	public String[] getInputArgs() {
 		return args;
 	}
+
+
 
 }

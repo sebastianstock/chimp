@@ -248,7 +248,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 		// Add FluentResourceConstraints
 		for (ConstraintNetwork cn :ret) {
 			for (Variable v : cn.getVariables()) {
-				if (v instanceof VariablePrototype) {
+				if (v instanceof VariablePrototype &&
+						!(((VariablePrototype) v).getParameters()[0] instanceof VariablePrototype)) {
 					String symbol = (String)((VariablePrototype) v).getParameters()[1];
 					List<ResourceUsageTemplate> rtList = resourcesTemplatesMap.get(symbol);
 					if (rtList != null) {

@@ -318,5 +318,10 @@ public class HybridDomain implements ClassicHybridDomain {
 	public int getMaxArgs() {
 		return maxArgs;
 	}
-	
+
+	@Override
+	public int getMaxIntArgs() {
+		return 0; // Not implemented for the old domain reader (use ChimpClassicReader)
+	}
+
 }

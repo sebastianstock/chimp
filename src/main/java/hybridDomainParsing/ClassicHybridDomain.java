@@ -16,6 +16,15 @@ public interface ClassicHybridDomain {
     List<FluentResourceUsageScheduler> getResourceSchedulers();
     List<ResourceUsageTemplate> getFluentResourceUsages();
 
-    int getMaxArgs(); // Maximum number of arguments of a fluent.
+    /**
+     * @return Maximum number of arguments of a fluent.
+     */
+    int getMaxArgs();
+
+    /**
+     * @return Maximum number of integer variables of a fluent
+     */
+    int getMaxIntArgs();
+
     String[] getPredicateSymbols();
 }

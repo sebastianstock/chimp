@@ -6,12 +6,14 @@ import htn.EffectTemplate;
 import htn.HTNMethod;
 import htn.HTNOperator;
 import htn.HTNPrecondition;
+import htn.IntArg;
+import htn.IntegerConstraintTemplate;
 import htn.OrderingConstraintTemplate;
 import htn.PlanReportroryItem;
 import hybridDomainParsing.ClassicHybridDomain;
-import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
+import integers.IntegerConstraint;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -41,6 +43,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                 new ArrayList<ResourceUsageTemplate>();
 
         public int maxArgs; // Maximum number of arguments of a fluent.
+        public int maxIntArgs; // Maximum number of integer variables of a fluent.
         public final List<String> predicateSymbols = new ArrayList<>();
 
         @Override
@@ -79,6 +82,12 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         }
 
         @Override
+        public int getMaxIntArgs() {
+            return maxIntArgs;
+        }
+
+
+        @Override
         public String[] getPredicateSymbols() {
             return predicateSymbols.toArray(new String[predicateSymbols.size()]);
         }
@@ -102,6 +111,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         ParsedDomain ret = new ParsedDomain();
         ret.name = visitDomain_name_def(ctx.domain_name_def());
         ret.maxArgs = visitMaxargs_def(ctx.maxargs_def());
+        ret.maxIntArgs = visitMaxintargs_def(ctx.maxintargs_def());
         maxArgs = ret.maxArgs;
         ret.predicateSymbols.addAll(visitPredicatesymbols_def(ctx.predicatesymbols_def()));
 
@@ -161,6 +171,15 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
+    public Integer visitMaxintargs_def(ChimpClassicParser.Maxintargs_defContext ctx) {
+        if (ctx.NUMBER() != null) {
+            return numberToInt(ctx.NUMBER());
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
     public List<String> visitPredicatesymbols_def(ChimpClassicParser.Predicatesymbols_defContext ctx) {
         List<String> ret = new ArrayList<>();
         for (ChimpClassicParser.Predicate_symbolContext symbolContext : ctx.predicate_symbol()) {
@@ -212,6 +231,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
         List<ParsedOrdering> parsedOrderingConstraints = new ArrayList<>();
         List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
+        List<IntegerConstraintTemplate> integerConstraintTemplates = new ArrayList<>();
         for (ChimpClassicParser.Method_elementContext d : ctx.method_element()) {
             if (d instanceof ChimpClassicParser.Precondition_m_elementContext) {
                 parsedPreconditions.add(visitPrecondition_m_element(
@@ -234,6 +254,9 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             } else if (d instanceof ChimpClassicParser.Temporal_constraint_m_elementContext) {
                 temporalConstraintTemplates.add(visitTemporal_constraint_m_element(
                         (ChimpClassicParser.Temporal_constraint_m_elementContext) d));
+            } else if (d instanceof ChimpClassicParser.Integer_constraint_m_elementContext) {
+                integerConstraintTemplates.add(visitInteger_constraint_m_element(
+                        (ChimpClassicParser.Integer_constraint_m_elementContext) d));
             } else if (d instanceof ChimpClassicParser.Subtask_def_m_elementContext) {
                 parsedSubtasks.add(visitSubtask_def_m_element(
                         (ChimpClassicParser.Subtask_def_m_elementContext) d));
@@ -243,7 +266,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             } else if (d instanceof ChimpClassicParser.Resource_usage_m_elementContext) {
                 resourceUsageTemplates.add(visitResource_usage_m_element(
                     (ChimpClassicParser.Resource_usage_m_elementContext) d));
-        }
+            }
         }
 
         HTNPrecondition[] htnPreconditions = createHTNPreconditionsAndNegativeEffects(head,
@@ -254,7 +277,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         addTemporalConstraintsToEffects(temporalConstraintTemplates, effectTemplates);
 
         OrderingConstraintTemplate[] orderingConstraints = createOrderingConstraints(parsedOrderingConstraints, effectTemplates);
-        HTNMethod method = new HTNMethod(head.name, head.args.toArray(new String[head.args.size()]),
+        HTNMethod method = new HTNMethod(head.name, head.args.toArray(new String[head.args.size()]), head.integerArgs,
                 htnPreconditions, effectTemplates, orderingConstraints, preferenceWeight);
 
         method.addVariablesPossibleValues(createVariablesValuesMap(parsedValueRestrictions));
@@ -265,6 +288,9 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
 
         // set additional constraints from head to head or between preconditions and effects
         method.setAdditionalConstraints(filterAdditionalConstraints(temporalConstraintTemplates));
+
+        method.setIntegerConstraintTemplates(
+                integerConstraintTemplates.toArray(new IntegerConstraintTemplate[integerConstraintTemplates.size()]));
 
         method.addResourceUsageTemplates(resourceUsageTemplates);
 
@@ -322,6 +348,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<ValueRestriction> parsedNotvalueRestrictions = new ArrayList<>();
         List<SubDifferentDefinition> subDifferentDefinitions = new ArrayList<>();
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
+        List<IntegerConstraintTemplate> integerConstraintTemplates = new ArrayList<>();
         List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
         for (ChimpClassicParser.Op_elementContext d : ctx.op_element()) {
             if (d instanceof ChimpClassicParser.Precondition_op_elementContext) {
@@ -351,6 +378,9 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             } else if (d instanceof ChimpClassicParser.Temporal_constraint_op_elementContext) {
                 temporalConstraintTemplates.add(visitTemporal_constraint_op_element(
                         (ChimpClassicParser.Temporal_constraint_op_elementContext) d));
+            } else if (d instanceof ChimpClassicParser.Integer_constraint_op_elementContext) {
+                integerConstraintTemplates.add(visitInteger_constraint_op_element(
+                        (ChimpClassicParser.Integer_constraint_op_elementContext) d));
             } else if (d instanceof ChimpClassicParser.Resource_usage_op_elementContext) {
                 resourceUsageTemplates.add(visitResource_usage_op_element(
                         (ChimpClassicParser.Resource_usage_op_elementContext) d));
@@ -364,7 +394,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         EffectTemplate[] effectTemplates = createEffectTemplates(parsedPositiveEffects, EFFECT_COMPONENT);
         addTemporalConstraintsToEffects(temporalConstraintTemplates, effectTemplates);
 
-        HTNOperator op = new HTNOperator(head.name, head.args.toArray(new String[head.args.size()]),
+        HTNOperator op = new HTNOperator(head.name, head.args.toArray(new String[head.args.size()]), head.integerArgs,
                 htnPreconditions, effectTemplates, preferenceWeight);
 
         op.addVariablesPossibleValues(createVariablesValuesMap(parsedValueRestrictions));
@@ -375,6 +405,9 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
 
         // set additional constraints from head to head or between preconditions and effects
         op.setAdditionalConstraints(filterAdditionalConstraints(temporalConstraintTemplates));
+
+        op.setIntegerConstraintTemplates(
+                integerConstraintTemplates.toArray(new IntegerConstraintTemplate[integerConstraintTemplates.size()]));
 
         op.addResourceUsageTemplates(resourceUsageTemplates);
 
@@ -425,6 +458,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             PredicateWithId p = parsedPredicates.get(i);
             effectTemplates[i] = new EffectTemplate(p.id, p.predicate.name,
                     p.predicate.args.toArray(new String[p.predicate.args.size()]),
+                    p.predicate.integerArgs,
                     maxArgs,
                     component);
         } return effectTemplates;
@@ -446,6 +480,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     public class Predicate {
         String name;
         List<String> args;
+        IntArg[] integerArgs;
     }
 
     public class PredicateWithId {
@@ -458,7 +493,22 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         Predicate head = new Predicate();
         head.name = visitPredicate_symbol(ctx.predicate_symbol());
         head.args = visitPredicate_args(ctx.predicate_args());
+        if (ctx.int_args_def() != null) {
+            head.integerArgs = visitInt_args_def(ctx.int_args_def());
+        }
         return head;
+    }
+
+    @Override
+    public IntArg[] visitInt_args_def(ChimpClassicParser.Int_args_defContext ctx) {
+        if (ctx == null) {
+            return new IntArg[0];
+        }
+        if (ctx.int_args() != null) {
+            return visitInt_args(ctx.int_args());
+        } else {
+            return new IntArg[0];
+        }
     }
 
     @Override
@@ -512,6 +562,11 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
+    public IntegerConstraintTemplate visitInteger_constraint_m_element(ChimpClassicParser.Integer_constraint_m_elementContext ctx) {
+        return visitInteger_constraint_def(ctx.integer_constraint_def());
+    }
+
+    @Override
     public PredicateWithId visitPrecondition_op_element(ChimpClassicParser.Precondition_op_elementContext ctx) {
         return visitPrecondition_def(ctx.precondition_def());
     }
@@ -562,6 +617,11 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
+    public IntegerConstraintTemplate visitInteger_constraint_op_element(ChimpClassicParser.Integer_constraint_op_elementContext ctx) {
+        return visitInteger_constraint_def(ctx.integer_constraint_def());
+    }
+
+    @Override
     public PredicateWithId visitPrecondition_def(ChimpClassicParser.Precondition_defContext ctx) {
         PredicateWithId ret = new PredicateWithId();
         ret.id = visitId(ctx.id());
@@ -606,6 +666,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         HTNPrecondition ret = new HTNPrecondition(parsedPrecondition.predicate.name,
                 parsedPrecondition.predicate.args.toArray(new String[parsedPrecondition.predicate.args.size()]),
                 connections,
+                parsedPrecondition.predicate.integerArgs,
                 maxArgs,
                 HybridDomain.EMPTYSTRING,
                 parsedPrecondition.id);
@@ -647,6 +708,60 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         String fromKey = ctx.id(0).getText();
         String toKey = ctx.id(1).getText();
         return new ParsedOrdering(fromKey, toKey);
+    }
+
+    @Override
+    public IntegerConstraintTemplate visitInteger_constraint_def(ChimpClassicParser.Integer_constraint_defContext ctx) {
+        if(ctx.integer_constraint1_def() != null) {
+            return visitInteger_constraint1_def(ctx.integer_constraint1_def());
+        } else {
+            return visitInteger_constraint2_def((ctx.integer_constraint2_def()));
+        }
+    }
+
+    @Override
+    public IntegerConstraintTemplate visitInteger_constraint1_def(ChimpClassicParser.Integer_constraint1_defContext ctx) {
+        String v0 = ctx.VAR_NAME().getText();
+        IntArg intArg1 = visitVar_or_int(ctx.var_or_int());
+        String op1 = visitInteger_operator1(ctx.integer_operator1());
+        String op2 = null;
+        String[] varKeys;
+        int cste = 0;
+        if (intArg1.isVariable()) {
+            varKeys = new String[] {v0, intArg1.varName};
+        } else {
+            varKeys = new String[] {v0};
+            cste = intArg1.constValue;
+        }
+        return new IntegerConstraintTemplate(IntegerConstraint.Type.ARITHM, varKeys, op1, op2, cste);
+    }
+
+    @Override
+    public IntegerConstraintTemplate visitInteger_constraint2_def(ChimpClassicParser.Integer_constraint2_defContext ctx) {
+        String v0 = ctx.VAR_NAME(0).getText();
+        String v1 = ctx.VAR_NAME(1).getText();
+        IntArg intArg2 = visitVar_or_int(ctx.var_or_int());
+        String op1 = visitInteger_operator1(ctx.integer_operator1());
+        String op2 = visitInteger_operator2(ctx.integer_operator2());
+        String[] varKeys;
+        int cste = 0;
+        if (intArg2.isVariable()) {
+            varKeys = new String[] {v0, v1, intArg2.varName};
+        } else {
+            varKeys = new String[] {v0, v1};
+            cste = intArg2.constValue;
+        }
+        return new IntegerConstraintTemplate(IntegerConstraint.Type.ARITHM, varKeys, op1, op2, cste);
+    }
+
+    @Override
+    public String visitInteger_operator1(ChimpClassicParser.Integer_operator1Context ctx) {
+        return ctx.getText();
+    }
+
+    @Override
+    public String visitInteger_operator2(ChimpClassicParser.Integer_operator2Context ctx) {
+        return ctx.getText();
     }
 
     @Override
@@ -888,6 +1003,10 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         Predicate predicate = new Predicate();
         predicate.name = ctx.NAME().getText();
         predicate.args = visitPredicate_args(ctx.predicate_args());
+        if (ctx.int_args_def() != null) {
+            predicate.integerArgs = visitInt_args_def(ctx.int_args_def());
+        }
+
         return predicate;
     }
 
@@ -898,6 +1017,24 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             predicateArgs.add(visitVar_or_const(vctx));
         }
         return predicateArgs;
+    }
+
+    @Override
+    public IntArg[] visitInt_args(ChimpClassicParser.Int_argsContext ctx) {
+        IntArg[] intArgs = new IntArg[ctx.var_or_int().size()];
+        for (int i = 0; i < ctx.var_or_int().size(); i++) {
+            intArgs[i] = visitVar_or_int(ctx.var_or_int().get(i));
+        }
+        return intArgs;
+    }
+
+    @Override
+    public IntArg visitVar_or_int(ChimpClassicParser.Var_or_intContext ctx) {
+        if (ctx.NUMBER() != null) {
+            return new IntArg(numberToInt(ctx.NUMBER()));
+        } else {
+            return new IntArg(ctx.VAR_NAME().getText());
+        }
     }
 
     @Override

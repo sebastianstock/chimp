@@ -64,6 +64,12 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMaxargs_def(ChimpClassicParser.Maxargs_defContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#maxintargs_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMaxintargs_def(ChimpClassicParser.Maxintargs_defContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ChimpClassicParser#predicatesymbols_def}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -111,6 +117,12 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitHead(ChimpClassicParser.HeadContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#int_args_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInt_args_def(ChimpClassicParser.Int_args_defContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code precondition_m_element}
 	 * labeled alternative in {@link ChimpClassicParser#method_element}.
@@ -182,6 +194,13 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOrdering_def_m_element(ChimpClassicParser.Ordering_def_m_elementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code integer_constraint_m_element}
+	 * labeled alternative in {@link ChimpClassicParser#method_element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_constraint_m_element(ChimpClassicParser.Integer_constraint_m_elementContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code precondition_op_element}
 	 * labeled alternative in {@link ChimpClassicParser#op_element}.
 	 * @param ctx the parse tree
@@ -252,6 +271,13 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVardifferent_op_element(ChimpClassicParser.Vardifferent_op_elementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code integer_constraint_op_element}
+	 * labeled alternative in {@link ChimpClassicParser#op_element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_constraint_op_element(ChimpClassicParser.Integer_constraint_op_elementContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ChimpClassicParser#precondition_def}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -281,6 +307,36 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitOrdering_constraint_def(ChimpClassicParser.Ordering_constraint_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#integer_constraint_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_constraint_def(ChimpClassicParser.Integer_constraint_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#integer_constraint1_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_constraint1_def(ChimpClassicParser.Integer_constraint1_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#integer_constraint2_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_constraint2_def(ChimpClassicParser.Integer_constraint2_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#integer_operator1}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_operator1(ChimpClassicParser.Integer_operator1Context ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#integer_operator2}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger_operator2(ChimpClassicParser.Integer_operator2Context ctx);
 	/**
 	 * Visit a parse tree produced by {@link ChimpClassicParser#temporal_constraint_def}.
 	 * @param ctx the parse tree
@@ -413,6 +469,18 @@ public interface ChimpClassicVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPredicate_args(ChimpClassicParser.Predicate_argsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#int_args}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInt_args(ChimpClassicParser.Int_argsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ChimpClassicParser#var_or_int}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVar_or_int(ChimpClassicParser.Var_or_intContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ChimpClassicParser#id}.
 	 * @param ctx the parse tree

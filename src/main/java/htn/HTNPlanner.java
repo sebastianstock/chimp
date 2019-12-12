@@ -4,6 +4,7 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomainPlanner;
+import integers.IntegerConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
@@ -122,13 +123,20 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
 			if (v instanceof VariablePrototype) {
+				VariablePrototype vp = (VariablePrototype) v;
+
+				// IntegerConstraints use different kind of variable prototype
+				if (vp.getParameters()[0] instanceof VariablePrototype) {
+					continue;
+				}
+
 				// 	Parameters for real instantiation: the first is the component 
 				//  and the second is the type, the third are the arguments of the fluent
-				String component = (String)((VariablePrototype) v).getParameters()[0];
-				String symbol = (String)((VariablePrototype) v).getParameters()[1];
+				String component = (String) vp.getParameters()[0];
+				String symbol = (String) vp.getParameters()[1];
 				Fluent fluent = (Fluent)groundSolver.createVariable(component);
 				
-				String[] arguments = (String[])((VariablePrototype) v).getParameters()[2];
+				String[] arguments = (String[]) vp.getParameters()[2];
 				fluent.setName(symbol, arguments);
 
 				fluent.setMarking(v.getMarking());
@@ -147,7 +155,13 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getCompoundSymbolicVariable();
 					} else if (con instanceof AllenIntervalConstraint){ 
 						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getAllenInterval();
-					}else {	
+					} else if (con instanceof IntegerConstraint){
+						VariablePrototype oldScopePrototype = (VariablePrototype)oldScope[i];
+						VariablePrototype oldFluentPrototype = (VariablePrototype) oldScopePrototype.getParameters()[0];
+						int intVarIndex = (int) oldScopePrototype.getParameters()[1];
+						Fluent fl = (Fluent) metaValue.getSubstitution(oldFluentPrototype);
+						newScope[i] = fl.getIntegerVariables()[intVarIndex];
+					} else {
 						newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
 					}
 				}

@@ -18,11 +18,16 @@ public class HTNMethod extends PlanReportroryItem {
 	private OrderingConstraintTemplate[] orderings;
 
 	
-	public HTNMethod(String taskName, String[] arguments, HTNPrecondition[] preconditions,
+	public HTNMethod(String taskName, String[] arguments, IntArg[] intArgs, HTNPrecondition[] preconditions,
 			EffectTemplate[] effects, OrderingConstraintTemplate[] orderings, int preferenceWeight) {
 		
-		super(taskName, arguments, preconditions, effects, preferenceWeight);
+		super(taskName, arguments, intArgs, preconditions, effects, preferenceWeight);
 		this.orderings = orderings;
+	}
+
+	public HTNMethod(String taskName, String[] arguments, HTNPrecondition[] preconditions,
+					 EffectTemplate[] effects, OrderingConstraintTemplate[] orderings, int preferenceWeight) {
+		this(taskName, arguments, new IntArg[0], preconditions, effects, orderings, preferenceWeight);
 	}
 
 
