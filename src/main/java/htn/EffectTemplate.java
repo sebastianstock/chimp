@@ -78,6 +78,7 @@ public class EffectTemplate {
 		return args;
 	}
 
-
-
+	public IntArg[] getIntArgs() {
+		return intArgs;
+	}
 }

@@ -15,6 +15,6 @@ public class IntArg {
     }
 
     public boolean isVariable() {
-        return varName == null;
+        return varName != null;
     }
 }

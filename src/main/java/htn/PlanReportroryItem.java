@@ -46,6 +46,8 @@ public abstract class PlanReportroryItem {
 	protected Map<String,String[]> variablesPossibleValuesMap = new HashMap<>();
 	protected Map<String,String[]> variablesImpossibleValuesMap;
 	protected SubDifferentDefinition[] subDifferentDefinitions;
+
+	protected Map<String, Map<String, Integer>> integerVariableOccurrencesMap;
 	
 	public static final String HEAD_KEYWORD_STRING = "task";
 	
@@ -68,6 +70,7 @@ public abstract class PlanReportroryItem {
 		this.effects = effects;
 		this.preferenceWeight = preferenceWeight;
 		createVariableOccurrencesMap();
+		createIntegerVariableOccurrencesMap();
 	}
 
 	public PlanReportroryItem(String taskname, String[] arguments, HTNPrecondition[] preconditions, 
@@ -127,6 +130,33 @@ public abstract class PlanReportroryItem {
 				occ.put(key, new Integer(i));
 				variableOccurrencesMap.put(dummyVarName, occ);
 				variablesPossibleValuesMap.put(dummyVarName, new String[] {argStrings[i]});
+			}
+		}
+	}
+
+	private void createIntegerVariableOccurrencesMap() {
+		integerVariableOccurrencesMap = new HashMap<>();
+		addIntegerVariableOccurrences(integerArguments, HEAD_KEYWORD_STRING);
+		for (HTNPrecondition pre : preconditions) {
+			addIntegerVariableOccurrences(pre.getIntegerArguments(), pre.getKey());
+		}
+		for (EffectTemplate et : effects) {
+			addIntegerVariableOccurrences(et.getIntArgs(), et.getKey());
+		}
+	}
+
+	protected void addIntegerVariableOccurrences(IntArg[] intArgs, String key) {
+		if (intArgs == null) {
+			return;
+		}
+		for (int i = 0; i < intArgs.length;  i++) {
+			if (intArgs[i].isVariable()) {
+				Map<String, Integer> occ = integerVariableOccurrencesMap.get(intArgs[i].varName);
+				if (occ == null) {
+					occ = new HashMap<String, Integer>();
+					integerVariableOccurrencesMap.put(intArgs[i].varName, occ);
+				}
+				occ.put(key, new Integer(i));
 			}
 		}
 	}
@@ -421,26 +451,113 @@ public abstract class PlanReportroryItem {
 					cn.addConstraint(resourceCon);
 				}
 
-				// add some integer constraints only for testing
-				if (taskFluent.getIntegerVariables().length > 0) {
-					IntegerConstraint ic0 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-							new IntegerVariable[]{taskFluent.getIntegerVariables()[0]},
-							"=", 77);
-					cn.addConstraint(ic0);
-					IntegerConstraint ic1 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-							new IntegerVariable[]{taskFluent.getIntegerVariables()[0], taskFluent.getIntegerVariables()[1]},
-							"+", ">=", 100);
-					cn.addConstraint(ic1);
-					// between first int variable of the task and third int variable of first effect
-					for (Entry<String, Variable> e: effKeyToVariableMap.entrySet()) {
-						VariablePrototype effectIntVar3 = new VariablePrototype(groundSolver, e.getValue(), 2);
-						IntegerConstraint icEffect = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-								new Variable[]{taskFluent.getIntegerVariables()[0], effectIntVar3},
-								"+", ">=", 1000);
-						cn.addConstraint(icEffect);
-						break;
+
+				if (groundSolver.hasIntegerConstraintSolver()) {
+					// add integer constraints from templates
+					if (integerConstraintTemplates != null) {
+						for (IntegerConstraintTemplate ict : integerConstraintTemplates) {
+							Variable[] icScope = new Variable[ict.varKeys.length];
+							for (int i = 0; i < ict.varKeys.length; i++) {
+								String key = ict.varKeys[i];
+								Map<String, Integer> keyOccurrences = integerVariableOccurrencesMap.get(key);
+								if (keyOccurrences == null) {
+									throw new IllegalArgumentException(
+											"Key " + key + " is used in IntegerConstraint but it is undefined!");
+								}
+								// prefer IntegerVariables from the task
+								Integer positionInTask = keyOccurrences.get(HEAD_KEYWORD_STRING);
+								if (positionInTask != null) {
+									icScope[i] = taskFluent.getIntegerVariables()[positionInTask];
+								} else { // otherwise use first entry
+									for (Entry<String, Integer> occ : keyOccurrences.entrySet()) {
+										Variable v = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
+										if (v instanceof Fluent) {
+											icScope[i] = ((Fluent)v).getIntegerVariables()[occ.getValue()];
+										} else {
+											icScope[i] = new VariablePrototype(groundSolver, v, occ.getValue());
+										}
+										break;
+									}
+								}
+							}
+							IntegerConstraint ic = new IntegerConstraint(ict.type, icScope, ict.op1, ict.op2, ict.cste);
+							cn.addConstraint(ic);
+						}
 					}
 
+					// add ALLEQUAL integer constraint for integer variables with the same name
+					for (Map<String, Integer> occurrences : integerVariableOccurrencesMap.values()) {
+						if (occurrences.size() > 0) {
+							List<Variable> vars = new ArrayList<>(occurrences.size());
+							for (Entry<String, Integer> occ : occurrences.entrySet()) {
+								if(occ.getKey().equals(HEAD_KEYWORD_STRING)) {
+									vars.add(taskFluent.getIntegerVariables()[occ.getValue()]);
+								} else {
+									Variable v = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
+									if (v instanceof Fluent) {
+										vars.add(((Fluent)v).getIntegerVariables()[occ.getValue()]);
+									} else {
+										vars.add(new VariablePrototype(groundSolver, v, occ.getValue()));
+									}
+								}
+							}
+							cn.addConstraint(
+									new IntegerConstraint(IntegerConstraint.Type.ALLEQUAL,
+											vars.toArray(new Variable[vars.size()])));
+						}
+					}
+
+					// add IntegerConstraints for constant values
+					for (int i = 0; i < integerArguments.length; i++) {
+						if(!integerArguments[i].isVariable()) {
+							cn.addConstraint(new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+									new Variable[]{taskFluent.getIntegerVariables()[i]},
+									"=", integerArguments[i].constValue));
+						}
+					}
+					for (EffectTemplate et : effects) {
+						for (int i = 0; i < et.getIntArgs().length; i++) {
+							if (!et.getIntArgs()[i].isVariable()) {
+								Variable v = et.getPrototype(groundSolver);
+								VariablePrototype vp = new VariablePrototype(groundSolver, v, i);
+								cn.addConstraint(new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+										new Variable[]{vp}, "=", et.getIntArgs()[i].constValue));
+							}
+						}
+					}
+					for (HTNPrecondition pre : preconditions) {
+						if (pre.getIntegerArguments() != null) {
+							IntArg[] intArgs = pre.getIntegerArguments();
+							for (int i = 0; i < intArgs.length; i++) {
+								if (!intArgs[i].isVariable()) {
+									Fluent preFluent = preKeyToFluentMap.get(pre.getKey());
+									cn.addConstraint(new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+											new Variable[]{preFluent.getIntegerVariables()[i]},
+											"=", intArgs[i].constValue));
+								}
+							}
+						}
+
+					}
+
+//					// add some integer constraints only for testing
+//					IntegerConstraint ic0 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+//							new IntegerVariable[]{taskFluent.getIntegerVariables()[0]},
+//							"=", 77);
+//					cn.addConstraint(ic0);
+//					IntegerConstraint ic1 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+//							new IntegerVariable[]{taskFluent.getIntegerVariables()[0], taskFluent.getIntegerVariables()[1]},
+//							"+", ">=", 100);
+//					cn.addConstraint(ic1);
+//					// between first int variable of the task and third int variable of first effect
+//					for (Entry<String, Variable> e: effKeyToVariableMap.entrySet()) {
+//						VariablePrototype effectIntVar3 = new VariablePrototype(groundSolver, e.getValue(), 2);
+//						IntegerConstraint icEffect = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
+//								new Variable[]{taskFluent.getIntegerVariables()[0], effectIntVar3},
+//								"+", ">=", 1000);
+//						cn.addConstraint(icEffect);
+//						break;
+//					}
 				}
 
 				ret.add(cn);
@@ -527,7 +644,7 @@ public abstract class PlanReportroryItem {
 					// go though all occurrences of that variable
 					for (Entry<String, Integer> occ : occs.getValue().entrySet()) {
 
-						Variable var = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
+						Variable var = findCompoundSymbolicVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
 						int[] indices = new int[] {occ.getValue().intValue()};
 						
 						if (possibleValues != null) {
@@ -559,9 +676,10 @@ public abstract class PlanReportroryItem {
 		}
 		return ret;
 	}
-	
-	private Variable findVariable(String id, Fluent taskFluent, 
-			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
+
+	private Variable findVariable(String id, Fluent taskFluent,
+								  Map<String, Fluent> preKeyToFluentMap,
+								  Map<String, Variable> effKeyToVariableMap) {
 		Variable var = null;
 		if (id.equals(HEAD_KEYWORD_STRING)) {
 			var = taskFluent;
@@ -572,9 +690,17 @@ public abstract class PlanReportroryItem {
 		}
 
 		if (var == null) {
-			throw new IllegalArgumentException("Error in Domain. No fluent for key " 
+			throw new IllegalArgumentException("Error in Domain. No fluent for key "
 					+ id + " in " + taskname );
 		}
+
+		return var;
+	}
+	
+	private Variable findCompoundSymbolicVariable(String id, Fluent taskFluent,
+												  Map<String, Fluent> preKeyToFluentMap,
+												  Map<String, Variable> effKeyToVariableMap) {
+		Variable var = findVariable(id, taskFluent, preKeyToFluentMap, effKeyToVariableMap);
 
 		// if it is a fluent we set it directly to the compound variable
 		// if it is a prototype we do that in addResolverSub
@@ -597,12 +723,12 @@ public abstract class PlanReportroryItem {
 				Map<String, Integer> toOccs = variableOccurrencesMap.get(toKey);
 				for (Entry<String, Integer> fromEntry : fromOccs.entrySet()) {
 					
-					Variable fromVar = findVariable(fromEntry.getKey(), taskFluent, preKeyToFluentMap, 
+					Variable fromVar = findCompoundSymbolicVariable(fromEntry.getKey(), taskFluent, preKeyToFluentMap,
 							effKeyToVariableMap);
 
 					int fromIndex = fromEntry.getValue().intValue();
 					for (Entry<String, Integer> toEntry :toOccs.entrySet()) {
-						Variable toVar = findVariable(toEntry.getKey(), taskFluent, preKeyToFluentMap, 
+						Variable toVar = findCompoundSymbolicVariable(toEntry.getKey(), taskFluent, preKeyToFluentMap,
 							effKeyToVariableMap);
 						// Create SUBMATCHES constraint
 						int[] connections = new int[] {fromIndex, toEntry.getValue().intValue()};

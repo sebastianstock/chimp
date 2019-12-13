@@ -324,4 +324,14 @@ public class HybridDomain implements ClassicHybridDomain {
 		return 0; // Not implemented for the old domain reader (use ChimpClassicReader)
 	}
 
+	@Override
+	public int getMinIntValue() {
+		return 0; // Not implemented for the old domain reader (use ChimpClassicReader)
+	}
+
+	@Override
+	public int getMaxIntValue() {
+		return 0; // Not implemented for the old domain reader (use ChimpClassicReader)
+	}
+
 }

@@ -1,0 +1,54 @@
+(Problem
+
+(ArgumentSymbols
+  front back
+  transport use
+  screwposture
+  true false
+  ur5 # leftArm1 rightArm1
+  table0 table1
+  table0Area table1Area
+  powerdrill0 
+  Powerdrill
+  gearbox0
+  Gearbox
+  tucked undefined
+  nothing
+  lab1 table0ManArea table1ManArea
+  workArea1
+  HomePose homePose0
+  observe100cm_right
+  transport_mobipick
+  drive_home
+  n)
+
+(Fluent f2 Holding(ur5 nothing))
+(Constraint Release[0,0](f2))
+
+(Fluent f6 Powerdrill(powerdrill0))
+(Constraint Release[0,0](f6))
+
+(Fluent f7 Type(Powerdrill powerdrill0))
+(Constraint Release[0,0](f7))
+
+(Fluent f8 On(powerdrill0 table1))
+(Constraint Release[0,0](f8))
+
+(Fluent f9 ReachableFrom(table0 table0Area true))
+(Constraint Release[0,0](f9))
+
+(Fluent f10 ReachableFrom(table1 table1Area true))
+(Constraint Release[0,0](f10))
+
+(Fluent f11 ArmPosture(ur5 undefined))
+(Constraint Release[0,0](f11))
+
+(Fluent f12 RobotAt(lab1))
+(Constraint Release[0,0](f12))
+
+(Fluent f13 BatteryLevel())
+(Constraint Release[0,0](f13))
+
+(Task t0 move_object(powerdrill0 table0))
+
+)

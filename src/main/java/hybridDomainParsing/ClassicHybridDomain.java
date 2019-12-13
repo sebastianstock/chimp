@@ -26,5 +26,15 @@ public interface ClassicHybridDomain {
      */
     int getMaxIntArgs();
 
+    /**
+     * @return Minimum value of an integer variable
+     */
+    int getMinIntValue();
+
+    /**
+     * @return Maximum value of an integer variable
+     */
+    int getMaxIntValue();
+
     String[] getPredicateSymbols();
 }

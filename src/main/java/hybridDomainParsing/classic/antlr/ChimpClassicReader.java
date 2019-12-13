@@ -86,6 +86,16 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             return maxIntArgs;
         }
 
+        @Override
+        public int getMinIntValue() {
+            return 0; // TODO Parse this
+        }
+
+        @Override
+        public int getMaxIntValue() {
+            return 10000; // TODO Parse this
+        }
+
 
         @Override
         public String[] getPredicateSymbols() {
@@ -111,7 +121,11 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         ParsedDomain ret = new ParsedDomain();
         ret.name = visitDomain_name_def(ctx.domain_name_def());
         ret.maxArgs = visitMaxargs_def(ctx.maxargs_def());
-        ret.maxIntArgs = visitMaxintargs_def(ctx.maxintargs_def());
+        if (ctx.maxintargs_def() != null) {
+            ret.maxIntArgs = visitMaxintargs_def(ctx.maxintargs_def());
+        } else {
+            ret.maxIntArgs = 0;
+        }
         maxArgs = ret.maxArgs;
         ret.predicateSymbols.addAll(visitPredicatesymbols_def(ctx.predicatesymbols_def()));
 
@@ -495,6 +509,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         head.args = visitPredicate_args(ctx.predicate_args());
         if (ctx.int_args_def() != null) {
             head.integerArgs = visitInt_args_def(ctx.int_args_def());
+        } else {
+            head.integerArgs = new IntArg[0];
         }
         return head;
     }
@@ -1005,6 +1021,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         predicate.args = visitPredicate_args(ctx.predicate_args());
         if (ctx.int_args_def() != null) {
             predicate.integerArgs = visitInt_args_def(ctx.int_args_def());
+        } else {
+            predicate.integerArgs = new IntArg[0];
         }
 
         return predicate;

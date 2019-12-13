@@ -23,6 +23,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	
 	protected long origin;
 	protected long horizon;
+	private final boolean hasIntegerConstraintSolver;
 
 	public FluentNetworkSolver(long origin, long horizon, String[][] symbols, int[] symbolicingredients) {
 		super(new Class[] {FluentConstraint.class, AllenIntervalConstraint.class}, Fluent.class, 
@@ -30,6 +31,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 				new int[] {1, 1});
 		this.origin = origin;
 		this.horizon = horizon;
+		this.hasIntegerConstraintSolver = false;
 	}
 
 	/**
@@ -49,6 +51,7 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 				new int[] {1, 1, numIntVars});
 		this.origin = origin;
 		this.horizon = horizon;
+		this.hasIntegerConstraintSolver = true;
 	}
 
 	@Override
@@ -176,6 +179,10 @@ public class FluentNetworkSolver extends MultiConstraintSolver {
 	 */
 	public long getHorizon() {
 		return horizon;
+	}
+
+	public boolean hasIntegerConstraintSolver() {
+		return hasIntegerConstraintSolver;
 	}
 
 }

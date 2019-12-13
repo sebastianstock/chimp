@@ -34,7 +34,7 @@
 
 (PredicateSymbols
 # Robot state:
-  ArmPosture TorsoPosture RobotAt Holding At
+  ArmPosture TorsoPosture RobotAt Holding PersonAt
 # Environment state:
   On DoorState In
   Connected Type
@@ -383,7 +383,7 @@
   (Pre p0 Type(?coffeetype ?coffee))
   (Values ?coffeetype Coffee)
   (Pre p1 On(?coffee ?fromArea))
-  (Pre p2 At(?guest ?guestArea))
+  (Pre p2 PersonAt(?guest ?guestArea))
 
 #  (Values ?fromArea placingAreaEastLeftTable1 placingAreaWestLeftTable1 placingAreaNorthLeftTable2 placingAreaSouthLeftTable2)
   
