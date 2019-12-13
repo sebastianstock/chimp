@@ -25,7 +25,7 @@ public class TestPlanningWithIntegerConstraints {
     public static void main(String[] args) {
 
         String problemFile = "problems/simple_integer_problem.pdl";
-        String domainFile = "domains/demo.ddl";
+        String domainFile = "domains/simple_integer_domain.ddl";
         ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
         ChimpClassicLexer lexer = null;

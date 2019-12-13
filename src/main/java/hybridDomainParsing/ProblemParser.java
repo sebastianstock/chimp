@@ -58,8 +58,20 @@ public class ProblemParser implements CHIMPProblem {
 		
 		// create fluents
 		for (Entry<String, String> e : fluentElementsMap.entrySet()) {
-			Variable var = fluentSolver.createVariable();
-			((Fluent) var).setName(e.getValue());
+			Fluent var = (Fluent) fluentSolver.createVariable();
+			int firstClosing = e.getValue().indexOf(')') + 1;
+			String predicate = e.getValue();
+			String symbolicPart = predicate;
+			if (firstClosing != e.getValue().length()) {
+				String intPart = predicate.substring(predicate.lastIndexOf('(') + 1 , predicate.length() - 1);
+				String[] intElements = intPart.split(" ");
+				for (int i = 0; i < intElements.length; i++) {
+					var.getIntegerVariables()[i].setConstantValue(Integer.valueOf(intElements[i]));
+				}
+				symbolicPart = symbolicPart.substring(0, firstClosing);
+
+			}
+			var.setName(symbolicPart);
 			var.setMarking(HTNMetaConstraint.markings.OPEN);
 			varsMap.put(e.getKey(), var);
 		}
@@ -73,8 +85,8 @@ public class ProblemParser implements CHIMPProblem {
 			} else {
 				component = "Task";
 			}
-			Variable var = fluentSolver.createVariable(component);
-			((Fluent) var).setName(name);
+			Fluent var = (Fluent) fluentSolver.createVariable(component);
+			var.setName(name);
 			var.setMarking(HTNMetaConstraint.markings.UNPLANNED);
 			varsMap.put(e.getKey(), var);
 		}

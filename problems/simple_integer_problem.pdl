@@ -46,7 +46,7 @@
 (Fluent f12 RobotAt(lab1))
 (Constraint Release[0,0](f12))
 
-(Fluent f13 BatteryLevel())
+(Fluent f13 BatteryLevel()(100))
 (Constraint Release[0,0](f13))
 
 (Task t0 move_object(powerdrill0 table0))
