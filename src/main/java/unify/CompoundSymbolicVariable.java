@@ -11,8 +11,6 @@ import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiVariable;
 
-import cern.colt.Arrays;
-
 public class CompoundSymbolicVariable extends MultiVariable {
 
 	/**
@@ -68,7 +66,7 @@ public class CompoundSymbolicVariable extends MultiVariable {
 		}
 		Variable[] vars = this.getInternalVariables();
 		if ((arguments.length + 1) > internalVarsCount) {
-			throw new IllegalArgumentException("Number of arguments is bigger than number of internal variables:" + type + Arrays.toString(arguments));
+			throw new IllegalArgumentException("Number of arguments is bigger than number of internal variables:" + type);
 		}
 		((NameVariable) vars[0]).setConstant(type);
 		for (int i = 0; i < arguments.length; i++) {

@@ -10,9 +10,6 @@ import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 
-import cern.colt.Arrays;
-
-
 public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 
 	/**
@@ -176,7 +173,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	@Override
 	public String getEdgeLabel() {
 		if (this.type.equals(Type.SUBMATCHES)) {
-			return this.type.toString() + Arrays.toString(connections);
+			return this.type.toString();
 		} else {	
 			return this.type.toString();
 		}
