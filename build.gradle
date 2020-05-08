@@ -39,7 +39,6 @@ dependencies {
 
   //compile fileTree(dir: 'lib', include: '**/*.jar')
 
-  // This pulls in the meta-csp-framework jar
   compile 'org.metacsp:meta-csp-framework:1.3.4'
   //compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
 
@@ -47,6 +46,13 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
   compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
+
+  //compile 'net.sf.jung:jung2:2.0.1'
+  compile 'net.sf.jung:jung-graph-impl:2.0.1'
+  compile 'net.sf.jung:jung-algorithms:2.0.1'
+  compile 'net.sf.jung:jung-visualization:2.0.1'
+
+  compile 'junit:junit:4.8.1'
 }
 
 
