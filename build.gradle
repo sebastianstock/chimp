@@ -21,10 +21,6 @@ run {
   }
 }
 
-task wrapper(type: Wrapper) {
-   gradleVersion = '4.2' 
-}
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
