@@ -11,9 +11,12 @@ import htn.IntegerConstraintTemplate;
 import htn.OrderingConstraintTemplate;
 import htn.PlanReportroryItem;
 import hybridDomainParsing.ClassicHybridDomain;
+import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
 import integers.IntegerConstraint;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -25,6 +28,7 @@ import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,6 +115,20 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
 
     private int maxArgs = -1;
     private Map<String, String[]> typesInstancesMap;
+
+    public static ParsedDomain parseDomainFromFile(String domainPath, Map<String, String[]> typesInstancesMap)
+            throws DomainParsingException {
+        ChimpClassicLexer lexer = null;
+        try {
+            lexer = new ChimpClassicLexer(CharStreams.fromFileName(domainPath));
+        } catch (IOException e) {
+            throw new DomainParsingException(e.getMessage());
+        }
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        ChimpClassicParser parser = new ChimpClassicParser(tokens);
+        ChimpClassicReader visitor = new ChimpClassicReader(typesInstancesMap);
+        return visitor.visitDomain(parser.domain());
+    }
 
     public ChimpClassicReader(Map<String, String[]> typesInstancesMap) {
         this.typesInstancesMap = typesInstancesMap;

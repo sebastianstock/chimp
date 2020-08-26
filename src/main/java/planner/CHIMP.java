@@ -1,11 +1,17 @@
 package planner;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import hybridDomainParsing.ClassicHybridDomain;
+import hybridDomainParsing.classic.antlr.ChimpClassicLexer;
+import hybridDomainParsing.classic.antlr.ChimpClassicParser;
+import hybridDomainParsing.classic.antlr.ChimpClassicReader;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
@@ -69,14 +75,12 @@ public class CHIMP {
 		}
 		
 		/**
-		 * This version still uses the old HybridDomain instead of the parser based on antlr.
 		 * @param domainPath Path to the domain file.
 		 * @param problemPath Path to the problem file.
 		 */
 		public CHIMPBuilder(String domainPath, String problemPath) throws DomainParsingException {
-			this.problem = new ProblemParser(problemPath);
-			this.domain = new HybridDomain(domainPath);
-			((HybridDomain) domain).parseDomain(problem.getTypesInstancesMap());
+			this.problem = new ProblemParser(problemPath); // TODO Create problem parser with antlr
+			this.domain = ChimpClassicReader.parseDomainFromFile(domainPath, problem.getTypesInstancesMap());
 		}
 		
 		/**
