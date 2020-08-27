@@ -123,7 +123,7 @@
  (Type ?camp BaseCamp)
  (Pre p1 RobotAt(?robot1 ?area))
  (Constraint During(task,p1))
- (Pre p2 At(?camp ?area))
+ (Pre p2 PersonAt(?camp ?area))
  (Del p2)
  (Constraint Meets(p2,task))
  (Add e1 Attached(?camp ?robot))
@@ -140,7 +140,7 @@
  (Constraint During(task,p1))
  (Pre p2 Attached(?camp ?lander))
  (Del p2)
- (Pre p3 At(?lander ?area))
+ (Pre p3 PersonAt(?lander ?area))
  (Constraint Meets(p2,task))
  (Add e1 Attached(?camp ?robot))
  (Constraint Meets(task,e1))
@@ -156,7 +156,7 @@
  (Constraint During(task,p1))
  (Pre p2 Attached(?camp ?robot))
  (Del p2)
- (Add e1 At(?camp ?area))
+ (Add e1 PersonAt(?camp ?area))
  (Constraint Meets(task,e1))
  (ResourceUsage ManipulationCapacityRover 1)
 )
@@ -251,7 +251,7 @@
  (Type ?lander Lander)
  
  (Pre p1 RobotAt(?robot ?robotArea))
- (Pre p2 At(?lander ?landerArea))
+ (Pre p2 PersonAt(?lander ?landerArea))
  (VarDifferent ?robotArea ?landerArea)
 
  (Sub s1 !move_to(?rover ?landerArea))
@@ -273,7 +273,7 @@
  (Type ?lander Lander)
  
  (Pre p1 RobotAt(?robot ?area))
- (Pre p2 At(?lander ?area))
+ (Pre p2 PersonAt(?lander ?area))
 
  (Sub s1 !pickup_basecamp(?robot ?camp))
  (Constraint Equals(s1,task))

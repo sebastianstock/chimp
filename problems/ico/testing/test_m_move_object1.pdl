@@ -49,7 +49,7 @@
 #(Fluent c9 Connected(placingAreaEastRightCounterOS1 manipulationAreaEastCounterOS1))
 #(Constraint Release[0,0](c9))
 
-(Fluent f0 At(guest1 guestArea1))
+(Fluent f0 PersonAt(guest1 guestArea1))
 (Constraint Release[0,0](f0))
 
 (Fluent c10 Connected(guestArea1 manipulationAreaEastTable2))

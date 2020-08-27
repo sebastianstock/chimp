@@ -18,7 +18,7 @@
 (Fluent f1 RobotAt(rover1 landingSite1))
 (Constraint Release[0,0](f1))
 
-(Fluent f2 At(baseCamp1 landingSite1))
+(Fluent f2 ObjAt(baseCamp1 landingSite1))
 (Constraint Release[0,0](f2))
 
 (Task t0 !pickup_basecamp(rover1 baseCamp1))

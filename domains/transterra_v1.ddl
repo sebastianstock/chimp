@@ -32,7 +32,7 @@
 
 (MaxArgs 3)
 
-(PredicateSymbols At RobotAt Attached ContainerAt BatteryAt
+(PredicateSymbols ObjAt RobotAt Attached ContainerAt BatteryAt
   !create_attached_fluent !!check_empty !move_to !sample_regolith
   !transfer_sample !transfer_battery !transfer_payload !pickup_basecamp
   !tuck_arms !place_basecamp
@@ -153,8 +153,6 @@
  (Constraint During(task,p2))
  (Add e1 ContainerAt(?container ?robot2 ?level))
  (Constraint Meets(task,e1))
-    (Usage ManipulationCapacityRover 1)
-    (Param 1 rover1))
  (ResourceUsage
     (Usage ManipulationCapacityRover 1)
     (Param 2 rover1))
@@ -172,8 +170,6 @@
  (Constraint During(task,p2))
  (Add e1 BatteryAt(?battery ?robot2 ?status))
  (Constraint Meets(task,e1))
-    (Usage ManipulationCapacityRover 1)
-    (Param 1 rover1))
  (ResourceUsage
     (Usage ManipulationCapacityRover 1)
     (Param 2 rover1))
@@ -190,8 +186,6 @@
  (Constraint During(task,p2))
  (Add e1 Attached(?payload ?robot2))
  (Constraint Meets(task,e1))
-    (Usage ManipulationCapacityRover 1)
-    (Param 1 rover1))
  (ResourceUsage
     (Usage ManipulationCapacityRover 1)
     (Param 2 rover1))
@@ -204,7 +198,7 @@
  (Type ?camp BaseCamp)
  (Pre p1 RobotAt(?robot1 ?area))
  (Constraint During(task,p1))
- (Pre p2 At(?camp ?area))
+ (Pre p2 ObjAt(?camp ?area))
  (Del p2)
  (Constraint Meets(p2,task))
  (Add e1 Attached(?camp ?robot))
@@ -237,7 +231,7 @@
  (Constraint During(task,p1))
  (Pre p2 Attached(?camp ?robot))
  (Del p2)
- (Add e1 At(?camp ?area))
+ (Add e1 ObjAt(?camp ?area))
  (Constraint Meets(task,e1))
  (ResourceUsage ManipulationCapacityRover 1)
 )
