@@ -104,7 +104,7 @@ bound : NUMBER | 'INF';
 id_or_task : id | 'task';
 
 resource_usage_def : '(ResourceUsage' NAME NUMBER ')'
-                   | '(ResourceUsage' '(Usage' NAME NUMBER ')' param_item* ')';
+                   | '(ResourceUsage' usage_def param_item* ')';
 
 fluentresourceusage_def : '(FluentResourceUsage' usage_def fluent_def param_item* ')';
 

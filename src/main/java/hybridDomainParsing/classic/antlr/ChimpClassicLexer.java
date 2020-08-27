@@ -1,4 +1,4 @@
-// Generated from /home/sebastian/code/chimp/src/main/antlr/ChimpClassic.g4 by ANTLR 4.7.2
+// Generated from /home/sebastian/code/chimp/src/main/antlr/ChimpClassic.g4 by ANTLR 4.8
 package hybridDomainParsing.classic.antlr;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class ChimpClassicLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -67,8 +67,9 @@ public class ChimpClassicLexer extends Lexer {
 			"'DuringOrEquals'", "'DuringOrEqualsOrStartsOrFinishes'", "'MeetsOrOverlapsOrFinishedByOrContains'", 
 			"'ContainsOrStartedByOrOverlappedByOrMetBy'", "'EndsDuring'", "'EndsOrEndedBy'", 
 			"'StartsOrStartedBy'", "'NotBeforeAndNotAfter'", "'['", "']'", "'INF'", 
-			"'task'", "'(ResourceUsage'", "'(Usage'", "'(FluentResourceUsage'", "'(Fluent'", 
-			"'(Param'", "'(Values'", "'(NotValues'", "'(Type'", "'(NotType'", "'(VarDifferent'"
+			"'task'", "'(ResourceUsage'", "'(FluentResourceUsage'", "'(Fluent'", 
+			"'(Usage'", "'(Param'", "'(Values'", "'(NotValues'", "'(Type'", "'(NotType'", 
+			"'(VarDifferent'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -190,8 +191,8 @@ public class ChimpClassicLexer extends Lexer {
 		"<\3<\3<\3<\3<\3<\3<\3<\3<\3<\3<\3=\3=\3=\3=\3=\3=\3=\3=\3=\3=\3=\3=\3"+
 		"=\3=\3=\3=\3=\3=\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3>\3"+
 		">\3>\3>\3>\3?\3?\3@\3@\3A\3A\3A\3A\3B\3B\3B\3B\3B\3C\3C\3C\3C\3C\3C\3"+
-		"C\3C\3C\3C\3C\3C\3C\3C\3C\3D\3D\3D\3D\3D\3D\3D\3E\3E\3E\3E\3E\3E\3E\3"+
-		"E\3E\3E\3E\3E\3E\3E\3E\3E\3E\3E\3E\3E\3E\3F\3F\3F\3F\3F\3F\3F\3F\3G\3"+
+		"C\3C\3C\3C\3C\3C\3C\3C\3C\3D\3D\3D\3D\3D\3D\3D\3D\3D\3D\3D\3D\3D\3D\3"+
+		"D\3D\3D\3D\3D\3D\3D\3E\3E\3E\3E\3E\3E\3E\3E\3F\3F\3F\3F\3F\3F\3F\3G\3"+
 		"G\3G\3G\3G\3G\3G\3H\3H\3H\3H\3H\3H\3H\3H\3I\3I\3I\3I\3I\3I\3I\3I\3I\3"+
 		"I\3I\3J\3J\3J\3J\3J\3J\3K\3K\3K\3K\3K\3K\3K\3K\3K\3L\3L\3L\3L\3L\3L\3"+
 		"L\3L\3L\3L\3L\3L\3L\3L\3M\3M\3M\3N\3N\7N\u03b5\nN\fN\16N\u03b8\13N\3O"+
@@ -232,7 +233,7 @@ public class ChimpClassicLexer extends Lexer {
 		"\3\2\2\2o\u0288\3\2\2\2q\u02a9\3\2\2\2s\u02cf\3\2\2\2u\u02f8\3\2\2\2w"+
 		"\u0303\3\2\2\2y\u0311\3\2\2\2{\u0323\3\2\2\2}\u0338\3\2\2\2\177\u033a"+
 		"\3\2\2\2\u0081\u033c\3\2\2\2\u0083\u0340\3\2\2\2\u0085\u0345\3\2\2\2\u0087"+
-		"\u0354\3\2\2\2\u0089\u035b\3\2\2\2\u008b\u0370\3\2\2\2\u008d\u0378\3\2"+
+		"\u0354\3\2\2\2\u0089\u0369\3\2\2\2\u008b\u0371\3\2\2\2\u008d\u0378\3\2"+
 		"\2\2\u008f\u037f\3\2\2\2\u0091\u0387\3\2\2\2\u0093\u0392\3\2\2\2\u0095"+
 		"\u0398\3\2\2\2\u0097\u03a1\3\2\2\2\u0099\u03af\3\2\2\2\u009b\u03b2\3\2"+
 		"\2\2\u009d\u03b9\3\2\2\2\u009f\u03c3\3\2\2\2\u00a1\u03c9\3\2\2\2\u00a3"+
@@ -419,16 +420,16 @@ public class ChimpClassicLexer extends Lexer {
 		"\u034a\7q\2\2\u034a\u034b\7w\2\2\u034b\u034c\7t\2\2\u034c\u034d\7e\2\2"+
 		"\u034d\u034e\7g\2\2\u034e\u034f\7W\2\2\u034f\u0350\7u\2\2\u0350\u0351"+
 		"\7c\2\2\u0351\u0352\7i\2\2\u0352\u0353\7g\2\2\u0353\u0086\3\2\2\2\u0354"+
-		"\u0355\7*\2\2\u0355\u0356\7W\2\2\u0356\u0357\7u\2\2\u0357\u0358\7c\2\2"+
-		"\u0358\u0359\7i\2\2\u0359\u035a\7g\2\2\u035a\u0088\3\2\2\2\u035b\u035c"+
-		"\7*\2\2\u035c\u035d\7H\2\2\u035d\u035e\7n\2\2\u035e\u035f\7w\2\2\u035f"+
-		"\u0360\7g\2\2\u0360\u0361\7p\2\2\u0361\u0362\7v\2\2\u0362\u0363\7T\2\2"+
-		"\u0363\u0364\7g\2\2\u0364\u0365\7u\2\2\u0365\u0366\7q\2\2\u0366\u0367"+
-		"\7w\2\2\u0367\u0368\7t\2\2\u0368\u0369\7e\2\2\u0369\u036a\7g\2\2\u036a"+
-		"\u036b\7W\2\2\u036b\u036c\7u\2\2\u036c\u036d\7c\2\2\u036d\u036e\7i\2\2"+
-		"\u036e\u036f\7g\2\2\u036f\u008a\3\2\2\2\u0370\u0371\7*\2\2\u0371\u0372"+
-		"\7H\2\2\u0372\u0373\7n\2\2\u0373\u0374\7w\2\2\u0374\u0375\7g\2\2\u0375"+
-		"\u0376\7p\2\2\u0376\u0377\7v\2\2\u0377\u008c\3\2\2\2\u0378\u0379\7*\2"+
+		"\u0355\7*\2\2\u0355\u0356\7H\2\2\u0356\u0357\7n\2\2\u0357\u0358\7w\2\2"+
+		"\u0358\u0359\7g\2\2\u0359\u035a\7p\2\2\u035a\u035b\7v\2\2\u035b\u035c"+
+		"\7T\2\2\u035c\u035d\7g\2\2\u035d\u035e\7u\2\2\u035e\u035f\7q\2\2\u035f"+
+		"\u0360\7w\2\2\u0360\u0361\7t\2\2\u0361\u0362\7e\2\2\u0362\u0363\7g\2\2"+
+		"\u0363\u0364\7W\2\2\u0364\u0365\7u\2\2\u0365\u0366\7c\2\2\u0366\u0367"+
+		"\7i\2\2\u0367\u0368\7g\2\2\u0368\u0088\3\2\2\2\u0369\u036a\7*\2\2\u036a"+
+		"\u036b\7H\2\2\u036b\u036c\7n\2\2\u036c\u036d\7w\2\2\u036d\u036e\7g\2\2"+
+		"\u036e\u036f\7p\2\2\u036f\u0370\7v\2\2\u0370\u008a\3\2\2\2\u0371\u0372"+
+		"\7*\2\2\u0372\u0373\7W\2\2\u0373\u0374\7u\2\2\u0374\u0375\7c\2\2\u0375"+
+		"\u0376\7i\2\2\u0376\u0377\7g\2\2\u0377\u008c\3\2\2\2\u0378\u0379\7*\2"+
 		"\2\u0379\u037a\7R\2\2\u037a\u037b\7c\2\2\u037b\u037c\7t\2\2\u037c\u037d"+
 		"\7c\2\2\u037d\u037e\7o\2\2\u037e\u008e\3\2\2\2\u037f\u0380\7*\2\2\u0380"+
 		"\u0381\7X\2\2\u0381\u0382\7c\2\2\u0382\u0383\7n\2\2\u0383\u0384\7w\2\2"+

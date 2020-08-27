@@ -886,13 +886,21 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
 
         int[] resourceRequirementPositions = new int[ctx.param_item().size()];
         String[] resourceRequirements = new String[ctx.param_item().size()];
-        String resourceName = ctx.NAME().getText();
-        int usageLevel = numberToInt(ctx.NUMBER());
+        String resourceName;
+        int usageLevel;
 
-        for (int i = 0; i < ctx.param_item().size(); ++i) {
-            UsageParam param = visitParam_item(ctx.param_item(i));
-            resourceRequirementPositions[i] = param.position;
-            resourceRequirements[i] = param.paramName;
+        if (ctx.NAME() != null) {
+            resourceName = ctx.NAME().getText();
+            usageLevel = numberToInt(ctx.NUMBER());
+        } else {
+            ParsedUsage usage = visitUsage_def(ctx.usage_def());
+            resourceName = usage.resourceName;
+            usageLevel = usage.usageLevel;
+            for (int i = 0; i < ctx.param_item().size(); ++i) {
+                UsageParam param = visitParam_item(ctx.param_item(i));
+                resourceRequirementPositions[i] = param.position;
+                resourceRequirements[i] = param.paramName;
+            }
         }
         return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions,
                 resourceRequirements, usageLevel);
