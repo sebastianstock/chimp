@@ -4,11 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
@@ -39,33 +35,43 @@ public class PlanExtractor {
 		this.fluentSolver = fluentSolver;
 	}
 
-	public void printActivities() {
+	public void printActions() {
 		Writer out
 		   = new BufferedWriter(new OutputStreamWriter(System.out));
-		writeActivities(out);
+		writeActions(out);
 		try {
 			out.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public void writeActivities(Writer writer) {
-		Variable[] allFluents = fluentSolver.getVariables();
-		ArrayList<Variable> plan = new ArrayList<Variable>();
-		for (Variable var : allFluents) {
-			String component = var.getComponent();
-			if (component == null) {
-				plan.add(var);
-			}
-			else if (component.equals("Activity")) {
-				plan.add(var);
-			}
+	public void writeROSPlanFormat(Writer writer) throws IOException {
+		Fluent[] actions = getActions();
+		sortFluentsByEst(actions);
+		for (Fluent action : actions) {
+			writer.write(formatActionToROSPlan(action));
+			writer.append(LINE_SEPARATOR);
+		}
+	}
+
+	public void writeActions(Writer writer) {
+		Fluent[] actions = getActions();
+		sortFluentsByEst(actions);
+
+		for (Fluent act : actions) {
+			if (act.getComponent() != null)
+				try {
+					activityToYaml((Fluent) act, writer);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 		}
 
-		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
-		Arrays.sort(planVector, new Comparator<Variable>() {
+	}
+
+	private static void sortFluentsByEst(Fluent[] actions) {
+		Arrays.sort(actions, new Comparator<Variable>() {
 			@Override
 			public int compare(Variable o1, Variable o2) {
 				Fluent f1 = (Fluent)o1;
@@ -73,19 +79,49 @@ public class PlanExtractor {
 				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
 			}
 		});
-		
-		for (Variable act : planVector) {
-			if (act.getComponent() != null)
-				try {
-					activityToYaml((Fluent) act, writer);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
-		
 	}
-	
+
+	private static boolean fluentIsAction(Variable var) {
+		String component = var.getComponent();
+		if (component != null && component.equals("Activity")) {
+			return true;
+		}
+		return false;
+	}
+
+	private Fluent[] getActions() {
+		ArrayList<Fluent> plan = new ArrayList<Fluent>();
+		for (Variable var : fluentSolver.getVariables()) {
+			if (fluentIsAction(var)) {
+				plan.add((Fluent) var);
+			}
+		}
+		return plan.toArray(new Fluent[plan.size()]);
+	}
+
+	/**
+	 * Formats the action to ROSPlans action format:
+	 * EST: (TASKNAME ARG1 ... ARGN) [Duration]
+	 * @param action
+	 * @return
+	 */
+	private String formatActionToROSPlan(Fluent action) {
+		AllenInterval interval = action.getAllenInterval();
+		double estSeconds = ((double) interval.getEST()) / 1000;
+		double minDurationSeconds = ((double) (interval.getEET() - interval.getEST())) / 1000;
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(estSeconds);
+		sb.append(": (");
+		CompoundSymbolicVariable csv = (CompoundSymbolicVariable) action.getInternalVariables()[0];
+		sb.append(csv.getPredicateName()).append(" ");
+		sb.append(String.join(" ", csv.getGroundArgs()));
+		sb.append(") [");
+		sb.append(String.format(Locale.ROOT,"%.3f", minDurationSeconds));
+		sb.append("]");
+		return sb.toString();
+	}
+
 	private void activityToYaml(Fluent activity, Writer w) throws IOException {
 		CompoundSymbolicVariable csv = (CompoundSymbolicVariable) activity.getInternalVariables()[0];
 

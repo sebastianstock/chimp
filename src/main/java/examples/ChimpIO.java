@@ -22,7 +22,6 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
-import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
@@ -139,7 +138,7 @@ public class ChimpIO {
 		
 		PlanExtractor pex = new PlanExtractor(fluentSolver);
 //		pex.printPlan();
-		pex.printActivities();
+		pex.printActions();
 		
 		// write plan to file
 		if (outputPath != null) {
@@ -148,7 +147,8 @@ public class ChimpIO {
 			try
 			{
 				fw = new FileWriter(outputPath);
-				pex.writeActivities(fw);
+				pex.writeROSPlanFormat(fw);
+//				pex.writeActions(fw);
 				fw.flush();
 			}
 			catch ( IOException e ) {
