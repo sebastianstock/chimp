@@ -6,6 +6,7 @@ import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import org.junit.Test;
 import org.metacsp.framework.ValueOrderingH;
+import picocli.CommandLine;
 import planner.CHIMP;
 
 import java.io.BufferedReader;
@@ -40,7 +41,8 @@ public class JUnitTestCHIMPIOOutput {
     @Test
     public void testCHIMPIOMain() {
         String planPath = "testing/ChimpIO_testplan.txt";
-        ChimpIO.main(new String[] {domainFile, problemFile, planPath});
+        String[] args = new String[] {domainFile, problemFile, "-o", planPath};
+        new CommandLine(new ChimpIO()).execute(args);
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(planPath));

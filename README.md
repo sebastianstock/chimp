@@ -24,7 +24,9 @@ To test CHIMP you can try different example domains in the package examples/chim
 
 CHIMP needs a domain and a problem description in order to generate a plan. The domain contains the HTN-methods and operators and the problem contains the initial state of the world and the goal tasks.
 
-#### Command line ####
+Other examples how to use CHIMP can be found in the packages `examples` and `examples.chimp`.
+
+### Usage ###
 
 You can start CHIMP from the command line with `gradle run` followed by arguments for the domain file and the problem file, e.g.:
 
@@ -32,7 +34,20 @@ You can start CHIMP from the command line with `gradle run` followed by argument
 ./gradlew run -Dexec.args="domains/ordered_domain.ddl problems/test_m_serve_coffee_problem_1.pdl"
 ```
 
-#### Code examples ####
+The output of CHIMP's `--help` command is shown below:
+```
+Usage: chimp [-hV] [--horizon=<horizon>] [-o=<outputFile>] <domainFile>
+             <problemFile>
+Plan with CHIMP.
+      <domainFile>          The file containing the planning domain.
+      <problemFile>         The file containing the planning problem.
+  -h, --help                Show this help message and exit.
+      --horizon=<horizon>   Horizon for the temporal variables. (Default:
+                              600000)
+  -o, --output=<outputFile> Write the plan to this output file.
 
-Other examples how to use CHIMP can be found in the packages `examples` and `examples.chimp`.
+```
+
+
+
 

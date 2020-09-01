@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
+
+import picocli.CommandLine;
 
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import org.metacsp.framework.Constraint;
@@ -30,16 +33,24 @@ import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
-public class ChimpIO {
+@CommandLine.Command(name = "chimp", mixinStandardHelpOptions = true,
+		description = "Plan with CHIMP.")
+public class ChimpIO implements Callable<Integer> {
 
-	private static final boolean DRAW = false;
-	
-	private static final int HORIZON = 600000;
-	
-	public static void printUsage() {
-		System.out.println("Usage: ");
-		System.out.println("chimp domain_file problem_file [output_file]");
-	}
+	@CommandLine.Parameters(index = "0", description = "The file containing the planning domain.")
+	File domainFile;
+
+	@CommandLine.Parameters(index = "1", description = "The file containing the planning problem.")
+	File problemFile;
+
+	@CommandLine.Option(names = {"-o", "--output"}, description = "Write the plan to this output file.")
+	File outputFile;
+
+	@CommandLine.Option(names = {"--horizon"}, description = "Horizon for the temporal variables. (Default: ${DEFAULT-VALUE})")
+	private int horizon = 600000;
+
+//	@CommandLine.Option(names = {"--draw"}, description = "Draw the plan? (Default: ${DEFAULT-VALUE})")
+	private boolean draw = false;
 	
 	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
 		domain.parseDomain(planner.getTypesInstancesMap());
@@ -69,31 +80,28 @@ public class ChimpIO {
 //		planner.addMetaConstraint(mbConstraint);
 	}
 
-	public static void main(String[] args) {
-		
-		if (!checkArgs(args)) {
-			printUsage();
-			return;
+	@Override
+	public Integer call() throws Exception {
+		if (!checkFile(problemFile) || !checkFile(domainFile)) {
+			CommandLine.usage(new ChimpIO(), System.out);
+			return -1;
 		}
-		
-		String outputPath = null;
-		if (args.length > 2) {
-			outputPath = args[2];
-		}
-		
 		try {
-			
-			callCHIMP(args[0], args[1], outputPath);
+			callCHIMP();
+			return 0;
 		} catch (DomainParsingException e) {
 			System.out.println("Could not parse domain");
+			return -1;
 		}
-		
-		
+	}
+
+	public static void main(String[] args) {
+		System.exit(new CommandLine(new ChimpIO()).execute(args));
 	}
 	
-	private static void callCHIMP(String domainPath, String problemPath, String outputPath) throws DomainParsingException {
-		HybridDomain domain  = new HybridDomain(domainPath);
-		ProblemParser problemParser = new ProblemParser(problemPath);
+	private void callCHIMP() throws DomainParsingException {
+		HybridDomain domain  = new HybridDomain(domainFile.getAbsolutePath());
+		ProblemParser problemParser = new ProblemParser(problemFile.getAbsolutePath());
 		
 		int[] ingredients = new int[] {1, domain.getMaxArgs()};
 		String[][] symbols = new String[2][];
@@ -101,7 +109,7 @@ public class ChimpIO {
 		symbols[1] = problemParser.getArgumentSymbols();
 		Map<String, String[]> typesInstancesMap = problemParser.getTypesInstancesMap();
 		
-		HTNPlanner planner = new HTNPlanner(0,  HORIZON,  0, symbols, ingredients);
+		HTNPlanner planner = new HTNPlanner(0,  horizon,  0, symbols, ingredients);
 		planner.setTypesInstancesMap(typesInstancesMap);
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
 
@@ -127,7 +135,7 @@ public class ChimpIO {
 		
 		plan(planner, fluentSolver);
 		
-		if (DRAW) {
+		if (draw) {
 			planner.draw();
 			drawNetworks(fluentSolver);
 		}
@@ -141,12 +149,12 @@ public class ChimpIO {
 		pex.printActions();
 		
 		// write plan to file
-		if (outputPath != null) {
+		if (outputFile != null) {
 
 			Writer fw = null;
 			try
 			{
-				fw = new FileWriter(outputPath);
+				fw = new FileWriter(outputFile);
 				pex.writeROSPlanFormat(fw);
 //				pex.writeActions(fw);
 				fw.flush();
@@ -233,23 +241,12 @@ public class ChimpIO {
 //		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());	
 	}
 	
-	private static boolean checkArgs(String[] args) {
-		if (args.length < 2) {
-			return false;
-		}
-		else {
-			return checkFile(args[0]) && checkFile(args[1]);
-		}
-	}
-	
-	private static boolean checkFile(String arg) {
-		File f = new File(arg);
+	private static boolean checkFile(File f) {
 		if(f.exists() && !f.isDirectory()) {
 			return true;
 		} else {
-			System.out.println("File " + arg + " does not exist");
+			System.out.println("File " + f.getAbsolutePath() + " does not exist");
 			return false;
 		}
 	}
-	
 }
