@@ -10,7 +10,6 @@ import picocli.CommandLine;
 import planner.CHIMP;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -46,6 +45,8 @@ public class JUnitTestCHIMPIOOutput {
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(planPath));
+            assertEquals("; Solution found", br.readLine());
+            assertEquals("; Actions:", br.readLine());
             assertEquals("0.001: (!move_torso TorsoDownPosture) [4.000]", br.readLine());
             assertEquals("0.001: (!tuck_arms ArmTuckedPosture ArmTuckedPosture) [4.000]", br.readLine());
             assertEquals("4.002: (!move_base preManipulationAreaNorthTable1) [0.002]", br.readLine());

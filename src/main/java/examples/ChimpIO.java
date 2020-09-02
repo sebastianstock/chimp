@@ -133,7 +133,7 @@ public class ChimpIO implements Callable<Integer> {
 		
 //		planner.createInitialMeetsFutureConstraints();
 		
-		plan(planner, fluentSolver);
+		boolean result = plan(planner, fluentSolver);
 		
 		if (draw) {
 			planner.draw();
@@ -147,28 +147,11 @@ public class ChimpIO implements Callable<Integer> {
 		PlanExtractor pex = new PlanExtractor(fluentSolver);
 //		pex.printPlan();
 		pex.printActions();
-		
-		// write plan to file
 		if (outputFile != null) {
-
-			Writer fw = null;
-			try
-			{
-				fw = new FileWriter(outputFile);
-				pex.writeROSPlanFormat(fw);
-//				pex.writeActions(fw);
-				fw.flush();
-			}
-			catch ( IOException e ) {
-				System.err.println( "Could not create file" );
-			}
-			finally {
-				if ( fw != null )
-					try { fw.close(); } catch ( IOException e ) { e.printStackTrace(); }
-			}
+			pex.writePlanToFile(result, outputFile);
 		}
-		
 	}
+
 
 	private static void printPlan(FluentNetworkSolver fluentSolver) {
 		Variable[] allFluents = fluentSolver.getVariables();

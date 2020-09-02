@@ -1,9 +1,6 @@
 package hybridDomainParsing;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 import org.metacsp.framework.Constraint;
@@ -46,7 +43,31 @@ public class PlanExtractor {
 		}
 	}
 
+	public void writePlanToFile(boolean result, File outputFile) {
+		if (outputFile != null) {
+			Writer fw = null;
+			try {
+				fw = new FileWriter(outputFile);
+				if (result) {
+					fw.write("; Solution found");
+					fw.write(LINE_SEPARATOR);
+				}
+				writeROSPlanFormat(fw);
+				fw.flush();
+			}
+			catch ( IOException e ) {
+				System.err.println( "Could not create file" );
+			}
+			finally {
+				if ( fw != null )
+					try { fw.close(); } catch ( IOException e ) { e.printStackTrace(); }
+			}
+		}
+	}
+
 	public void writeROSPlanFormat(Writer writer) throws IOException {
+		writer.write("; Actions:");
+		writer.append(LINE_SEPARATOR);
 		Fluent[] actions = getActions();
 		sortFluentsByEst(actions);
 		for (Fluent action : actions) {
