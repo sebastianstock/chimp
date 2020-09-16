@@ -35,7 +35,7 @@ group = 'chimp'
 
 dependencies {
 
-  implementation group: 'org.metacsp', name: 'meta-csp-framework', version: '1.3.4'
+  implementation group: 'org.metacsp', name: 'meta-csp-framework', version: '1.3.5'
   //compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
 
   implementation group: 'info.picocli', name: 'picocli', version: '4.5.1'
