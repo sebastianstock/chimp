@@ -119,7 +119,7 @@ public class CHIMP {
 
 		/**
 		 * 
-		 * @param guess Indicates wheter the GuessOrderinMetaConstraint shall be used. Default: false 
+		 * @param guess Indicates whether the GuessOrderinMetaConstraint shall be used. Default: false
 		 * @return This {@link CHIMPBuilder}.
 		 */
 		public CHIMPBuilder guessOrdering(boolean guess) {

@@ -1,37 +1,24 @@
 package examples;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-
-import picocli.CommandLine;
-
+import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
+import htn.HTNPlanner;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
+import hybridDomainParsing.DomainParsingException;
+import hybridDomainParsing.PlanExtractor;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import htn.HTNPlanner;
-import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
-import hybridDomainParsing.ProblemParser;
-import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
+import picocli.CommandLine;
+import planner.CHIMP;
 import unify.CompoundSymbolicVariableConstraintSolver;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 @CommandLine.Command(name = "chimp", mixinStandardHelpOptions = true,
 		description = "Plan with CHIMP.")
@@ -49,36 +36,17 @@ public class ChimpIO implements Callable<Integer> {
 	@CommandLine.Option(names = {"--horizon"}, description = "Horizon for the temporal variables. (Default: ${DEFAULT-VALUE})")
 	private int horizon = 600000;
 
-//	@CommandLine.Option(names = {"--draw"}, description = "Draw the plan? (Default: ${DEFAULT-VALUE})")
+	@CommandLine.Option(names = {"--htn-unification"}, description = "Try to unify tasks with existing ones during HTN-planning. (Default: ${DEFAULT-VALUE})")
+	private boolean htnUnification = false;
+
+	@CommandLine.Option(names = {"--guess-ordering"}, description = "Indicates whether the GuessOrderingMetaConstraint shall be used. (Default: ${DEFAULT-VALUE})")
+	private boolean guessOrdering = false;
+
+	@CommandLine.Option(names = {"--print-stats"}, description = "Print statistics. (Default: ${DEFAULT-VALUE})")
+	private boolean printStats = false;
+
+//	@CommandLine.Option(names = {"--draw"}, description = "Draw the plan and search tree? (Default: ${DEFAULT-VALUE})")
 	private boolean draw = false;
-	
-	public static void initPlanner(HTNPlanner planner, HybridDomain domain) throws DomainParsingException {
-		domain.parseDomain(planner.getTypesInstancesMap());
-		
-		// init meta constraints based on domain
-//		ValueOrderingH valOH = new NewestFluentsValOH();
-		//ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
-		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
-		
-		for (FluentScheduler fs : domain.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
-		}
-		
-		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
-		}
-		
-		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
-		htnConstraint.addOperators(domain.getOperators());
-		htnConstraint.addMethods(domain.getMethods());
-		htnConstraint.setResourceUsages(domain.getFluentResourceUsages());
-		planner.addMetaConstraint(htnConstraint);
-		
-		// Not needed for transterra at the moment
-//		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimator();
-//		MoveBaseMetaConstraint mbConstraint = new MoveBaseMetaConstraint(mbEstimator);
-//		planner.addMetaConstraint(mbConstraint);
-	}
 
 	@Override
 	public Integer call() throws Exception {
@@ -98,53 +66,38 @@ public class ChimpIO implements Callable<Integer> {
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new ChimpIO()).execute(args));
 	}
-	
+
 	private void callCHIMP() throws DomainParsingException {
-		HybridDomain domain  = new HybridDomain(domainFile.getAbsolutePath());
-		ProblemParser problemParser = new ProblemParser(problemFile.getAbsolutePath());
-		
-		int[] ingredients = new int[] {1, domain.getMaxArgs()};
-		String[][] symbols = new String[2][];
-		symbols[0] =  domain.getPredicateSymbols();
-		symbols[1] = problemParser.getArgumentSymbols();
-		Map<String, String[]> typesInstancesMap = problemParser.getTypesInstancesMap();
-		
-		HTNPlanner planner = new HTNPlanner(0,  horizon,  0, symbols, ingredients);
-		planner.setTypesInstancesMap(typesInstancesMap);
-		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-
-
+		CHIMP.CHIMPBuilder builder;
+		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 		try {
-			initPlanner(planner, domain);
+			builder = new CHIMP.CHIMPBuilder(domainFile.getAbsolutePath(), problemFile.getAbsolutePath())
+					.horizon(horizon)
+					.valHeuristic(valOH)
+					.guessOrdering(guessOrdering)
+					.htnUnification(htnUnification);
 		} catch (DomainParsingException e) {
-			System.out.println("Error while parsing domain: " + e.getMessage());
 			e.printStackTrace();
 			return;
 		}
-		
-		problemParser.createState(fluentSolver, domain);
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-		
-//		MetaCSPLogging.setLevel(Level.FINE);
+		CHIMP chimp = builder.build();
+
 		MetaCSPLogging.setLevel(Level.OFF);
 		
-//		planner.createInitialMeetsFutureConstraints();
-		
-		boolean result = plan(planner, fluentSolver);
+		boolean result = chimp.generatePlan();
 		
 		if (draw) {
-			planner.draw();
-			drawNetworks(fluentSolver);
+			chimp.getPlanner().draw();
+			chimp.drawSearchSpace();
+			chimp.drawHierarchyNetwork();
+			chimp.drawPlanHierarchy(5);
 		}
-		
-//		System.out.println(planner.getDescription());
-		
-//		printPlan(fluentSolver);
-		
-		PlanExtractor pex = new PlanExtractor(fluentSolver);
+
+		if (printStats) {
+			chimp.printStats(System.out);
+		}
+
+		PlanExtractor pex = new PlanExtractor(chimp.getFluentSolver());
 //		pex.printPlan();
 		pex.printActions();
 		if (outputFile != null) {
@@ -203,25 +156,6 @@ public class ChimpIO implements Callable<Integer> {
 
 		System.out.println("Planning took "+((endTime - startTime) / 1000000) + " ms"); 
 		return result;
-	}
-	
-	public static void drawNetworks(FluentNetworkSolver fluentSolver) {
-		ConstraintNetwork cn = new ConstraintNetwork(null);
-		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
-			if (con instanceof FluentConstraint) {
-				FluentConstraint fc = (FluentConstraint) con;
-				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-					fc.getFrom().setMarking(HTNMetaConstraint.markings.UNIFIED);
-					cn.addConstraint(fc);
-				} else if (fc.getType() == FluentConstraint.Type.DC) {
-					cn.addConstraint(fc);
-				}
-			}
-		}
-		ConstraintNetwork.draw(cn);
-		
-		ConstraintNetwork.draw(fluentSolver.getConstraintNetwork());
-//		ConstraintNetwork.draw(fluentSolver.getConstraintSolvers()[1].getConstraintNetwork());	
 	}
 	
 	private static boolean checkFile(File f) {
