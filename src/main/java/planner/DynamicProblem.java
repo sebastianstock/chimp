@@ -1,11 +1,6 @@
 package planner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
@@ -65,6 +60,11 @@ public class DynamicProblem implements CHIMPProblem {
 	@Override
 	public String[] getArgumentSymbols() {
 		return argumentSymbols.toArray(new String[argumentSymbols.size()]);
+	}
+
+	@Override
+	public void addArgumentSymbols(Collection<String> symbols) {
+		argumentSymbols.addAll(symbols);
 	}
 
 	@Override

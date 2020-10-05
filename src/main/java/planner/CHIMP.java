@@ -3,9 +3,9 @@ package planner;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
+
+import htn.PlanReportroryItem;
 import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.classic.antlr.ChimpClassicLexer;
 import hybridDomainParsing.classic.antlr.ChimpClassicParser;
@@ -73,7 +73,18 @@ public class CHIMP {
 			this.domain = domain;
 			this.problem = problem;
 		}
-		
+
+		private Set<String> extractSymbolicConstants(ClassicHybridDomain domain) {
+			Set<String> constants = new HashSet<>();
+			for (PlanReportroryItem pri : domain.getOperators()) {
+				constants.addAll(pri.getSymbolicConstants());
+			}
+			for (PlanReportroryItem pri : domain.getMethods()) {
+				constants.addAll(pri.getSymbolicConstants());
+			}
+			return constants;
+		}
+
 		/**
 		 * @param domainPath Path to the domain file.
 		 * @param problemPath Path to the problem file.
@@ -81,6 +92,7 @@ public class CHIMP {
 		public CHIMPBuilder(String domainPath, String problemPath) throws DomainParsingException {
 			this.problem = new ProblemParser(problemPath); // TODO Create problem parser with antlr
 			this.domain = ChimpClassicReader.parseDomainFromFile(domainPath, problem.getTypesInstancesMap());
+			this.problem.addArgumentSymbols(extractSymbolicConstants(this.domain));
 		}
 		
 		/**

@@ -4,14 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
@@ -41,7 +35,7 @@ public class ProblemParser implements CHIMPProblem {
 	private final Map<String, String> fluentElementsMap = new HashMap<String, String>();
 	private final Map<String, String> taskElementsMap = new HashMap<String, String>();
 	private String[] problemStrs;
-	private String[] argumentSymbols;
+	private Set<String> argumentSymbols = new HashSet<>();
 	private Map<String, String[]> typesInstancesMap;
 
 
@@ -168,7 +162,7 @@ public class ProblemParser implements CHIMPProblem {
 	}
 	
 	private void parseProblem(String problem) {
-		argumentSymbols = parseArgumentSymbols(problem);
+		argumentSymbols.addAll(parseArgumentSymbols(problem));
 		typesInstancesMap = parseTypesInstancesMap(problem);
 		
 		String[] fluentStrs = HybridDomain.parseKeyword(FLUENT_KEYWORD, problem);
@@ -261,17 +255,17 @@ public class ProblemParser implements CHIMPProblem {
 		return ret;
 	}
 	
-	private static String[] parseArgumentSymbols(String everyting) {
+	private static List<String> parseArgumentSymbols(String everyting) {
 		String[] parsed = HybridDomain.parseKeyword(ARGUMENT_SYMBOLS_KEYWORD, everyting);
+		List<String> retL = new ArrayList<>();
 		if (parsed.length > 0) {
 			String[] parsedSymbols = parsed[0].split("\\s+");
-			String[] ret = Arrays.copyOf(parsedSymbols, parsedSymbols.length + 1);
-			ret[ret.length - 1] = N;
-			return ret;
+			retL.addAll(Arrays.asList(parsedSymbols));
 		} else {
 			MetaCSPLogging.getLogger(ProblemParser.class).warning("Warning: No argument symbols specified in problem!");
-			return new String[]{};
 		}
+		retL.add(N);
+		return retL;
 	}
 	
 	private Map<String, String[]> parseTypesInstancesMap(String everything) {
@@ -285,7 +279,12 @@ public class ProblemParser implements CHIMPProblem {
 
 	@Override
 	public String[] getArgumentSymbols() {
-		return argumentSymbols;
+		return argumentSymbols.toArray(new String[argumentSymbols.size()]);
+	}
+
+	@Override
+	public void addArgumentSymbols(Collection<String> symbols) {
+		argumentSymbols.addAll(symbols);
 	}
 
 	@Override

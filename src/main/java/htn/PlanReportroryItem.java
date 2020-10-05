@@ -48,6 +48,8 @@ public abstract class PlanReportroryItem {
 	protected SubDifferentDefinition[] subDifferentDefinitions;
 
 	protected Map<String, Map<String, Integer>> integerVariableOccurrencesMap;
+
+	protected List<String> symbolicConstants = new ArrayList<>();
 	
 	public static final String HEAD_KEYWORD_STRING = "task";
 	
@@ -130,6 +132,7 @@ public abstract class PlanReportroryItem {
 				occ.put(key, new Integer(i));
 				variableOccurrencesMap.put(dummyVarName, occ);
 				variablesPossibleValuesMap.put(dummyVarName, new String[] {argStrings[i]});
+				symbolicConstants.add(argStrings[i]);
 			}
 		}
 	}
@@ -870,6 +873,10 @@ public abstract class PlanReportroryItem {
 
 	public int getPreferenceWeight() {
 		return preferenceWeight;
+	}
+
+	public List<String> getSymbolicConstants() {
+		return symbolicConstants;
 	}
 
 }
