@@ -21,6 +21,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	
 	private static final long serialVersionUID = 4546697317217126280L;
 	private final List<PlanReportroryItem> operators = new ArrayList<PlanReportroryItem>();
+	private final Set<String> operatorNames = new HashSet<>();
 	private final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
 
 	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
@@ -113,7 +114,8 @@ public class HTNMetaConstraint extends MetaConstraint {
 		
 		for (Variable var : problematicNetwork.getVariables()) {
 			Fluent taskFluent = (Fluent) var;
-			if (taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0].charAt(0) == '!') {
+			String taskName = taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0];
+			if (operatorNames.contains(taskName)) {
 				if (tryUnification) {
 					ret.addAll(unifyTasks(taskFluent, groundSolver));
 				}
@@ -302,6 +304,9 @@ public class HTNMetaConstraint extends MetaConstraint {
 
 	public void addOperators(List<PlanReportroryItem> operators) {
 		this.operators.addAll(operators);
+		for (PlanReportroryItem op : operators) {
+			operatorNames.add(op.getName());
+		}
 	}
 	
 	public void addMethods(List<PlanReportroryItem> methods) {
@@ -310,6 +315,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	
 	public void addOperator(PlanReportroryItem o) {
 		operators.add(o);
+		operatorNames.add(o.getName());
 	}
 	
 	public void addMethod(PlanReportroryItem m) {
