@@ -2,6 +2,7 @@ package htn;
 
 import java.util.Vector;
 
+import fluentSolver.Fluent;
 import org.metacsp.framework.VariablePrototype;
 
 import fluentSolver.FluentNetworkSolver;
@@ -13,10 +14,8 @@ public class EffectTemplate {
 	private final String name;
 	private final String[] args;
 	private final IntArg[] intArgs;
-	private final String comp;
+	private String comp;
 	private int maxArgs;
-	
-	private static final String ACTIVITY_STR = "Activity";
 	
 	private VariablePrototype prototype = null;
 	private final Vector<AdditionalConstraintTemplate> additionalConstraints = 
@@ -28,8 +27,8 @@ public class EffectTemplate {
 		this.args = args;
 		this.intArgs = intArgs;
 		this.maxArgs = maxArgs;
-		if (component.equals("Task") && name.startsWith("!")) {
-			comp = ACTIVITY_STR;
+		if (component.equals("Task") && name.startsWith("!")) { // this is updated later in the parser when all operator names are known
+			setComponentToActivity();
 		} else {
 			comp = component;
 		}
@@ -80,5 +79,13 @@ public class EffectTemplate {
 
 	public IntArg[] getIntArgs() {
 		return intArgs;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setComponentToActivity() {
+		comp = Fluent.ACTIVITY_TYPE_STR;
 	}
 }

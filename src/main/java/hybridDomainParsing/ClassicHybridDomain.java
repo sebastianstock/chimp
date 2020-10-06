@@ -5,7 +5,9 @@ import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public interface ClassicHybridDomain {
 
@@ -37,4 +39,6 @@ public interface ClassicHybridDomain {
     int getMaxIntValue();
 
     String[] getPredicateSymbols();
+
+    Set<String> getOperatorNames();
 }

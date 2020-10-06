@@ -29,10 +29,7 @@ import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ChimpClassicReader implements ChimpClassicVisitor {
 
@@ -100,10 +97,32 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             return 10000; // TODO Parse this
         }
 
-
         @Override
         public String[] getPredicateSymbols() {
             return predicateSymbols.toArray(new String[predicateSymbols.size()]);
+        }
+
+        @Override
+        public Set<String> getOperatorNames() {
+            Set<String> operatorNames = new HashSet<>();
+            for (PlanReportroryItem operator : operators) {
+                operatorNames.add(operator.getName());
+            }
+            return operatorNames;
+        }
+
+        /**
+         * Set the components of all method's effects to Activity iff they are planned by an operator.
+         */
+        private void upateEffectComponents() {
+            Set<String> operatorNames = getOperatorNames();
+            for (PlanReportroryItem method : methods) {
+                for (EffectTemplate effect : method.getEffects()) {
+                    if (operatorNames.contains(effect.getName())) {
+                        effect.setComponentToActivity();
+                    }
+                }
+            }
         }
     }
 
@@ -163,6 +182,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                         (ChimpClassicParser.Domain_item_fluentresourceusageContext) d));
             }
         }
+        ret.upateEffectComponents();
         return ret;
     }
 

@@ -4,11 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.meta.MetaConstraint;
@@ -334,4 +331,12 @@ public class HybridDomain implements ClassicHybridDomain {
 		return 0; // Not implemented for the old domain reader (use ChimpClassicReader)
 	}
 
+	@Override
+	public Set<String> getOperatorNames() {
+		Set<String> operatorNames = new HashSet<>();
+		for (PlanReportroryItem operator : operators) {
+			operatorNames.add(operator.getName());
+		}
+		return operatorNames;
+	}
 }

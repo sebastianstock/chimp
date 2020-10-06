@@ -879,4 +879,7 @@ public abstract class PlanReportroryItem {
 		return symbolicConstants;
 	}
 
+	public EffectTemplate[] getEffects() {
+		return effects;
+	}
 }

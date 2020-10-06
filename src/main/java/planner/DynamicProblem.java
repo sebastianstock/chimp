@@ -86,11 +86,13 @@ public class DynamicProblem implements CHIMPProblem {
 			fl.setMarking(HTNMetaConstraint.markings.OPEN);
 			System.out.println("Created state fluent " + fl.toString());
 		}
-		
+
+		Set<String> operatorNames = domain.getOperatorNames();
+
 		for (FluentPrototype p : taskVars) {
 			String component;
-			if (p.predicate.startsWith("!")) {
-				component = "Activity";
+			if (operatorNames.contains(p.predicate)) {
+				component = Fluent.ACTIVITY_TYPE_STR;
 			} else {
 				component = "Task";
 			}

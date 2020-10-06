@@ -1,22 +1,5 @@
 package planner;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
-
-import htn.PlanReportroryItem;
-import hybridDomainParsing.ClassicHybridDomain;
-import hybridDomainParsing.classic.antlr.ChimpClassicLexer;
-import hybridDomainParsing.classic.antlr.ChimpClassicParser;
-import hybridDomainParsing.classic.antlr.ChimpClassicReader;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 import externalPathPlanning.MoveBaseDurationEstimator;
@@ -26,17 +9,27 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
+import htn.PlanReportroryItem;
 import htn.guessOrdering.GuessOrderingMetaConstraint;
 import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
+import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
+import hybridDomainParsing.classic.antlr.ChimpClassicReader;
+import org.metacsp.framework.Constraint;
+import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ValueOrderingH;
+import org.metacsp.framework.Variable;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import ui.PlanHierarchyFrame;
 import unify.CompoundSymbolicVariableConstraintSolver;
+
+import java.awt.*;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * A wrapper for the HTN-Planner that bundles the features of the planner CHIMP.
@@ -217,7 +210,7 @@ public class CHIMP {
 			}
 		}
 		for (Fluent f : g.getVertices()) {
-			if (!f.getName().startsWith("!"))
+			if (f.getTypeStr().equals(Fluent.ACTIVITY_TYPE_STR))
 				f.setColor(Color.BLUE);
 			else
 				f.setColor(Color.RED);

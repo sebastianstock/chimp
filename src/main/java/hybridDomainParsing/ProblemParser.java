@@ -69,15 +69,16 @@ public class ProblemParser implements CHIMPProblem {
 			var.setMarking(HTNMetaConstraint.markings.OPEN);
 			varsMap.put(e.getKey(), var);
 		}
-		
+
+		Set<String> operatorNames = domain.getOperatorNames();
 		// create tasks
 		for (Entry<String, String> e : taskElementsMap.entrySet()) {
 			String name = e.getValue();
 			String component;
-			if (name.startsWith("!")) {
-				component = "Activity";
+			if (operatorNames.contains(name)) {
+				component = Fluent.ACTIVITY_TYPE_STR;
 			} else {
-				component = "Task";
+				component = Fluent.TASK_TYPE_STR;
 			}
 			Fluent var = (Fluent) fluentSolver.createVariable(component);
 			var.setName(name);
