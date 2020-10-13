@@ -1,0 +1,19 @@
+(Problem
+
+(ArgumentSymbols
+lab1
+lab1area
+nothing
+undef
+ur5
+n)
+
+(Fluent f1 arm_posture(ur5 undef))
+(Constraint Release[0,0](f1))
+(Fluent f2 robot_at(lab1))
+(Constraint Release[0,0](f2))
+(Fluent f3 holding(ur5 nothing))
+(Constraint Release[0,0](f3))
+
+(Task t4 drive(lab1area))
+)
