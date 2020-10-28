@@ -52,9 +52,9 @@
 # Robot is holding nothing: tuck arm
 (:method
  (Head drive(?to_area))
- #(Pre p0 holding(ur5 nothing))
- #(Pre p1 robot_at(?from_area))
- #(VarDifferent ?to_area ?from_area)
+ (Pre p0 holding(ur5 nothing))
+ (Pre p1 robot_at(?from_area))
+ (VarDifferent ?to_area ?from_area)
  (Sub s1 adapt_arm(ur5 tucked))
  (Constraint Starts(s1,task))
  (Sub s2 move_base(?from_area ?to_area))
