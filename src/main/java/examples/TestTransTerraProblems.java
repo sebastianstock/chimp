@@ -29,7 +29,7 @@ import htn.valOrderingHeuristics.UnifyEarlisttasksValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
+import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;

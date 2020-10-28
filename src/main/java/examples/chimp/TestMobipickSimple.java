@@ -7,7 +7,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.multi.TCSP.DistanceConstraint;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
 import org.metacsp.time.APSPSolver;
@@ -16,7 +15,6 @@ import org.metacsp.time.TimePoint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import planner.CHIMP;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -87,62 +85,33 @@ public class TestMobipickSimple {
                     (AllenIntervalNetworkSolver) chimp.getFluentSolver().getConstraintSolvers()[1];
             APSPSolver apspSolver = (APSPSolver) aiSolver.getConstraintSolvers()[0];
 
-//            ConstraintNetwork.draw(aiSolver.getConstraintNetwork());
-//            ConstraintNetwork.draw(apspSolver.getConstraintNetwork());
-
-            AllenInterval ai2 = (AllenInterval) aiSolver.getVariable(3);
-            System.out.println("ai2: " + ai2.toString());
-            TimePoint tp2Start = ai2.getStart();
-            TimePoint tp2End = ai2.getEnd();
-            System.out.println("tp2Start " + tp2Start.toString());
-            System.out.println("tp2End " + tp2End.toString());
-//            apspSolver.getConstraintNetwork().getDe
-
             // Copy temporal constraint network to dummy cn
+            ConstraintNetwork cn = (ConstraintNetwork) apspSolver.getConstraintNetwork().clone();
 
-            ConstraintNetwork cn = new ConstraintNetwork(null);
-            for (Constraint con : apspSolver.getConstraints()) {
-                cn.addConstraint(con);
-            }
-
+            // [0,0]-constraints are relevant in both directions, therefore we also need edges in both directions
             // add reverse constraints for constraints [0,0]-constraints from end-timepoint to end-timepoint
             List<SimpleDistanceConstraint> additionalConsList = new ArrayList<>();
-            for (Constraint con : apspSolver.getConstraints()) {
+            for (Constraint con : cn.getConstraints()) {
                 SimpleDistanceConstraint dst = (SimpleDistanceConstraint) con;
-                if ((dst.getFrom().getID() % 2) == 1 && (dst.getTo().getID() % 2) == 1 &&
+                if (isEndpoint(dst.getFrom()) && isEndpoint(dst.getTo()) &&
                         dst.getMinimum() == 0 && dst.getMaximum() == 0) {
-                    SimpleDistanceConstraint reverseCon = new SimpleDistanceConstraint();
-                    reverseCon.setMinimum(0);
-                    reverseCon.setMaximum(0);
-                    reverseCon.setFrom(dst.getTo());
-                    reverseCon.setTo(dst.getFrom());
-                    additionalConsList.add(reverseCon);
+                    additionalConsList.add(createReverseConstraint(dst));
                 }
             }
-
             cn.addConstraints(additionalConsList.toArray(new SimpleDistanceConstraint[additionalConsList.size()]));
 
+            // replace fluents that are not activities
             for (Variable v : chimp.getFluentSolver().getVariables()) {
                 Fluent fl = (Fluent) v;
-                if (fl.getTypeStr().equals(Fluent.ACTIVITY_TYPE_STR))
-                    continue;
-
-                TimePoint start = fl.getAllenInterval().getStart();
-                List<SimpleDistanceConstraint> replacingStart = replaceNode(cn, start);
-                for (SimpleDistanceConstraint con : replacingStart) {
-                    cn.addConstraint(con);
-                    additionalConsList.add(con);
-                }
-
-                TimePoint end = fl.getAllenInterval().getEnd();
-                List<SimpleDistanceConstraint> replacingEnd = replaceNode(cn, end);
-                for (SimpleDistanceConstraint con : replacingEnd) {
-                    cn.addConstraint(con);
-                    additionalConsList.add(con);
+                if (!fl.isActivity()) {
+                    TimePoint start = fl.getAllenInterval().getStart();
+                    additionalConsList.addAll(replaceNode(cn, start));
+                    TimePoint end = fl.getAllenInterval().getEnd();
+                    additionalConsList.addAll(replaceNode(cn, end));
                 }
             }
 
-            System.out.println("Before adding " + additionalConsList.size() + " constraints");
+            System.out.println("Adding " + additionalConsList.size() + " constraints");
             boolean success = apspSolver.addConstraints(
                     additionalConsList.toArray(new SimpleDistanceConstraint[additionalConsList.size()]));
             System.out.println("Success? " + success);
@@ -159,6 +128,7 @@ public class TestMobipickSimple {
             System.out.println("Searching for 14-12: " + apspSolver.getConstraint(tp14, tp12).toString());
             System.out.println("Searching for 15-12: " + apspSolver.getConstraint(tp15, tp12).toString());
 //            System.out.println(apspSolver.getConstraint(tp12, tp14).toString());
+//            System.out.println("Searching for 13-12: " + apspSolver.getConstraint(tp13, tp12).toString());
 
             for (Constraint con : apspSolver.getConstraintNetwork().getConstraints()) {
                 SimpleDistanceConstraint dstCon = (SimpleDistanceConstraint) con;
@@ -169,17 +139,31 @@ public class TestMobipickSimple {
                 }
             }
 
-
-//            Fluent torsoassume = (Fluent) chimp.getFluentSolver().getConstraintNetwork().getVariable(17);
-//            System.out.println("torsoassume: " + torsoassume.toString());
-//            System.out.println("tmporal var id: " + torsoassume.getTemporalVariable().getID());
-//            AllenInterval torsoAllen = torsoassume.getTemporalVariable();
-//            Constraint[] edges = torsoassume.getTemporalVariable().getConstraintSolver().getConstraintNetwork().getIncidentEdges(torsoassume);
-//            System.out.println(edges.length);
         }
 
 
 
+    }
+
+    //
+
+    /**
+     * Check if the temporal variable represents a start or end point.
+     *
+     * Assumes that ids of endpoints are odd.
+     * @return true if the temporal variable is a endpoint, false if it as startpoint
+     */
+    private static boolean isEndpoint(Variable var) {
+        return (var.getID() % 2) == 1;
+    }
+
+    private static SimpleDistanceConstraint createReverseConstraint(SimpleDistanceConstraint con) {
+        SimpleDistanceConstraint reverseCon = new SimpleDistanceConstraint();
+        reverseCon.setMinimum(con.getMinimum());
+        reverseCon.setMaximum(con.getMaximum());
+        reverseCon.setFrom(con.getTo());
+        reverseCon.setTo(con.getFrom());
+        return reverseCon;
     }
 
 //    private static void replaceTimepoint(ConstraintNetwork cn, TimePoint start) {
@@ -224,13 +208,13 @@ public class TestMobipickSimple {
                     System.out.println("Found self-constraint: " + sumDistCon.toString());
                 } else {
                     newConstraints.add(sumDistCon);
+                    cn.addConstraint(sumDistCon);
                 }
 
 //                System.out.println("Replacement for " + inDistCon.toString() + " and " + outDistCon.toString() + ":");
 //                System.out.println("   -> " + sumDistCon.toString());
             }
         }
-
         System.out.println();
         return newConstraints;
     }

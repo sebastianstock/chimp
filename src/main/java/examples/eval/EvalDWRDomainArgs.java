@@ -35,7 +35,7 @@ import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
+import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;

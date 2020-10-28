@@ -25,7 +25,7 @@ import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.DeepestFewestsubsNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
-import hybridDomainParsing.PlanExtractor;
+import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;

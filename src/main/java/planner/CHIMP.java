@@ -15,7 +15,7 @@ import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.PlanExtractor;
+import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.classic.antlr.ChimpClassicReader;
 import org.metacsp.framework.Constraint;

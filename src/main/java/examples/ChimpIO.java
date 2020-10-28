@@ -5,7 +5,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import hybridDomainParsing.PlanExtractor;
+import postprocessing.PlanExtractor;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;

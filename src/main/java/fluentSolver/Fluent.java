@@ -145,4 +145,11 @@ public class Fluent extends MultiVariable implements Activity{
 		}
 	}
 
+	/**
+	 * @return true if this Fluent represents an activity
+	 */
+	public boolean isActivity() {
+		return getTypeStr().equals(ACTIVITY_TYPE_STR);
+	}
+
 }
