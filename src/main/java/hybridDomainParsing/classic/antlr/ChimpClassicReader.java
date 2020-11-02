@@ -831,7 +831,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     @Override
     public AllenIntervalConstraint.Type visitUnary_temporal_constraint_type(
             ChimpClassicParser.Unary_temporal_constraint_typeContext ctx) {
-        return AllenIntervalConstraint.Type.valueOf(ctx.getText());
+        return AllenIntervalConstraint.Type.valueOf(ctx.getText().split(" ")[1]);
     }
 
     @Override
