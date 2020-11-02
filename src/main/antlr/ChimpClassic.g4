@@ -81,9 +81,9 @@ integer_operator2 : '=' | '!=' | '>' | '<' | '>=' | '<=' | '+' | '-' | '*' | '/'
 
 temporal_constraint_def : unary_temporal_constraint_def | binary_temporal_constraint_def;
 
-unary_temporal_constraint_def : '(Constraint' unary_temporal_constraint_type bounds_list '(' id_or_task ')' ')';
+unary_temporal_constraint_def : unary_temporal_constraint_type bounds_list '(' id_or_task ')' ')';
 
-unary_temporal_constraint_type : 'Duration' | 'Release' | 'Deadline' | 'Forever' | 'At';
+unary_temporal_constraint_type : '(Constraint Duration' | '(Constraint Release' | '(Constraint Deadline' | '(Constraint Forever' | '(Constraint At';
 
 binary_temporal_constraint_def : '(Constraint' binary_temporal_constraint_type bounds_list '(' id_or_task ',' id_or_task ')' ')';
 
