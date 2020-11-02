@@ -47,7 +47,10 @@ dependencies {
   // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
   implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.8'
 
-  //compile 'net.sf.jung:jung2:2.0.1'
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
+  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.11.3'
+
+    //compile 'net.sf.jung:jung2:2.0.1'
   api 'net.sf.jung:jung-graph-impl:2.0.1'
   api 'net.sf.jung:jung-algorithms:2.0.1'
   api 'net.sf.jung:jung-visualization:2.0.1'

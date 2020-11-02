@@ -1,23 +1,14 @@
 package examples.chimp;
 
-import fluentSolver.Fluent;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
-import org.metacsp.time.APSPSolver;
-import org.metacsp.time.SimpleDistanceConstraint;
-import org.metacsp.time.TimePoint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import planner.CHIMP;
 import postprocessing.EsterelGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.StringWriter;
 import java.util.logging.Level;
 
 public class TestMobipickSimple {
@@ -73,16 +64,19 @@ public class TestMobipickSimple {
                     System.out.println(c++ + ".\t" + act);
             }
 
-//            chimp.printFullPlan();
+            chimp.printFullPlan();
 //            chimp.drawPlanHierarchy(100);
 //            chimp.drawHierarchyNetwork();
 //            chimp.drawSearchSpace();
 
 //            ConstraintNetwork.draw(chimp.getFluentSolver().getConstraintNetwork());
 
-            System.out.println(chimp.printDescription());
+//            System.out.println(chimp.printDescription());
 
-            EsterelGenerator.generateEsterelGraph(chimp);
+//            StringWriter sw = new StringWriter();
+//            EsterelGenerator.generateEsterelGraph(chimp, sw);
+//            System.out.println("Generated Esterel Graph:");
+//            System.out.println(sw.toString());
 
         }
 

@@ -97,7 +97,7 @@ public class PlanExtractor {
 			public int compare(Variable o1, Variable o2) {
 				Fluent f1 = (Fluent)o1;
 				Fluent f2 = (Fluent)o2;
-				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
+				return Long.compare(f1.getTemporalVariable().getEST(), f2.getTemporalVariable().getEST());
 			}
 		});
 	}

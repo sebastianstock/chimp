@@ -1,5 +1,7 @@
 package postprocessing;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import fluentSolver.Fluent;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -9,13 +11,17 @@ import org.metacsp.time.APSPSolver;
 import org.metacsp.time.SimpleDistanceConstraint;
 import org.metacsp.time.TimePoint;
 import planner.CHIMP;
+import postprocessing.estereltypes.EsterelPlan;
+import postprocessing.estereltypes.EsterelPlanNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.*;
 
 public class EsterelGenerator {
 
-    public static void generateEsterelGraph(CHIMP chimp) {
+    public static void generateEsterelGraph(CHIMP chimp, Writer writer) {
         AllenIntervalNetworkSolver aiSolver =
                 (AllenIntervalNetworkSolver) chimp.getFluentSolver().getConstraintSolvers()[1];
         APSPSolver apspSolver = (APSPSolver) aiSolver.getConstraintSolvers()[0];
@@ -24,7 +30,7 @@ public class EsterelGenerator {
         ConstraintNetwork cn = (ConstraintNetwork) apspSolver.getConstraintNetwork().clone();
 
         // [0,0]-constraints are relevant in both directions, therefore we also need edges in both directions
-        // add reverse constraints for constraints [0,0]-constraints from end-timepoint to end-timepoint
+        // Add reverse constraints for constraints [0,0]-constraints from end-timepoint to end-timepoint
         List<SimpleDistanceConstraint> additionalConsList = new ArrayList<>();
         for (Constraint con : cn.getConstraints()) {
             SimpleDistanceConstraint dst = (SimpleDistanceConstraint) con;
@@ -35,7 +41,7 @@ public class EsterelGenerator {
         }
         cn.addConstraints(additionalConsList.toArray(new SimpleDistanceConstraint[additionalConsList.size()]));
 
-        // replace fluents that are not activities
+        // Replace fluents that are not activities
         for (Variable v : chimp.getFluentSolver().getVariables()) {
             Fluent fl = (Fluent) v;
             if (!fl.isActivity()) {
@@ -46,6 +52,7 @@ public class EsterelGenerator {
             }
         }
 
+        // Add new constraints to apspSolver
         System.out.println("Adding " + additionalConsList.size() + " constraints");
         boolean success = apspSolver.addConstraints(
                 additionalConsList.toArray(new SimpleDistanceConstraint[additionalConsList.size()]));
@@ -73,6 +80,67 @@ public class EsterelGenerator {
                 System.out.println(dstCon.toString());
             }
         }
+
+        // Create Esterel Graph:
+
+        // Create map/array TimepointId -> FluentId
+        System.out.println("Creating timePointActivityMap");
+        Map<TimePoint, Fluent> timePointActivityMap = new HashMap<>();
+        for (Variable activityVar : chimp.getFluentSolver().getVariables(Fluent.ACTIVITY_TYPE_STR))  {
+            Fluent activity = (Fluent) activityVar;
+            timePointActivityMap.put(activity.getAllenInterval().getStart(), activity);
+            timePointActivityMap.put(activity.getAllenInterval().getEnd(), activity);
+            System.out.println("Added " + activity.toString());
+        }
+
+        // Write nodes
+        TimePoint[] tps = new TimePoint[timePointActivityMap.keySet().size() + 2];
+        tps[0] = apspSolver.getSource();
+        tps[tps.length-1] = apspSolver.getSink();
+        int pos = 1;
+        for (TimePoint tp : timePointActivityMap.keySet()) {
+            tps[pos++] = tp;
+        }
+
+        Arrays.sort(tps, new Comparator<TimePoint>() {
+            @Override
+            public int compare(TimePoint t0, TimePoint t1) {
+                return Long.compare(t0.getLowerBound(), t1.getLowerBound());
+            }
+        });
+
+        System.out.println("Sorted timepoints");
+        EsterelPlan esterelPlan = new EsterelPlan();
+        for (TimePoint tp : tps) {
+            System.out.println(tp);
+            EsterelPlanNode node = new EsterelPlanNode();
+            node.name = "n";
+            node.node_type = isEndpoint(tp) ? 1 : 0;
+            node.node_id = tp.getID();
+            esterelPlan.nodes.add(node);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper(
+                new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+        try {
+            objectMapper.writeValue(writer, esterelPlan);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Write edges
+        // for two nodes check if an edge exist and write
+
+        for (int i = 0; i < tps.length; i++) {
+            for (int j = 0; j < tps.length; j++) {
+                SimpleDistanceConstraint sdc = apspSolver.getConstraint(tps[i], tps[j]);
+                if (sdc != null) {
+                    System.out.println("Found constraint: " + i + " -> " + j + " : " + sdc);
+                }
+            }
+        }
+
+
     }
 
     //
