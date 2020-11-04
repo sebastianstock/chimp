@@ -11,12 +11,12 @@ import org.metacsp.time.APSPSolver;
 import org.metacsp.time.SimpleDistanceConstraint;
 import org.metacsp.time.TimePoint;
 import planner.CHIMP;
-import postprocessing.estereltypes.EsterelPlan;
-import postprocessing.estereltypes.EsterelPlanNode;
+import postprocessing.estereltypes.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.sql.Time;
 import java.util.*;
 
 public class EsterelGenerator {
@@ -93,7 +93,24 @@ public class EsterelGenerator {
             System.out.println("Added " + activity.toString());
         }
 
+        // create ActionDispatch messages
+        Map<Fluent, ActionDispatch> fluentActionDispatchMap = new HashMap<>();
+        for (Fluent fl : timePointActivityMap.values()) {
+            ActionDispatch actionDispatch = new ActionDispatch(fl.getID(),
+                    fl.getCompoundSymbolicVariable().getPredicateName());
+            actionDispatch.duration = (fl.getAllenInterval().getEET() - fl.getAllenInterval().getEST()) / 1000;
+            String[] flArgs = fl.getCompoundSymbolicVariable().getArgs();
+            for (int i = 0; i < flArgs.length; i++) {
+                String key = "v" + i;
+                actionDispatch.parameters.add(new KeyValue(key, flArgs[i]));
+            }
+            actionDispatch.dispatch_time = fl.getAllenInterval().getEST() / 1000;
+            fluentActionDispatchMap.put(fl, actionDispatch);
+        }
+
         // Write nodes
+
+        // Create and sort array of timepoints
         TimePoint[] tps = new TimePoint[timePointActivityMap.keySet().size() + 2];
         tps[0] = apspSolver.getSource();
         tps[tps.length-1] = apspSolver.getSink();
@@ -101,7 +118,6 @@ public class EsterelGenerator {
         for (TimePoint tp : timePointActivityMap.keySet()) {
             tps[pos++] = tp;
         }
-
         Arrays.sort(tps, new Comparator<TimePoint>() {
             @Override
             public int compare(TimePoint t0, TimePoint t1) {
@@ -109,17 +125,57 @@ public class EsterelGenerator {
             }
         });
 
-        System.out.println("Sorted timepoints");
+        // add nodes to esterel paln
         EsterelPlan esterelPlan = new EsterelPlan();
-        for (TimePoint tp : tps) {
-            System.out.println(tp);
-            EsterelPlanNode node = new EsterelPlanNode();
-            node.name = "n";
-            node.node_type = isEndpoint(tp) ? 1 : 0;
-            node.node_id = tp.getID();
-            esterelPlan.nodes.add(node);
+        for (int i = 0; i < tps.length - 1; i++) {
+            TimePoint tp = tps[i];
+            if (tp.getID() == 0) {
+                EsterelPlanNode node = new EsterelPlanNode();
+                node.name = "plan_start";
+                node.node_id = 0;
+                node.node_type = 2;
+                node.action = new ActionDispatch(0, "");
+                esterelPlan.nodes.add(node);
+            } else {
+                Fluent fl = timePointActivityMap.get(tp);
+                System.out.println(tp);
+                EsterelPlanNode node = new EsterelPlanNode();
+                node.name = fl.getCompoundSymbolicVariable().getPredicateName();
+                if (isEndpoint(tp)) {
+                    node.name += "_end";
+                } else {
+                    node.name += "_start";
+                }
+                node.node_type = isEndpoint(tp) ? 1 : 0;
+                node.node_id = i;
+                node.action = fluentActionDispatchMap.get(fl);
+                esterelPlan.nodes.add(node);
+            }
         }
 
+        // the index of nodes in the esterel plan is the same as that of the corresponding timepoint in tps
+
+        // Write edges
+        // for two nodes check if an edge exist and write
+
+        int edgeIdCnt = 0;
+        for (int i = 0; i < tps.length - 1; i++) {
+            for (int j = 0; j < tps.length - 1; j++) {
+                SimpleDistanceConstraint sdc = apspSolver.getConstraint(tps[i], tps[j]);
+                if (sdc != null) {
+                    System.out.println("Found constraint: " + i + " -> " + j + " : " + sdc);
+                    // create edge
+                    int edgeId = edgeIdCnt++;
+                    EsterelPlanEdge edge = new EsterelPlanEdge(edgeId, "edge" + edgeId, i, j,
+                            sdc.getMinimum() / 1000, sdc.getMaximum() / 1000);
+                    esterelPlan.addEdge(edge);
+
+                }
+            }
+        }
+
+
+        // export esterel
         ObjectMapper objectMapper = new ObjectMapper(
                 new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
         try {
@@ -127,20 +183,6 @@ public class EsterelGenerator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Write edges
-        // for two nodes check if an edge exist and write
-
-        for (int i = 0; i < tps.length; i++) {
-            for (int j = 0; j < tps.length; j++) {
-                SimpleDistanceConstraint sdc = apspSolver.getConstraint(tps[i], tps[j]);
-                if (sdc != null) {
-                    System.out.println("Found constraint: " + i + " -> " + j + " : " + sdc);
-                }
-            }
-        }
-
-
     }
 
     //

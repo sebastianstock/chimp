@@ -193,6 +193,29 @@ public class CompoundSymbolicVariable extends MultiVariable {
 		}
 		return ret.toArray(new String[ret.size()]);
 	}
+
+	/**
+	 * Computes an array of ground arguments that are not NONESYMBOL.
+	 * @return Array of ground arguments.
+	 */
+	public String[] getArgs() {
+		Variable[] internalVars = this.getInternalVariables();
+		if (internalVars.length < 2) {
+			return noStrs;
+		}
+
+		List<String> ret = new ArrayList<String>(internalVars.length - 1);
+		for (int i = 1; i < internalVars.length; i++) {
+			NameVariable nv = (NameVariable) internalVars[i];
+			String str = nv.toString();
+			if (!str.equals(NONESYMBOL)) {
+				ret.add(str);
+			} else {
+				break;
+			}
+		}
+		return ret.toArray(new String[ret.size()]);
+	}
 	
 	// TODO: UPDATE
 //	/**

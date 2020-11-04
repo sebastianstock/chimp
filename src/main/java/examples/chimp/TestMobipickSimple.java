@@ -73,10 +73,10 @@ public class TestMobipickSimple {
 
 //            System.out.println(chimp.printDescription());
 
-//            StringWriter sw = new StringWriter();
-//            EsterelGenerator.generateEsterelGraph(chimp, sw);
-//            System.out.println("Generated Esterel Graph:");
-//            System.out.println(sw.toString());
+            StringWriter sw = new StringWriter();
+            EsterelGenerator.generateEsterelGraph(chimp, sw);
+            System.out.println("Generated Esterel Graph:");
+            System.out.println(sw.toString());
 
         }
 
