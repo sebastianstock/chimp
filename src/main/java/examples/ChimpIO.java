@@ -5,6 +5,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
+import postprocessing.EsterelGenerator;
 import postprocessing.PlanExtractor;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
@@ -14,6 +15,8 @@ import planner.CHIMP;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,6 +35,9 @@ public class ChimpIO implements Callable<Integer> {
 
 	@CommandLine.Option(names = {"-o", "--output"}, description = "Write the plan to this output file.")
 	File outputFile;
+
+	@CommandLine.Option(names = {"-e", "--esterel"}, description = "Write esterel graph to this output file.")
+	File esterelOutputFile;
 
 	@CommandLine.Option(names = {"--horizon"}, description = "Horizon for the temporal variables. (Default: ${DEFAULT-VALUE})")
 	private int horizon = 600000;
@@ -103,6 +109,17 @@ public class ChimpIO implements Callable<Integer> {
 		if (outputFile != null) {
 			pex.writePlanToFile(result, outputFile);
 		}
+
+		if (esterelOutputFile != null) {
+			try {
+				FileWriter fw = new FileWriter(esterelOutputFile);
+				EsterelGenerator.generateEsterelGraph(chimp, fw);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+
 	}
 
 

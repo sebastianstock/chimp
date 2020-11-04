@@ -53,7 +53,6 @@ public class EsterelGenerator {
                 esterelPlan.nodes.add(node);
             } else {
                 Fluent fl = timePointActivityMap.get(tp);
-                System.out.println(tp);
                 EsterelPlanNode node = new EsterelPlanNode();
                 node.name = fl.getCompoundSymbolicVariable().getPredicateName();
                 if (isEndpoint(tp)) {
@@ -75,7 +74,6 @@ public class EsterelGenerator {
             for (int j = 0; j < tps.length - 1; j++) {  // horizon tp is last in tps and can be ignored
                 SimpleDistanceConstraint sdc = apspSolver.getConstraint(tps[i], tps[j]);
                 if (sdc != null) {
-                    System.out.println("Found constraint: " + i + " -> " + j + " : " + sdc);
                     // create edge
                     int edgeId = edgeIdCnt++;
                     EsterelPlanEdge edge = new EsterelPlanEdge(edgeId, "edge" + edgeId, i, j,
@@ -203,7 +201,6 @@ public class EsterelGenerator {
     }
 
     public static List<SimpleDistanceConstraint> replaceNode(ConstraintNetwork cn, TimePoint tp) {
-        System.out.println("## Replacing " + tp.toString());
         List<SimpleDistanceConstraint> newConstraints = new ArrayList<>();
         for (Constraint inConstraint : cn.getIngoingEdges(tp)) {
             SimpleDistanceConstraint inDistCon = (SimpleDistanceConstraint) inConstraint;
@@ -227,7 +224,7 @@ public class EsterelGenerator {
                 sumDistCon.setFrom(inDistCon.getFrom());
                 sumDistCon.setTo(outDistCon.getTo());
                 if(sumDistCon.getFrom().getID() == sumDistCon.getTo().getID()) {
-                    System.out.println("Found self-constraint: " + sumDistCon.toString());
+//                    System.out.println("Found self-constraint: " + sumDistCon.toString());
                 } else {
                     newConstraints.add(sumDistCon);
                     cn.addConstraint(sumDistCon);
@@ -237,7 +234,6 @@ public class EsterelGenerator {
 //                System.out.println("   -> " + sumDistCon.toString());
             }
         }
-        System.out.println();
         return newConstraints;
     }
 }

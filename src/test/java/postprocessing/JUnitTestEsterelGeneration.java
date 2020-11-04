@@ -29,7 +29,7 @@ public class JUnitTestEsterelGeneration {
             chimp.printStats(System.out);
             StringWriter sw = new StringWriter();
             EsterelGenerator.generateEsterelGraph(chimp, sw);
-
+            // TODO check output
         } catch (DomainParsingException e) {
             e.printStackTrace();
             assertFalse(true);
