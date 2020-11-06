@@ -9,6 +9,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
+import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
@@ -237,6 +238,13 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	public FluentNetworkSolver getFluentNetworkSolver() {
 		return (FluentNetworkSolver) getConstraintSolvers()[0];
 	}
-	
+
+	public HTNMetaConstraint getHTNMetaConstraint() {
+		for (MetaConstraint mc : getMetaConstraints()) {
+			if (mc instanceof HTNMetaConstraint)
+				return (HTNMetaConstraint) mc;
+		}
+		return null;
+	}
 
 }

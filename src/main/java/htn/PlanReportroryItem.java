@@ -882,4 +882,8 @@ public abstract class PlanReportroryItem {
 	public EffectTemplate[] getEffects() {
 		return effects;
 	}
+
+	public String[] getStringArgumentNames() {
+		return arguments;
+	}
 }

@@ -357,4 +357,11 @@ public class HTNMetaConstraint extends MetaConstraint {
 		this.tryUnification = true;	
 	}
 
+	public List<PlanReportroryItem> getOperators() {
+		return operators;
+	}
+
+	public List<PlanReportroryItem> getMethods() {
+		return methods;
+	}
 }

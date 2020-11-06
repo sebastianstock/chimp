@@ -4,6 +4,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import htn.HTNMetaConstraint;
+import htn.HTNOperator;
+import htn.HTNPlanner;
+import htn.PlanReportroryItem;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
@@ -22,6 +26,7 @@ import java.util.*;
 public class EsterelGenerator {
 
     public static void generateEsterelGraph(CHIMP chimp, Writer writer) {
+
         FluentNetworkSolver fluentSolver = chimp.getFluentSolver();
         List<SimpleDistanceConstraint> additionalConsList = calcAdditionalConstraints(fluentSolver);
 
@@ -35,7 +40,7 @@ public class EsterelGenerator {
         Map<TimePoint, Fluent> timePointActivityMap = getTimePointActivityMap(fluentSolver);
 
         // create ActionDispatch messages
-        Map<Fluent, ActionDispatch> fluentActionDispatchMap = getFluentActionDispatchMap(timePointActivityMap);
+        Map<Fluent, ActionDispatch> fluentActionDispatchMap = getFluentActionDispatchMap(timePointActivityMap, chimp);
 
         // Create and sort array of timepoints
         TimePoint[] tps = createSortedActivityTimepoints(apspSolver, timePointActivityMap);
@@ -110,15 +115,28 @@ public class EsterelGenerator {
         return tps;
     }
 
-    public static Map<Fluent, ActionDispatch> getFluentActionDispatchMap(Map<TimePoint, Fluent> timePointActivityMap) {
+    public static Map<Fluent, ActionDispatch> getFluentActionDispatchMap(Map<TimePoint, Fluent> timePointActivityMap,
+                                                                         CHIMP chimp) {
+        // we need the operators to get the names of the actions' arguments
+        List<PlanReportroryItem> operators = chimp.getPlanner().getHTNMetaConstraint().getOperators();
+        Map<String, PlanReportroryItem> nameOperatorMap = new HashMap<>();
+        for (PlanReportroryItem op : operators) {
+            nameOperatorMap.put(op.getName(), op);
+        }
+
         Map<Fluent, ActionDispatch> fluentActionDispatchMap = new HashMap<>();
         for (Fluent fl : timePointActivityMap.values()) {
-            ActionDispatch actionDispatch = new ActionDispatch(fl.getID(),
-                    fl.getCompoundSymbolicVariable().getPredicateName());
+            String actionName= fl.getCompoundSymbolicVariable().getPredicateName();
+            ActionDispatch actionDispatch = new ActionDispatch(fl.getID(), actionName);
             actionDispatch.duration = (fl.getAllenInterval().getEET() - fl.getAllenInterval().getEST()) / 1000;
+            String[] opArgNames = nameOperatorMap.get(actionName).getStringArgumentNames();
             String[] flArgs = fl.getCompoundSymbolicVariable().getArgs();
             for (int i = 0; i < flArgs.length; i++) {
-                String key = "v" + i;
+                String key = opArgNames[i];
+                // remove leading '?'
+                if (key.length() > 0 && key.charAt(0) == '?') {
+                    key = key.substring(1);
+                }
                 actionDispatch.parameters.add(new KeyValue(key, flArgs[i]));
             }
             actionDispatch.dispatch_time = fl.getAllenInterval().getEST() / 1000;
