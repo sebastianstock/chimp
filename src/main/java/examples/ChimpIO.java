@@ -105,12 +105,14 @@ public class ChimpIO implements Callable<Integer> {
 
 		PlanExtractor pex = new PlanExtractor(chimp.getFluentSolver());
 //		pex.printPlan();
-		pex.printActions();
+		if(result) {
+			pex.printActions();
+		}
 		if (outputFile != null) {
 			pex.writePlanToFile(result, outputFile);
 		}
 
-		if (esterelOutputFile != null) {
+		if (esterelOutputFile != null && result) {
 			try {
 				FileWriter fw = new FileWriter(esterelOutputFile);
 				EsterelGenerator.generateEsterelGraph(chimp, fw);

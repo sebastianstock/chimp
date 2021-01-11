@@ -51,8 +51,10 @@ public class PlanExtractor {
 				if (result) {
 					fw.write("; Solution found");
 					fw.write(LINE_SEPARATOR);
+					writeROSPlanFormat(fw);
+				} else {
+					fw.write("; Could not find a solution");
 				}
-				writeROSPlanFormat(fw);
 				fw.flush();
 			}
 			catch ( IOException e ) {
