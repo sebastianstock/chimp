@@ -308,8 +308,6 @@ public class CHIMP {
 			ps.println("#Compound Tasks: " + mCount);
 			ps.println("#Fluents: " + fluentSolver.getVariables().length);
 			ps.println("#FluentConstraints: " + fluentSolver.getConstraints().length);
-		} else {
-			ps.println("Could not find a plan.");
 		}
 	}
 	

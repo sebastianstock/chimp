@@ -99,6 +99,12 @@ public class ChimpIO implements Callable<Integer> {
 			chimp.drawPlanHierarchy(5);
 		}
 
+		if (result) {
+			System.out.println("Solution found");
+		} else {
+			System.out.println("Could not find a plan");
+		}
+
 		if (printStats) {
 			chimp.printStats(System.out);
 		}
