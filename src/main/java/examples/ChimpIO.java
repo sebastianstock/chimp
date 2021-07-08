@@ -40,7 +40,7 @@ public class ChimpIO implements Callable<Integer> {
 	File esterelOutputFile;
 
 	@CommandLine.Option(names = {"--horizon"}, description = "Horizon for the temporal variables. (Default: ${DEFAULT-VALUE})")
-	private int horizon = 600000;
+	private int horizon = 3600000;
 
 	@CommandLine.Option(names = {"--htn-unification"}, description = "Try to unify tasks with existing ones during HTN-planning. (Default: ${DEFAULT-VALUE})")
 	private boolean htnUnification = false;
