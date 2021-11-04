@@ -37,8 +37,8 @@ You can start CHIMP from the command line with `gradle run` followed by argument
 The output of CHIMP's `--help` command is shown below:
 ```
 Usage: chimp [-hV] [--guess-ordering] [--htn-unification] [--print-stats]
-             [-e=<esterelOutputFile>] [--horizon=<horizon>] [-o=<outputFile>]
-             <domainFile> <problemFile>
+             [-e=<esterelOutputFile>] [--horizon=<horizon>] [--hpr=<hprOutputFile>]
+             [-o=<outputFile>] <domainFile> <problemFile>
 Plan with CHIMP.
       <domainFile>          The file containing the planning domain.
       <problemFile>         The file containing the planning problem.
@@ -48,7 +48,8 @@ Plan with CHIMP.
                               shall be used. (Default: false)
   -h, --help                Show this help message and exit.
       --horizon=<horizon>   Horizon for the temporal variables. (Default:
-                              600000)
+                              3600000)
+      --hpr=<hprOutputFile> Write HPR graph to this output file.
       --htn-unification     Try to unify tasks with existing ones during
                               HTN-planning. (Default: false)
   -o, --output=<outputFile> Write the plan to this output file.
