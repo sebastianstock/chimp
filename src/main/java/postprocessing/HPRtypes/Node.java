@@ -3,21 +3,28 @@ package postprocessing.HPRtypes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import postprocessing.estereltypes.KeyValue;
 
 public class Node {
     
     public int node_type;
     public int node_id;
-    public String name;
-    public HPRActionDispatch action;
+    public String action_name;
+    public float duration;
+    public float dispatch_time;
+    public List<KeyValue> parameters = new ArrayList<>();
+    public List<String> preconditions = new ArrayList<>();
+    public List<String> positive_effects = new ArrayList<>();
+    public List<String> negative_effects = new ArrayList<>();
     public List<Integer> edges_out = new ArrayList<>();
     public List<Integer> edges_in = new ArrayList<>();
 
-    public Node(int node_id, int node_type, String name, HPRActionDispatch action) {
+    public Node(int node_id, int node_type, String action_name, float duration, float dispatch_time) {
         this.node_id = node_id;
         this.node_type = node_type;
-        this.name = name;
-        this.action = action;
+        this.action_name = action_name;
+        this.duration = duration;
+        this.dispatch_time = dispatch_time;
     }
 
     @Override

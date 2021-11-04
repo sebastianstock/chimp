@@ -39,10 +39,8 @@ public class HPRGenerator {
     private FluentNetworkSolver fluentSolver;
     private HPRPlan hprPlan;
     private Map<Duration, Fluent> timePointActivityMap;
-    private Map<Fluent, HPRActionDispatch> fluentActionDispatchMap;
     private ListMultimap<Fluent, FluentConstraint> fluentsConstraintsMultiMap;
     private Table<Fluent, Fluent, FluentConstraint> beforesTable;
-    private Map<Fluent, Integer> fluentNodeIdMap;
 
     public HPRGenerator(CHIMP chimp, Writer writer) {
         this.chimp = chimp;
@@ -53,8 +51,6 @@ public class HPRGenerator {
         this.beforesTable = HashBasedTable.create();
         createFluentsConstraintsMultiMap();
         this.timePointActivityMap = getTimePointActivityMap();
-        this.fluentActionDispatchMap = getFluentActionDispatchMap();
-        this.fluentNodeIdMap = new HashMap<>();
     }
 
     public void generateHPR() {
@@ -76,15 +72,49 @@ public class HPRGenerator {
     }
 
     private void addNodesToPlan(Duration[] tps) {
+        List<PlanReportroryItem> operators = this.chimp.getPlanner().getHTNMetaConstraint().getOperators();
+        Map<String, PlanReportroryItem> nameActionMap = new HashMap<>();
+        for (PlanReportroryItem op : operators) {
+            nameActionMap.put(op.getName(), op);
+        }
+
+        List<PlanReportroryItem> methods = this.chimp.getPlanner().getHTNMetaConstraint().getMethods();
+        for (PlanReportroryItem me : methods) {
+            nameActionMap.put(me.getName(), me);
+        }
+
         for (int i = 0; i < tps.length; i++) {
             Duration tp = tps[i];
             Fluent fl = this.timePointActivityMap.get(tp);
             String name = fl.getCompoundSymbolicVariable().getPredicateName();
             // check if method action or operator action (primitive action)
             int type = isOperator(fl) ? 1 : 0;
-            Node node = new Node(i, type, name, this.fluentActionDispatchMap.get(fl));
+            Node node = new Node(fl.getID(), type, name, fl.getAllenInterval().getEST() / 1000,
+                    (fl.getAllenInterval().getEET() - fl.getAllenInterval().getEST()) / 1000);
+            String[] opArgNames = nameActionMap.get(name).getStringArgumentNames();
+            String[] flArgs = fl.getCompoundSymbolicVariable().getArgs();
+            for (int j = 0; j < flArgs.length; j++) {
+                String key = opArgNames[j];
+                // remove leading '?'
+                if (key.length() > 0 && key.charAt(0) == '?') {
+                    key = key.substring(1);
+                }
+                node.parameters.add(new KeyValue(key, flArgs[j]));
+            }
+
+            for (FluentConstraint con : this.fluentsConstraintsMultiMap.get(fl)) {
+                FluentConstraint.Type con_type = con.getType();
+                if (con_type.equals(FluentConstraint.Type.PRE)) {
+                    node.preconditions.add(((Fluent) con.getFrom()).getCompoundSymbolicVariable().getName());
+                }
+                if (con_type.equals(FluentConstraint.Type.OPENS)) {
+                    node.positive_effects.add(((Fluent) con.getTo()).getCompoundSymbolicVariable().getName());
+                }
+                if (con_type.equals(FluentConstraint.Type.CLOSES)) {
+                    node.negative_effects.add(((Fluent) con.getTo()).getCompoundSymbolicVariable().getName());
+                }
+            }
             this.hprPlan.addNode(node);
-            this.fluentNodeIdMap.put(fl, i);
         }
     }
 
@@ -100,37 +130,36 @@ public class HPRGenerator {
         int edgeIdCnt = 0;
         for (int i = 0; i < tps.length; i++) {
             for (int j = 0; j < tps.length; j++) {
-                if (i == j) {
-                    continue;
-                }
                 SimpleDistanceConstraint sdcSS = apspSolver.getConstraint(tps[i].start, tps[j].start);
                 SimpleDistanceConstraint sdcSE = apspSolver.getConstraint(tps[i].start, tps[j].end);
                 SimpleDistanceConstraint sdcES = apspSolver.getConstraint(tps[i].end, tps[j].start);
                 SimpleDistanceConstraint sdcEE = apspSolver.getConstraint(tps[i].end, tps[j].end);
+                Fluent source_fl = this.timePointActivityMap.get(tps[i]);
+                Fluent sink_fl = this.timePointActivityMap.get(tps[j]);
 
                 // create edges
                 if (sdcSS != null) {
                     int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, "edge" + edgeId, i, j, sdcSS.getMinimum() / 1000,
-                            sdcSS.getMaximum() / 1000, "start_to_start");
+                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcSS.getMinimum() / 1000,
+                            sdcSS.getMaximum() / 1000, 0);
                     hprPlan.addEdge(edge);
                 }
                 if (sdcSE != null) {
                     int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, "edge" + edgeId, i, j, sdcSE.getMinimum() / 1000,
-                            sdcSE.getMaximum() / 1000, "start_to_end");
+                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcSE.getMinimum() / 1000,
+                            sdcSE.getMaximum() / 1000, 1);
                     hprPlan.addEdge(edge);
                 }
                 if (sdcES != null) {
                     int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, "edge" + edgeId, i, j, sdcES.getMinimum() / 1000,
-                            sdcES.getMaximum() / 1000, "end_to_start");
+                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcES.getMinimum() / 1000,
+                            sdcES.getMaximum() / 1000, 2);
                     hprPlan.addEdge(edge);
                 }
                 if (sdcEE != null) {
                     int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, "edge" + edgeId, i, j, sdcEE.getMinimum() / 1000,
-                            sdcEE.getMaximum() / 1000, "end_to_end");
+                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcEE.getMinimum() / 1000,
+                            sdcEE.getMaximum() / 1000, 3);
                     hprPlan.addEdge(edge);
                 }
             }
@@ -170,24 +199,10 @@ public class HPRGenerator {
         for (Fluent sub : subtasks) {
             recursiveAddCausalEdges(sub);
             int edgeId = this.hprPlan.edges.size();
-            int sourceId = this.fluentNodeIdMap.get(task);
-            int sinkId = this.fluentNodeIdMap.get(sub);
-            CausalEdge causalEdge = new CausalEdge(edgeId, "edge" + edgeId, sourceId, sinkId);
+            int sourceId = task.getID();
+            int sinkId = sub.getID();
+            DecompositionEdge causalEdge = new DecompositionEdge(edgeId, sourceId, sinkId);
             this.hprPlan.addEdge(causalEdge);
-        }
-
-        for (int i = 0; i < subtasks.size(); i++) {
-            Fluent from = subtasks.get(i);
-            for (int j = i + 1; j < subtasks.size(); j++) {
-                Fluent to = subtasks.get(j);
-                if (beforesTable.contains(from, to)) {
-                    int edgeId = this.hprPlan.edges.size();
-                    int sourceId = this.fluentNodeIdMap.get(from);
-                    int sinkId = this.fluentNodeIdMap.get(to);
-                    Edge beforeEdge = new Edge(edgeId, "edge" + edgeId, 2, sourceId, sinkId);
-                    this.hprPlan.addEdge(beforeEdge);
-                }
-            }
         }
     }
 
@@ -258,54 +273,6 @@ public class HPRGenerator {
             timePointActivityMap.put(duration, fl);
         }
         return timePointActivityMap;
-    }
-
-    private Map<Fluent, HPRActionDispatch> getFluentActionDispatchMap() {
-        // we need the operators and methods to get the names of the actions' arguments
-        List<PlanReportroryItem> operators = this.chimp.getPlanner().getHTNMetaConstraint().getOperators();
-        Map<String, PlanReportroryItem> nameActionMap = new HashMap<>();
-        for (PlanReportroryItem op : operators) {
-            nameActionMap.put(op.getName(), op);
-        }
-
-        List<PlanReportroryItem> methods = this.chimp.getPlanner().getHTNMetaConstraint().getMethods();
-        for (PlanReportroryItem me : methods) {
-            nameActionMap.put(me.getName(), me);
-        }
-
-        Map<Fluent, HPRActionDispatch> fluentActionDispatchMap = new HashMap<>();
-        for (Fluent fl : this.timePointActivityMap.values()) {
-            String actionName = fl.getCompoundSymbolicVariable().getPredicateName();
-            HPRActionDispatch actionDispatch = new HPRActionDispatch(fl.getID(), actionName);
-            actionDispatch.duration = (fl.getAllenInterval().getEET() - fl.getAllenInterval().getEST()) / 1000;
-            String[] opArgNames = nameActionMap.get(actionName).getStringArgumentNames();
-            String[] flArgs = fl.getCompoundSymbolicVariable().getArgs();
-            for (int i = 0; i < flArgs.length; i++) {
-                String key = opArgNames[i];
-                // remove leading '?'
-                if (key.length() > 0 && key.charAt(0) == '?') {
-                    key = key.substring(1);
-                }
-                actionDispatch.parameters.add(new KeyValue(key, flArgs[i]));
-            }
-            actionDispatch.dispatch_time = fl.getAllenInterval().getEST() / 1000;
-
-            for (FluentConstraint con : this.fluentsConstraintsMultiMap.get(fl)) {
-                FluentConstraint.Type type = con.getType();
-                if (type.equals(FluentConstraint.Type.PRE)) {
-                    actionDispatch.preconditions.add(((Fluent) con.getFrom()).getCompoundSymbolicVariable().getName());
-                }
-                if (type.equals(FluentConstraint.Type.OPENS)) {
-                    actionDispatch.effects.add("+" + ((Fluent) con.getTo()).getCompoundSymbolicVariable().getName());
-                }
-                if (type.equals(FluentConstraint.Type.CLOSES)) {
-                    actionDispatch.effects.add("-" + ((Fluent) con.getTo()).getCompoundSymbolicVariable().getName());
-                }
-            }
-
-            fluentActionDispatchMap.put(fl, actionDispatch);
-        }
-        return fluentActionDispatchMap;
     }
 
     private Duration[] createSortedActivityTimepoints() {

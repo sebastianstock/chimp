@@ -10,11 +10,20 @@ public class HPRPlan {
 
     public void addEdge(Edge edge) {
         this.edges.add(edge);
-        this.nodes.get(edge.sink_ids[0]).edges_in.add(edge.edge_id);
-        this.nodes.get(edge.source_ids[0]).edges_out.add(edge.edge_id);
+        searchNodeByID(edge.sink_id).edges_in.add(edge.edge_id);
+        searchNodeByID(edge.source_id).edges_out.add(edge.edge_id);
     }
 
     public void addNode(Node node) {
         this.nodes.add(node);
+    }
+
+    private Node searchNodeByID(int node_id) {
+        for(Node node : this.nodes) {
+            if (node.node_id == node_id) {
+                return node;
+            }
+        }
+        return null;
     }
 }
