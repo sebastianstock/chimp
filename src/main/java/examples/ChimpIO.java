@@ -6,10 +6,12 @@ import htn.HTNPlanner;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import postprocessing.EsterelGenerator;
+import postprocessing.HPRGenerator;
 import postprocessing.PlanExtractor;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
+
 import picocli.CommandLine;
 import planner.CHIMP;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -38,6 +40,9 @@ public class ChimpIO implements Callable<Integer> {
 
 	@CommandLine.Option(names = {"-e", "--esterel"}, description = "Write esterel graph to this output file.")
 	File esterelOutputFile;
+
+	@CommandLine.Option(names = {"--hpr"}, description = "Write HPR graph to this output file.")
+	File hprOutputFile;
 
 	@CommandLine.Option(names = {"--horizon"}, description = "Horizon for the temporal variables. (Default: ${DEFAULT-VALUE})")
 	private int horizon = 3600000;
@@ -122,6 +127,16 @@ public class ChimpIO implements Callable<Integer> {
 			try {
 				FileWriter fw = new FileWriter(esterelOutputFile);
 				EsterelGenerator.generateEsterelGraph(chimp, fw);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (hprOutputFile != null && result) {
+			try {
+				FileWriter fw = new FileWriter(hprOutputFile);
+				HPRGenerator hprGenerator = new HPRGenerator(chimp, fw);
+				hprGenerator.generateHPR();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
