@@ -42,7 +42,7 @@ dependencies {
 
   implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
-  implementation group: 'org.choco-solver', name: 'choco-solver', version: '4.10.2'
+  implementation group: 'org.choco-solver', name: 'choco-solver', version: '4.10.10'
 
   // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
   implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.8'
