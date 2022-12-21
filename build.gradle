@@ -40,7 +40,7 @@ dependencies {
 
   implementation group: 'info.picocli', name: 'picocli', version: '4.5.1'
 
-  implementation group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+  implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
   implementation group: 'org.choco-solver', name: 'choco-solver', version: '4.10.2'
 
