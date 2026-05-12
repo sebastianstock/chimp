@@ -75,12 +75,12 @@ public abstract class PlanReportroiryItemParser {
 					occ = new HashMap<String, Integer>();
 					variableOccurrencesMap.put(argStrings[i], occ);
 				}
-				occ.put(key, new Integer(i));
+				occ.put(key, Integer.valueOf(i));
 			} else {
 				// It is a constant -> create dummy variable name to insert it into variableOccurrencesMap and add it to possible values
 				String dummyVarName = key + "_v" + i;
 				Map<String, Integer> occ = new HashMap<>();
-				occ.put(key, new Integer(i));
+				occ.put(key, Integer.valueOf(i));
 				variableOccurrencesMap.put(dummyVarName, occ);
 				variablesPossibleValuesMap.put(dummyVarName, new String[] {argStrings[i]});
 			}

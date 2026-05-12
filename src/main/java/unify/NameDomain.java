@@ -60,7 +60,7 @@ public class NameDomain extends Domain {
 			List<Integer> possibles = new ArrayList<Integer>();
 			for (int i = 0; i < domain.length; i++) {
 				if (domain[i]) {
-					possibles.add(new Integer(i));
+					possibles.add(Integer.valueOf(i));
 				}
 			}
 			int[] ret = new int[possibles.size()];

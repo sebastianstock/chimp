@@ -1,4 +1,4 @@
-// Generated from /home/sebastian/code/chimp/src/main/antlr/ChimpClassic.g4 by ANTLR 4.8
+// Generated from ChimpClassic.g4 by ANTLR 4.13.2
 package hybridDomainParsing.classic.antlr;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 

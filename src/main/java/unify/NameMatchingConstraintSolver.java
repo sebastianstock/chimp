@@ -41,7 +41,7 @@ public class NameMatchingConstraintSolver extends ConstraintSolver {
 		this.symbols = symbols;
 		symbols2Index = new HashMap<String, Integer>();
 		for (int i = 0; i < symbols.length; i++) {
-			symbols2Index.put(symbols[i], new Integer(i));
+			symbols2Index.put(symbols[i], Integer.valueOf(i));
 		}
 	}
 	

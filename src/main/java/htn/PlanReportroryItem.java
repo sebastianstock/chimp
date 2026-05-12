@@ -124,12 +124,12 @@ public abstract class PlanReportroryItem {
 					occ = new HashMap<String, Integer>();
 					variableOccurrencesMap.put(argStrings[i], occ);
 				}
-				occ.put(key, new Integer(i));
+				occ.put(key, Integer.valueOf(i));
 			} else {
 				// It is a constant -> create dummy variable name to insert it into variableOccurrencesMap and add it to possible values
 				String dummyVarName = key + "_v" + i;
 				Map<String, Integer> occ = new HashMap<>();
-				occ.put(key, new Integer(i));
+				occ.put(key, Integer.valueOf(i));
 				variableOccurrencesMap.put(dummyVarName, occ);
 				variablesPossibleValuesMap.put(dummyVarName, new String[] {argStrings[i]});
 				symbolicConstants.add(argStrings[i]);
@@ -159,7 +159,7 @@ public abstract class PlanReportroryItem {
 					occ = new HashMap<String, Integer>();
 					integerVariableOccurrencesMap.put(intArgs[i].varName, occ);
 				}
-				occ.put(key, new Integer(i));
+				occ.put(key, Integer.valueOf(i));
 			}
 		}
 	}
@@ -839,8 +839,8 @@ public abstract class PlanReportroryItem {
 		for (int i = 0; i < prototypeargs.length; i++) {
 			for (int j = 0; j < arguments.length; j++) {
 				if (prototypeargs[i].startsWith("?") && prototypeargs[i].equals(this.arguments[j])) {
-					connections.add(new Integer(j));
-					connections.add(new Integer(i));
+					connections.add(Integer.valueOf(j));
+					connections.add(Integer.valueOf(i));
 				}
 			}
 		}
