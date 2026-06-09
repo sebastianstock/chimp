@@ -24,6 +24,22 @@ The build directly depends on `org.metacsp:meta-csp-framework:1.3.5`.
 
 The dependency is not limited to infrastructure. Core CHIMP concepts such as fluents, decomposition constraints, flaws, resolver alternatives, temporal constraints, unification, integer expressions, and resource conflicts are represented using Meta-CSP classes.
 
+## Initial Independent Model
+
+The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet integrated into the planner.
+
+| Independent model | Current representation | Initial mapping |
+| --- | --- | --- |
+| `FluentId` | `Fluent.getID()` | Stable non-negative fluent identity. |
+| `FluentType` | `Fluent.getTypeStr()` and component strings | Maps `Activity`, `State`, `PlannedState`, and `Task` to explicit enum values. |
+| `FluentSignature` | `CompoundSymbolicVariable` through `Fluent.getName()` | Predicate plus an immutable ordered argument list. It does not model symbolic domains or unresolved alternatives yet. |
+| `TemporalBounds` | `Fluent.getAllenInterval()` | Immutable snapshot of EST, LST, EET, and LET. It does not replace Allen relation constraints. |
+| `FluentNode` | `Fluent` | Immutable semantic snapshot composed from ID, type, signature, and temporal bounds. It intentionally excludes solver references, markings, and integer-variable domains. |
+| `ConstraintKind` | `FluentConstraint.Type` | Uses domain names for the current relation set: `DC` becomes `DECOMPOSITION`, `PRE` becomes `PRECONDITION`, `UNARYAPPLIED` becomes `APPLIED`, and `MOVEDURATION` becomes `MOVE_DURATION`. |
+| `ChimpConstraint` | `FluentConstraint` | Immutable kind and endpoint IDs, with optional temporal bounds for bounded relations. Planner-specific payloads such as repository items, resource templates, axiom text, connection arrays, depth, and additional Allen constraints remain outside this initial model. |
+
+The eventual adapter from `Fluent` should read the Meta-CSP variable ID, component, compound symbolic value, and Allen interval bounds into a `FluentNode`. The adapter from `FluentConstraint` should map its type and endpoint IDs into a `ChimpConstraint`, adding temporal bounds only where the current constraint carries them. These adapters should be introduced at a boundary rather than as methods on the independent model classes.
+
 ## Import Inventory
 
 There are 94 Java classes importing `org.metacsp.*`: 85 under `src/main/java` and 9 under `src/test/java`.
