@@ -234,6 +234,13 @@ public class FluentConstraint extends MultiBinaryConstraint {
 	public Type getType() {
 		return type;
 	}
+
+	public Bounds getBounds() {
+		if (bounds == null) {
+			return null;
+		}
+		return new Bounds(bounds.min, bounds.max);
+	}
 	
 	public PlanReportroryItem getPlannedWith() {
 		return plannedWith;

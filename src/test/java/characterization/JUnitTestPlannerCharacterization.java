@@ -1,5 +1,6 @@
 package characterization;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +9,12 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 
+import chimp.adapter.metacsp.MetaCspModelAdapter;
+import chimp.model.ChimpConstraint;
+import chimp.model.ConstraintKind;
+import chimp.model.FluentId;
+import chimp.model.FluentNode;
+import chimp.model.FluentType;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -17,6 +24,8 @@ import planner.CHIMP;
 
 public class JUnitTestPlannerCharacterization {
 
+    private final MetaCspModelAdapter modelAdapter = new MetaCspModelAdapter();
+
     @Test
     public void plansPrimitiveDwrMove() throws DomainParsingException {
         CHIMP chimp = plan("domains/dwr/dwr.ddl", "domains/dwr/test/test_op_move.pdl");
@@ -24,6 +33,13 @@ public class JUnitTestPlannerCharacterization {
         Fluent[] actions = extractActions(chimp);
         assertTrue("Expected the primitive DWR problem to produce an action", actions.length > 0);
         assertTrue("Expected the DWR move action", actions[0].getName().contains("!move"));
+
+        FluentNode snapshot = modelAdapter.toFluentNode(actions[0]);
+        assertEquals(new FluentId(actions[0].getID()), snapshot.id());
+        assertEquals(FluentType.ACTIVITY, snapshot.type());
+        assertEquals("!move", snapshot.signature().predicate());
+        assertEquals(actions[0].getAllenInterval().getEST(), snapshot.temporalInterval().earliestStart());
+        assertEquals(actions[0].getAllenInterval().getLET(), snapshot.temporalInterval().latestEnd());
     }
 
     @Test
@@ -52,6 +68,11 @@ public class JUnitTestPlannerCharacterization {
         Fluent to = (Fluent) before.getTo();
         assertTrue("Expected the BEFORE edge to be reflected by the temporal solution",
                 from.getAllenInterval().getEET() < to.getAllenInterval().getEST());
+
+        ChimpConstraint snapshot = modelAdapter.toChimpConstraint(before);
+        assertEquals(ConstraintKind.BEFORE, snapshot.kind());
+        assertEquals(new FluentId(from.getID()), snapshot.from());
+        assertEquals(new FluentId(to.getID()), snapshot.to());
     }
 
     private CHIMP plan(String domainFile, String problemFile) throws DomainParsingException {

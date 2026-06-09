@@ -48,15 +48,24 @@ public class ChimpModelTest {
     }
 
     @Test
-    public void temporalBoundsExposeCurrentIntervalShape() {
-        TemporalBounds bounds = new TemporalBounds(1, 10, 6, 20);
+    public void temporalBoundsRepresentAnOrderedRange() {
+        TemporalBounds bounds = new TemporalBounds(1, 10);
 
-        assertEquals(1, bounds.earliestStart());
-        assertEquals(10, bounds.latestStart());
-        assertEquals(6, bounds.earliestEnd());
-        assertEquals(20, bounds.latestEnd());
-        assertThrows(IllegalArgumentException.class, () -> new TemporalBounds(10, 1, 11, 12));
-        assertThrows(IllegalArgumentException.class, () -> new TemporalBounds(5, 6, 4, 7));
+        assertEquals(1, bounds.minimum());
+        assertEquals(10, bounds.maximum());
+        assertThrows(IllegalArgumentException.class, () -> new TemporalBounds(10, 1));
+    }
+
+    @Test
+    public void temporalIntervalRepresentsAValidSolvedInterval() {
+        TemporalInterval interval = new TemporalInterval(1, 10, 6, 20);
+
+        assertEquals(1, interval.earliestStart());
+        assertEquals(10, interval.latestStart());
+        assertEquals(6, interval.earliestEnd());
+        assertEquals(20, interval.latestEnd());
+        assertThrows(IllegalArgumentException.class, () -> new TemporalInterval(10, 1, 11, 12));
+        assertThrows(IllegalArgumentException.class, () -> new TemporalInterval(5, 6, 4, 7));
     }
 
     @Test
@@ -65,7 +74,7 @@ public class ChimpModelTest {
                 new FluentId(3),
                 FluentType.ACTIVITY,
                 new FluentSignature("move", "robot1", "area2"),
-                new TemporalBounds(1, 10, 6, 20));
+                new TemporalInterval(1, 10, 6, 20));
 
         assertEquals(new FluentId(3), node.id());
         assertEquals("move", node.signature().predicate());
@@ -80,7 +89,7 @@ public class ChimpModelTest {
 
         assertFalse(ordering.temporalBounds().isPresent());
 
-        TemporalBounds bounds = new TemporalBounds(0, 10, 5, 20);
+        TemporalBounds bounds = new TemporalBounds(5, 20);
         ChimpConstraint duration = new ChimpConstraint(
                 ConstraintKind.MOVE_DURATION, from, from, bounds);
 

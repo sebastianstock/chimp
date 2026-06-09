@@ -33,12 +33,13 @@ The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet
 | `FluentId` | `Fluent.getID()` | Stable non-negative fluent identity. |
 | `FluentType` | `Fluent.getTypeStr()` and component strings | Maps `Activity`, `State`, `PlannedState`, and `Task` to explicit enum values. |
 | `FluentSignature` | `CompoundSymbolicVariable` through `Fluent.getName()` | Predicate plus an immutable ordered argument list. It does not model symbolic domains or unresolved alternatives yet. |
-| `TemporalBounds` | `Fluent.getAllenInterval()` | Immutable snapshot of EST, LST, EET, and LET. It does not replace Allen relation constraints. |
-| `FluentNode` | `Fluent` | Immutable semantic snapshot composed from ID, type, signature, and temporal bounds. It intentionally excludes solver references, markings, and integer-variable domains. |
+| `TemporalBounds` | `org.metacsp.time.Bounds` | Immutable minimum and maximum range for duration or relation parameters. |
+| `TemporalInterval` | `Fluent.getAllenInterval()` | Immutable snapshot of EST, LST, EET, and LET. |
+| `FluentNode` | `Fluent` | Immutable semantic snapshot composed from ID, type, signature, and temporal interval. It intentionally excludes solver references, markings, and integer-variable domains. |
 | `ConstraintKind` | `FluentConstraint.Type` | Uses domain names for the current relation set: `DC` becomes `DECOMPOSITION`, `PRE` becomes `PRECONDITION`, `UNARYAPPLIED` becomes `APPLIED`, and `MOVEDURATION` becomes `MOVE_DURATION`. |
 | `ChimpConstraint` | `FluentConstraint` | Immutable kind and endpoint IDs, with optional temporal bounds for bounded relations. Planner-specific payloads such as repository items, resource templates, axiom text, connection arrays, depth, and additional Allen constraints remain outside this initial model. |
 
-The eventual adapter from `Fluent` should read the Meta-CSP variable ID, component, compound symbolic value, and Allen interval bounds into a `FluentNode`. The adapter from `FluentConstraint` should map its type and endpoint IDs into a `ChimpConstraint`, adding temporal bounds only where the current constraint carries them. These adapters should be introduced at a boundary rather than as methods on the independent model classes.
+`chimp.adapter.metacsp.MetaCspModelAdapter` provides the initial one-way boundary. It reads a grounded Meta-CSP `Fluent` into a `FluentNode` and maps a `FluentConstraint` into a `ChimpConstraint`. Duration bounds are copied when present. The adapter fails explicitly for unknown fluent components, non-ground signatures, and non-fluent constraint endpoints. Conversion remains outside the independent model package.
 
 ## Import Inventory
 
@@ -398,18 +399,10 @@ Each stage should preserve existing planning results before removing the corresp
 
 Add parser-focused tests as neutral domain values are introduced. These tests should assert semantic parser output without initializing Meta-CSP solvers.
 
-## Smallest Safe First Code Change
+## Current Boundary and Next Safe Change
 
-Introduce a CHIMP-owned immutable `TemporalBounds` value type and use it first in the leaf-level `MoveBaseDurationEstimator` API.
+The initial value layer and one-way Meta-CSP adapter are now established. `TemporalBounds` represents a minimum/maximum range, `TemporalInterval` represents a solved interval snapshot, and `MetaCspModelAdapter` converts grounded `Fluent` and `FluentConstraint` instances without changing planner behavior.
 
-Convert `TemporalBounds` to Meta-CSP `Bounds` only inside `MoveBaseMetaConstraint`.
+The next safe integration is to migrate `CHIMPConnector` internally to build its existing JNI-facing structs from `FluentNode` and `ChimpConstraint`. Its public fields and output format should remain unchanged. This exercises the independent model at a read-only system boundary before parser or planner internals are changed.
 
-This is the smallest safe starting point because:
-
-- The API has a narrow call graph.
-- It does not alter planner search or fluent representation.
-- It preserves the same lower and upper bound values.
-- It establishes the domain-value-to-Meta-CSP-adapter pattern needed for parser and HTN temporal constraints.
-- It can be verified through the existing move-base lookup example and focused unit tests.
-
-The first change should not alter `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, or `HTNMetaConstraint`. Those classes sit on the critical planning path and should be migrated only after neutral values and compilation boundaries are established.
+`Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, and `HTNMetaConstraint` should otherwise remain unchanged until neutral parser definitions and resolver descriptions exist.
