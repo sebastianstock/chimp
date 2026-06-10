@@ -403,6 +403,8 @@ Add parser-focused tests as neutral domain values are introduced. These tests sh
 
 The initial value layer and one-way Meta-CSP adapter are now established. `TemporalBounds` represents a minimum/maximum range, `TemporalInterval` represents a solved interval snapshot, and `MetaCspModelAdapter` converts grounded `Fluent` and `FluentConstraint` instances without changing planner behavior.
 
-The next safe integration is to migrate `CHIMPConnector` internally to build its existing JNI-facing structs from `FluentNode` and `ChimpConstraint`. Its public fields and output format should remain unchanged. This exercises the independent model at a read-only system boundary before parser or planner internals are changed.
+`CHIMPConnector` can now build its existing JNI-facing structs from `FluentNode` and `ChimpConstraint`. The legacy `Fluent` constructor remains a direct projection so it continues to accept arbitrary component names and symbolic states. Public fields, legacy constraint type strings, action/precondition structure, and output values remain unchanged. This exercises the independent model at a read-only system boundary before parser or planner internals are changed.
+
+The next safe integration is an immutable `PlanSnapshot` containing fluent nodes and constraints. The Meta-CSP adapter should create it after successful planning, and subsequent read-only consumers should use that common snapshot instead of independently traversing the solver network.
 
 `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, and `HTNMetaConstraint` should otherwise remain unchanged until neutral parser definitions and resolver descriptions exist.

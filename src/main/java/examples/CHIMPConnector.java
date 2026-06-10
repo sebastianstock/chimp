@@ -1,5 +1,11 @@
 package examples;
 
+import chimp.adapter.metacsp.MetaCspModelAdapter;
+import chimp.model.ChimpConstraint;
+import chimp.model.ConstraintKind;
+import chimp.model.FluentNode;
+import chimp.model.FluentSignature;
+import chimp.model.TemporalInterval;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
@@ -8,7 +14,6 @@ import hybridDomainParsing.DomainParsingException;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenInterval;
 import planner.CHIMP;
 
 import java.util.ArrayList;
@@ -22,6 +27,8 @@ import java.util.List;
  *
  */
 public class CHIMPConnector {
+
+    private static final MetaCspModelAdapter MODEL_ADAPTER = new MetaCspModelAdapter();
 
     static final boolean GUESS_ORDERING = false;
     static final boolean USE_HTN_UNIFICATION = true;
@@ -49,11 +56,23 @@ public class CHIMPConnector {
             name = fluent.getName();
             type = fluent.getTypeStr();
             id = fluent.getID();
-            AllenInterval ai = fluent.getAllenInterval();
-            est = ai.getEST();
-            lst = ai.getLST();
-            eet = ai.getEET();
-            let = ai.getLET();
+            est = fluent.getAllenInterval().getEST();
+            lst = fluent.getAllenInterval().getLST();
+            eet = fluent.getAllenInterval().getEET();
+            let = fluent.getAllenInterval().getLET();
+            preconditions = null;
+        }
+
+        public FluentStruct(FluentNode fluent) {
+            FluentSignature signature = fluent.signature();
+            name = signature.predicate() + "(" + String.join(" ", signature.arguments()) + ")";
+            type = fluent.type().componentName();
+            id = Math.toIntExact(fluent.id().value());
+            TemporalInterval interval = fluent.temporalInterval();
+            est = interval.earliestStart();
+            lst = interval.latestStart();
+            eet = interval.earliestEnd();
+            let = interval.latestEnd();
             preconditions = null;
         }
     }
@@ -66,10 +85,14 @@ public class CHIMPConnector {
         public boolean negativeEffect;
 
         public FluentConstraintStruct(FluentConstraint fc) {
-            fromId = fc.getFrom().getID();
-            toId = fc.getTo().getID();
-            type = fc.getType().toString();
-            negativeEffect = fc.isNegativeEffect();
+            this(MODEL_ADAPTER.toChimpConstraint(fc), fc.isNegativeEffect());
+        }
+
+        FluentConstraintStruct(ChimpConstraint constraint, boolean negativeEffect) {
+            fromId = Math.toIntExact(constraint.from().value());
+            toId = Math.toIntExact(constraint.to().value());
+            type = legacyConstraintType(constraint.kind());
+            this.negativeEffect = negativeEffect;
         }
     }
 
@@ -162,6 +185,21 @@ public class CHIMPConnector {
             }
         }
         return  fluentStructs;
+    }
+
+    private static String legacyConstraintType(ConstraintKind kind) {
+        return switch (kind) {
+            case MATCHES -> "MATCHES";
+            case DECOMPOSITION -> "DC";
+            case PRECONDITION -> "PRE";
+            case OPENS -> "OPENS";
+            case CLOSES -> "CLOSES";
+            case BEFORE -> "BEFORE";
+            case APPLIED -> "UNARYAPPLIED";
+            case MOVE_DURATION -> "MOVEDURATION";
+            case AXIOM -> "AXIOM";
+            case RESOURCE_USAGE -> "RESOURCEUSAGE";
+        };
     }
 
 }
