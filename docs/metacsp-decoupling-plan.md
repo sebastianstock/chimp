@@ -43,13 +43,13 @@ The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet
 
 ## Import Inventory
 
-There are 94 Java classes importing `org.metacsp.*`: 85 under `src/main/java` and 9 under `src/test/java`.
+There are 97 Java files importing `org.metacsp.*`: 85 under `src/main/java` and 12 under `src/test/java`.
 
 ### Production and Example Sources
 
 - `dispatching`: `FluentDispatcher`, `FluentDispatchingFunction`
 - `dwr`: `DWRNavigationMetaConstraint`
-- `examples`: `CHIMPConnector`, `ChimpIO`, `TestDWRDomain`, `TestTransTerraProblems`, `VariousTests`
+- `examples`: `ChimpIO`, `TestDWRDomain`, `TestTransTerraProblems`, `VariousTests`
 - `examples.chimp`: `TestICODomainCHIMP`, `TestIncrementalMerging`, `TestIncrementalMergingDispatching`, `TestMobipickSimple`, `TestPlanningWithIntegerConstraints`, `TestRACEDomain`
 - `examples.eval`: `EvalDWRDomain`, `EvalDWRDomainArgs`, `EvalRACEDomain`
 - `examples.negative_precondition_resource`: `TestRemoveAllSamples`
@@ -165,7 +165,7 @@ Used by `HTNPlanner`, `HTNMetaConstraint`, `FluentResourceUsageScheduler`, and t
 
 ### `AllenInterval`
 
-Used by `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNMetaConstraint`, `CHIMPConnector`, `PlanExtractor`, and `HierarchicalLayout`.
+Used by `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNMetaConstraint`, `PlanExtractor`, and `HierarchicalLayout`.
 
 The temporal extent of a fluent is therefore exposed directly as a Meta-CSP object throughout planning and output code.
 
@@ -403,10 +403,10 @@ Add parser-focused tests as neutral domain values are introduced. These tests sh
 
 The initial value layer and one-way Meta-CSP adapter are now established. `TemporalBounds` represents a minimum/maximum range, `TemporalInterval` represents a solved interval snapshot, and `MetaCspModelAdapter` converts grounded `Fluent` and `FluentConstraint` instances without changing planner behavior.
 
-`CHIMPConnector` can now build its existing JNI-facing structs from `FluentNode` and `ChimpConstraint`. The legacy `Fluent` constructor remains a direct projection so it continues to accept arbitrary component names and symbolic states. Public fields, legacy constraint type strings, action/precondition structure, and output values remain unchanged. This exercises the independent model at a read-only system boundary before parser or planner internals are changed.
+The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been removed. Future integration with other languages should use a new boundary designed for that environment rather than preserve the legacy JNI transfer structs.
 
 `PlanSnapshot` now provides an immutable grounded Activity/Task graph with ID, type, and constraint queries. `MetaCspModelAdapter` creates it from the solved fluent network, and `PlanExtractor` uses it for ROS and YAML action output. Hierarchy/debug output remains on the legacy solver path because it depends on markings and raw fluent rendering.
 
-The next safe integration is to extend the snapshot with grounded state/precondition nodes so `CHIMPConnector` action/precondition assembly can use one common snapshot. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
+The next safe integration is to introduce CHIMP-owned temporal relation and constraint-template values for parser output, then compile those values to Meta-CSP constraints in the adapter layer. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
 
 `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, and `HTNMetaConstraint` should otherwise remain unchanged until neutral parser definitions and resolver descriptions exist.
