@@ -37,7 +37,7 @@ public class OperatorParser extends PlanReportroiryItemParser {
 		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();
 		op.setSubDifferentDefinitions(subDiffs);
 		
-		op.addResourceUsageTemplates(rtList);
+		op.addResourceRequirements(rtList);
 		return op;
 	}
 

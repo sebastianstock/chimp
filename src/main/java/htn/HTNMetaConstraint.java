@@ -7,12 +7,15 @@ import org.metacsp.framework.*;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenInterval;
-import resourceFluent.ResourceUsageTemplate;
+import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
+import chimp.model.ResourceRequirement;
 
 import java.util.*;
 
 
 public class HTNMetaConstraint extends MetaConstraint {
+	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
+			new MetaCspResourceRequirementAdapter();
 
 	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}
 
@@ -24,7 +27,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private final Set<String> operatorNames = new HashSet<>();
 	private final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
 
-	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
+	private Map<String, List<ResourceRequirement>> resourcesTemplatesMap;  //resource type -> templates
 	
 	// try to unify tasks with planned tasks?
 	private boolean tryUnification = false;
@@ -253,11 +256,12 @@ public class HTNMetaConstraint extends MetaConstraint {
 				if (v instanceof VariablePrototype &&
 						!(((VariablePrototype) v).getParameters()[0] instanceof VariablePrototype)) {
 					String symbol = (String)((VariablePrototype) v).getParameters()[1];
-					List<ResourceUsageTemplate> rtList = resourcesTemplatesMap.get(symbol);
+					List<ResourceRequirement> rtList = resourcesTemplatesMap.get(symbol);
 					if (rtList != null) {
-						for (ResourceUsageTemplate rt : rtList) {
+						for (ResourceRequirement rt : rtList) {
 							FluentConstraint resourceCon = 
-									new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+									new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE,
+											RESOURCE_ADAPTER.toResourceUsageTemplate(rt));
 							resourceCon.setFrom(v);
 							resourceCon.setTo(v);
 							cn.addConstraint(resourceCon);
@@ -327,23 +331,25 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 * When creating effects these will be used to add resource constraints to those fluents.
 	 * @param resourceTemplates Indicate the resource usages.
 	 */
-	public void setResourceUsages(List<ResourceUsageTemplate> resourceTemplates) {
+	public void setResourceUsages(List<ResourceRequirement> resourceTemplates) {
 		resourcesTemplatesMap = createResourceUsagesMap(resourceTemplates);
 	}
 	
 	/**
-	 * Generate a map from resource types to lists of ResourceUsageTemplates.
+	 * Generate a map from fluent types to resource requirements.
 	 * @param resourceTemplates Indicate the resource usages.
-	 * @return Map from resource types to a list of ResourceUsageTemplates.
+	 * @return Map from fluent types to their resource requirements.
 	 */
-	public static Map<String, List<ResourceUsageTemplate>> createResourceUsagesMap(List<ResourceUsageTemplate> resourceTemplates) {
-		Map<String, List<ResourceUsageTemplate>> ret = 
-				new HashMap<String, List<ResourceUsageTemplate>>();  //resource type -> templates
-		for (ResourceUsageTemplate rt : resourceTemplates){
-			List<ResourceUsageTemplate> l = ret.get(rt.getFluentType());
+	public static Map<String, List<ResourceRequirement>> createResourceUsagesMap(List<ResourceRequirement> resourceTemplates) {
+		Map<String, List<ResourceRequirement>> ret =
+				new HashMap<String, List<ResourceRequirement>>();  //resource type -> templates
+		for (ResourceRequirement rt : resourceTemplates){
+			String fluentType = rt.fluentType().orElseThrow(
+					() -> new IllegalArgumentException("Fluent resource usage requires a fluent type"));
+			List<ResourceRequirement> l = ret.get(fluentType);
 			if (l == null) {
-				l = new ArrayList<ResourceUsageTemplate>();
-				ret.put(rt.getFluentType(), l);
+				l = new ArrayList<ResourceRequirement>();
+				ret.put(fluentType, l);
 			}
 			l.add(rt);
 		}

@@ -12,11 +12,11 @@ import com.google.common.primitives.Ints;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
+import chimp.model.ResourceRequirement;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNPrecondition;
 import htn.PlanReportroryItem;
-import resourceFluent.ResourceUsageTemplate;
 
 public abstract class PlanReportroiryItemParser {
 
@@ -26,7 +26,7 @@ public abstract class PlanReportroiryItemParser {
 
 	protected final String head;
 	protected final String[] argStrings;
-	protected final List<ResourceUsageTemplate> rtList = new ArrayList<ResourceUsageTemplate>();
+	protected final List<ResourceRequirement> rtList = new ArrayList<ResourceRequirement>();
 	
 	protected final Vector<AdditionalConstraintTemplate> additionalAIConstraints = 
 			new Vector<AdditionalConstraintTemplate>(); 
@@ -59,7 +59,7 @@ public abstract class PlanReportroiryItemParser {
 		String[] resourceElements = HybridDomain.parseKeyword(HybridDomain.ACTION_RESOURCE_KEYWORD, 
 				textualSpecification);
 		for (String resElement : resourceElements) {
-			ResourceUsageTemplate rt = HybridDomain.parseResourceUsage(resElement, false);
+			ResourceRequirement rt = HybridDomain.parseResourceUsage(resElement, false);
 			rtList.add(rt);
 		}
 	}

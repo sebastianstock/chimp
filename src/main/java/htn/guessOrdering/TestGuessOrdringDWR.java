@@ -27,7 +27,7 @@ import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
+import chimp.model.ResourceRequirement;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestGuessOrdringDWR {
@@ -201,7 +201,7 @@ public class TestGuessOrdringDWR {
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());
 		htnConstraint.addMethods(domain.getMethods());
-		Vector<ResourceUsageTemplate> fluentResourceUsages = domain.getFluentResourceUsages();
+		Vector<ResourceRequirement> fluentResourceUsages = domain.getFluentResourceUsages();
 		htnConstraint.setResourceUsages(fluentResourceUsages);
 		
 		

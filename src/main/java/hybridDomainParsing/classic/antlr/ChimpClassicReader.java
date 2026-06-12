@@ -5,6 +5,8 @@ import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
 import chimp.model.IntegerConstraintKind;
+import chimp.model.ResourceParameterRequirement;
+import chimp.model.ResourceRequirement;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
@@ -26,7 +28,6 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,8 +41,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         public String name;
         public final List<FluentResourceUsageScheduler> resourceSchedulers =
                 new ArrayList<FluentResourceUsageScheduler>();
-        public final List<ResourceUsageTemplate> fluentResourceUsages =
-                new ArrayList<ResourceUsageTemplate>();
+        public final List<ResourceRequirement> fluentResourceUsages =
+                new ArrayList<ResourceRequirement>();
 
         public int maxArgs; // Maximum number of arguments of a fluent.
         public int maxIntArgs; // Maximum number of integer variables of a fluent.
@@ -73,7 +74,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         }
 
         @Override
-        public List<ResourceUsageTemplate> getFluentResourceUsages() {
+        public List<ResourceRequirement> getFluentResourceUsages() {
             return fluentResourceUsages;
         }
 
@@ -192,7 +193,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitDomain_item_fluentresourceusage(
+    public ResourceRequirement visitDomain_item_fluentresourceusage(
             ChimpClassicParser.Domain_item_fluentresourceusageContext ctx) {
         return visitFluentresourceusage_def(ctx.fluentresourceusage_def());
     }
@@ -282,7 +283,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<SubDifferentDefinition> subDifferentDefinitions = new ArrayList<>();
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
         List<ParsedOrdering> parsedOrderingConstraints = new ArrayList<>();
-        List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
+        List<ResourceRequirement> resourceUsageTemplates = new ArrayList<>();
         List<IntegerConstraintTemplate> integerConstraintTemplates = new ArrayList<>();
         for (ChimpClassicParser.Method_elementContext d : ctx.method_element()) {
             if (d instanceof ChimpClassicParser.Precondition_m_elementContext) {
@@ -344,7 +345,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         method.setIntegerConstraintTemplates(
                 integerConstraintTemplates.toArray(new IntegerConstraintTemplate[integerConstraintTemplates.size()]));
 
-        method.addResourceUsageTemplates(resourceUsageTemplates);
+        method.addResourceRequirements(resourceUsageTemplates);
 
         return method;
     }
@@ -401,7 +402,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<SubDifferentDefinition> subDifferentDefinitions = new ArrayList<>();
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
         List<IntegerConstraintTemplate> integerConstraintTemplates = new ArrayList<>();
-        List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
+        List<ResourceRequirement> resourceUsageTemplates = new ArrayList<>();
         for (ChimpClassicParser.Op_elementContext d : ctx.op_element()) {
             if (d instanceof ChimpClassicParser.Precondition_op_elementContext) {
                 parsedPreconditions.add(visitPrecondition_op_element(
@@ -461,7 +462,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         op.setIntegerConstraintTemplates(
                 integerConstraintTemplates.toArray(new IntegerConstraintTemplate[integerConstraintTemplates.size()]));
 
-        op.addResourceUsageTemplates(resourceUsageTemplates);
+        op.addResourceRequirements(resourceUsageTemplates);
 
         return op;
     }
@@ -576,7 +577,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitResource_usage_m_element(ChimpClassicParser.Resource_usage_m_elementContext ctx) {
+    public ResourceRequirement visitResource_usage_m_element(ChimpClassicParser.Resource_usage_m_elementContext ctx) {
         return visitResource_usage_def(ctx.resource_usage_def());
     }
 
@@ -641,7 +642,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitResource_usage_op_element(ChimpClassicParser.Resource_usage_op_elementContext ctx) {
+    public ResourceRequirement visitResource_usage_op_element(ChimpClassicParser.Resource_usage_op_elementContext ctx) {
         return visitResource_usage_def(ctx.resource_usage_def());
     }
 
@@ -896,11 +897,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitResource_usage_def(ChimpClassicParser.Resource_usage_defContext ctx) {
-        String fluentType = "";
-
-        int[] resourceRequirementPositions = new int[ctx.param_item().size()];
-        String[] resourceRequirements = new String[ctx.param_item().size()];
+    public ResourceRequirement visitResource_usage_def(ChimpClassicParser.Resource_usage_defContext ctx) {
+        List<ResourceParameterRequirement> parameterRequirements = new ArrayList<>();
         String resourceName;
         int usageLevel;
 
@@ -913,31 +911,26 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             usageLevel = usage.usageLevel;
             for (int i = 0; i < ctx.param_item().size(); ++i) {
                 UsageParam param = visitParam_item(ctx.param_item(i));
-                resourceRequirementPositions[i] = param.position;
-                resourceRequirements[i] = param.paramName;
-            }
-        }
-        return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions,
-                resourceRequirements, usageLevel);
-    }
+				parameterRequirements.add(new ResourceParameterRequirement(param.position, param.paramName));
+			}
+		}
+		return new ResourceRequirement(resourceName, parameterRequirements, usageLevel);
+	}
 
-    @Override
-    public ResourceUsageTemplate visitFluentresourceusage_def(ChimpClassicParser.Fluentresourceusage_defContext ctx) {
+	@Override
+	public ResourceRequirement visitFluentresourceusage_def(ChimpClassicParser.Fluentresourceusage_defContext ctx) {
         String fluentType = visitFluent_def(ctx.fluent_def());
 
         String resourceName = ctx.usage_def().NAME().getText();
         int usageLevel = numberToInt(ctx.usage_def().NUMBER());
 
-        int[] resourceRequirementPositions = new int[ctx.param_item().size()];
-        String[] resourceRequirements = new String[ctx.param_item().size()];
+		List<ResourceParameterRequirement> parameterRequirements = new ArrayList<>();
 
         for (int i = 0; i < ctx.param_item().size(); ++i) {
             UsageParam param = visitParam_item(ctx.param_item(i));
-            resourceRequirementPositions[i] = param.position;
-            resourceRequirements[i] = param.paramName;
-        }
-        return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions,
-                resourceRequirements, usageLevel);
+			parameterRequirements.add(new ResourceParameterRequirement(param.position, param.paramName));
+		}
+		return new ResourceRequirement(resourceName, fluentType, parameterRequirements, usageLevel);
     }
 
     @Override

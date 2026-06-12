@@ -39,7 +39,7 @@ public class MethodParser extends PlanReportroiryItemParser {
 		SubDifferentDefinition[] subDiffs = parseSubDifferentDefinitions();
 		ret.setSubDifferentDefinitions(subDiffs);
 		
-		ret.addResourceUsageTemplates(rtList);
+		ret.addResourceRequirements(rtList);
 		return ret;
 	}
 	

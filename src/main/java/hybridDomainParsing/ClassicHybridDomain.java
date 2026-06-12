@@ -1,9 +1,9 @@
 package hybridDomainParsing;
 
 import htn.PlanReportroryItem;
+import chimp.model.ResourceRequirement;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
 
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +16,7 @@ public interface ClassicHybridDomain {
     List<FluentScheduler> getFluentSchedulers();
     String getName();
     List<FluentResourceUsageScheduler> getResourceSchedulers();
-    List<ResourceUsageTemplate> getFluentResourceUsages();
+    List<ResourceRequirement> getFluentResourceUsages();
 
     /**
      * @return Maximum number of arguments of a fluent.

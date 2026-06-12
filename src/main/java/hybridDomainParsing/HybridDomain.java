@@ -14,9 +14,10 @@ import org.metacsp.utility.logging.MetaCSPLogging;
 import htn.HTNMethod;
 import htn.HTNOperator;
 import htn.PlanReportroryItem;
+import chimp.model.ResourceParameterRequirement;
+import chimp.model.ResourceRequirement;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
 
 
 public class HybridDomain implements ClassicHybridDomain {
@@ -27,8 +28,8 @@ public class HybridDomain implements ClassicHybridDomain {
 	private String name;
 	private final Vector<FluentResourceUsageScheduler> resourceSchedulers = 
 			new Vector<FluentResourceUsageScheduler>();
-	private final Vector<ResourceUsageTemplate> fluentResourceUsages = 
-			new Vector<ResourceUsageTemplate>();
+	private final Vector<ResourceRequirement> fluentResourceUsages =
+			new Vector<ResourceRequirement>();
 	
 	private int maxArgs; // Maximum number of arguments of a fluent.
 	private final String domainStr;
@@ -86,7 +87,7 @@ public class HybridDomain implements ClassicHybridDomain {
 		return resourceSchedulers;
 	}
 	
-	public Vector<ResourceUsageTemplate> getFluentResourceUsages() {
+	public Vector<ResourceRequirement> getFluentResourceUsages() {
 		return fluentResourceUsages;
 	}
 	
@@ -170,9 +171,9 @@ public class HybridDomain implements ClassicHybridDomain {
 		String[] usageElements = parseKeyword(FLUENT_RESOURCE_KEYWORD, domainStr);
 		processFluentResourceUsages(usageElements);
 		// test if all resources are listed:
-		for (ResourceUsageTemplate rt : fluentResourceUsages) {
-			if (!resources.containsKey(rt.getResourceName())) {
-				throw new DomainParsingException("Resource " + rt.getResourceName() + " is not defined");
+		for (ResourceRequirement rt : fluentResourceUsages) {
+			if (!resources.containsKey(rt.resourceName())) {
+				throw new DomainParsingException("Resource " + rt.resourceName() + " is not defined");
 			}
 		}
 		
@@ -258,7 +259,7 @@ public class HybridDomain implements ClassicHybridDomain {
 	 * @param stateUsage True if it is a state fluent that uses the resource, false if it is an action.
 	 * @return
 	 */
-	static ResourceUsageTemplate parseResourceUsage(String usageElement, 
+	static ResourceRequirement parseResourceUsage(String usageElement,
 			boolean stateUsage) {
 		// parse Resource
 		
@@ -279,18 +280,17 @@ public class HybridDomain implements ClassicHybridDomain {
 
 		// parse Params
 		String[] paramElements = parseKeyword(PARAM_KEYWORD, usageElement);
-		int[] resourceRequirementPositions = new int[paramElements.length];
-		String[] resourceRequirements = new String[paramElements.length];
+		List<ResourceParameterRequirement> parameterRequirements = new ArrayList<>();
 		for (int j = 0; j < paramElements.length; j++) {
 			String paramElement = paramElements[j];
-			resourceRequirementPositions[j] = 
-					Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
-			resourceRequirements[j] = paramElement.substring(paramElement.indexOf(" ")).trim();
+			int position = Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
+			String value = paramElement.substring(paramElement.indexOf(" ")).trim();
+			parameterRequirements.add(new ResourceParameterRequirement(position, value));
 		}
-		
 
-		return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions, 
-				resourceRequirements, usageLevel);
+		return stateUsage
+				? new ResourceRequirement(resourceName, fluentType, parameterRequirements, usageLevel)
+				: new ResourceRequirement(resourceName, parameterRequirements, usageLevel);
 	}
 
 	private static String[] parsePredicateSymbols(String everything) {

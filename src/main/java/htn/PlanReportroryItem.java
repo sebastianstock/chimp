@@ -18,8 +18,9 @@ import chimp.adapter.metacsp.MetaCspIntegerConstraintAdapter;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
+import chimp.model.ResourceRequirement;
+import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
 import org.metacsp.utility.logging.MetaCSPLogging;
-import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
@@ -33,6 +34,8 @@ public abstract class PlanReportroryItem {
 			new MetaCspTemporalConstraintAdapter();
 	private static final MetaCspIntegerConstraintAdapter INTEGER_ADAPTER =
 			new MetaCspIntegerConstraintAdapter();
+	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
+			new MetaCspResourceRequirementAdapter();
 	
 	private static final boolean MULT_ACTION_NEG_EFFECT = false;
 	
@@ -68,8 +71,8 @@ public abstract class PlanReportroryItem {
 	 */
 	protected TemporalBounds durationBounds;
 	
-	protected final List<ResourceUsageTemplate> resourceUsageIndicators = 
-			new ArrayList<ResourceUsageTemplate>();
+	protected final List<ResourceRequirement> resourceUsageIndicators =
+			new ArrayList<ResourceRequirement>();
 
 	public PlanReportroryItem(String taskname, String[] arguments, IntArg[] intArgs, HTNPrecondition[] preconditions,
 							  EffectTemplate[] effects, int preferenceWeight) {
@@ -88,11 +91,11 @@ public abstract class PlanReportroryItem {
 		this(taskname, arguments, new IntArg[0], preconditions, effects, preferenceWeight);
 	}
 	
-	public void addResourceUsageTemplate(ResourceUsageTemplate rt) {
+	public void addResourceRequirement(ResourceRequirement rt) {
 		resourceUsageIndicators.add(rt);
 	}
 	
-	public void addResourceUsageTemplates(List<ResourceUsageTemplate> rtList) {
+	public void addResourceRequirements(List<ResourceRequirement> rtList) {
 		resourceUsageIndicators.addAll(rtList);
 	}
 	
@@ -454,9 +457,10 @@ public abstract class PlanReportroryItem {
 				}
 
 				// Add Constraints for RESOURCES
-				for (ResourceUsageTemplate rt : this.resourceUsageIndicators) {
+				for (ResourceRequirement rt : this.resourceUsageIndicators) {
 					FluentConstraint resourceCon = 
-							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE,
+									RESOURCE_ADAPTER.toResourceUsageTemplate(rt));
 					resourceCon.setFrom(taskFluent);
 					resourceCon.setTo(taskFluent);
 					cn.addConstraint(resourceCon);

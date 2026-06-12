@@ -32,6 +32,7 @@ import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
+import chimp.model.ResourceRequirement;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRemoveAllSamples {
@@ -215,7 +216,7 @@ public class TestRemoveAllSamples {
 		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
 		selectionConstraint.addOperators(dom.getOperators());
 		selectionConstraint.addMethods(dom.getMethods());
-		Vector<ResourceUsageTemplate> fluentResourceUsages = dom.getFluentResourceUsages();
+		Vector<ResourceRequirement> fluentResourceUsages = dom.getFluentResourceUsages();
 		selectionConstraint.setResourceUsages(fluentResourceUsages);
 		
 		for (FluentScheduler fs : dom.getFluentSchedulers()) {

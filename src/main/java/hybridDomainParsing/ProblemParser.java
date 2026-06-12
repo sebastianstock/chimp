@@ -18,10 +18,13 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import planner.CHIMPProblem;
-import resourceFluent.ResourceUsageTemplate;
+import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
+import chimp.model.ResourceRequirement;
 import unify.CompoundSymbolicVariable;
 
 public class ProblemParser implements CHIMPProblem {
+	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
+			new MetaCspResourceRequirementAdapter();
 		
 	public static final String PROBLEM_KEYWORD = "Problem";
 	public static final String FLUENT_KEYWORD = "Fluent";
@@ -103,20 +106,21 @@ public class ProblemParser implements CHIMPProblem {
 	}
 
 	private Constraint[] createResourceUsageConstraints(
-			List<ResourceUsageTemplate> fluentResourceUsages,
+			List<ResourceRequirement> fluentResourceUsages,
 			Collection<Variable> vars) {
 		List<Constraint> ret = new ArrayList<Constraint>();
-		Map<String, List<ResourceUsageTemplate>> usageTemplatesMap = HTNMetaConstraint.createResourceUsagesMap(fluentResourceUsages);
+		Map<String, List<ResourceRequirement>> usageTemplatesMap = HTNMetaConstraint.createResourceUsagesMap(fluentResourceUsages);
 		
 		for(Variable var : vars) {
 			CompoundSymbolicVariable csv = ((Fluent) var).getCompoundSymbolicVariable();
 			String symbol = csv.getPredicateName();
 			
-			List<ResourceUsageTemplate> rtList = usageTemplatesMap.get(symbol);
+			List<ResourceRequirement> rtList = usageTemplatesMap.get(symbol);
 			if (rtList != null) {
-				for (ResourceUsageTemplate rt : rtList) {
+				for (ResourceRequirement rt : rtList) {
 					FluentConstraint resourceCon = 
-							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE,
+									RESOURCE_ADAPTER.toResourceUsageTemplate(rt));
 					resourceCon.setFrom(var);
 					resourceCon.setTo(var);
 					ret.add(resourceCon);
