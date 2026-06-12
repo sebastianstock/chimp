@@ -7,12 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
-
 import com.google.common.primitives.Ints;
 
-import fluentSolver.FluentNetworkSolver;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalConstraintTemplate;
+import chimp.model.TemporalRelation;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNPrecondition;
@@ -247,22 +246,22 @@ public abstract class PlanReportroiryItemParser {
 		for (String conElement : constraintElements) {
 			try {
 				String constraintName = null;
-				Vector<Bounds> bounds = null;
+				List<TemporalBounds> bounds = null;
 				if (conElement.contains("[")) {
 					constraintName = conElement.substring(0,conElement.indexOf("[")).trim();
 					String boundsString = conElement.substring(conElement.indexOf("["),conElement.lastIndexOf("]")+1);
 					String[] splitBounds = boundsString.split("\\[");
-					bounds = new Vector<Bounds>();
+					bounds = new ArrayList<TemporalBounds>();
 					for (String oneBound : splitBounds) {
 						if (!oneBound.trim().equals("")) {
 							String lbString = oneBound.substring(oneBound.indexOf("[")+1,oneBound.indexOf(",")).trim();
 							String ubString = oneBound.substring(oneBound.indexOf(",")+1,oneBound.indexOf("]")).trim();
 							long lb, ub;
-							if (lbString.equals("INF")) lb = org.metacsp.time.APSPSolver.INF;
+							if (lbString.equals("INF")) lb = TemporalBounds.INFINITY;
 							else lb = Long.parseLong(lbString);
-							if (ubString.equals("INF")) ub = org.metacsp.time.APSPSolver.INF;
+							if (ubString.equals("INF")) ub = TemporalBounds.INFINITY;
 							else ub = Long.parseLong(ubString);
-							bounds.add(new Bounds(lb,ub));
+							bounds.add(new TemporalBounds(lb,ub));
 						}
 					}
 				}
@@ -288,11 +287,10 @@ public abstract class PlanReportroiryItemParser {
 					to = fromSeg.substring(fromSeg.indexOf(",")+1, fromSeg.indexOf(")")).trim();
 				}
 
-				AllenIntervalConstraint con = null;
-				if (bounds != null) {
-					con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName),bounds.toArray(new Bounds[bounds.size()]));
-				}
-				else con = new AllenIntervalConstraint(AllenIntervalConstraint.Type.valueOf(constraintName));
+				TemporalRelation relation = TemporalRelation.valueOf(constraintName);
+				TemporalConstraintTemplate con = bounds != null
+						? new TemporalConstraintTemplate(relation, bounds)
+						: new TemporalConstraintTemplate(relation);
 				additionalAIConstraints.add(new AdditionalConstraintTemplate(con, from, to));
 			} catch (Exception e) {
 				System.err.println(e);

@@ -1,6 +1,9 @@
 package hybridDomainParsing.classic.antlr;
 
 import com.google.common.primitives.Ints;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalConstraintTemplate;
+import chimp.model.TemporalRelation;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
@@ -21,9 +24,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.APSPSolver;
-import org.metacsp.time.Bounds;
 import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
@@ -831,33 +831,28 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     @Override
     public AdditionalConstraintTemplate visitUnary_temporal_constraint_def(
             ChimpClassicParser.Unary_temporal_constraint_defContext ctx) {
-        AllenIntervalConstraint.Type constraintType =
+        TemporalRelation constraintType =
                 visitUnary_temporal_constraint_type(ctx.unary_temporal_constraint_type());
         String from = visitId_or_task(ctx.id_or_task());
         return createAdditionalConstraintTemplate(constraintType, from, from, visitBounds_list(ctx.bounds_list()));
     }
 
-    public AdditionalConstraintTemplate createAdditionalConstraintTemplate(AllenIntervalConstraint.Type constraintType,
-                                              String from, String to, Bounds[] bounds) {
-        AllenIntervalConstraint con;
-        if (bounds.length > 0) {
-            con = new AllenIntervalConstraint(constraintType, bounds);
-        } else {
-            con = new AllenIntervalConstraint(constraintType);
-        }
+    public AdditionalConstraintTemplate createAdditionalConstraintTemplate(TemporalRelation constraintType,
+                                              String from, String to, List<TemporalBounds> bounds) {
+        TemporalConstraintTemplate con = new TemporalConstraintTemplate(constraintType, bounds);
         return new AdditionalConstraintTemplate(con, from, to);
     }
 
     @Override
-    public AllenIntervalConstraint.Type visitUnary_temporal_constraint_type(
+    public TemporalRelation visitUnary_temporal_constraint_type(
             ChimpClassicParser.Unary_temporal_constraint_typeContext ctx) {
-        return AllenIntervalConstraint.Type.valueOf(ctx.getText().split(" ")[1]);
+        return TemporalRelation.valueOf(ctx.getText().split(" ")[1]);
     }
 
     @Override
     public AdditionalConstraintTemplate visitBinary_temporal_constraint_def(
             ChimpClassicParser.Binary_temporal_constraint_defContext ctx) {
-        AllenIntervalConstraint.Type constraintType =
+        TemporalRelation constraintType =
                 visitBinary_temporal_constraint_type(ctx.binary_temporal_constraint_type());
         String from = visitId_or_task(ctx.id_or_task(0));
         String to = visitId_or_task(ctx.id_or_task(1));
@@ -865,30 +860,30 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public AllenIntervalConstraint.Type visitBinary_temporal_constraint_type(ChimpClassicParser.Binary_temporal_constraint_typeContext ctx) {
-        return AllenIntervalConstraint.Type.valueOf(ctx.getText());
+    public TemporalRelation visitBinary_temporal_constraint_type(ChimpClassicParser.Binary_temporal_constraint_typeContext ctx) {
+        return TemporalRelation.valueOf(ctx.getText());
     }
 
     @Override
-    public Bounds[] visitBounds_list(ChimpClassicParser.Bounds_listContext ctx) {
-        Bounds[] bounds = new Bounds[ctx.bounds().size()];
+    public List<TemporalBounds> visitBounds_list(ChimpClassicParser.Bounds_listContext ctx) {
+        List<TemporalBounds> bounds = new ArrayList<>();
         for (int i = 0; i < ctx.bounds().size(); i++) {
-            bounds[i] = visitBounds(ctx.bounds(i));
+            bounds.add(visitBounds(ctx.bounds(i)));
         }
         return bounds;
     }
 
     @Override
-    public Bounds visitBounds(ChimpClassicParser.BoundsContext ctx) {
+    public TemporalBounds visitBounds(ChimpClassicParser.BoundsContext ctx) {
         Long lb = visitBound(ctx.bound(0));
         Long ub = visitBound(ctx.bound(1));
-        return new Bounds(lb, ub);
+        return new TemporalBounds(lb, ub);
     }
 
     @Override
     public Long visitBound(ChimpClassicParser.BoundContext ctx) {
         if (ctx.getText().equals("INF")) {
-            return APSPSolver.INF;
+            return TemporalBounds.INFINITY;
         } else {
             return numberToLong(ctx.NUMBER());
         }

@@ -12,12 +12,15 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 
 import htn.AdditionalConstraintTemplate;
+import chimp.adapter.metacsp.MetaCspTemporalConstraintAdapter;
 import htn.PlanReportroryItem;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
 public class FluentConstraint extends MultiBinaryConstraint {
+	private static final MetaCspTemporalConstraintAdapter TEMPORAL_ADAPTER =
+			new MetaCspTemporalConstraintAdapter();
 
 	/**
 	 * 
@@ -91,7 +94,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.DC)) {
 			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
 				for (AdditionalConstraintTemplate aConTemplate : additionalConstraints) {
-					AllenIntervalConstraint con = (AllenIntervalConstraint) aConTemplate.getConstraint().clone();
+					AllenIntervalConstraint con = TEMPORAL_ADAPTER.toAllenIntervalConstraint(aConTemplate.getConstraint());
 					if (aConTemplate.startsFromHead()) {
 						con.setFrom(((Fluent) f).getAllenInterval());
 						con.setTo(((Fluent) t).getAllenInterval());
@@ -113,7 +116,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.PRE)) {
 			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
 				for (AdditionalConstraintTemplate aConTemplate : additionalConstraints) {
-					AllenIntervalConstraint con = (AllenIntervalConstraint) aConTemplate.getConstraint().clone();
+					AllenIntervalConstraint con = TEMPORAL_ADAPTER.toAllenIntervalConstraint(aConTemplate.getConstraint());
 					if (aConTemplate.startsFromHead()) {
 						con.setFrom(((Fluent) t).getAllenInterval());
 						con.setTo(((Fluent) f).getAllenInterval());
@@ -140,7 +143,7 @@ public class FluentConstraint extends MultiBinaryConstraint {
 		} else if (this.type.equals(Type.OPENS)) { 
 			if (additionalConstraints != null && additionalConstraints.size() > 0) { 
 				for (AdditionalConstraintTemplate aConTemplate : additionalConstraints) {
-					AllenIntervalConstraint con = (AllenIntervalConstraint) aConTemplate.getConstraint().clone();
+					AllenIntervalConstraint con = TEMPORAL_ADAPTER.toAllenIntervalConstraint(aConTemplate.getConstraint());
 					if (aConTemplate.startsFromHead()) {
 						con.setFrom(((Fluent) f).getAllenInterval());
 						con.setTo(((Fluent) t).getAllenInterval());

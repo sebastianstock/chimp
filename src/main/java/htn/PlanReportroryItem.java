@@ -14,6 +14,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
+import chimp.adapter.metacsp.MetaCspTemporalConstraintAdapter;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
@@ -25,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public abstract class PlanReportroryItem {
+	private static final MetaCspTemporalConstraintAdapter TEMPORAL_ADAPTER =
+			new MetaCspTemporalConstraintAdapter();
 	
 	private static final boolean MULT_ACTION_NEG_EFFECT = false;
 	
@@ -616,12 +619,12 @@ public abstract class PlanReportroryItem {
 							+ toKey + " in " + taskname );
 				}
 				
-				AllenIntervalConstraint newCon = (AllenIntervalConstraint) act.getConstraint().clone();
+				AllenIntervalConstraint newCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(act.getConstraint());
 				newCon.setFrom(from);
 				newCon.setTo(to);
 				ret.add(newCon);
 			} else if (act.headToHead()) {    // HEAD -> HEAD
-				AllenIntervalConstraint newCon = (AllenIntervalConstraint) act.getConstraint().clone();
+				AllenIntervalConstraint newCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(act.getConstraint());
 				newCon.setFrom(taskFluent.getAllenInterval());
 				newCon.setTo(taskFluent.getAllenInterval());
 				ret.add(newCon);

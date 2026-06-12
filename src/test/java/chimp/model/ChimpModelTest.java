@@ -57,6 +57,20 @@ public class ChimpModelTest {
     }
 
     @Test
+    public void temporalConstraintTemplateIsAnImmutableValue() {
+        List<TemporalBounds> bounds = new ArrayList<>(List.of(
+                new TemporalBounds(5, TemporalBounds.INFINITY)));
+        TemporalConstraintTemplate template = new TemporalConstraintTemplate(
+                TemporalRelation.Duration, bounds);
+
+        bounds.clear();
+
+        assertEquals(TemporalRelation.Duration, template.relation());
+        assertEquals(List.of(new TemporalBounds(5, Long.MAX_VALUE - 1)), template.bounds());
+        assertThrows(UnsupportedOperationException.class, () -> template.bounds().clear());
+    }
+
+    @Test
     public void temporalIntervalRepresentsAValidSolvedInterval() {
         TemporalInterval interval = new TemporalInterval(1, 10, 6, 20);
 
