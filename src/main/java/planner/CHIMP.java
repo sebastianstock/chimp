@@ -23,8 +23,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
+import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
 import chimp.model.ResourceCapacity;
-import resourceFluent.FluentScheduler;
 import ui.PlanHierarchyFrame;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
@@ -41,6 +41,8 @@ import java.util.*;
 public class CHIMP {
 	private static final MetaCspResourceCapacityAdapter RESOURCE_CAPACITY_ADAPTER =
 			new MetaCspResourceCapacityAdapter();
+	private static final MetaCspStateVariableAdapter STATE_VARIABLE_ADAPTER =
+			new MetaCspStateVariableAdapter();
 
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
@@ -325,8 +327,10 @@ public class CHIMP {
 			htnConstraint.enableUnification();
 		}
 		
-		for (FluentScheduler fs : domain.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
+		for (var definition : domain.getStateVariableDefinitions()) {
+			for (var scheduler : STATE_VARIABLE_ADAPTER.toFluentSchedulers(definition)) {
+				planner.addMetaConstraint(scheduler);
+			}
 		}
 		
 		for (ResourceCapacity resourceCapacity : domain.getResourceCapacities()) {

@@ -30,11 +30,11 @@ import hybridDomainParsing.HybridDomain;
 import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import chimp.model.ResourceRequirement;
 import chimp.model.ResourceCapacity;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
+import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRemoveAllSamples {
@@ -221,8 +221,11 @@ public class TestRemoveAllSamples {
 		Vector<ResourceRequirement> fluentResourceUsages = dom.getFluentResourceUsages();
 		selectionConstraint.setResourceUsages(fluentResourceUsages);
 		
-		for (FluentScheduler fs : dom.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
+		MetaCspStateVariableAdapter stateVariableAdapter = new MetaCspStateVariableAdapter();
+		for (var definition : dom.getStateVariableDefinitions()) {
+			for (var scheduler : stateVariableAdapter.toFluentSchedulers(definition)) {
+				planner.addMetaConstraint(scheduler);
+			}
 		}
 		
 		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();

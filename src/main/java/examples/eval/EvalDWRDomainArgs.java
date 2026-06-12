@@ -38,8 +38,8 @@ import hybridDomainParsing.HybridDomain;
 import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
+import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
 import chimp.model.ResourceCapacity;
-import resourceFluent.FluentScheduler;
 import chimp.model.ResourceRequirement;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
@@ -324,8 +324,11 @@ public class EvalDWRDomainArgs {
 		htnConstraint.setResourceUsages(fluentResourceUsages);
 		
 		
-		for (FluentScheduler fs : domain.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
+		MetaCspStateVariableAdapter stateVariableAdapter = new MetaCspStateVariableAdapter();
+		for (var definition : domain.getStateVariableDefinitions()) {
+			for (var scheduler : stateVariableAdapter.toFluentSchedulers(definition)) {
+				planner.addMetaConstraint(scheduler);
+			}
 		}
 		
 		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();

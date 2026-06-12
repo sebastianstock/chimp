@@ -32,11 +32,11 @@ import hybridDomainParsing.HybridDomain;
 import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import chimp.model.ResourceRequirement;
 import chimp.model.ResourceCapacity;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
+import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestTransTerraProblems {
@@ -238,8 +238,11 @@ public class TestTransTerraProblems {
 		selectionConstraint.addMethods(dom.getMethods());
 		selectionConstraint.setResourceUsages(dom.getFluentResourceUsages());
 		
-		for (FluentScheduler fs : dom.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
+		MetaCspStateVariableAdapter stateVariableAdapter = new MetaCspStateVariableAdapter();
+		for (var definition : dom.getStateVariableDefinitions()) {
+			for (var scheduler : stateVariableAdapter.toFluentSchedulers(definition)) {
+				planner.addMetaConstraint(scheduler);
+			}
 		}
 		
 		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();
@@ -318,8 +321,11 @@ public class TestTransTerraProblems {
 		Vector<ResourceRequirement> fluentResourceUsages = domain.getFluentResourceUsages();
 		htnConstraint.setResourceUsages(fluentResourceUsages);
 		
-		for (FluentScheduler fs : domain.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
+		MetaCspStateVariableAdapter stateVariableAdapter = new MetaCspStateVariableAdapter();
+		for (var definition : domain.getStateVariableDefinitions()) {
+			for (var scheduler : stateVariableAdapter.toFluentSchedulers(definition)) {
+				planner.addMetaConstraint(scheduler);
+			}
 		}
 		
 		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();

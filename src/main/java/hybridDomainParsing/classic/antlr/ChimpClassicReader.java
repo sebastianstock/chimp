@@ -8,6 +8,7 @@ import chimp.model.IntegerConstraintKind;
 import chimp.model.ResourceParameterRequirement;
 import chimp.model.ResourceRequirement;
 import chimp.model.ResourceCapacity;
+import chimp.model.StateVariableDefinition;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
@@ -27,7 +28,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import resourceFluent.FluentScheduler;
 
 import java.io.IOException;
 import java.util.*;
@@ -37,7 +37,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     public class ParsedDomain implements ClassicHybridDomain {
         public final List<PlanReportroryItem> operators = new ArrayList<PlanReportroryItem>();
         public final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
-        public final List<FluentScheduler> fluentSchedulers = new ArrayList<FluentScheduler>();
+        public final List<StateVariableDefinition> stateVariableDefinitions = new ArrayList<>();
         public String name;
         public final List<ResourceCapacity> resourceCapacities = new ArrayList<ResourceCapacity>();
         public final List<ResourceRequirement> fluentResourceUsages =
@@ -58,8 +58,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         }
 
         @Override
-        public List<FluentScheduler> getFluentSchedulers() {
-            return fluentSchedulers;
+        public List<StateVariableDefinition> getStateVariableDefinitions() {
+            return stateVariableDefinitions;
         }
 
         @Override
@@ -173,7 +173,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
                 ret.resourceCapacities.add(
                         visitDomain_item_resource((ChimpClassicParser.Domain_item_resourceContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_statevariableContext) {
-                ret.fluentSchedulers.addAll(
+                ret.stateVariableDefinitions.add(
                         visitDomain_item_statevariable((ChimpClassicParser.Domain_item_statevariableContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_methodContext) {
                 ret.methods.add(visitDomain_item_method((ChimpClassicParser.Domain_item_methodContext) d));
@@ -198,7 +198,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public List<FluentScheduler> visitDomain_item_statevariable(ChimpClassicParser.Domain_item_statevariableContext ctx) {
+    public StateVariableDefinition visitDomain_item_statevariable(ChimpClassicParser.Domain_item_statevariableContext ctx) {
         return visitStatevariable_def(ctx.statevariable_def());
     }
 
@@ -251,14 +251,14 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public List<FluentScheduler> visitStatevariable_def(ChimpClassicParser.Statevariable_defContext ctx) {
+    public StateVariableDefinition visitStatevariable_def(ChimpClassicParser.Statevariable_defContext ctx) {
         String name = visitStatevariable_name(ctx.statevariable_name());
         int field = numberToInt(ctx.NUMBER());
-        List<FluentScheduler> schedulers = new ArrayList<>();
+        List<String> exclusiveValues = new ArrayList<>();
         for (TerminalNode fieldValue : ctx.NAME()) {
-            schedulers.add(new FluentScheduler(null, null, name, field, fieldValue.getText()));
+            exclusiveValues.add(fieldValue.getText());
         }
-        return schedulers;
+        return new StateVariableDefinition(name, field, exclusiveValues);
     }
 
     @Override

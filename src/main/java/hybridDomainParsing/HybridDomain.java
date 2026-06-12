@@ -17,14 +17,14 @@ import htn.PlanReportroryItem;
 import chimp.model.ResourceParameterRequirement;
 import chimp.model.ResourceRequirement;
 import chimp.model.ResourceCapacity;
-import resourceFluent.FluentScheduler;
+import chimp.model.StateVariableDefinition;
 
 
 public class HybridDomain implements ClassicHybridDomain {
 
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
 	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();
-	private final Vector<FluentScheduler> fluentSchedulers = new Vector<FluentScheduler>();
+	private final Vector<StateVariableDefinition> stateVariableDefinitions = new Vector<>();
 	private String name;
 	private final Vector<ResourceCapacity> resourceCapacities = new Vector<ResourceCapacity>();
 	private final Vector<ResourceRequirement> fluentResourceUsages =
@@ -78,8 +78,8 @@ public class HybridDomain implements ClassicHybridDomain {
 		return methods;
 	}
 	
-	public Vector<FluentScheduler> getFluentSchedulers() {
-		return fluentSchedulers;
+	public Vector<StateVariableDefinition> getStateVariableDefinitions() {
+		return stateVariableDefinitions;
 	}
 	
 	public Vector<ResourceCapacity> getResourceCapacities() {
@@ -108,15 +108,12 @@ public class HybridDomain implements ClassicHybridDomain {
 		}
 	}
 
-	private void createFluentSchedulers(String stateStr) {
-		// Parse Head	
+	static StateVariableDefinition parseStateVariableDefinition(String stateStr) {
 		String[] elements = stateStr.split(" ");
 		String head = elements[0];
 		int field = Integer.parseInt(elements[1]);
-		String[] fieldValues = Arrays.copyOfRange(elements, 2, elements.length);
-		for (String fieldValue : fieldValues) {
-			this.fluentSchedulers.add(new FluentScheduler(null, null, head, field, fieldValue));
-		}
+		List<String> fieldValues = Arrays.asList(Arrays.copyOfRange(elements, 2, elements.length));
+		return new StateVariableDefinition(head, field, fieldValues);
 	}
 	
 	private static String readDomain(String fileName) throws DomainParsingException{
@@ -188,7 +185,7 @@ public class HybridDomain implements ClassicHybridDomain {
 		// Parse state variables:
 		String[] stateVariableElements = parseKeyword(STATE_VARIBALE_KEYWORD, domainStr);
 		for (String stateStr : stateVariableElements) {
-			createFluentSchedulers(stateStr);
+			stateVariableDefinitions.add(parseStateVariableDefinition(stateStr));
 		}
 	}
 
