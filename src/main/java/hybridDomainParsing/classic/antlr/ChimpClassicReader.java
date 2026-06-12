@@ -7,6 +7,7 @@ import chimp.model.TemporalRelation;
 import chimp.model.IntegerConstraintKind;
 import chimp.model.ResourceParameterRequirement;
 import chimp.model.ResourceRequirement;
+import chimp.model.ResourceCapacity;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
@@ -26,7 +27,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 
 import java.io.IOException;
@@ -39,8 +39,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         public final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
         public final List<FluentScheduler> fluentSchedulers = new ArrayList<FluentScheduler>();
         public String name;
-        public final List<FluentResourceUsageScheduler> resourceSchedulers =
-                new ArrayList<FluentResourceUsageScheduler>();
+        public final List<ResourceCapacity> resourceCapacities = new ArrayList<ResourceCapacity>();
         public final List<ResourceRequirement> fluentResourceUsages =
                 new ArrayList<ResourceRequirement>();
 
@@ -69,8 +68,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         }
 
         @Override
-        public List<FluentResourceUsageScheduler> getResourceSchedulers() {
-            return resourceSchedulers;
+        public List<ResourceCapacity> getResourceCapacities() {
+            return resourceCapacities;
         }
 
         @Override
@@ -171,7 +170,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             if (d instanceof ChimpClassicParser.Domain_item_operatorContext) {
                 ret.operators.add(visitDomain_item_operator((ChimpClassicParser.Domain_item_operatorContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_resourceContext) {
-                ret.resourceSchedulers.add(
+                ret.resourceCapacities.add(
                         visitDomain_item_resource((ChimpClassicParser.Domain_item_resourceContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_statevariableContext) {
                 ret.fluentSchedulers.addAll(
@@ -188,7 +187,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public FluentResourceUsageScheduler visitDomain_item_resource(ChimpClassicParser.Domain_item_resourceContext ctx) {
+    public ResourceCapacity visitDomain_item_resource(ChimpClassicParser.Domain_item_resourceContext ctx) {
         return visitResource_def(ctx.resource_def());
     }
 
@@ -247,9 +246,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public FluentResourceUsageScheduler visitResource_def(ChimpClassicParser.Resource_defContext ctx) {
-        return new FluentResourceUsageScheduler(null, null, ctx.NAME().getText(),
-                numberToInt(ctx.NUMBER()));
+    public ResourceCapacity visitResource_def(ChimpClassicParser.Resource_defContext ctx) {
+        return new ResourceCapacity(ctx.NAME().getText(), numberToInt(ctx.NUMBER()));
     }
 
     @Override

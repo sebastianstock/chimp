@@ -35,6 +35,8 @@ import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import chimp.model.ResourceRequirement;
+import chimp.model.ResourceCapacity;
+import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestTransTerraProblems {
@@ -240,9 +242,11 @@ public class TestTransTerraProblems {
 			planner.addMetaConstraint(fs);
 		}
 		
-		for (FluentResourceUsageScheduler rs : dom.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
-			System.out.println("Added FluentResourceUsageScheduler: " + rs);
+		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();
+		for (ResourceCapacity capacity : dom.getResourceCapacities()) {
+			FluentResourceUsageScheduler scheduler = resourceAdapter.toResourceScheduler(capacity);
+			planner.addMetaConstraint(scheduler);
+			System.out.println("Added FluentResourceUsageScheduler: " + scheduler);
 		}
 		
 		planner.addMetaConstraint(selectionConstraint);
@@ -318,8 +322,9 @@ public class TestTransTerraProblems {
 			planner.addMetaConstraint(fs);
 		}
 		
-		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
+		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();
+		for (ResourceCapacity capacity : domain.getResourceCapacities()) {
+			planner.addMetaConstraint(resourceAdapter.toResourceScheduler(capacity));
 		}
 		
 		MoveBaseDurationEstimator mbEstimator = new LookUpTableDurationEstimatorICO();

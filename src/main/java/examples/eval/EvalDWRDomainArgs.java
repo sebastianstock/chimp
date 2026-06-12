@@ -37,7 +37,8 @@ import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
-import resourceFluent.FluentResourceUsageScheduler;
+import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
+import chimp.model.ResourceCapacity;
 import resourceFluent.FluentScheduler;
 import chimp.model.ResourceRequirement;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -327,8 +328,9 @@ public class EvalDWRDomainArgs {
 			planner.addMetaConstraint(fs);
 		}
 		
-		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
+		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();
+		for (ResourceCapacity capacity : domain.getResourceCapacities()) {
+			planner.addMetaConstraint(resourceAdapter.toResourceScheduler(capacity));
 		}
 		
 		if (GUESS_ORDERING) {

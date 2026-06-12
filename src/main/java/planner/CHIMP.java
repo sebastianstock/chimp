@@ -22,7 +22,8 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import resourceFluent.FluentResourceUsageScheduler;
+import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
+import chimp.model.ResourceCapacity;
 import resourceFluent.FluentScheduler;
 import ui.PlanHierarchyFrame;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -38,6 +39,8 @@ import java.util.*;
  *
  */
 public class CHIMP {
+	private static final MetaCspResourceCapacityAdapter RESOURCE_CAPACITY_ADAPTER =
+			new MetaCspResourceCapacityAdapter();
 
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
@@ -326,8 +329,8 @@ public class CHIMP {
 			planner.addMetaConstraint(fs);
 		}
 		
-		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
+		for (ResourceCapacity resourceCapacity : domain.getResourceCapacities()) {
+			planner.addMetaConstraint(RESOURCE_CAPACITY_ADAPTER.toResourceScheduler(resourceCapacity));
 		}
 		
 		if (guessOrdering) {

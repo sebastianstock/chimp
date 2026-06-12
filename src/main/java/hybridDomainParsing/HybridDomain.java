@@ -16,7 +16,7 @@ import htn.HTNOperator;
 import htn.PlanReportroryItem;
 import chimp.model.ResourceParameterRequirement;
 import chimp.model.ResourceRequirement;
-import resourceFluent.FluentResourceUsageScheduler;
+import chimp.model.ResourceCapacity;
 import resourceFluent.FluentScheduler;
 
 
@@ -26,8 +26,7 @@ public class HybridDomain implements ClassicHybridDomain {
 	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();
 	private final Vector<FluentScheduler> fluentSchedulers = new Vector<FluentScheduler>();
 	private String name;
-	private final Vector<FluentResourceUsageScheduler> resourceSchedulers = 
-			new Vector<FluentResourceUsageScheduler>();
+	private final Vector<ResourceCapacity> resourceCapacities = new Vector<ResourceCapacity>();
 	private final Vector<ResourceRequirement> fluentResourceUsages =
 			new Vector<ResourceRequirement>();
 	
@@ -83,8 +82,8 @@ public class HybridDomain implements ClassicHybridDomain {
 		return fluentSchedulers;
 	}
 	
-	public Vector<FluentResourceUsageScheduler> getResourceSchedulers() {
-		return resourceSchedulers;
+	public Vector<ResourceCapacity> getResourceCapacities() {
+		return resourceCapacities;
 	}
 	
 	public Vector<ResourceRequirement> getFluentResourceUsages() {
@@ -154,25 +153,18 @@ public class HybridDomain implements ClassicHybridDomain {
 	public void parseDomain(Map<String, String[]> typesInstancesMap) throws DomainParsingException {
 		name = parseKeyword(DOMAIN_KEYWORD, domainStr)[0];
 		
-		// Parse Resources and create ResourceSchedulers
+		// Parse resource capacities.
 		String[] resourceElements = parseKeyword(RESOURCE_KEYWORD, domainStr);
-		Map<String,Integer> resources = processResources(resourceElements);
-		resourceSchedulers.clear();
-		for (Entry<String, Integer> entry : resources.entrySet()) {
-			FluentResourceUsageScheduler rs = new FluentResourceUsageScheduler(null, null, entry.getKey(), 
-					entry.getValue().intValue());
-			
-//			resourceSchedulers.add(new FluentResourceUsageScheduler(null, null, entry.getKey(), 
-//					entry.getValue().intValue()));
-			resourceSchedulers.add(rs);
-		}
+		List<ResourceCapacity> resources = processResources(resourceElements);
+		resourceCapacities.clear();
+		resourceCapacities.addAll(resources);
 		
 		// Parse FluentResourceUsages
 		String[] usageElements = parseKeyword(FLUENT_RESOURCE_KEYWORD, domainStr);
 		processFluentResourceUsages(usageElements);
 		// test if all resources are listed:
 		for (ResourceRequirement rt : fluentResourceUsages) {
-			if (!resources.containsKey(rt.resourceName())) {
+			if (resources.stream().noneMatch(capacity -> capacity.resourceName().equals(rt.resourceName()))) {
 				throw new DomainParsingException("Resource " + rt.resourceName() + " is not defined");
 			}
 		}
@@ -236,12 +228,12 @@ public class HybridDomain implements ClassicHybridDomain {
 		return elements.toArray(new String[elements.size()]);		
 	}
 
-	protected static HashMap<String,Integer> processResources (String[] resources) {
-		HashMap<String, Integer> ret = new HashMap<String, Integer>();
+	protected static List<ResourceCapacity> processResources (String[] resources) {
+		List<ResourceCapacity> ret = new ArrayList<ResourceCapacity>();
 		for (String resourceElement : resources) {
 			String resourceName = resourceElement.substring(0,resourceElement.indexOf(" ")).trim();
 			int resourceCap = Integer.parseInt(resourceElement.substring(resourceElement.indexOf(" ")).trim());
-			ret.put(resourceName, resourceCap);
+			ret.add(new ResourceCapacity(resourceName, resourceCap));
 		}
 		return ret;
 	}

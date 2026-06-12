@@ -33,6 +33,8 @@ import resourceFluent.FluentResourceUsageScheduler;
 import resourceFluent.FluentScheduler;
 import resourceFluent.ResourceUsageTemplate;
 import chimp.model.ResourceRequirement;
+import chimp.model.ResourceCapacity;
+import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRemoveAllSamples {
@@ -223,9 +225,11 @@ public class TestRemoveAllSamples {
 			planner.addMetaConstraint(fs);
 		}
 		
-		for (FluentResourceUsageScheduler rs : dom.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
-			System.out.println("Added FluentResourceUsageScheduler: " + rs);
+		MetaCspResourceCapacityAdapter resourceAdapter = new MetaCspResourceCapacityAdapter();
+		for (ResourceCapacity capacity : dom.getResourceCapacities()) {
+			FluentResourceUsageScheduler scheduler = resourceAdapter.toResourceScheduler(capacity);
+			planner.addMetaConstraint(scheduler);
+			System.out.println("Added FluentResourceUsageScheduler: " + scheduler);
 		}
 		
 		planner.addMetaConstraint(selectionConstraint);

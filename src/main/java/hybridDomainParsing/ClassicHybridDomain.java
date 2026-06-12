@@ -2,7 +2,7 @@ package hybridDomainParsing;
 
 import htn.PlanReportroryItem;
 import chimp.model.ResourceRequirement;
-import resourceFluent.FluentResourceUsageScheduler;
+import chimp.model.ResourceCapacity;
 import resourceFluent.FluentScheduler;
 
 import java.util.HashSet;
@@ -15,7 +15,7 @@ public interface ClassicHybridDomain {
     List<PlanReportroryItem> getMethods();
     List<FluentScheduler> getFluentSchedulers();
     String getName();
-    List<FluentResourceUsageScheduler> getResourceSchedulers();
+    List<ResourceCapacity> getResourceCapacities();
     List<ResourceRequirement> getFluentResourceUsages();
 
     /**
