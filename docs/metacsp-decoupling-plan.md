@@ -409,8 +409,8 @@ The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been 
 
 `PlanSnapshot` now provides an immutable grounded Activity/Task graph with ID, type, and constraint queries. `MetaCspModelAdapter` creates it from the solved fluent network, and `PlanExtractor` uses it for ROS and YAML action output. Hierarchy/debug output remains on the legacy solver path because it depends on markings and raw fluent rendering.
 
-Both domain parser paths now create CHIMP-owned `TemporalRelation`, `TemporalBounds`, and `TemporalConstraintTemplate` values. `AdditionalConstraintTemplate` retains endpoint keys without storing Meta-CSP objects, and `MetaCspTemporalConstraintAdapter` compiles a fresh `AllenIntervalConstraint` only when resolver or fluent constraints are materialized.
+Both domain parser paths now create CHIMP-owned `TemporalRelation`, `TemporalBounds`, and `TemporalConstraintTemplate` values. `AdditionalConstraintTemplate` retains endpoint keys without storing Meta-CSP objects, and `MetaCspTemporalConstraintAdapter` compiles a fresh `AllenIntervalConstraint` only when resolver or fluent constraints are materialized. Plan-repository duration bounds also use `TemporalBounds` and pass through the same compilation boundary.
 
-The next safe integration is to move plan-repository duration bounds onto the neutral temporal model so parser output no longer exposes `org.metacsp.time.Bounds`. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
+The next safe integration is to introduce neutral integer constraint templates so parser output no longer exposes `IntegerConstraint.Type`. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
 
 `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, and `HTNMetaConstraint` should otherwise remain unchanged until neutral parser definitions and resolver descriptions exist.

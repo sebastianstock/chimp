@@ -13,8 +13,10 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
 import chimp.adapter.metacsp.MetaCspTemporalConstraintAdapter;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalConstraintTemplate;
+import chimp.model.TemporalRelation;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import resourceFluent.ResourceUsageTemplate;
 import unify.CompoundSymbolicValueConstraint;
@@ -61,7 +63,7 @@ public abstract class PlanReportroryItem {
 	/**
 	 * The bounds that will be used for the duration constraint of this task.
 	 */
-	protected Bounds durationBounds;
+	protected TemporalBounds durationBounds;
 	
 	protected final List<ResourceUsageTemplate> resourceUsageIndicators = 
 			new ArrayList<ResourceUsageTemplate>();
@@ -441,8 +443,8 @@ public abstract class PlanReportroryItem {
 
 				// Add constraints for DURATION
 				if (durationBounds != null) {
-					AllenIntervalConstraint durationCon = 
-							new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, durationBounds);
+					AllenIntervalConstraint durationCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(
+							new TemporalConstraintTemplate(TemporalRelation.Duration, durationBounds));
 					durationCon.setFrom(taskFluent.getAllenInterval());
 					durationCon.setTo(taskFluent.getAllenInterval());
 					cn.addConstraint(durationCon);
@@ -858,7 +860,7 @@ public abstract class PlanReportroryItem {
 	 * 
 	 * @return The bounds that will be used for the duration constraint of this task.
 	 */
-	public Bounds getDurationBounds() {
+	public TemporalBounds getDurationBounds() {
 		return durationBounds;
 	}
 
@@ -866,7 +868,7 @@ public abstract class PlanReportroryItem {
 	 * 
 	 * @param durationBounds The bounds that will be used for the duration constraint of this task.
 	 */
-	public void setDurationBounds(Bounds durationBounds) {
+	public void setDurationBounds(TemporalBounds durationBounds) {
 		this.durationBounds = durationBounds;
 	}
 
