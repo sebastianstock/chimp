@@ -72,3 +72,9 @@ task fatJar(type: Jar) {
     with jar
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'junit:junit:4.13.2'
+    }
+}
+
