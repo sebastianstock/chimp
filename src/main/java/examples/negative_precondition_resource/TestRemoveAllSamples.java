@@ -35,6 +35,7 @@ import chimp.model.ResourceRequirement;
 import chimp.model.ResourceCapacity;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
+import chimp.adapter.metacsp.MetaCspProblemCompiler;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
 public class TestRemoveAllSamples {
@@ -100,7 +101,7 @@ public class TestRemoveAllSamples {
 
 		HybridDomain domain = initPlanner(planner, "testing/examples.negative_precondition_resource/negative_test_domain.ddl");
 
-		pp.createState(fluentSolver, domain);
+		new MetaCspProblemCompiler().compile(pp.getProblemDefinition(), fluentSolver, domain);
 		
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		

@@ -29,6 +29,7 @@ import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
+import chimp.adapter.metacsp.MetaCspProblemCompiler;
 import chimp.model.ResourceCapacity;
 import chimp.model.ResourceRequirement;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -117,7 +118,7 @@ public class TestDWRDomain {
 		}
 		
 		FluentNetworkSolver fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		pp.createState(fluentSolver, domain);
+		new MetaCspProblemCompiler().compile(pp.getProblemDefinition(), fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		MetaCSPLogging.setLevel(Level.INFO);

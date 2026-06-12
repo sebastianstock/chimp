@@ -1,112 +1,73 @@
 package planner;
 
-import java.util.*;
+import chimp.model.FluentSignature;
+import chimp.model.InitialFluentDefinition;
+import chimp.model.InitialTaskDefinition;
+import chimp.model.ProblemDefinition;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import hybridDomainParsing.ClassicHybridDomain;
-import hybridDomainParsing.HybridDomain;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * CHIMPProblem that is not based on a PDL file.
- * 
- * @author Sebastian Stock
- *
- */
+/** CHIMP problem assembled programmatically rather than parsed from PDL. */
 public class DynamicProblem implements CHIMPProblem {
-	
-	private class FluentPrototype {
-		
-		public FluentPrototype(String p, String[] a) {
-			this.predicate = p;
-			this.args = a;
-		}
-		
-		String predicate;
-		String[] args;
-	}
-	
-	private final Set<String> argumentSymbols = new HashSet<String>();
-	private final Map<String, String[]> typesInstancesMap = new HashMap<String, String[]>();
-	
-	private final List<FluentPrototype> stateVars = new ArrayList<FluentPrototype>();
-	private final List<FluentPrototype> taskVars = new ArrayList<FluentPrototype>();
+    private final Set<String> argumentSymbols = new LinkedHashSet<>();
+    private final Map<String, List<String>> typeInstances = new LinkedHashMap<>();
+    private final List<InitialFluentDefinition> initialFluents = new ArrayList<>();
+    private final List<InitialTaskDefinition> initialTasks = new ArrayList<>();
 
-	private boolean createdState = false;
-	
-	public void addArgumentSymbol(String symbol) {
-		argumentSymbols.add(symbol);
-	}
-	
-	public void setTypesInstances(String type, String[] instances) {
-		typesInstancesMap.put(type, instances);
-	}
-	
-	public void addState(String predicate, String[] args) {
-		stateVars.add(new FluentPrototype(predicate, args));
-		for (String s : args) {
-			argumentSymbols.add(s);
-		}
-	}
-	
-	public void addTask(String predicate, String[] args) {
-		taskVars.add(new FluentPrototype(predicate, args));
-		for (String s : args) {
-			argumentSymbols.add(s);
-		}
-	}
+    public void addArgumentSymbol(String symbol) {
+        argumentSymbols.add(symbol);
+    }
 
-	@Override
-	public String[] getArgumentSymbols() {
-		return argumentSymbols.toArray(new String[argumentSymbols.size()]);
-	}
+    public void setTypesInstances(String type, String[] instances) {
+        typeInstances.put(type, List.of(instances));
+    }
 
-	@Override
-	public void addArgumentSymbols(Collection<String> symbols) {
-		argumentSymbols.addAll(symbols);
-	}
+    public void addState(String predicate, String[] args) {
+        initialFluents.add(new InitialFluentDefinition(
+                "state" + initialFluents.size(),
+                new FluentSignature(predicate, args),
+                List.of()));
+        argumentSymbols.addAll(List.of(args));
+    }
 
-	@Override
-	public Map<String, String[]> getTypesInstancesMap() {
-		return typesInstancesMap;
-	}
+    public void addTask(String predicate, String[] args) {
+        initialTasks.add(new InitialTaskDefinition(
+                "task" + initialTasks.size(),
+                new FluentSignature(predicate, args)));
+        argumentSymbols.addAll(List.of(args));
+    }
 
-	@Override
-	public void createState(FluentNetworkSolver fluentSolver, ClassicHybridDomain domain) {
-		if (createdState) {
-			throw new IllegalStateException("State has already been created.");
-		}
-		createdState = true;
-		System.out.println("Creating state");
-		for (FluentPrototype p : stateVars) {
+    @Override
+    public String[] getArgumentSymbols() {
+        return argumentSymbols.toArray(String[]::new);
+    }
 
-			Fluent fl = (Fluent) fluentSolver.createVariable();
-			fl.setName(p.predicate, p.args);
-			fl.setMarking(HTNMetaConstraint.markings.OPEN);
-			System.out.println("Created state fluent " + fl.toString());
-		}
+    @Override
+    public void addArgumentSymbols(Collection<String> symbols) {
+        argumentSymbols.addAll(symbols);
+    }
 
-		Set<String> operatorNames = domain.getOperatorNames();
+    @Override
+    public Map<String, String[]> getTypesInstancesMap() {
+        Map<String, String[]> result = new LinkedHashMap<>();
+        typeInstances.forEach((type, instances) -> result.put(type, instances.toArray(String[]::new)));
+        return result;
+    }
 
-		for (FluentPrototype p : taskVars) {
-			String component;
-			if (operatorNames.contains(p.predicate)) {
-				component = Fluent.ACTIVITY_TYPE_STR;
-			} else {
-				component = "Task";
-			}
-			Fluent fl = (Fluent) fluentSolver.createVariable(component);
-			fl.setName(p.predicate, p.args);
-			fl.setMarking(HTNMetaConstraint.markings.UNPLANNED);
-			System.out.println("Created fluent: " + fl.toString());
-		}
-		
-		// TODO Create AllenIntervals
-		// TODO Create Ordering Constraints
-		// TODO Create FluentResourceUsage constraints
-		
-		
-	}
-
+    @Override
+    public ProblemDefinition getProblemDefinition() {
+        return new ProblemDefinition(
+                List.copyOf(argumentSymbols),
+                typeInstances,
+                initialFluents,
+                initialTasks,
+                List.of(),
+                List.of());
+    }
 }

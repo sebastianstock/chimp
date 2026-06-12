@@ -24,6 +24,7 @@ import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
+import chimp.adapter.metacsp.MetaCspProblemCompiler;
 import chimp.model.ResourceCapacity;
 import ui.PlanHierarchyFrame;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -43,6 +44,8 @@ public class CHIMP {
 			new MetaCspResourceCapacityAdapter();
 	private static final MetaCspStateVariableAdapter STATE_VARIABLE_ADAPTER =
 			new MetaCspStateVariableAdapter();
+	private static final MetaCspProblemCompiler PROBLEM_COMPILER =
+			new MetaCspProblemCompiler();
 
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
@@ -169,7 +172,7 @@ public class CHIMP {
 		
 		// create initial state:
 		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		builder.problem.createState(fluentSolver, builder.domain);
+		PROBLEM_COMPILER.compile(builder.problem.getProblemDefinition(), fluentSolver, builder.domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 	}
 	
