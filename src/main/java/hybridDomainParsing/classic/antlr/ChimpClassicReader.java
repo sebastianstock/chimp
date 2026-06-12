@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
+import chimp.model.IntegerConstraintKind;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
@@ -17,7 +18,6 @@ import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
-import integers.IntegerConstraint;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -787,7 +787,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             varKeys = new String[] {v0};
             cste = intArg1.constValue;
         }
-        return new IntegerConstraintTemplate(IntegerConstraint.Type.ARITHM, varKeys, op1, op2, cste);
+        return new IntegerConstraintTemplate(IntegerConstraintKind.ARITHMETIC, varKeys, op1, op2, cste);
     }
 
     @Override
@@ -805,7 +805,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             varKeys = new String[] {v0, v1};
             cste = intArg2.constValue;
         }
-        return new IntegerConstraintTemplate(IntegerConstraint.Type.ARITHM, varKeys, op1, op2, cste);
+        return new IntegerConstraintTemplate(IntegerConstraintKind.ARITHMETIC, varKeys, op1, op2, cste);
     }
 
     @Override

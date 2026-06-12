@@ -37,6 +37,7 @@ The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet
 | `TemporalInterval` | `Fluent.getAllenInterval()` | Immutable snapshot of EST, LST, EET, and LET. |
 | `TemporalRelation` | `AllenIntervalConstraint.Type` | CHIMP-owned names for the supported Allen relations and temporal operators. |
 | `TemporalConstraintTemplate` | Parser-created `AllenIntervalConstraint` | Immutable relation and ordered bounds used before solver materialization. |
+| `IntegerConstraintKind` | `IntegerConstraint.Type` in parser templates | CHIMP-owned names for arithmetic, all-different, and all-equal integer relations. |
 | `FluentNode` | `Fluent` | Immutable semantic snapshot composed from ID, type, signature, and temporal interval. It intentionally excludes solver references, markings, and integer-variable domains. |
 | `ConstraintKind` | `FluentConstraint.Type` | Uses domain names for the current relation set: `DC` becomes `DECOMPOSITION`, `PRE` becomes `PRECONDITION`, `UNARYAPPLIED` becomes `APPLIED`, and `MOVEDURATION` becomes `MOVE_DURATION`. |
 | `ChimpConstraint` | `FluentConstraint` | Immutable kind and endpoint IDs, with optional temporal bounds for bounded relations. Planner-specific payloads such as repository items, resource templates, axiom text, connection arrays, depth, and additional Allen constraints remain outside this initial model. |
@@ -45,7 +46,7 @@ The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet
 
 ## Import Inventory
 
-There are 96 Java files importing `org.metacsp.*`: 83 under `src/main/java` and 13 under `src/test/java`.
+There are 98 Java files importing `org.metacsp.*`: 84 under `src/main/java` and 14 under `src/test/java`.
 
 ### Production and Example Sources
 
@@ -409,8 +410,8 @@ The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been 
 
 `PlanSnapshot` now provides an immutable grounded Activity/Task graph with ID, type, and constraint queries. `MetaCspModelAdapter` creates it from the solved fluent network, and `PlanExtractor` uses it for ROS and YAML action output. Hierarchy/debug output remains on the legacy solver path because it depends on markings and raw fluent rendering.
 
-Both domain parser paths now create CHIMP-owned `TemporalRelation`, `TemporalBounds`, and `TemporalConstraintTemplate` values. `AdditionalConstraintTemplate` retains endpoint keys without storing Meta-CSP objects, and `MetaCspTemporalConstraintAdapter` compiles a fresh `AllenIntervalConstraint` only when resolver or fluent constraints are materialized. Plan-repository duration bounds also use `TemporalBounds` and pass through the same compilation boundary.
+Both domain parser paths now create CHIMP-owned `TemporalRelation`, `TemporalBounds`, and `TemporalConstraintTemplate` values. `AdditionalConstraintTemplate` retains endpoint keys without storing Meta-CSP objects, and `MetaCspTemporalConstraintAdapter` compiles a fresh `AllenIntervalConstraint` only when resolver or fluent constraints are materialized. Plan-repository duration bounds also use `TemporalBounds` and pass through the same compilation boundary. Integer parser templates use `IntegerConstraintKind`, and `MetaCspIntegerConstraintAdapter` creates concrete integer constraints during resolver materialization.
 
-The next safe integration is to introduce neutral integer constraint templates so parser output no longer exposes `IntegerConstraint.Type`. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
+The next safe integration is to introduce CHIMP-owned resource requirement values so domain parsing no longer creates `ResourceUsageTemplate` and scheduler objects directly. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
 
 `Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, and `HTNMetaConstraint` should otherwise remain unchanged until neutral parser definitions and resolver descriptions exist.

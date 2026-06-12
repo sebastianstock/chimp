@@ -14,6 +14,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import chimp.adapter.metacsp.MetaCspTemporalConstraintAdapter;
+import chimp.adapter.metacsp.MetaCspIntegerConstraintAdapter;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
@@ -30,6 +31,8 @@ import java.util.logging.Logger;
 public abstract class PlanReportroryItem {
 	private static final MetaCspTemporalConstraintAdapter TEMPORAL_ADAPTER =
 			new MetaCspTemporalConstraintAdapter();
+	private static final MetaCspIntegerConstraintAdapter INTEGER_ADAPTER =
+			new MetaCspIntegerConstraintAdapter();
 	
 	private static final boolean MULT_ACTION_NEG_EFFECT = false;
 	
@@ -464,9 +467,10 @@ public abstract class PlanReportroryItem {
 					// add integer constraints from templates
 					if (integerConstraintTemplates != null) {
 						for (IntegerConstraintTemplate ict : integerConstraintTemplates) {
-							Variable[] icScope = new Variable[ict.varKeys.length];
-							for (int i = 0; i < ict.varKeys.length; i++) {
-								String key = ict.varKeys[i];
+							String[] variableKeys = ict.variableKeys();
+							Variable[] icScope = new Variable[variableKeys.length];
+							for (int i = 0; i < variableKeys.length; i++) {
+								String key = variableKeys[i];
 								Map<String, Integer> keyOccurrences = integerVariableOccurrencesMap.get(key);
 								if (keyOccurrences == null) {
 									throw new IllegalArgumentException(
@@ -488,7 +492,7 @@ public abstract class PlanReportroryItem {
 									}
 								}
 							}
-							IntegerConstraint ic = new IntegerConstraint(ict.type, icScope, ict.op1, ict.op2, ict.cste);
+							IntegerConstraint ic = INTEGER_ADAPTER.toIntegerConstraint(ict, icScope);
 							cn.addConstraint(ic);
 						}
 					}
