@@ -79,6 +79,10 @@ public class HTNMethod extends PlanReportroryItem {
 
 		return newConstraints;
 	}
+
+	public OrderingConstraintTemplate[] getOrderings() {
+		return orderings;
+	}
 	
 
 }

@@ -20,6 +20,20 @@ import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
 import chimp.model.ResourceRequirement;
 import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
+import chimp.adapter.metacsp.MetaCspResolverAdapter;
+import chimp.model.FluentPrototypeDescription;
+import chimp.model.FluentSignature;
+import chimp.model.IntegerArgumentDescription;
+import chimp.model.IntegerConstraintKind;
+import chimp.model.ProblemMarking;
+import chimp.model.ResolverArgumentReference;
+import chimp.model.ResolverDescription;
+import chimp.model.ResolverIntegerConstraintDescription;
+import chimp.model.ResolverOrderingEdge;
+import chimp.model.ResolverSemanticKind;
+import chimp.model.ResolverTemporalConstraintDescription;
+import chimp.model.SymbolicConstraintDescription;
+import chimp.model.SymbolicRelationKind;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
@@ -36,6 +50,8 @@ public abstract class PlanReportroryItem {
 			new MetaCspIntegerConstraintAdapter();
 	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
 			new MetaCspResourceRequirementAdapter();
+	private static final MetaCspResolverAdapter RESOLVER_ADAPTER =
+			new MetaCspResolverAdapter();
 	
 	private static final boolean MULT_ACTION_NEG_EFFECT = false;
 	
@@ -263,14 +279,58 @@ public abstract class PlanReportroryItem {
 	}
 	
 	/**
-	 * Expands preconditions and effects of a task + Adds Duration constraint
+	 * Describes feasible resolver candidates without materializing Meta-CSP resolver networks.
 	 * @param taskFluent The task that has to be expanded.
 	 * @param depth The current depth of the task fluent in the plan's hierarchy.
-	 * @param groundSolver The groundSolver.
 	 * @param openFluents All fluents that are open.
-	 * @return The resulting ConstraintNetwork.
+	 * @return Neutral descriptions of feasible resolver candidates.
 	 */
-	public List<ConstraintNetwork> expand(Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
+	public List<ResolverDescription> describeResolvers(
+			Fluent taskFluent, int depth, Fluent[] openFluents) {
+		List<Set<PreconditionSelection>> possibleSelections = new ArrayList<>();
+		if (preconditions != null) {
+			for (HTNPrecondition precondition : preconditions) {
+				Set<PreconditionSelection> matching = new HashSet<>();
+				for (Fluent openFluent : openFluents) {
+					if (precondition.getFluenttype().equals(
+							openFluent.getCompoundSymbolicVariable().getPredicateName())
+							&& testArguments(taskFluent, precondition, openFluent)
+							&& (!precondition.isNegativeEffect()
+									|| MULT_ACTION_NEG_EFFECT
+									|| openFluent.getMarking() != HTNMetaConstraint.markings.CLOSED)) {
+						matching.add(new PreconditionSelection(precondition, openFluent));
+					}
+				}
+				if (matching.isEmpty()) {
+					return List.of();
+				}
+				possibleSelections.add(matching);
+			}
+		}
+
+		List<ResolverDescription> descriptions = new ArrayList<>();
+		for (List<PreconditionSelection> combination : Sets.cartesianProduct(possibleSelections)) {
+			Map<String, Fluent> selectedFluents = new HashMap<>();
+			Map<String, Long> selectedIds = new LinkedHashMap<>();
+			for (PreconditionSelection selection : combination) {
+				selectedFluents.put(selection.precondition().getKey(), selection.fluent());
+				selectedIds.put(selection.precondition().getKey(), (long) selection.fluent().getID());
+			}
+			if (isSymbolicallyFeasible(taskFluent, selectedFluents)) {
+				descriptions.add(createResolverDescription(depth, selectedIds));
+			}
+		}
+		return List.copyOf(descriptions);
+	}
+
+	public List<ConstraintNetwork> expand(
+			Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
+		List<ResolverDescription> descriptions = describeResolvers(taskFluent, depth, openFluents);
+		return RESOLVER_ADAPTER.compile(this, descriptions, taskFluent, depth, groundSolver, openFluents);
+	}
+
+	public List<ConstraintNetwork> materializeResolverDescriptions(
+			Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
 		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
 		
 		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
@@ -583,6 +643,276 @@ public abstract class PlanReportroryItem {
 		}
 		return ret;		
 	}
+
+	private boolean isSymbolicallyFeasible(
+			Fluent taskFluent, Map<String, Fluent> selectedPreconditions) {
+		if (variableOccurrencesMap == null) {
+			return true;
+		}
+		for (Entry<String, Map<String, Integer>> occurrences : variableOccurrencesMap.entrySet()) {
+			Set<String> possibleValues = null;
+			String[] positiveValues = variablesPossibleValuesMap.get(occurrences.getKey());
+			if (positiveValues != null) {
+				possibleValues = new HashSet<>(Arrays.asList(positiveValues));
+			}
+			for (Entry<String, Integer> occurrence : occurrences.getValue().entrySet()) {
+				Fluent fluent = occurrence.getKey().equals(HEAD_KEYWORD_STRING)
+						? taskFluent
+						: selectedPreconditions.get(occurrence.getKey());
+				if (fluent != null) {
+					List<String> symbols = Arrays.asList(fluent.getCompoundSymbolicVariable()
+							.getSymbolsAt(occurrence.getValue() + 1));
+					if (possibleValues == null) {
+						possibleValues = new HashSet<>(symbols);
+					} else {
+						possibleValues.retainAll(symbols);
+					}
+				}
+			}
+			if (possibleValues != null && variablesImpossibleValuesMap != null) {
+				String[] impossibleValues = variablesImpossibleValuesMap.get(occurrences.getKey());
+				if (impossibleValues != null) {
+					possibleValues.removeAll(Arrays.asList(impossibleValues));
+				}
+			}
+			if (possibleValues != null && possibleValues.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private ResolverDescription createResolverDescription(
+			int depth, Map<String, Long> selectedPreconditions) {
+		List<FluentPrototypeDescription> prototypes = new ArrayList<>();
+		for (EffectTemplate effect : effects) {
+			List<String> arguments = new ArrayList<>(Arrays.asList(effect.getInputArgs()));
+			while (arguments.size() < effect.getMaxArgs()) {
+				arguments.add(HybridDomain.EMPTYSTRING);
+			}
+			List<IntegerArgumentDescription> integerDescriptions = new ArrayList<>();
+			for (IntArg argument : effect.getIntArgs()) {
+				integerDescriptions.add(argument.isVariable()
+						? IntegerArgumentDescription.variable(argument.varName)
+						: IntegerArgumentDescription.constant(argument.constValue));
+			}
+			prototypes.add(new FluentPrototypeDescription(
+					effect.getKey(),
+					effect.getComponent(),
+					new FluentSignature(effect.getName(), arguments),
+					integerDescriptions,
+					this instanceof HTNOperator ? ProblemMarking.OPEN : ProblemMarking.UNPLANNED));
+		}
+
+		List<ResolverSemanticKind> kinds = new ArrayList<>();
+		for (HTNPrecondition precondition : preconditions) {
+			kinds.add(ResolverSemanticKind.PRECONDITION);
+			if (precondition.isNegativeEffect() && this instanceof HTNOperator) {
+				kinds.add(ResolverSemanticKind.NEGATIVE_EFFECT);
+			}
+		}
+		for (int i = 0; i < effects.length; i++) {
+			kinds.add(this instanceof HTNOperator
+					? ResolverSemanticKind.EFFECT
+					: ResolverSemanticKind.DECOMPOSITION);
+		}
+		List<ResolverOrderingEdge> orderingEdges = new ArrayList<>();
+		if (this instanceof HTNMethod method && method.getOrderings() != null) {
+			for (OrderingConstraintTemplate ordering : method.getOrderings()) {
+				orderingEdges.add(new ResolverOrderingEdge(
+						ordering.getFrom().getKey(), ordering.getTo().getKey()));
+				kinds.add(ResolverSemanticKind.ORDERING);
+			}
+		}
+		List<SymbolicConstraintDescription> symbolicConstraints = createSymbolicDescriptions();
+		int bindingCount = (int) symbolicConstraints.stream()
+				.filter(constraint -> constraint.kind() == SymbolicRelationKind.EQUAL)
+				.count();
+		for (int i = 0; i < bindingCount; i++) {
+			kinds.add(ResolverSemanticKind.SYMBOLIC_BINDING);
+		}
+		for (SymbolicConstraintDescription constraint : symbolicConstraints) {
+			if (constraint.kind() == SymbolicRelationKind.DIFFERENT) {
+				kinds.add(ResolverSemanticKind.SYMBOLIC_DIFFERENCE);
+			} else if (constraint.kind() == SymbolicRelationKind.ALLOWED_VALUES
+					|| constraint.kind() == SymbolicRelationKind.FORBIDDEN_VALUES) {
+				kinds.add(ResolverSemanticKind.VALUE_RESTRICTION);
+			}
+		}
+		List<ResolverTemporalConstraintDescription> temporalConstraints = new ArrayList<>();
+		if (additionalConstraints != null) {
+			for (AdditionalConstraintTemplate constraint : additionalConstraints) {
+				addTemporalDescription(temporalConstraints, kinds, constraint);
+			}
+		}
+		for (HTNPrecondition precondition : preconditions) {
+			for (AdditionalConstraintTemplate constraint : precondition.getAdditionalConstraints()) {
+				addTemporalDescription(temporalConstraints, kinds, constraint);
+			}
+		}
+		for (EffectTemplate effect : effects) {
+			for (AdditionalConstraintTemplate constraint : effect.getAdditionalConstraints()) {
+				addTemporalDescription(temporalConstraints, kinds, constraint);
+			}
+		}
+		if (durationBounds != null) {
+			temporalConstraints.add(new ResolverTemporalConstraintDescription(
+					HEAD_KEYWORD_STRING,
+					HEAD_KEYWORD_STRING,
+					new TemporalConstraintTemplate(TemporalRelation.Duration, durationBounds)));
+			kinds.add(ResolverSemanticKind.TEMPORAL_RELATION);
+		}
+		if (!resourceUsageIndicators.isEmpty()) {
+			for (int i = 0; i < resourceUsageIndicators.size(); i++) {
+				kinds.add(ResolverSemanticKind.RESOURCE_USAGE);
+			}
+		}
+		List<ResolverIntegerConstraintDescription> integerConstraints = createIntegerDescriptions();
+		if (!integerConstraints.isEmpty()) {
+			kinds.add(ResolverSemanticKind.INTEGER_RELATION);
+		}
+		kinds.add(ResolverSemanticKind.APPLICATION);
+		return new ResolverDescription(
+				id, taskname, depth, preferenceWeight, selectedPreconditions, prototypes,
+				kinds, symbolicConstraints, orderingEdges, temporalConstraints, integerConstraints,
+				resourceUsageIndicators, bindingCount);
+	}
+
+	private void addTemporalDescription(
+			List<ResolverTemporalConstraintDescription> descriptions,
+			List<ResolverSemanticKind> kinds,
+			AdditionalConstraintTemplate constraint) {
+		descriptions.add(new ResolverTemporalConstraintDescription(
+				constraint.getFromKey(), constraint.getToKey(), constraint.getConstraint()));
+		kinds.add(ResolverSemanticKind.TEMPORAL_RELATION);
+	}
+
+	private List<SymbolicConstraintDescription> createSymbolicDescriptions() {
+		List<SymbolicConstraintDescription> descriptions = new ArrayList<>();
+		for (Map<String, Integer> occurrence : variableOccurrencesMap.values()) {
+			List<Entry<String, Integer>> entries = occurrence.entrySet().stream()
+					.filter(entry -> !entry.getKey().equals(HEAD_KEYWORD_STRING))
+					.toList();
+			for (int i = 0; i < entries.size(); i++) {
+				for (int j = i + 1; j < entries.size(); j++) {
+					descriptions.add(SymbolicConstraintDescription.binary(
+							SymbolicRelationKind.EQUAL,
+							toReference(entries.get(i)),
+							toReference(entries.get(j))));
+				}
+			}
+		}
+		if (subDifferentDefinitions != null) {
+			for (SubDifferentDefinition different : subDifferentDefinitions) {
+				Map<String, Integer> fromOccurrences = variableOccurrencesMap.get(different.getFromKey());
+				Map<String, Integer> toOccurrences = variableOccurrencesMap.get(different.getToKey());
+				for (Entry<String, Integer> from : fromOccurrences.entrySet()) {
+					for (Entry<String, Integer> to : toOccurrences.entrySet()) {
+						descriptions.add(SymbolicConstraintDescription.binary(
+								SymbolicRelationKind.DIFFERENT,
+								toReference(from),
+								toReference(to)));
+					}
+				}
+			}
+		}
+		for (Entry<String, Map<String, Integer>> variable : variableOccurrencesMap.entrySet()) {
+			String[] allowed = variablesPossibleValuesMap.get(variable.getKey());
+			String[] forbidden = variablesImpossibleValuesMap == null
+					? null
+					: variablesImpossibleValuesMap.get(variable.getKey());
+			for (Entry<String, Integer> occurrence : variable.getValue().entrySet()) {
+				if (allowed != null) {
+					descriptions.add(SymbolicConstraintDescription.unary(
+							SymbolicRelationKind.ALLOWED_VALUES,
+							toReference(occurrence),
+							Arrays.asList(allowed)));
+				}
+				if (forbidden != null) {
+					descriptions.add(SymbolicConstraintDescription.unary(
+							SymbolicRelationKind.FORBIDDEN_VALUES,
+							toReference(occurrence),
+							Arrays.asList(forbidden)));
+				}
+			}
+		}
+		return List.copyOf(descriptions);
+	}
+
+	private List<ResolverIntegerConstraintDescription> createIntegerDescriptions() {
+		List<ResolverIntegerConstraintDescription> descriptions = new ArrayList<>();
+		if (integerConstraintTemplates != null) {
+			for (IntegerConstraintTemplate template : integerConstraintTemplates) {
+				List<ResolverArgumentReference> references = new ArrayList<>();
+				for (String variableKey : template.variableKeys()) {
+					references.add(preferredIntegerReference(variableKey));
+				}
+				descriptions.add(new ResolverIntegerConstraintDescription(
+						template.kind(), references, template.operator1(), template.operator2(),
+						template.constant()));
+			}
+		}
+		for (Map<String, Integer> occurrences : integerVariableOccurrencesMap.values()) {
+			if (!occurrences.isEmpty()) {
+				descriptions.add(new ResolverIntegerConstraintDescription(
+						IntegerConstraintKind.ALL_EQUAL,
+						occurrences.entrySet().stream().map(this::toReference).toList(),
+						null, null, 0));
+			}
+		}
+		for (int i = 0; i < integerArguments.length; i++) {
+			if (!integerArguments[i].isVariable()) {
+				descriptions.add(integerConstantDescription(HEAD_KEYWORD_STRING, i, integerArguments[i].constValue));
+			}
+		}
+		for (EffectTemplate effect : effects) {
+			for (int i = 0; i < effect.getIntArgs().length; i++) {
+				if (!effect.getIntArgs()[i].isVariable()) {
+					descriptions.add(integerConstantDescription(
+							effect.getKey(), i, effect.getIntArgs()[i].constValue));
+				}
+			}
+		}
+		for (HTNPrecondition precondition : preconditions) {
+			if (precondition.getIntegerArguments() != null) {
+				for (int i = 0; i < precondition.getIntegerArguments().length; i++) {
+					if (!precondition.getIntegerArguments()[i].isVariable()) {
+						descriptions.add(integerConstantDescription(
+								precondition.getKey(), i,
+								precondition.getIntegerArguments()[i].constValue));
+					}
+				}
+			}
+		}
+		return List.copyOf(descriptions);
+	}
+
+	private ResolverIntegerConstraintDescription integerConstantDescription(
+			String key, int index, int value) {
+		return new ResolverIntegerConstraintDescription(
+				IntegerConstraintKind.ARITHMETIC,
+				List.of(new ResolverArgumentReference(key, index)),
+				"=", null, value);
+	}
+
+	private ResolverArgumentReference preferredIntegerReference(String variableKey) {
+		Map<String, Integer> occurrences = integerVariableOccurrencesMap.get(variableKey);
+		if (occurrences == null) {
+			throw new IllegalArgumentException(
+					"Key " + variableKey + " is used in IntegerConstraint but it is undefined!");
+		}
+		Integer headPosition = occurrences.get(HEAD_KEYWORD_STRING);
+		if (headPosition != null) {
+			return new ResolverArgumentReference(HEAD_KEYWORD_STRING, headPosition);
+		}
+		return toReference(occurrences.entrySet().iterator().next());
+	}
+
+	private ResolverArgumentReference toReference(Entry<String, Integer> occurrence) {
+		return new ResolverArgumentReference(occurrence.getKey(), occurrence.getValue());
+	}
+
+	private record PreconditionSelection(HTNPrecondition precondition, Fluent fluent) {}
 	
 	private boolean testArguments(Fluent taskFluent, HTNPrecondition pre,
 			Fluent openFluent) {

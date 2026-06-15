@@ -85,6 +85,14 @@ public class EffectTemplate {
 		return name;
 	}
 
+	public String getComponent() {
+		return comp;
+	}
+
+	public int getMaxArgs() {
+		return maxArgs;
+	}
+
 	public void setComponentToActivity() {
 		comp = Fluent.ACTIVITY_TYPE_STR;
 	}
