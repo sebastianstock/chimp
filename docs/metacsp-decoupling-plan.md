@@ -413,14 +413,29 @@ Add parser-focused tests as neutral domain values are introduced. These tests sh
 
 ## Current Boundary and Next Safe Change
 
-The initial value layer and one-way Meta-CSP adapter are now established. `TemporalBounds` represents a minimum/maximum range, `TemporalInterval` represents a solved interval snapshot, and `MetaCspModelAdapter` converts grounded `Fluent` and `FluentConstraint` instances without changing planner behavior.
+Milestones 1 through 5 have established CHIMP-owned model, parser, resolver-description, and search-facing boundaries while retaining Meta-CSP as the active solver and search backend.
 
-The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been removed. Future integration with other languages should use a new boundary designed for that environment rather than preserve the legacy JNI transfer structs.
+The independent model now includes temporal, symbolic, integer, resource, state-variable, problem, fluent-prototype, resolver, and plan-snapshot values. Both domain parser paths produce these values, and dedicated adapters under `chimp.adapter.metacsp` compile them into the existing Meta-CSP representation. The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been removed.
 
 `PlanSnapshot` now provides an immutable grounded Activity/Task graph with ID, type, and constraint queries. `MetaCspModelAdapter` creates it from the solved fluent network, and `PlanExtractor` uses it for ROS and YAML action output. Hierarchy/debug output remains on the legacy solver path because it depends on markings and raw fluent rendering.
 
-Both domain parser paths now create CHIMP-owned temporal, integer, resource requirement, and resource capacity values. Dedicated Meta-CSP adapters create concrete temporal, integer, resource usage, and scheduler objects only during solver initialization or resolver materialization. Scheduler behavior remains unchanged.
+Repository expansion now first produces neutral `ResolverDescription` values. `MetaCspResolverAdapter` materializes them as resolver networks without changing resolver application or rollback. Search-facing `PlanningFlaw`, `ResolverCandidate`, and `ResolverCandidateMetadata` values are attached to Meta-CSP networks as specialized annotations. `HTNMetaConstraint` consumes the neutral flaw representation, and the existing value-ordering classes delegate to CHIMP-owned lexicographic resolver comparators. Legacy network inspection remains as a compatibility fallback.
 
-The next safe integration is to introduce neutral state-variable scheduling definitions so domain parsing no longer constructs `FluentScheduler` directly. HPR and Esterel remain later milestones because they require temporal-distance and repository metadata not represented by the current model.
+The active runtime remains coupled at the solver-service level:
 
-`Fluent`, `FluentConstraint`, `FluentNetworkSolver`, `HTNPlanner`, and `HTNMetaConstraint` should otherwise remain unchanged until neutral parser definitions and resolver descriptions exist.
+- `Fluent` and `FluentConstraint` are still Meta-CSP storage and constraint objects.
+- `FluentNetworkSolver` still owns symbolic, temporal, and integer solver composition.
+- HTN expansion and supporting services still query solver objects directly.
+- Resource conflict resolution still uses Meta-CSP scheduling and meta-variables.
+- `HTNMetaConstraint` and `HTNPlanner` still inherit Meta-CSP search classes and retain resolver application, retraction, and rollback responsibilities.
+
+Milestone 6 should introduce CHIMP-owned fluent access and solver-service interfaces, beginning with read-oriented `FluentView` and `FluentStore` APIs. The initial implementation should be a Meta-CSP adapter over `FluentNetworkSolver`; it should not replace the solver or change planner behavior.
+
+The first Milestone 6 changes should be small and ordered:
+
+1. Define stable fluent identity, type, signature, marking, interval, and integer-value access through `FluentView`.
+2. Define fluent lookup and constraint-query operations through `FluentStore` based on concrete current call sites.
+3. Add a Meta-CSP-backed implementation and characterization tests for ordering and query semantics.
+4. Migrate one narrow read-only consumer before expanding the interface or moving HTN expansion.
+
+Temporal mutation, symbolic binding, integer propagation, resource scheduling, resolver application, prototype substitution, and rollback should remain on the existing backend during this milestone. Those capabilities belong behind later focused service interfaces before Meta-CSP inheritance is removed.
