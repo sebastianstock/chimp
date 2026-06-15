@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class MetaCspResolverAdapter {
+    private static final MetaCspSearchAdapter SEARCH_ADAPTER = new MetaCspSearchAdapter();
 
     public List<ConstraintNetwork> compile(
             PlanReportroryItem item,
@@ -36,8 +37,13 @@ public final class MetaCspResolverAdapter {
                 .toList();
         List<ConstraintNetwork> validated = new ArrayList<>();
         for (ConstraintNetwork network : compiled) {
-            if (describedSelections.contains(selectedPreconditionIds(network))) {
-                validated.add(network);
+            List<Long> selection = selectedPreconditionIds(network);
+            for (int i = 0; i < descriptions.size(); i++) {
+                if (describedSelections.get(i).equals(selection)) {
+                    SEARCH_ADAPTER.annotateExpansion(network, taskFluent, descriptions.get(i));
+                    validated.add(network);
+                    break;
+                }
             }
         }
         return List.copyOf(validated);

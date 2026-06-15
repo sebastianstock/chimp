@@ -8,7 +8,10 @@ import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
+import chimp.adapter.metacsp.MetaCspSearchAdapter;
 import chimp.model.ResourceRequirement;
+import chimp.search.PlanningFlaw;
+import chimp.search.TaskPlanningFlaw;
 
 import java.util.*;
 
@@ -16,6 +19,7 @@ import java.util.*;
 public class HTNMetaConstraint extends MetaConstraint {
 	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
 			new MetaCspResourceRequirementAdapter();
+	private static final MetaCspSearchAdapter SEARCH_ADAPTER = new MetaCspSearchAdapter();
 
 	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}
 
@@ -71,7 +75,11 @@ public class HTNMetaConstraint extends MetaConstraint {
 		}
 		
 		if (nw.getVariables().length > 0) {
-				ret.add(nw);
+			List<Long> eligibleTaskIds = Arrays.stream(nw.getVariables())
+					.map(variable -> (long) variable.getID())
+					.toList();
+			SEARCH_ADAPTER.annotateFlaw(nw, new TaskPlanningFlaw(eligibleTaskIds));
+			ret.add(nw);
 		}
 //		logger.finest("MetaVariables: " + ret);
 
@@ -115,7 +123,16 @@ public class HTNMetaConstraint extends MetaConstraint {
 			
 		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		
-		for (Variable var : problematicNetwork.getVariables()) {
+		PlanningFlaw flaw = SEARCH_ADAPTER.toPlanningFlaw(problematicNetwork);
+		Map<Long, Variable> variablesById = new HashMap<>();
+		for (Variable variable : problematicNetwork.getVariables()) {
+			variablesById.put((long) variable.getID(), variable);
+		}
+		for (long taskId : flaw.eligibleTaskIds()) {
+			Variable var = variablesById.get(taskId);
+			if (var == null) {
+				throw new IllegalArgumentException("Planning flaw references unknown task ID " + taskId);
+			}
 			Fluent taskFluent = (Fluent) var;
 			String taskName = taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0];
 			if (operatorNames.contains(taskName)) {
@@ -183,6 +200,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 			applicationCon.setTo(task);
 //			applicationCon.setDepth(depth);
 			cn.addConstraint(applicationCon);
+			SEARCH_ADAPTER.annotateTaskUnification(cn, task, fl);
 			ret.add(cn);
 		}
 		if (ret.size() > 0 ) {

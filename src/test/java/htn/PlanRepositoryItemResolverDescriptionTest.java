@@ -12,6 +12,9 @@ import chimp.model.SymbolicRelationKind;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
+import chimp.search.ExpansionCandidateDescription;
+import chimp.search.ResolverCandidate;
+import chimp.search.ResolverCandidateKind;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
@@ -100,6 +103,16 @@ public class PlanRepositoryItemResolverDescriptionTest {
 
         assertEquals(selectedPreconditionIdMultiset(legacy), selectedPreconditionIdMultiset(delegated));
         assertEquals(summarizeAsMultiset(legacy), summarizeAsMultiset(delegated));
+        for (ConstraintNetwork network : delegated) {
+            ResolverCandidate candidate = (ResolverCandidate) network.getSpecilizedAnnotation();
+            assertEquals(ResolverCandidateKind.EXPANSION, candidate.metadata().kind());
+            assertEquals(task.getID(), candidate.metadata().taskId());
+            assertEquals(operator.getId(), candidate.metadata().repositoryItemId().getAsInt());
+            assertEquals(3, candidate.metadata().depth());
+            assertEquals(7, candidate.metadata().weight().getAsInt());
+            assertEquals(1, candidate.metadata().bindingCount());
+            assertTrue(candidate.description() instanceof ExpansionCandidateDescription);
+        }
     }
 
     @Test

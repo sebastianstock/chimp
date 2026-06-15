@@ -25,7 +25,9 @@ import org.metacsp.framework.Variable;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
 import chimp.adapter.metacsp.MetaCspProblemCompiler;
+import chimp.adapter.metacsp.MetaCspResolverOrderingAdapter;
 import chimp.model.ResourceCapacity;
+import chimp.search.ResolverCandidate;
 import ui.PlanHierarchyFrame;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
@@ -103,6 +105,14 @@ public class CHIMP {
 		 */
 		public CHIMPBuilder valHeuristic(ValueOrderingH valOH) {
 			this.htnValOH = valOH;
+			return this;
+		}
+
+		/**
+		 * Configures a CHIMP-owned resolver comparator while retaining Meta-CSP as the search backend.
+		 */
+		public CHIMPBuilder valHeuristic(Comparator<ResolverCandidate> comparator) {
+			this.htnValOH = new MetaCspResolverOrderingAdapter(comparator);
 			return this;
 		}
 		

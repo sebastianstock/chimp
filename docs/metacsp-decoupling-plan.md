@@ -26,7 +26,7 @@ The dependency is not limited to infrastructure. Core CHIMP concepts such as flu
 
 ## Initial Independent Model
 
-The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet integrated into the planner.
+The Meta-CSP-independent value layer lives in `chimp.model` and `chimp.search`. Model and resolver descriptions are integrated incrementally while Meta-CSP remains the active backend.
 
 | Independent model | Current representation | Initial mapping |
 | --- | --- | --- |
@@ -43,8 +43,15 @@ The first Meta-CSP-independent value layer lives in `chimp.model`. It is not yet
 | `FluentNode` | `Fluent` | Immutable semantic snapshot composed from ID, type, signature, and temporal interval. It intentionally excludes solver references, markings, and integer-variable domains. |
 | `ConstraintKind` | `FluentConstraint.Type` | Uses domain names for the current relation set: `DC` becomes `DECOMPOSITION`, `PRE` becomes `PRECONDITION`, `UNARYAPPLIED` becomes `APPLIED`, and `MOVEDURATION` becomes `MOVE_DURATION`. |
 | `ChimpConstraint` | `FluentConstraint` | Immutable kind and endpoint IDs, with optional temporal bounds for bounded relations. Planner-specific payloads such as repository items, resource templates, axiom text, connection arrays, depth, and additional Allen constraints remain outside this initial model. |
+| `PlanningFlaw` / `TaskPlanningFlaw` | Meta-variable `ConstraintNetwork` | Immutable ordered IDs of the eligible tasks grouped into the current HTN flaw. |
+| `ResolverCandidate` | Resolver `ConstraintNetwork` | Neutral expansion or task-unification candidate with immutable search metadata. |
+| `ResolverCandidateMetadata` | Network and fluent inspection in value heuristics | Candidate kind, task and optional repository/match IDs, depth, optional weight, subtask count, task EST, selected-precondition EST sum, and binding count. |
 
 `chimp.adapter.metacsp.MetaCspModelAdapter` provides the initial one-way boundary. It reads a grounded Meta-CSP `Fluent` into a `FluentNode` and maps a `FluentConstraint` into a `ChimpConstraint`. Duration bounds are copied when present. The adapter fails explicitly for unknown fluent components, non-ground signatures, and non-fluent constraint endpoints. Conversion remains outside the independent model package.
+
+`chimp.adapter.metacsp.MetaCspSearchAdapter` is the active search boundary. It attaches neutral flaws and resolver candidates to Meta-CSP networks through specialized annotations and retains network inspection as a compatibility fallback. `MetaCspResolverOrderingAdapter` lets Meta-CSP call CHIMP-owned lexicographic resolver comparators; the existing `*ValOH` classes remain source-compatible wrappers.
+
+Resolver descriptions and search-facing ordering metadata are complete for Milestone 5. Fluent-store and solver-service interfaces remain deferred to Milestone 6.
 
 ## Import Inventory
 
