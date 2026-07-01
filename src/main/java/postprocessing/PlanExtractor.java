@@ -3,38 +3,29 @@ package postprocessing;
 import java.io.*;
 import java.util.*;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.Variable;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Table;
-
+import chimp.adapter.metacsp.MetaCspFluentStore;
 import chimp.adapter.metacsp.MetaCspModelAdapter;
+import chimp.model.ChimpConstraint;
+import chimp.model.ConstraintKind;
+import chimp.model.FluentId;
 import chimp.model.FluentNode;
 import chimp.model.FluentSignature;
+import chimp.model.FluentStore;
 import chimp.model.FluentType;
+import chimp.model.FluentView;
 import chimp.model.PlanSnapshot;
 import chimp.model.TemporalInterval;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 public class PlanExtractor {
 	
-	private final FluentNetworkSolver fluentSolver;
+	private final FluentStore fluentStore;
 	private final PlanSnapshot planSnapshot;
 	
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-	
-	private ListMultimap<Fluent, FluentConstraint> fluentsOutgoingDCsMultiMap;
-	private Table<Fluent, Fluent, FluentConstraint> beforesTable;
 
 	public PlanExtractor(FluentNetworkSolver fluentSolver) {
-		this.fluentSolver = fluentSolver;
+		this.fluentStore = new MetaCspFluentStore(fluentSolver);
 		this.planSnapshot = new MetaCspModelAdapter().toPlanSnapshot(fluentSolver);
 	}
 
@@ -156,43 +147,40 @@ public class PlanExtractor {
 	 * Prints the current plan on the command line.
 	 */
 	public void printPlan() {
-		List<Fluent> plannedFluents = filterPlannedFluents();
+		List<FluentView> plannedFluents = filterPlannedFluents();
 		
-		List<Fluent> rootTasks = filterRootTasks(plannedFluents);
-		
-		createOutgoingDCMultiMap();
+		List<FluentView> rootTasks = filterRootTasks(plannedFluents);
 
 		System.out.println("#######  PLAN ######");
-		for (Fluent root : rootTasks) {
+		for (FluentView root : rootTasks) {
 			printDecomposition(root, "");
 		}
 		
 	}	
 	
 	public void printAllFluents() {
-		for (Variable var : fluentSolver.getVariables()) {
-//			ret.add((Fluent) var);
-			System.out.println(var);
+		for (FluentView fluent : fluentStore.fluents()) {
+			System.out.println(formatFluent(fluent));
 		}
 	}
 	
-	private void printDecomposition(Fluent task, String indentation) {
-		System.out.println(indentation + task);
+	private void printDecomposition(FluentView task, String indentation) {
+		System.out.println(indentation + formatFluent(task));
 		
 		String nextIndentation = indentation + "  ";
 		
-		List<FluentConstraint> dcs = fluentsOutgoingDCsMultiMap.get(task);
-		List<Fluent> subtasks = new ArrayList<Fluent>();
-		for (FluentConstraint dc : dcs) {
-			subtasks.add((Fluent) dc.getTo());
+		List<FluentView> subtasks = new ArrayList<>();
+		for (ChimpConstraint decomposition
+				: fluentStore.outgoing(task.id(), ConstraintKind.DECOMPOSITION)) {
+			subtasks.add(requireFluent(decomposition.to()));
 		}
 		
-		Collections.sort(subtasks, new Comparator<Fluent>() {
+		Collections.sort(subtasks, new Comparator<FluentView>() {
 			@Override
-			public int compare(final Fluent obj1, final Fluent obj2) {
-				if (beforesTable.contains(obj1, obj2)) {
+			public int compare(final FluentView obj1, final FluentView obj2) {
+				if (hasBefore(obj1.id(), obj2.id())) {
 					return -1;
-				} else if (beforesTable.contains(obj2, obj1)) {
+				} else if (hasBefore(obj2.id(), obj1.id())) {
 					return 1;
 				} else {
 					return 0;
@@ -200,21 +188,21 @@ public class PlanExtractor {
 			}
 		});
 		
-		for (Fluent sub : subtasks) {
+		for (FluentView sub : subtasks) {
 			printDecomposition(sub, nextIndentation);
 		}
 		
 		for (int i = 0; i < subtasks.size(); i++) {
-			Fluent from = subtasks.get(i);
+			FluentView from = subtasks.get(i);
 			for (int j = i+1; j < subtasks.size(); j++) {
-				Fluent to = subtasks.get(j);
-				if (beforesTable.contains(from, to)) {
+				FluentView to = subtasks.get(j);
+				if (hasBefore(from.id(), to.id())) {
 					StringBuilder sb = new StringBuilder();
 					sb.append(nextIndentation);
 					sb.append("Before: ");
-					sb.append(from.getID());
+					sb.append(from.id().value());
 					sb.append(" --> ");
-					sb.append(to.getID());
+					sb.append(to.id().value());
 					System.out.println(sb.toString());
 				}
 			}
@@ -222,58 +210,40 @@ public class PlanExtractor {
 		
 	}
 	
-	private List<Fluent> filterPlannedFluents() {
-		ArrayList<Fluent> ret = new ArrayList<Fluent>();
-		for (Variable var : fluentSolver.getVariables("Activity")) {
-			ret.add((Fluent) var);
-		}
-		for (Variable var : fluentSolver.getVariables("Task")) {
-			ret.add((Fluent) var);
-		}
-		
+	private List<FluentView> filterPlannedFluents() {
+		List<FluentView> ret = new ArrayList<>();
+		ret.addAll(fluentStore.fluents(FluentType.ACTIVITY));
+		ret.addAll(fluentStore.fluents(FluentType.TASK));
 		return ret;
 	}
 	
-	private List<Fluent> filterRootTasks(List<Fluent> tasks) {
-		ArrayList<Fluent> ret = new ArrayList<Fluent>();
-		SetMultimap<Fluent, FluentConstraint> fluentsIncomingDCsMultiMap = HashMultimap.create();
-		
-		for (Constraint con : fluentSolver.getConstraints()) {
-			if (con instanceof FluentConstraint) {
-				FluentConstraint.Type type = ((FluentConstraint) con).getType();
-				if (type.equals(FluentConstraint.Type.DC)) {
-					fluentsIncomingDCsMultiMap.put((Fluent) ((FluentConstraint) con).getTo(), 
-							(FluentConstraint) con); 
-				}
+	private List<FluentView> filterRootTasks(List<FluentView> tasks) {
+		List<FluentView> ret = new ArrayList<>();
+		for (FluentView task : tasks) {
+			if (fluentStore.incoming(task.id(), ConstraintKind.DECOMPOSITION).isEmpty()) {
+				ret.add(task);
 			}
 		}
-		
-		for (Fluent t : tasks) {
-			if (! fluentsIncomingDCsMultiMap.containsKey(t)) {
-				ret.add(t);
-			}
-		}
-		
 		return ret;
 	}
 	
-	private void createOutgoingDCMultiMap() {
-		fluentsOutgoingDCsMultiMap = ArrayListMultimap.create();
-		beforesTable = HashBasedTable.create();
-		
-		for (Constraint con : fluentSolver.getConstraints()) {
-			if (con instanceof FluentConstraint) {
-				Fluent from = (Fluent) ((FluentConstraint) con).getFrom();
-				Fluent to = (Fluent) ((FluentConstraint) con).getTo();
-				FluentConstraint.Type type = ((FluentConstraint) con).getType();
-				if (type.equals(FluentConstraint.Type.DC)) {
-					fluentsOutgoingDCsMultiMap.put(from, (FluentConstraint) con); 
-				}
-				if (type.equals(FluentConstraint.Type.BEFORE)) {
-					beforesTable.put(from, to, (FluentConstraint) con);
-				}
+	private boolean hasBefore(FluentId from, FluentId to) {
+		for (ChimpConstraint before : fluentStore.outgoing(from, ConstraintKind.BEFORE)) {
+			if (before.to().equals(to)) {
+				return true;
 			}
 		}
+		return false;
+	}
+
+	private FluentView requireFluent(FluentId id) {
+		return fluentStore.fluent(id)
+				.orElseThrow(() -> new IllegalStateException(
+						"Constraint references unknown fluent ID: " + id.value()));
+	}
+
+	private String formatFluent(FluentView fluent) {
+		return fluent.toString();
 	}
 
 	
