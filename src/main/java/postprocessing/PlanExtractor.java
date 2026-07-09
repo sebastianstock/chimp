@@ -4,29 +4,24 @@ import java.io.*;
 import java.util.*;
 
 import chimp.adapter.metacsp.MetaCspFluentStore;
-import chimp.adapter.metacsp.MetaCspModelAdapter;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
-import chimp.model.FluentNode;
 import chimp.model.FluentSignature;
 import chimp.model.FluentStore;
 import chimp.model.FluentType;
 import chimp.model.FluentView;
-import chimp.model.PlanSnapshot;
 import chimp.model.TemporalInterval;
 import fluentSolver.FluentNetworkSolver;
 
 public class PlanExtractor {
 	
 	private final FluentStore fluentStore;
-	private final PlanSnapshot planSnapshot;
 	
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	public PlanExtractor(FluentNetworkSolver fluentSolver) {
 		this.fluentStore = new MetaCspFluentStore(fluentSolver);
-		this.planSnapshot = new MetaCspModelAdapter().toPlanSnapshot(fluentSolver);
 	}
 
 	public void printActions() {
@@ -67,15 +62,14 @@ public class PlanExtractor {
 	public void writeROSPlanFormat(Writer writer) throws IOException {
 		writer.write("; Actions:");
 		writer.append(LINE_SEPARATOR);
-		List<FluentNode> actions = getActions();
-		for (FluentNode action : actions) {
+		for (FluentView action : getActions()) {
 			writer.write(formatActionToROSPlan(action));
 			writer.append(LINE_SEPARATOR);
 		}
 	}
 
 	public void writeActions(Writer writer) {
-		for (FluentNode action : getActions()) {
+		for (FluentView action : getActions()) {
 			try {
 				activityToYaml(action, writer);
 			} catch (IOException e) {
@@ -85,8 +79,8 @@ public class PlanExtractor {
 
 	}
 
-	private List<FluentNode> getActions() {
-		List<FluentNode> actions = new ArrayList<>(planSnapshot.fluents(FluentType.ACTIVITY));
+	private List<FluentView> getActions() {
+		List<FluentView> actions = new ArrayList<>(fluentStore.fluents(FluentType.ACTIVITY));
 		actions.sort(Comparator.comparingLong(action -> action.temporalInterval().earliestStart()));
 		return actions;
 	}
@@ -97,7 +91,7 @@ public class PlanExtractor {
 	 * @param action
 	 * @return
 	 */
-	private String formatActionToROSPlan(FluentNode action) {
+	private String formatActionToROSPlan(FluentView action) {
 		TemporalInterval interval = action.temporalInterval();
 		double estSeconds = ((double) interval.earliestStart()) / 1000;
 		double minDurationSeconds = ((double) (interval.earliestEnd() - interval.earliestStart())) / 1000;
@@ -114,7 +108,7 @@ public class PlanExtractor {
 		return sb.toString();
 	}
 
-	private void activityToYaml(FluentNode activity, Writer w) throws IOException {
+	private void activityToYaml(FluentView activity, Writer w) throws IOException {
 		FluentSignature signature = activity.signature();
 
 		w.write("- id: " + activity.id().value());

@@ -415,9 +415,9 @@ Add parser-focused tests as neutral domain values are introduced. These tests sh
 
 Milestones 1 through 5 have established CHIMP-owned model, parser, resolver-description, and search-facing boundaries while retaining Meta-CSP as the active solver and search backend.
 
-The independent model now includes temporal, symbolic, integer, resource, state-variable, problem, fluent-prototype, resolver, and plan-snapshot values. Both domain parser paths produce these values, and dedicated adapters under `chimp.adapter.metacsp` compile them into the existing Meta-CSP representation. The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been removed.
+The independent model now includes temporal, symbolic, integer, resource, state-variable, problem, fluent-prototype, and resolver values. Both domain parser paths produce these values, and dedicated adapters under `chimp.adapter.metacsp` compile them into the existing Meta-CSP representation. The obsolete `CHIMPConnector` JNI integration and its dedicated tests have been removed.
 
-`PlanSnapshot` now provides an immutable grounded Activity/Task graph with ID, type, and constraint queries. `MetaCspModelAdapter` creates it from the solved fluent network, and `PlanExtractor` uses it for ROS and YAML action output. Hierarchy/debug output remains on the legacy solver path because it depends on markings and raw fluent rendering.
+Milestone 6 has begun. Read-oriented `FluentView` and `FluentStore` interfaces are defined in `chimp.model`, backed by `MetaCspFluentStore` over `FluentNetworkSolver`. `FluentView` carries id, type, signature, marking, temporal interval, and integer values; `FluentStore` provides fluent lookup and incoming/outgoing constraint queries by id and kind. `PlanExtractor` is the first migrated consumer and now drives both ROS/YAML action output and hierarchy/debug output through `FluentStore`. The previously separate `PlanSnapshot` value type and `MetaCspModelAdapter.toPlanSnapshot` have been removed in favor of this single read boundary. Hierarchy/debug output uses `FluentStore` directly; it no longer depends on a separate snapshot.
 
 Repository expansion now first produces neutral `ResolverDescription` values. `MetaCspResolverAdapter` materializes them as resolver networks without changing resolver application or rollback. Search-facing `PlanningFlaw`, `ResolverCandidate`, and `ResolverCandidateMetadata` values are attached to Meta-CSP networks as specialized annotations. `HTNMetaConstraint` consumes the neutral flaw representation, and the existing value-ordering classes delegate to CHIMP-owned lexicographic resolver comparators. Legacy network inspection remains as a compatibility fallback.
 
@@ -436,6 +436,6 @@ The first Milestone 6 changes should be small and ordered:
 1. Define stable fluent identity, type, signature, marking, interval, and integer-value access through `FluentView`.
 2. Define fluent lookup and constraint-query operations through `FluentStore` based on concrete current call sites.
 3. Add a Meta-CSP-backed implementation and characterization tests for ordering and query semantics.
-4. Migrate one narrow read-only consumer before expanding the interface or moving HTN expansion.
+4. Migrate one narrow read-only consumer before expanding the interface or moving HTN expansion. `PlanExtractor` has been migrated, and the overlapping `PlanSnapshot` read path was consolidated into `FluentStore` to avoid maintaining two parallel read APIs.
 
 Temporal mutation, symbolic binding, integer propagation, resource scheduling, resolver application, prototype substitution, and rollback should remain on the existing backend during this milestone. Those capabilities belong behind later focused service interfaces before Meta-CSP inheritance is removed.

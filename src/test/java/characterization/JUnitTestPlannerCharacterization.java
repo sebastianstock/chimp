@@ -15,7 +15,6 @@ import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
 import chimp.model.FluentNode;
 import chimp.model.FluentType;
-import chimp.model.PlanSnapshot;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -41,10 +40,6 @@ public class JUnitTestPlannerCharacterization {
         assertEquals("!move", snapshot.signature().predicate());
         assertEquals(actions[0].getAllenInterval().getEST(), snapshot.temporalInterval().earliestStart());
         assertEquals(actions[0].getAllenInterval().getLET(), snapshot.temporalInterval().latestEnd());
-
-        PlanSnapshot planSnapshot = modelAdapter.toPlanSnapshot(chimp.getFluentSolver());
-        assertTrue(planSnapshot.fluents(FluentType.ACTIVITY).stream()
-                .anyMatch(action -> action.id().equals(snapshot.id())));
     }
 
     @Test
@@ -78,10 +73,6 @@ public class JUnitTestPlannerCharacterization {
         assertEquals(ConstraintKind.BEFORE, snapshot.kind());
         assertEquals(new FluentId(from.getID()), snapshot.from());
         assertEquals(new FluentId(to.getID()), snapshot.to());
-
-        PlanSnapshot planSnapshot = modelAdapter.toPlanSnapshot(chimp.getFluentSolver());
-        assertTrue(planSnapshot.constraints(ConstraintKind.BEFORE).contains(snapshot));
-        assertTrue(planSnapshot.constraints(ConstraintKind.DECOMPOSITION).size() > 0);
     }
 
     private CHIMP plan(String domainFile, String problemFile) throws DomainParsingException {

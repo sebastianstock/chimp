@@ -1,14 +1,9 @@
 package chimp.adapter.metacsp;
 
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
-import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import org.metacsp.time.Bounds;
@@ -19,38 +14,13 @@ import chimp.model.FluentId;
 import chimp.model.FluentNode;
 import chimp.model.FluentSignature;
 import chimp.model.FluentType;
-import chimp.model.PlanSnapshot;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalInterval;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
 import unify.CompoundSymbolicVariable;
 
 public final class MetaCspModelAdapter {
-
-    public PlanSnapshot toPlanSnapshot(FluentNetworkSolver solver) {
-        Objects.requireNonNull(solver, "solver");
-
-        List<FluentNode> fluents = new ArrayList<>();
-        Set<FluentId> includedIds = new HashSet<>();
-        for (Variable variable : solver.getVariables()) {
-            if (variable instanceof Fluent fluent && isPlannedFluent(fluent)) {
-                FluentNode node = toFluentNode(fluent);
-                fluents.add(node);
-                includedIds.add(node.id());
-            }
-        }
-
-        List<ChimpConstraint> constraints = new ArrayList<>();
-        for (Constraint constraint : solver.getConstraints()) {
-            if (constraint instanceof FluentConstraint fluentConstraint
-                    && hasIncludedEndpoints(fluentConstraint, includedIds)) {
-                constraints.add(toChimpConstraint(fluentConstraint));
-            }
-        }
-        return new PlanSnapshot(fluents, constraints);
-    }
 
     public FluentNode toFluentNode(Fluent fluent) {
         Objects.requireNonNull(fluent, "fluent");
@@ -113,17 +83,4 @@ public final class MetaCspModelAdapter {
         return new TemporalBounds(bounds.min, bounds.max);
     }
 
-    private boolean isPlannedFluent(Fluent fluent) {
-        String component = fluent.getTypeStr();
-        return Fluent.ACTIVITY_TYPE_STR.equals(component) || Fluent.TASK_TYPE_STR.equals(component);
-    }
-
-    private boolean hasIncludedEndpoints(FluentConstraint constraint, Set<FluentId> includedIds) {
-        Variable from = constraint.getFrom();
-        Variable to = constraint.getTo();
-        return from instanceof Fluent
-                && to instanceof Fluent
-                && includedIds.contains(new FluentId(from.getID()))
-                && includedIds.contains(new FluentId(to.getID()));
-    }
 }

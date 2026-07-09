@@ -18,7 +18,6 @@ import chimp.model.FluentId;
 import chimp.model.FluentNode;
 import chimp.model.FluentSignature;
 import chimp.model.FluentType;
-import chimp.model.PlanSnapshot;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalInterval;
 import fluentSolver.Fluent;
@@ -137,26 +136,6 @@ public class MetaCspModelAdapterTest {
         constraint.setTo(to);
 
         assertThrows(IllegalArgumentException.class, () -> adapter.toChimpConstraint(constraint));
-    }
-
-    @Test
-    public void createsSnapshotFromGroundedActivityAndTaskGraph() {
-        FluentConstraint before = constraint(FluentConstraint.Type.BEFORE);
-        assertTrue(solver.addConstraint(before));
-
-        PlanSnapshot snapshot = adapter.toPlanSnapshot(solver);
-
-        assertEquals(2, snapshot.fluents().size());
-        assertEquals(1, snapshot.constraints().size());
-        assertEquals(ConstraintKind.BEFORE, snapshot.constraints().get(0).kind());
-    }
-
-    @Test
-    public void rejectsUngroundedPlannedFluentsInSnapshot() {
-        Fluent ungrounded = (Fluent) solver.createVariable(Fluent.ACTIVITY_TYPE_STR);
-        ungrounded.setName("move", new String[] {"?robot", "area1"});
-
-        assertThrows(IllegalStateException.class, () -> adapter.toPlanSnapshot(solver));
     }
 
     private FluentConstraint constraint(FluentConstraint.Type type) {
