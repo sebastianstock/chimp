@@ -6,8 +6,6 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
-import integers.IntegerConstraint;
-import integers.IntegerVariable;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
@@ -556,7 +554,7 @@ public abstract class PlanReportroryItem {
 									}
 								}
 							}
-							IntegerConstraint ic = INTEGER_ADAPTER.toIntegerConstraint(ict, icScope);
+							Constraint ic = INTEGER_ADAPTER.toIntegerConstraint(ict, icScope);
 							cn.addConstraint(ic);
 						}
 					}
@@ -578,7 +576,7 @@ public abstract class PlanReportroryItem {
 								}
 							}
 							cn.addConstraint(
-									new IntegerConstraint(IntegerConstraint.Type.ALLEQUAL,
+									INTEGER_ADAPTER.createAllEqualConstraint(
 											vars.toArray(new Variable[vars.size()])));
 						}
 					}
@@ -586,9 +584,8 @@ public abstract class PlanReportroryItem {
 					// add IntegerConstraints for constant values
 					for (int i = 0; i < integerArguments.length; i++) {
 						if(!integerArguments[i].isVariable()) {
-							cn.addConstraint(new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-									new Variable[]{taskFluent.getIntegerVariables()[i]},
-									"=", integerArguments[i].constValue));
+							cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+									taskFluent.getIntegerVariables()[i], integerArguments[i].constValue));
 						}
 					}
 					for (EffectTemplate et : effects) {
@@ -596,8 +593,8 @@ public abstract class PlanReportroryItem {
 							if (!et.getIntArgs()[i].isVariable()) {
 								Variable v = et.getPrototype(groundSolver);
 								VariablePrototype vp = new VariablePrototype(groundSolver, v, i);
-								cn.addConstraint(new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-										new Variable[]{vp}, "=", et.getIntArgs()[i].constValue));
+								cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+										vp, et.getIntArgs()[i].constValue));
 							}
 						}
 					}
@@ -607,9 +604,8 @@ public abstract class PlanReportroryItem {
 							for (int i = 0; i < intArgs.length; i++) {
 								if (!intArgs[i].isVariable()) {
 									Fluent preFluent = preKeyToFluentMap.get(pre.getKey());
-									cn.addConstraint(new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-											new Variable[]{preFluent.getIntegerVariables()[i]},
-											"=", intArgs[i].constValue));
+									cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+											preFluent.getIntegerVariables()[i], intArgs[i].constValue));
 								}
 							}
 						}

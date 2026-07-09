@@ -48,6 +48,33 @@ public class MetaCspIntegerConstraintAdapterTest {
                 adapter.toIntegerConstraint(template(IntegerConstraintKind.ALL_EQUAL), scope).getType());
     }
 
+    @Test
+    public void createsAllEqualConstraint() {
+        IntegerConstraintSolver solver = new IntegerConstraintSolver(0, 100);
+        Variable[] scope = solver.createVariables(2);
+
+        IntegerConstraint constraint = new MetaCspIntegerConstraintAdapter()
+                .createAllEqualConstraint(scope);
+
+        assertEquals(IntegerConstraint.Type.ALLEQUAL, constraint.getType());
+        assertEquals(scope[0], constraint.getScope()[0]);
+        assertEquals(scope[1], constraint.getScope()[1]);
+    }
+
+    @Test
+    public void createsConstantConstraint() {
+        IntegerConstraintSolver solver = new IntegerConstraintSolver(0, 100);
+        Variable[] scope = solver.createVariables(1);
+
+        IntegerConstraint constraint = new MetaCspIntegerConstraintAdapter()
+                .createConstantConstraint(scope[0], 42);
+
+        assertEquals(IntegerConstraint.Type.ARITHM, constraint.getType());
+        assertEquals("=", constraint.getOp1());
+        assertEquals(42, constraint.getCste());
+        assertEquals(scope[0], constraint.getScope()[0]);
+    }
+
     private IntegerConstraintTemplate template(IntegerConstraintKind kind) {
         return new IntegerConstraintTemplate(kind, new String[] {"?a", "?b"}, null, null, 0);
     }

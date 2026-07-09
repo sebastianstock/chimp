@@ -18,6 +18,18 @@ public final class MetaCspIntegerConstraintAdapter {
                 template.constant());
     }
 
+    public IntegerConstraint createAllEqualConstraint(Variable[] scope) {
+        return new IntegerConstraint(IntegerConstraint.Type.ALLEQUAL, scope);
+    }
+
+    public IntegerConstraint createConstantConstraint(Variable variable, int constant) {
+        return new IntegerConstraint(
+                IntegerConstraint.Type.ARITHM,
+                new Variable[]{variable},
+                "=",
+                constant);
+    }
+
     private IntegerConstraint.Type toMetaCspType(IntegerConstraintKind kind) {
         return switch (kind) {
             case ARITHMETIC -> IntegerConstraint.Type.ARITHM;
