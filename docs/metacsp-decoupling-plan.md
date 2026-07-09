@@ -478,6 +478,7 @@ There was no JUnit domain test exercising integer constraints in an end-to-end p
 **Done:**
 - [x] Behavioral contract: `JUnitTestIntegerPlanning` (7-action plan, battery `(100,98)` and `(98,96)`).
 - [x] All `IntegerConstraint` construction in `PlanReportroryItem` now routes through `MetaCspIntegerConstraintAdapter` (`createAllEqualConstraint`, `createConstantConstraint`, plus the existing `toIntegerConstraint`). `PlanReportroryItem` has zero `integers.*` imports.
+- [x] All `CompoundSymbolicValueConstraint` construction in `PlanReportroryItem` now routes through `MetaCspSymbolicConstraintAdapter` (`createPositiveValueRestriction`, `createNegativeValueRestriction`, `createSubDifferent`, `createSubMatches`). `PlanReportroryItem` no longer imports `unify.CompoundSymbolicValueConstraint`. The remaining `unify` import (`CompoundSymbolicVariable`) stays — it is used for live variable reads (`possibleArgumentDifferent`) that are M9-coupled.
 
 **What remains and where it blocks:**
 
@@ -491,11 +492,11 @@ So M7-integer has reached its natural boundary: **construction is isolated behin
 
 The plan's original sequencing (M7 before M9) is validated: when M9 neutralizes the resolver network, `addResolverSub`'s integer dispatch disappears naturally because the resolver description already carries `ResolverIntegerConstraintDescription` values and the adapter already compiles them.
 
-### Next: M7-symbolic or reassess
+### Next: M9 or reassess
 
-The M7-symbolic wedge (hiding `CompoundSymbolicVariable` matching/restriction behind a port) faces the same structural boundary: `HTNMetaConstraint` and `PlanReportroryItem` call `getCompoundSymbolicVariable().possibleMatch(...)` etc. on live `Fluent` objects, and `FluentConstraint.createInternalConstraints()` constructs `CompoundSymbolicValueConstraint` objects that go into the Meta-CSP network. The construction can be routed through an adapter (as done for integers), but the live `CompoundSymbolicVariable` reads/mutations are M9-coupled.
+Both M7 wedges (integer and symbolic) have now hit the same M9 wall: construction is isolated behind adapters, but live variable reads (`Fluent.getIntegerVariables()`, `CompoundSymbolicVariable.possibleArgumentDifferent()`, `getCompoundSymbolicVariable().getPredicateName()`, etc.) and the `addResolverSub` type-dispatches (`instanceof IntegerConstraint`, `instanceof CompoundSymbolicValueConstraint`, `instanceof AllenIntervalConstraint`) remain because they operate on the raw Meta-CSP `ConstraintNetwork` resolver representation.
 
-Given that both M7 wedges hit the same M9 wall, the honest reassessment is: **the productive next step may be M9 itself** (neutralize the resolver-network representation so `addResolverSub`'s type-dispatches fall away), or **M7-symbolic construction isolation** (the same pattern as M7-integer: route `CompoundSymbolicValueConstraint` construction through an adapter, accept that live variable reads stay Meta-CSP until M9). The latter is smaller and consistent with the M7-integer pattern just completed.
+The honest assessment is that **M7 construction isolation is complete** — all constraint construction in `PlanReportroryItem` now goes through `chimp.adapter.metacsp` adapters. What remains is M9: neutralize the resolver-network representation so the `addResolverSub` type-dispatches and live variable reads fall away. The `ResolverDescription` values (M3) and the adapter factory methods (M7) are already in place to make that possible.
 
 ### Verification (M7-integer)
 
