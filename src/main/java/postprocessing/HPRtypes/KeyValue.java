@@ -1,4 +1,4 @@
-package postprocessing.estereltypes;
+package postprocessing.HPRtypes;
 
 public class KeyValue {
 

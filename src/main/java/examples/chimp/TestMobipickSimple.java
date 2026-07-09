@@ -6,9 +6,7 @@ import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import planner.CHIMP;
-import postprocessing.EsterelGenerator;
 
-import java.io.StringWriter;
 import java.util.logging.Level;
 
 public class TestMobipickSimple {
@@ -72,11 +70,6 @@ public class TestMobipickSimple {
 //            ConstraintNetwork.draw(chimp.getFluentSolver().getConstraintNetwork());
 
 //            System.out.println(chimp.printDescription());
-
-            StringWriter sw = new StringWriter();
-            EsterelGenerator.generateEsterelGraph(chimp, sw);
-            System.out.println("Generated Esterel Graph:");
-            System.out.println(sw.toString());
 
         }
 

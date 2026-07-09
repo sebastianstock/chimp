@@ -37,13 +37,11 @@ You can start CHIMP from the command line with `gradle run` followed by argument
 The output of CHIMP's `--help` command is shown below:
 ```
 Usage: chimp [-hV] [--guess-ordering] [--htn-unification] [--print-stats]
-             [-e=<esterelOutputFile>] [--horizon=<horizon>] [--hpr=<hprOutputFile>]
+             [--horizon=<horizon>] [--hpr=<hprOutputFile>]
              [-o=<outputFile>] <domainFile> <problemFile>
 Plan with CHIMP.
       <domainFile>          The file containing the planning domain.
       <problemFile>         The file containing the planning problem.
-  -e, --esterel=<esterelOutputFile>
-                            Write esterel graph to this output file.
       --guess-ordering      Indicates whether the GuessOrderingMetaConstraint
                               shall be used. (Default: false)
   -h, --help                Show this help message and exit.

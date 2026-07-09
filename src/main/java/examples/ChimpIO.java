@@ -5,7 +5,6 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNPlanner;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import postprocessing.EsterelGenerator;
 import postprocessing.HPRGenerator;
 import postprocessing.PlanExtractor;
 import org.metacsp.framework.ValueOrderingH;
@@ -37,9 +36,6 @@ public class ChimpIO implements Callable<Integer> {
 
 	@CommandLine.Option(names = {"-o", "--output"}, description = "Write the plan to this output file.")
 	File outputFile;
-
-	@CommandLine.Option(names = {"-e", "--esterel"}, description = "Write esterel graph to this output file.")
-	File esterelOutputFile;
 
 	@CommandLine.Option(names = {"--hpr"}, description = "Write HPR graph to this output file.")
 	File hprOutputFile;
@@ -121,15 +117,6 @@ public class ChimpIO implements Callable<Integer> {
 		}
 		if (outputFile != null) {
 			pex.writePlanToFile(result, outputFile);
-		}
-
-		if (esterelOutputFile != null && result) {
-			try {
-				FileWriter fw = new FileWriter(esterelOutputFile);
-				EsterelGenerator.generateEsterelGraph(chimp, fw);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 
 		if (hprOutputFile != null && result) {

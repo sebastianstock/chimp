@@ -13,7 +13,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.PlanReportroryItem;
 
 import planner.CHIMP;
-import postprocessing.estereltypes.KeyValue;
+import postprocessing.HPRtypes.KeyValue;
 import postprocessing.HPRtypes.*;
 
 import chimp.adapter.metacsp.MetaCspFluentStore;
