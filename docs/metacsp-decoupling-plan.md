@@ -443,3 +443,85 @@ The first Milestone 6 changes should be small and ordered:
 6. Migrate `HPRGenerator`'s fluent and constraint reads to `FluentStore`/`FluentView`, and its temporal-edge extraction to `temporalDistance`. Drop the `HPRtypes.Duration` TimePoint wrapper. HPR YAML output is preserved byte-for-byte. The Esterel export (`EsterelGenerator`, `estereltypes`, the `--esterel` CLI flag, and its test) was removed as a non-core feature rather than migrated, leaving `postprocessing` free of `org.metacsp.*` imports and removing the last postprocessing consumer that would have forced the temporal-service milestone.
 
 Temporal mutation, symbolic binding, integer propagation, resource scheduling, resolver application, prototype substitution, and rollback should remain on the existing backend during this milestone. Those capabilities belong behind later focused service interfaces before Meta-CSP inheritance is removed.
+
+## Milestone 7 (proposed) — Complete the Temporal Boundary: Read Side Done, Write Side Next
+
+### Where the read boundary leaves us
+
+The Milestone 6 read work is effectively complete for real consumers. `FluentView` already exposes `TemporalInterval` (EST/LST/EET/LET), and `FluentStore.temporalDistance` covers the APSP read path. An audit of the remaining 72 main files importing `org.metacsp` shows that every remaining coupling is blocked, directly or transitively, by either the temporal **write/mutation** surface or by Meta-CSP **inheritance** in the core classes:
+
+| Cluster | Files | Blocked by |
+| --- | --- | --- |
+| Core storage: `Fluent`, `FluentConstraint`, `FluentNetworkSolver` | 3 | M9 inheritance (they ARE Meta-CSP objects) |
+| HTN core: `HTNPlanner`, `HTNMetaConstraint`, `PlanReportroryItem`, `HTNMethod`, `HTNOperator` | 5+ | M9 inheritance + resolver materialization |
+| Unification | 10 | M7 ports + M9 inheritance |
+| Integer | 4 | M7 ports + M9 inheritance |
+| Resource scheduling | 3 | M8 + `Schedulable`/`MetaVariable` (M9) |
+| Mutation consumers: `dispatching`, `sensing` | 6 | Temporal write/mutation port (this milestone) |
+| Peripheral: `ui`, `examples`, `eval`, `dwr`, `externalPathPlanning`, `old_dev` | ~25 | Core types are still Meta-CSP (M10) |
+
+There is no remaining shallow, speculative-free read migration: `ui.HierarchicalLayout` is a JUNG `Layout<Fluent, FluentConstraint>` typed on the core classes, and the `examples.*` temporal reads operate on `Variable[]` from the solver. Both are blocked until the core stops being Meta-CSP. So the next milestone is necessarily a step up in scope: it begins the **write/mutation** service boundary, which is the plan's prescribed item 6 ("Hide Temporal Solver Types") minus the read half already done.
+
+### Decision to surface
+
+Three directions are consistent with the plan. Per the AGENTS.md rule of not picking silently when interpretations differ, they are stated explicitly; the recommendation follows.
+
+- **(A) Commit to the core decoupling chain** — complete the temporal write/mutation port (this proposal), then unification/integer ports, then resource, then inheritance removal (M9). Ends with CHIMP off Meta-CSP. Largest commitment; M9 is explicitly the highest-risk step in the plan.
+- **(B) Pause Meta-CSP removal; pivot toward UP integration.** The long-term goal is UP integration. The existing read boundary (`FluentStore`/`FluentView`) may be enough to build a first UP bridge against a solved plan, which could be more valuable for a research project than finishing the removal. This defers the risky M9 work indefinitely.
+- **(C) A bounded first wedge of (A): only the temporal write/mutation port, driven by the smallest mutation consumer (`dispatching`), then stop and reassess.** Lower commitment than full (A); produces a concrete, tested port without committing to M9.
+
+**Recommendation: (C).** It is the plan's prescribed next milestone (the write half of "Hide Temporal Solver Types"), it has a forcing consumer so it is not speculative, it is bounded, and it leaves the option open for (A) or (B) at the next reassessment. (A) in one go is too large given the simplicity mandate; (B) is a direction change the user should choose explicitly rather than drift into.
+
+### Scope for (C): Temporal Write/Mutation Service Boundary
+
+Define a CHIMP-owned mutation port for the operations the non-core mutation consumers currently perform directly on `AllenIntervalConstraint`/`FluentNetworkSolver`. Concretely, from `dispatching.FluentDispatcher`:
+
+- Add a temporal relation between two fluents (Allen `Type` + `Bounds`), e.g. `Overlaps`.
+- Add a self deadline constraint (`Deadline` + `Bounds`).
+- Add/remove constraints on the fluent network and observe success/failure (propagation result).
+- Read EST/EET for bounds construction (already available via `FluentView`; reuse it).
+
+Likely interface shape (to be confirmed against real call sites, not designed up front):
+
+```java
+// in chimp.model, alongside FluentStore
+public interface FluentMutationStore extends FluentStore {
+    boolean addTemporalRelation(FluentId from, FluentId to, TemporalRelation relation, TemporalBounds bounds);
+    boolean addDeadline(FluentId fluent, TemporalBounds bounds);
+    boolean removeConstraint(ChimpConstraint constraint);
+}
+```
+
+`TemporalRelation` already exists in the independent model. The Meta-CSP adapter (`MetaCspFluentStore`) implements these by constructing `AllenIntervalConstraint` and calling `FluentNetworkSolver.addConstraint`, exactly as `FluentDispatcher` does today, so behavior is preserved.
+
+In-scope files:
+- `chimp.model.FluentMutationStore` (new interface) and any small value additions.
+- `chimp.adapter.metacsp.MetaCspFluentStore` (implement the mutation methods).
+- `dispatching.FluentDispatchingFunction` (40 lines, framework-only) and `dispatching.FluentDispatcher` (193 lines) — migrate to the port; drop their `org.metacsp.*` imports.
+- Characterization test asserting dispatching behavior is unchanged.
+
+Out of scope (explicitly deferred):
+- `sensing.*` (marking transitions + `HTNMetaConstraint` coupling; migrate only if the port covers it trivially, otherwise leave).
+- `HTNPlanner`/`HTNMetaConstraint` resolver application and rollback (M9).
+- Unification, integer, resource ports (M7/M8).
+- Any change to `Fluent`/`FluentConstraint`/`FluentNetworkSolver` inheritance (M9).
+
+### Ordered steps
+
+1. Enumerate the exact `AllenIntervalConstraint` constructions and `addConstraint`/`removeConstraint` calls in `FluentDispatcher` and `FluentDispatchingFunction`; confirm the minimal port method set. → verify: written list matches every `org.metacsp` usage in those two files.
+2. Add `FluentMutationStore` to `chimp.model` and implement in `MetaCspFluentStore` by delegating to the existing Meta-CSP calls. → verify: compiles; adapter unit test for each method against a small solved plan.
+3. Migrate `FluentDispatchingFunction` then `FluentDispatcher` to the port. → verify: no `org.metacsp.*` imports remain in `dispatching`; `./gradlew test` green; dispatching output/behavior byte-identical on a representative plan.
+4. Reassess: decide (A) continue the core chain, or (B) pivot to UP integration.
+
+### Verification
+
+- `./gradlew test --rerun-tasks` green (full suite, including dispatching/sensing tests).
+- `dispatching` package has zero `org.metacsp.*` imports.
+- Diff dispatching behavior (constraint networks produced) before/after on a plan that exercises dispatching; expect identical.
+- No new production dependencies.
+
+### Risks
+
+- The mutation port is a real abstraction (it has a forcing consumer), but getting the method shapes right matters: if `sensing` needs marking transitions the port doesn't cover, it stays on Meta-CSP and we accept a split boundary for now. Flagged, not forced.
+- `FluentDispatcher` sorts fluents by EST and reads `AllenIntervalConstraint.Type.Equals`; the port must expose relation-type reads or reuse `ChimpConstraint`/`ConstraintKind`. Confirm in step 1.
+- Behavior preservation depends on the adapter issuing the same `addConstraint` calls in the same order; verify by diff.
