@@ -18,6 +18,7 @@ import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
 import chimp.model.ResourceRequirement;
 import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
+import chimp.adapter.metacsp.MetaCspSymbolicConstraintAdapter;
 import chimp.adapter.metacsp.MetaCspResolverAdapter;
 import chimp.model.FluentPrototypeDescription;
 import chimp.model.FluentSignature;
@@ -33,7 +34,6 @@ import chimp.model.ResolverTemporalConstraintDescription;
 import chimp.model.SymbolicConstraintDescription;
 import chimp.model.SymbolicRelationKind;
 import org.metacsp.utility.logging.MetaCSPLogging;
-import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
 import java.util.*;
@@ -48,6 +48,8 @@ public abstract class PlanReportroryItem {
 			new MetaCspIntegerConstraintAdapter();
 	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
 			new MetaCspResourceRequirementAdapter();
+	private static final MetaCspSymbolicConstraintAdapter SYMBOLIC_ADAPTER =
+			new MetaCspSymbolicConstraintAdapter();
 	private static final MetaCspResolverAdapter RESOLVER_ADAPTER =
 			new MetaCspResolverAdapter();
 	
@@ -991,25 +993,17 @@ public abstract class PlanReportroryItem {
 						
 						if (possibleValues != null) {
 							// TODO merge multiple constraints into one.
-							CompoundSymbolicValueConstraint rcon = 
-									new CompoundSymbolicValueConstraint(
-											CompoundSymbolicValueConstraint.Type.POSITIVEVALUERESTRICTION, 
-											indices, 
-											positiveRestrictions);
-							rcon.setFrom(var);
-							rcon.setTo(var);
+							Constraint rcon =
+									SYMBOLIC_ADAPTER.createPositiveValueRestriction(
+											var, indices, positiveRestrictions);
 							ret.add(rcon);
 						}
 						
 						if (impossibleValues != null) {
 							// TODO merge multiple constraints into one.
-							CompoundSymbolicValueConstraint rcon = 
-									new CompoundSymbolicValueConstraint(
-											CompoundSymbolicValueConstraint.Type.NEGATIVEVALUERESTRICTION, 
-											indices, 
-											negativeRestrictions);
-							rcon.setFrom(var);
-							rcon.setTo(var);
+							Constraint rcon =
+									SYMBOLIC_ADAPTER.createNegativeValueRestriction(
+											var, indices, negativeRestrictions);
 							ret.add(rcon);
 						}
 					}
@@ -1079,11 +1073,7 @@ public abstract class PlanReportroryItem {
 								throw new IllegalStateException();
 							}
 						}
-						CompoundSymbolicValueConstraint scon = new CompoundSymbolicValueConstraint(
-								CompoundSymbolicValueConstraint.Type.SUBDIFFERENT, 
-								connections);
-						scon.setFrom(fromVar);
-						scon.setTo(toVar);
+						Constraint scon = SYMBOLIC_ADAPTER.createSubDifferent(fromVar, toVar, connections);
 						ret.add(scon);
 					}
 				}
@@ -1112,43 +1102,33 @@ public abstract class PlanReportroryItem {
 						// Create binding constraint
 						int connections[] = new int[] {occurrence.get(occKeys[i]).intValue(),
 								occurrence.get(occKeys[j]).intValue()};
-						CompoundSymbolicValueConstraint bcon = new CompoundSymbolicValueConstraint(
-								CompoundSymbolicValueConstraint.Type.SUBMATCHES, 
-								connections);
-
 						// set from
 						Variable from = preKeyToFluentMap.get(occKeys[i]); // try precondition keys
 						if (from == null) {
 							from = effKeyToVariableMap.get(occKeys[i]);          // else try effect keys
 						}
-						if (from != null) {
-							if (from instanceof Fluent) {
-								bcon.setFrom(((Fluent) from).getCompoundSymbolicVariable());
-							} else {  // Variable Prototype (will be set in addResolverSub)
-								bcon.setFrom(from);
-							}
-						} else {
+						if (from == null) {
 							logger.fine("No fluent found for key " + occKeys[i]);
 							continue;
 						}
-
+						if (from instanceof Fluent) {
+							from = ((Fluent) from).getCompoundSymbolicVariable();
+						} // else: Variable Prototype (will be set in addResolverSub)
+						
 						// set to
 						Variable to = preKeyToFluentMap.get(occKeys[j]); // try precondition keys
 						if (to == null) {
 							to = effKeyToVariableMap.get(occKeys[j]);        // else try effect keys
 						}
-						
-						if (to != null) {
-							if (to instanceof Fluent) {
-								bcon.setTo(((Fluent) to).getCompoundSymbolicVariable());
-							} else {  // Variable Prototype (will be set in addResolverSub)
-								bcon.setTo(to);
-							}
-						} else {
+						if (to == null) {
 							logger.fine("No fluent found for key " + occKeys[j]);
 							continue;
 						}
-
+						if (to instanceof Fluent) {
+							to = ((Fluent) to).getCompoundSymbolicVariable();
+						} // else: Variable Prototype (will be set in addResolverSub)
+						
+						Constraint bcon = SYMBOLIC_ADAPTER.createSubMatches(from, to, connections);
 						ret.add(bcon);
 					}
 				}
