@@ -457,13 +457,54 @@ An audit confirms `dispatching` and `sensing` are purely peripheral:
 
 They can be deleted wholesale (6 files, ~870 lines) with no impact on planning or tests. This is an optional cleanup, not a prerequisite for planner work. It is recorded here as approved-but-deferred; it can be done in a single small commit whenever it is useful to reduce noise.
 
-## Milestone 7 (revised) — Planner Core: Break the Meta-CSP Search Inheritance
+## Milestone 7 (revised) — Hide Unification and Integer Solvers (planner-relevant service ports)
+
+### Why M7, not the M9 search-loop wedge
+
+After the post-M6 reassessment, the user chose to proceed with M7 rather than jumping to the M9 search-inheritance break. M7 is not a peripheral detour: its consumers are the planner core itself. `HTNPlanner.addResolverSub` type-dispatches on `CompoundSymbolicValueConstraint`, `AllenIntervalConstraint`, and `IntegerConstraint` to repair resolver scopes, and HTN expansion (`PlanReportroryItem`) calls directly into `CompoundSymbolicVariable` matching/restriction methods and constructs `IntegerConstraint`s. The plan's original ordering put M7 before M9 precisely so that two of the three `addResolverSub` type-dispatches disappear before the search loop is ported. Doing M9 first (the earlier proposal) would yield a CHIMP-owned search engine that still reaches into Meta-CSP storage via type-dispatch &mdash; an awkward intermediate state. M7-first avoids that.
+
+M1&ndash;M5 already built the *description* layer (`IntegerConstraintKind`, `ResolverIntegerConstraintDescription`, `SymbolicRelationKind`, `SymbolicConstraintDescription`, `MetaCspIntegerConstraintAdapter`). What does not yet exist is the **runtime service port** &mdash; the live `CompoundSymbolicVariable`/`IntegerVariable` objects inside `Fluent`, manipulated during search. M7 is that runtime port.
+
+M7 is split into two wedges:
+- **M7-integer** (first): smaller, partly scaffolded, simpler semantics (arithmetic / all-different / all-equal).
+- **M7-symbolic** (second): the CHIMP task-matching core (`possibleMatch`, `possibleArgumentsMatch`, `possibleArgumentDifferent`, predicate/argument reads and mutations). Most semantically delicate part outside the search engine.
+
+### M7-integer: prerequisite behavioral contract (done)
+
+There was no JUnit domain test exercising integer constraints in an end-to-end plan &mdash; `examples/chimp/TestPlanningWithIntegerConstraints` is a `main()` demo, not `@Test`. A behavioral contract is required before migrating the integer runtime. `src/test/java/htn/JUnitTestIntegerPlanning.java` was added: it plans over `domains/simple_integer_domain.ddl` (battery-level integer variable; `!move_base` requires `?batteryStart > 2` and sets `?batteryEnd = ?batteryStart - 2`, initial battery 100) and asserts a 7-action plan with two `!move_base` actions whose integer values are `(100, 98)` and `(98, 96)`. Those battery values are domain-defined semantics (initial 100, decrement 2), not implementation artifacts, so they are a robust, non-brittle contract. The test is non-vacuous (verified by temporarily flipping an assertion). This is the contract that must stay green across the M7-integer migration.
+
+### M7-integer: ordered steps
+
+1. **Add the integer-planning behavioral contract** (done: `JUnitTestIntegerPlanning`). &rarr; verify: passes on current code; non-vacuous.
+2. **Enumerate the exact integer runtime surface** the planner/fluent core use: `Fluent.getIntegerVariables()`; the four direct `new IntegerConstraint(...)` calls in `PlanReportroryItem` (plus the already-adapter-routed `MetaCspIntegerConstraintAdapter.toIntegerConstraint`); the `addResolverSub` integer scope-repair dispatch; `IntegerConstraintSolver` composition and `hasIntegerConstraintSolver()` in `FluentNetworkSolver`; `IntegerConstraint`/`IntegerVariable`/`IntegerDomain` reads in the adapter. &rarr; verify: written list accounts for every `integers.*` usage outside `chimp.adapter.metacsp` and the `integers` package itself.
+3. **Define the integer runtime port** in `chimp.model` (an interface exposing integer-variable access and constraint creation/checking against `FluentId`), implemented in `chimp.adapter.metacsp` over the existing `IntegerConstraintSolver`. &rarr; verify: compiles; adapter unit test.
+4. **Migrate the call sites** &mdash; route the four `new IntegerConstraint` calls and the `getIntegerVariables()` reads and the `addResolverSub` integer dispatch through the port. &rarr; verify: `./gradlew test --rerun-tasks` green; `JUnitTestIntegerPlanning` plan identical (same 7 actions, same battery transitions); reduced `org.metacsp`/`integers.*` imports in `htn`/`fluentSolver`.
+5. **Reassess** &mdash; proceed to M7-symbolic or pause.
+
+### Verification (M7-integer)
+
+- `./gradlew test --rerun-tasks` green.
+- `JUnitTestIntegerPlanning`: 7 actions, `!move_base` `(100, 98)` and `(98, 96)` unchanged.
+- No new production dependencies.
+
+### Risks (M7-integer)
+
+- The integer runtime port must carry the variable-identity information that `addResolverSub` needs (nested `VariablePrototype` &rarr; `Fluent.getIntegerVariables()[index]`). Confirm the port can express this without leaking `IntegerVariable`; if it cannot, keep that one dispatch on Meta-CSP for now and accept a partial boundary.
+- `IntegerConstraintSolver` may propagate via Choco or similar internals; the port wraps, not replaces, so this is not a risk for this wedge.
+
+### Deferred
+
+- M7-symbolic (the matching/restriction computation port) &mdash; after M7-integer.
+- M8 resource scheduling, M9 search-inheritance break, M10 peripheral &mdash; after M7.
+- Dispatching/sensing removal &mdash; approved-but-deferred cleanup, independent of M7.
 
 ### What "focus on the planner" means concretely
 
 The planner core is `HTNPlanner extends MetaConstraintSolver` and `HTNMetaConstraint extends MetaConstraint`. The CHIMP-specific search behavior lives in overridden hooks (`addResolverSub`, `retractResolverSub`, `preBacktrack`, `postBacktrack`, bounds, conflict clauses), but the **search engine itself** — backtracking, flaw enumeration, resolver application/retraction orchestration, rollback — is inherited from `MetaConstraintSolver` (755 lines). Removing this inheritance is the plan's item 9, explicitly flagged as the highest-risk step.
 
 This is the only real planner work left. There is no shallow planner migration: every remaining `org.metacsp` coupling in the planner is either the inheritance itself or the `ConstraintNetwork`/`VariablePrototype`/`Constraint` types that flow through the inherited search protocol.
+
+This inheritance break (M9) remains the eventual planner goal, but it is now sequenced **after** M7 per the plan's original ordering, so that `addResolverSub`'s type-dispatches on `CompoundSymbolicValueConstraint` and `IntegerConstraint` are already gone when the search loop is ported. The grounded scope reading below is retained for when M9 is reached.
 
 ### Grounded scope (from reading `MetaConstraintSolver` + `HTNPlanner`)
 
