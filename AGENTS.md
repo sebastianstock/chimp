@@ -64,6 +64,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Project context
 
+CHIMP is a research project. Keep the overall architecture simple and avoid overcomplicating it during the Meta-CSP removal process. Do not introduce speculative abstractions, layers, or indirection beyond what the current step requires.
+
 CHIMP is a hierarchical hybrid planner implemented in Java 17. It currently depends on the Meta-CSP Framework. The long-term goal is to make CHIMP independent of Meta-CSP and integrate it with the Unified Planning library (UP) hile preserving planner semantics.
 
 ## Main engineering rule
