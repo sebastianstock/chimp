@@ -473,13 +473,29 @@ M7 is split into two wedges:
 
 There was no JUnit domain test exercising integer constraints in an end-to-end plan &mdash; `examples/chimp/TestPlanningWithIntegerConstraints` is a `main()` demo, not `@Test`. A behavioral contract is required before migrating the integer runtime. `src/test/java/htn/JUnitTestIntegerPlanning.java` was added: it plans over `domains/simple_integer_domain.ddl` (battery-level integer variable; `!move_base` requires `?batteryStart > 2` and sets `?batteryEnd = ?batteryStart - 2`, initial battery 100) and asserts a 7-action plan with two `!move_base` actions whose integer values are `(100, 98)` and `(98, 96)`. Those battery values are domain-defined semantics (initial 100, decrement 2), not implementation artifacts, so they are a robust, non-brittle contract. The test is non-vacuous (verified by temporarily flipping an assertion). This is the contract that must stay green across the M7-integer migration.
 
-### M7-integer: ordered steps
+### M7-integer: progress and honest boundary
 
-1. **Add the integer-planning behavioral contract** (done: `JUnitTestIntegerPlanning`). &rarr; verify: passes on current code; non-vacuous.
-2. **Enumerate the exact integer runtime surface** the planner/fluent core use: `Fluent.getIntegerVariables()`; the four direct `new IntegerConstraint(...)` calls in `PlanReportroryItem` (plus the already-adapter-routed `MetaCspIntegerConstraintAdapter.toIntegerConstraint`); the `addResolverSub` integer scope-repair dispatch; `IntegerConstraintSolver` composition and `hasIntegerConstraintSolver()` in `FluentNetworkSolver`; `IntegerConstraint`/`IntegerVariable`/`IntegerDomain` reads in the adapter. &rarr; verify: written list accounts for every `integers.*` usage outside `chimp.adapter.metacsp` and the `integers` package itself.
-3. **Define the integer runtime port** in `chimp.model` (an interface exposing integer-variable access and constraint creation/checking against `FluentId`), implemented in `chimp.adapter.metacsp` over the existing `IntegerConstraintSolver`. &rarr; verify: compiles; adapter unit test.
-4. **Migrate the call sites** &mdash; route the four `new IntegerConstraint` calls and the `getIntegerVariables()` reads and the `addResolverSub` integer dispatch through the port. &rarr; verify: `./gradlew test --rerun-tasks` green; `JUnitTestIntegerPlanning` plan identical (same 7 actions, same battery transitions); reduced `org.metacsp`/`integers.*` imports in `htn`/`fluentSolver`.
-5. **Reassess** &mdash; proceed to M7-symbolic or pause.
+**Done:**
+- [x] Behavioral contract: `JUnitTestIntegerPlanning` (7-action plan, battery `(100,98)` and `(98,96)`).
+- [x] All `IntegerConstraint` construction in `PlanReportroryItem` now routes through `MetaCspIntegerConstraintAdapter` (`createAllEqualConstraint`, `createConstantConstraint`, plus the existing `toIntegerConstraint`). `PlanReportroryItem` has zero `integers.*` imports.
+
+**What remains and where it blocks:**
+
+The remaining integer-runtime couplings are all blocked by the Meta-CSP storage/resolver-network layer (M9), not by a missing port:
+
+- `HTNPlanner.addResolverSub` does `con instanceof IntegerConstraint` and repairs scope via `fl.getIntegerVariables()[intVarIndex]`. This operates on the raw Meta-CSP `ConstraintNetwork` resolver values; the type-dispatch cannot be hidden until the resolver network representation is neutralized (M9 / resolver materialization).
+- `Fluent.getIntegerVariables()` returns `IntegerVariable[]` by slicing `getInternalVariables()`. The elements are used as `Constraint` scope elements inside Meta-CSP `ConstraintNetwork`s, so the return type cannot be neutralized until `Fluent` stops being a Meta-CSP `MultiVariable` (M9 storage).
+- `FluentNetworkSolver` composes `IntegerConstraintSolver` as a Meta-CSP ingredient. It IS a Meta-CSP `MultiConstraintSolver`; this is the storage layer (M9).
+
+So M7-integer has reached its natural boundary: **construction is isolated behind the adapter, but the live `IntegerVariable` objects and the `instanceof` dispatch remain because they are woven into the Meta-CSP resolver-network representation.** Further integer isolation is an M9 task, not an M7 task.
+
+The plan's original sequencing (M7 before M9) is validated: when M9 neutralizes the resolver network, `addResolverSub`'s integer dispatch disappears naturally because the resolver description already carries `ResolverIntegerConstraintDescription` values and the adapter already compiles them.
+
+### Next: M7-symbolic or reassess
+
+The M7-symbolic wedge (hiding `CompoundSymbolicVariable` matching/restriction behind a port) faces the same structural boundary: `HTNMetaConstraint` and `PlanReportroryItem` call `getCompoundSymbolicVariable().possibleMatch(...)` etc. on live `Fluent` objects, and `FluentConstraint.createInternalConstraints()` constructs `CompoundSymbolicValueConstraint` objects that go into the Meta-CSP network. The construction can be routed through an adapter (as done for integers), but the live `CompoundSymbolicVariable` reads/mutations are M9-coupled.
+
+Given that both M7 wedges hit the same M9 wall, the honest reassessment is: **the productive next step may be M9 itself** (neutralize the resolver-network representation so `addResolverSub`'s type-dispatches fall away), or **M7-symbolic construction isolation** (the same pattern as M7-integer: route `CompoundSymbolicValueConstraint` construction through an adapter, accept that live variable reads stay Meta-CSP until M9). The latter is smaller and consistent with the M7-integer pattern just completed.
 
 ### Verification (M7-integer)
 
