@@ -5,6 +5,10 @@ import java.util.Optional;
 
 public interface FluentStore {
 
+    Optional<TemporalBounds> temporalDistance(FluentId from, FluentId to,
+                                               TemporalEndpoint fromEndpoint,
+                                               TemporalEndpoint toEndpoint);
+
     List<FluentView> fluents();
 
     Optional<FluentView> fluent(FluentId id);

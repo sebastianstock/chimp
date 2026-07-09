@@ -8,6 +8,11 @@ import java.util.OptionalInt;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.Variable;
+import org.metacsp.multi.allenInterval.AllenInterval;
+import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
+import org.metacsp.time.APSPSolver;
+import org.metacsp.time.SimpleDistanceConstraint;
+import org.metacsp.time.TimePoint;
 
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
@@ -18,6 +23,8 @@ import chimp.model.FluentStore;
 import chimp.model.FluentType;
 import chimp.model.FluentView;
 import chimp.model.IntegerValue;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalEndpoint;
 import chimp.model.TemporalInterval;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -33,6 +40,28 @@ public final class MetaCspFluentStore implements FluentStore {
 
     public MetaCspFluentStore(FluentNetworkSolver solver) {
         this.solver = Objects.requireNonNull(solver, "solver");
+    }
+
+    @Override
+    public Optional<TemporalBounds> temporalDistance(FluentId from, FluentId to,
+                                                       TemporalEndpoint fromEndpoint,
+                                                       TemporalEndpoint toEndpoint) {
+        Objects.requireNonNull(from, "from");
+        Objects.requireNonNull(to, "to");
+        Objects.requireNonNull(fromEndpoint, "fromEndpoint");
+        Objects.requireNonNull(toEndpoint, "toEndpoint");
+
+        Fluent fromFluent = requireFluent(from);
+        Fluent toFluent = requireFluent(to);
+
+        TimePoint fromTimePoint = timePoint(fromFluent, fromEndpoint);
+        TimePoint toTimePoint = timePoint(toFluent, toEndpoint);
+
+        SimpleDistanceConstraint distance = apspSolver().getConstraint(fromTimePoint, toTimePoint);
+        if (distance == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new TemporalBounds(distance.getMinimum(), distance.getMaximum()));
     }
 
     @Override
@@ -126,6 +155,25 @@ public final class MetaCspFluentStore implements FluentStore {
             }
         }
         return List.copyOf(result);
+    }
+
+    private Fluent requireFluent(FluentId id) {
+        for (Variable variable : solver.getVariables()) {
+            if (variable instanceof Fluent fluent && fluent.getID() == id.value()) {
+                return fluent;
+            }
+        }
+        throw new IllegalArgumentException("Unknown fluent ID: " + id.value());
+    }
+
+    private TimePoint timePoint(Fluent fluent, TemporalEndpoint endpoint) {
+        AllenInterval interval = fluent.getAllenInterval();
+        return endpoint == TemporalEndpoint.START ? interval.getStart() : interval.getEnd();
+    }
+
+    private APSPSolver apspSolver() {
+        AllenIntervalNetworkSolver allenSolver = (AllenIntervalNetworkSolver) solver.getConstraintSolvers()[1];
+        return (APSPSolver) allenSolver.getConstraintSolvers()[0];
     }
 
     private FluentMarking toMarking(Object marking) {

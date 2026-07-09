@@ -17,6 +17,7 @@ import chimp.model.FluentId;
 import chimp.model.FluentMarking;
 import chimp.model.FluentType;
 import chimp.model.FluentView;
+import chimp.model.TemporalEndpoint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
@@ -127,6 +128,23 @@ public class MetaCspFluentStoreTest {
             assertEquals(FluentMarking.valueOf(marking.name()),
                     store.fluent(new FluentId(first.getID())).orElseThrow().marking());
         }
+    }
+
+    @Test
+    public void temporalDistanceRejectsUnknownIdsAndNullArguments() {
+        FluentId unknown = new FluentId(999);
+        assertThrows(IllegalArgumentException.class,
+                () -> store.temporalDistance(unknown, new FluentId(first.getID()),
+                        TemporalEndpoint.START, TemporalEndpoint.START));
+        assertThrows(IllegalArgumentException.class,
+                () -> store.temporalDistance(new FluentId(first.getID()), unknown,
+                        TemporalEndpoint.START, TemporalEndpoint.START));
+        assertThrows(NullPointerException.class,
+                () -> store.temporalDistance(null, new FluentId(first.getID()),
+                        TemporalEndpoint.START, TemporalEndpoint.START));
+        assertThrows(NullPointerException.class,
+                () -> store.temporalDistance(new FluentId(first.getID()), new FluentId(second.getID()),
+                        null, TemporalEndpoint.START));
     }
 
     private Fluent createFluent(String type, String predicate, String... arguments) {
