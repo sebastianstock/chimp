@@ -6,26 +6,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Table;
 
-import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
-import org.metacsp.time.APSPSolver;
-import org.metacsp.time.SimpleDistanceConstraint;
-
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.Constraint;
-
-import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
-import fluentSolver.FluentConstraint;
 import htn.PlanReportroryItem;
 
 import planner.CHIMP;
 import postprocessing.estereltypes.KeyValue;
 import postprocessing.HPRtypes.*;
+
+import chimp.adapter.metacsp.MetaCspFluentStore;
+import chimp.model.ChimpConstraint;
+import chimp.model.ConstraintKind;
+import chimp.model.FluentId;
+import chimp.model.FluentStore;
+import chimp.model.FluentType;
+import chimp.model.FluentView;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalEndpoint;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -36,29 +35,30 @@ public class HPRGenerator {
 
     private CHIMP chimp;
     private Writer writer;
-    private FluentNetworkSolver fluentSolver;
+    private FluentStore store;
     private HPRPlan hprPlan;
-    private Map<Duration, Fluent> timePointActivityMap;
-    private ListMultimap<Fluent, FluentConstraint> fluentsConstraintsMultiMap;
-    private Table<Fluent, Fluent, FluentConstraint> beforesTable;
+    private List<FluentView> plannedFluents;
+    private ListMultimap<FluentId, ChimpConstraint> fluentsConstraintsMultiMap;
+    private Table<FluentId, FluentId, Boolean> beforesTable;
 
     public HPRGenerator(CHIMP chimp, Writer writer) {
         this.chimp = chimp;
         this.writer = writer;
-        this.fluentSolver = chimp.getFluentSolver();
+        FluentNetworkSolver fluentSolver = chimp.getFluentSolver();
+        this.store = new MetaCspFluentStore(fluentSolver);
         this.hprPlan = new HPRPlan();
         this.fluentsConstraintsMultiMap = ArrayListMultimap.create();
         this.beforesTable = HashBasedTable.create();
         createFluentsConstraintsMultiMap();
-        this.timePointActivityMap = getTimePointActivityMap();
+        this.plannedFluents = collectPlannedFluents();
     }
 
     public void generateHPR() {
         // Create and sort array of timepoints for each action
-        Duration[] tps = createSortedActivityTimepoints();
+        List<FluentView> sortedFluents = createSortedPlannedFluents();
 
-        addNodesToPlan(tps);
-        addTemporalEdgesToPlan(tps);
+        addNodesToPlan(sortedFluents);
+        addTemporalEdgesToPlan(sortedFluents);
         addCausalEdgesToPlan();
 
         // export HPR
@@ -71,7 +71,7 @@ public class HPRGenerator {
         }
     }
 
-    private void addNodesToPlan(Duration[] tps) {
+    private void addNodesToPlan(List<FluentView> fluents) {
         List<PlanReportroryItem> operators = this.chimp.getPlanner().getHTNMetaConstraint().getOperators();
         Map<String, PlanReportroryItem> nameActionMap = new HashMap<>();
         for (PlanReportroryItem op : operators) {
@@ -83,109 +83,98 @@ public class HPRGenerator {
             nameActionMap.put(me.getName(), me);
         }
 
-        for (int i = 0; i < tps.length; i++) {
-            Duration tp = tps[i];
-            Fluent fl = this.timePointActivityMap.get(tp);
-            String name = fl.getCompoundSymbolicVariable().getPredicateName();
+        for (FluentView fl : fluents) {
+            String name = fl.signature().predicate();
             // check if method action or operator action (primitive action)
             int type = isOperator(fl) ? 1 : 0;
-            Node node = new Node(fl.getID(), type, name, fl.getAllenInterval().getEST() / 1000,
-                    (fl.getAllenInterval().getEET() - fl.getAllenInterval().getEST()) / 1000);
+            Node node = new Node((int) fl.id().value(), type, name, fl.temporalInterval().earliestStart() / 1000,
+                    (fl.temporalInterval().earliestEnd() - fl.temporalInterval().earliestStart()) / 1000);
             String[] opArgNames = nameActionMap.get(name).getStringArgumentNames();
-            String[] flArgs = fl.getCompoundSymbolicVariable().getArgs();
-            for (int j = 0; j < flArgs.length; j++) {
+            List<String> flArgs = fl.signature().arguments();
+            for (int j = 0; j < flArgs.size(); j++) {
                 String key = opArgNames[j];
                 // remove leading '?'
                 if (key.length() > 0 && key.charAt(0) == '?') {
                     key = key.substring(1);
                 }
-                node.parameters.add(new KeyValue(key, flArgs[j]));
+                node.parameters.add(new KeyValue(key, flArgs.get(j)));
             }
 
-            for (FluentConstraint con : this.fluentsConstraintsMultiMap.get(fl)) {
-                FluentConstraint.Type con_type = con.getType();
-                if (con_type.equals(FluentConstraint.Type.PRE)) {
-                    node.preconditions.add(((Fluent) con.getFrom()).getCompoundSymbolicVariable().getName());
+            for (ChimpConstraint con : this.fluentsConstraintsMultiMap.get(fl.id())) {
+                if (con.kind().equals(ConstraintKind.PRECONDITION)) {
+                    node.preconditions.add(fluentName(requireFluent(con.from())));
                 }
-                if (con_type.equals(FluentConstraint.Type.OPENS)) {
-                    node.positive_effects.add(((Fluent) con.getTo()).getCompoundSymbolicVariable().getName());
+                if (con.kind().equals(ConstraintKind.OPENS)) {
+                    node.positive_effects.add(fluentName(requireFluent(con.to())));
                 }
-                if (con_type.equals(FluentConstraint.Type.CLOSES)) {
-                    node.negative_effects.add(((Fluent) con.getTo()).getCompoundSymbolicVariable().getName());
+                if (con.kind().equals(ConstraintKind.CLOSES)) {
+                    node.negative_effects.add(fluentName(requireFluent(con.to())));
                 }
             }
             this.hprPlan.addNode(node);
         }
     }
 
-    private void addTemporalEdgesToPlan(Duration[] tps) {
-        APSPSolver apspSolver = ((APSPSolver) ((AllenIntervalNetworkSolver) fluentSolver.getConstraintSolvers()[1])
-                .getConstraintSolvers()[0]);
-
+    private void addTemporalEdgesToPlan(List<FluentView> fluents) {
         // the index of nodes in the HPR plan is the same as that of the corresponding
-        // timepoint in tps
+        // fluent in the sorted list
 
         // Add edges: for two nodes check if an edge exist and add it to the plan
 
         int edgeIdCnt = 0;
-        for (int i = 0; i < tps.length; i++) {
-            for (int j = 0; j < tps.length; j++) {
-                SimpleDistanceConstraint sdcSS = apspSolver.getConstraint(tps[i].start, tps[j].start);
-                SimpleDistanceConstraint sdcSE = apspSolver.getConstraint(tps[i].start, tps[j].end);
-                SimpleDistanceConstraint sdcES = apspSolver.getConstraint(tps[i].end, tps[j].start);
-                SimpleDistanceConstraint sdcEE = apspSolver.getConstraint(tps[i].end, tps[j].end);
-                Fluent source_fl = this.timePointActivityMap.get(tps[i]);
-                Fluent sink_fl = this.timePointActivityMap.get(tps[j]);
+        for (int i = 0; i < fluents.size(); i++) {
+            for (int j = 0; j < fluents.size(); j++) {
+                FluentId sourceId = fluents.get(i).id();
+                FluentId sinkId = fluents.get(j).id();
+                int source = (int) sourceId.value();
+                int sink = (int) sinkId.value();
 
-                // create edges
-                if (sdcSS != null) {
-                    int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcSS.getMinimum() / 1000,
-                            sdcSS.getMaximum() / 1000, 0);
-                    hprPlan.addEdge(edge);
-                }
-                if (sdcSE != null) {
-                    int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcSE.getMinimum() / 1000,
-                            sdcSE.getMaximum() / 1000, 1);
-                    hprPlan.addEdge(edge);
-                }
-                if (sdcES != null) {
-                    int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcES.getMinimum() / 1000,
-                            sdcES.getMaximum() / 1000, 2);
-                    hprPlan.addEdge(edge);
-                }
-                if (sdcEE != null) {
-                    int edgeId = edgeIdCnt++;
-                    Edge edge = new TemporalEdge(edgeId, source_fl.getID(), sink_fl.getID(), sdcEE.getMinimum() / 1000,
-                            sdcEE.getMaximum() / 1000, 3);
-                    hprPlan.addEdge(edge);
-                }
+                edgeIdCnt = addTemporalEdge(edgeIdCnt, source, sink, sourceId, sinkId,
+                        TemporalEndpoint.START, TemporalEndpoint.START, 0);
+                edgeIdCnt = addTemporalEdge(edgeIdCnt, source, sink, sourceId, sinkId,
+                        TemporalEndpoint.START, TemporalEndpoint.END, 1);
+                edgeIdCnt = addTemporalEdge(edgeIdCnt, source, sink, sourceId, sinkId,
+                        TemporalEndpoint.END, TemporalEndpoint.START, 2);
+                edgeIdCnt = addTemporalEdge(edgeIdCnt, source, sink, sourceId, sinkId,
+                        TemporalEndpoint.END, TemporalEndpoint.END, 3);
             }
         }
     }
 
-    private void addCausalEdgesToPlan() {
-        List<Fluent> rootTasks = filterRootTasks();
+    private int addTemporalEdge(int edgeId, int source, int sink,
+                                FluentId sourceId, FluentId sinkId,
+                                TemporalEndpoint fromEndpoint, TemporalEndpoint toEndpoint,
+                                int edgeType) {
+        Optional<TemporalBounds> distance = store.temporalDistance(sourceId, sinkId, fromEndpoint, toEndpoint);
+        if (distance.isEmpty()) {
+            return edgeId;
+        }
+        TemporalBounds bounds = distance.get();
+        Edge edge = new TemporalEdge(edgeId, source, sink,
+                bounds.minimum() / 1000, bounds.maximum() / 1000, edgeType);
+        hprPlan.addEdge(edge);
+        return edgeId + 1;
+    }
 
-        for (Fluent root : rootTasks) {
+    private void addCausalEdgesToPlan() {
+        List<FluentView> rootTasks = filterRootTasks();
+
+        for (FluentView root : rootTasks) {
             recursiveAddCausalEdges(root);
         }
     }
 
-    private void recursiveAddCausalEdges(Fluent task) {
-        List<FluentConstraint> cons = this.fluentsConstraintsMultiMap.get(task);
-        List<Fluent> subtasks = new ArrayList<Fluent>();
-        for (FluentConstraint con : cons) {
-            if (con.getType().equals(FluentConstraint.Type.DC)) {
-                subtasks.add((Fluent) con.getTo());
+    private void recursiveAddCausalEdges(FluentView task) {
+        List<FluentId> subtaskIds = new ArrayList<>();
+        for (ChimpConstraint con : this.fluentsConstraintsMultiMap.get(task.id())) {
+            if (con.kind().equals(ConstraintKind.DECOMPOSITION)) {
+                subtaskIds.add(con.to());
             }
         }
 
-        Collections.sort(subtasks, new Comparator<Fluent>() {
+        Collections.sort(subtaskIds, new Comparator<FluentId>() {
             @Override
-            public int compare(final Fluent obj1, final Fluent obj2) {
+            public int compare(final FluentId obj1, final FluentId obj2) {
                 if (beforesTable.contains(obj1, obj2)) {
                     return -1;
                 } else if (beforesTable.contains(obj2, obj1)) {
@@ -196,103 +185,84 @@ public class HPRGenerator {
             }
         });
 
-        for (Fluent sub : subtasks) {
-            recursiveAddCausalEdges(sub);
+        for (FluentId subId : subtaskIds) {
+            recursiveAddCausalEdges(requireFluent(subId));
             int edgeId = this.hprPlan.edges.size();
-            int sourceId = task.getID();
-            int sinkId = sub.getID();
+            int sourceId = (int) task.id().value();
+            int sinkId = (int) subId.value();
             DecompositionEdge causalEdge = new DecompositionEdge(edgeId, sourceId, sinkId);
             this.hprPlan.addEdge(causalEdge);
         }
     }
 
     private void createFluentsConstraintsMultiMap() {
-        for (Constraint con : this.fluentSolver.getConstraints()) {
-            if (con instanceof FluentConstraint) {
-                Fluent from = (Fluent) ((FluentConstraint) con).getFrom();
-                Fluent to = (Fluent) ((FluentConstraint) con).getTo();
-                FluentConstraint.Type type = ((FluentConstraint) con).getType();
-                if (type.equals(FluentConstraint.Type.DC)) {
-                    this.fluentsConstraintsMultiMap.put(from, (FluentConstraint) con);
+        for (FluentView fluent : store.fluents()) {
+            FluentId id = fluent.id();
+            for (ChimpConstraint con : store.outgoing(id)) {
+                switch (con.kind()) {
+                    case DECOMPOSITION, OPENS, CLOSES -> this.fluentsConstraintsMultiMap.put(id, con);
+                    case BEFORE -> this.beforesTable.put(id, con.to(), true);
+                    default -> { }
                 }
-                if (type.equals(FluentConstraint.Type.PRE)) {
-                    this.fluentsConstraintsMultiMap.put(to, (FluentConstraint) con);
-                }
-                if (type.equals(FluentConstraint.Type.OPENS)) {
-                    this.fluentsConstraintsMultiMap.put(from, (FluentConstraint) con);
-                }
-                if (type.equals(FluentConstraint.Type.CLOSES)) {
-                    this.fluentsConstraintsMultiMap.put(from, (FluentConstraint) con);
-                }
-                if (type.equals(FluentConstraint.Type.BEFORE)) {
-                    this.beforesTable.put(from, to, (FluentConstraint) con);
-                }
+            }
+            for (ChimpConstraint con : store.incoming(id, ConstraintKind.PRECONDITION)) {
+                this.fluentsConstraintsMultiMap.put(id, con);
             }
         }
     }
 
-    private List<Fluent> filterPlannedFluents() {
-        ArrayList<Fluent> ret = new ArrayList<Fluent>();
-        for (Variable var : this.fluentSolver.getVariables("Activity")) {
-            ret.add((Fluent) var);
-        }
-        for (Variable var : this.fluentSolver.getVariables("Task")) {
-            ret.add((Fluent) var);
-        }
-
+    private List<FluentView> collectPlannedFluents() {
+        List<FluentView> ret = new ArrayList<>();
+        ret.addAll(store.fluents(FluentType.ACTIVITY));
+        ret.addAll(store.fluents(FluentType.TASK));
         return ret;
     }
 
-    private List<Fluent> filterRootTasks() {
-        ArrayList<Fluent> ret = new ArrayList<Fluent>();
-        SetMultimap<Fluent, FluentConstraint> fluentsIncomingDCsMultiMap = HashMultimap.create();
-
-        for (Constraint con : this.fluentSolver.getConstraints()) {
-            if (con instanceof FluentConstraint) {
-                FluentConstraint.Type type = ((FluentConstraint) con).getType();
-                if (type.equals(FluentConstraint.Type.DC)) {
-                    fluentsIncomingDCsMultiMap.put((Fluent) ((FluentConstraint) con).getTo(), (FluentConstraint) con);
-                }
-            }
-        }
-
-        for (Fluent t : this.timePointActivityMap.values()) {
-            if (!fluentsIncomingDCsMultiMap.containsKey(t)) {
+    private List<FluentView> filterRootTasks() {
+        List<FluentView> ret = new ArrayList<>();
+        for (FluentView t : this.plannedFluents) {
+            if (store.incoming(t.id(), ConstraintKind.DECOMPOSITION).isEmpty()) {
                 ret.add(t);
             }
         }
-
         return ret;
     }
 
-    private Map<Duration, Fluent> getTimePointActivityMap() {
-        Map<Duration, Fluent> timePointActivityMap = new HashMap<>();
-        List<Fluent> plannedFluents = filterPlannedFluents();
-        for (Fluent fl : plannedFluents) {
-            Duration duration = new Duration(fl.getAllenInterval().getStart(), fl.getAllenInterval().getEnd());
-            timePointActivityMap.put(duration, fl);
-        }
-        return timePointActivityMap;
-    }
-
-    private Duration[] createSortedActivityTimepoints() {
-        Duration[] tps = new Duration[this.timePointActivityMap.keySet().size()];
-        int pos = 0;
-        for (Duration tp : this.timePointActivityMap.keySet()) {
-            tps[pos++] = tp;
-        }
-        Arrays.sort(tps, new Comparator<Duration>() {
+    private List<FluentView> createSortedPlannedFluents() {
+        List<FluentView> sorted = new ArrayList<>(this.plannedFluents);
+        sorted.sort(new Comparator<FluentView>() {
             @Override
-            public int compare(Duration t0, Duration t1) {
-                int comparison = Long.compare(t0.start.getLowerBound(), t1.start.getLowerBound());
-                return (comparison != 0) ? comparison : Long.compare(t0.end.getLowerBound(), t1.end.getLowerBound());
+            public int compare(FluentView f0, FluentView f1) {
+                int byStart = Long.compare(
+                        f0.temporalInterval().earliestStart(),
+                        f1.temporalInterval().earliestStart());
+                if (byStart != 0) return byStart;
+                int byEnd = Long.compare(
+                        f0.temporalInterval().earliestEnd(),
+                        f1.temporalInterval().earliestEnd());
+                if (byEnd != 0) return byEnd;
+                // Deterministic tiebreak for fluents that share EST and EET.
+                // The previous implementation relied on HashMap iteration order,
+                // which was not semantically meaningful; fluent id is stable.
+                return Long.compare(f0.id().value(), f1.id().value());
             }
         });
-        return tps;
+        return sorted;
     }
 
-    private static boolean isOperator(Fluent fl) {
-        return fl.getCompoundSymbolicVariable().getPredicateName().startsWith("!");
+    private static boolean isOperator(FluentView fl) {
+        return fl.signature().predicate().startsWith("!");
+    }
+
+    private FluentView requireFluent(FluentId id) {
+        return store.fluent(id)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Constraint references unknown fluent ID: " + id.value()));
+    }
+
+    private static String fluentName(FluentView fluent) {
+        return fluent.signature().predicate() + "("
+                + String.join(" ", fluent.signature().arguments()) + ")";
     }
 
 }
