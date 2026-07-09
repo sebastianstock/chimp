@@ -444,84 +444,73 @@ The first Milestone 6 changes should be small and ordered:
 
 Temporal mutation, symbolic binding, integer propagation, resource scheduling, resolver application, prototype substitution, and rollback should remain on the existing backend during this milestone. Those capabilities belong behind later focused service interfaces before Meta-CSP inheritance is removed.
 
-## Milestone 7 (proposed) — Complete the Temporal Boundary: Read Side Done, Write Side Next
+## Direction reassessment (post-M6)
 
-### Where the read boundary leaves us
+After M6, the user redirected: **focus on the planner core, not peripheral services.** Dispatching/sensing are non-crucial and may be deleted rather than migrated. This makes the temporal write/mutation port (the earlier "M7 (C)" proposal) a non-goal: it existed only to serve `dispatching`, which is no longer a priority.
 
-The Milestone 6 read work is effectively complete for real consumers. `FluentView` already exposes `TemporalInterval` (EST/LST/EET/LET), and `FluentStore.temporalDistance` covers the APSP read path. An audit of the remaining 72 main files importing `org.metacsp` shows that every remaining coupling is blocked, directly or transitively, by either the temporal **write/mutation** surface or by Meta-CSP **inheritance** in the core classes:
+### Dispatching and sensing: cleanly removable, not blocking
 
-| Cluster | Files | Blocked by |
-| --- | --- | --- |
-| Core storage: `Fluent`, `FluentConstraint`, `FluentNetworkSolver` | 3 | M9 inheritance (they ARE Meta-CSP objects) |
-| HTN core: `HTNPlanner`, `HTNMetaConstraint`, `PlanReportroryItem`, `HTNMethod`, `HTNOperator` | 5+ | M9 inheritance + resolver materialization |
-| Unification | 10 | M7 ports + M9 inheritance |
-| Integer | 4 | M7 ports + M9 inheritance |
-| Resource scheduling | 3 | M8 + `Schedulable`/`MetaVariable` (M9) |
-| Mutation consumers: `dispatching`, `sensing` | 6 | Temporal write/mutation port (this milestone) |
-| Peripheral: `ui`, `examples`, `eval`, `dwr`, `externalPathPlanning`, `old_dev` | ~25 | Core types are still Meta-CSP (M10) |
+An audit confirms `dispatching` and `sensing` are purely peripheral:
+- Neither the planner (`planner/`, `htn/`, `fluentSolver/`) nor `CHIMP.java` references them.
+- They are not JUnit tests; they are `main()` demo programs and are not wired into the gradle test suite.
+- The only external reference is `examples/chimp/TestIncrementalMergingDispatching.java`, itself a `main()` demo.
 
-There is no remaining shallow, speculative-free read migration: `ui.HierarchicalLayout` is a JUNG `Layout<Fluent, FluentConstraint>` typed on the core classes, and the `examples.*` temporal reads operate on `Variable[]` from the solver. Both are blocked until the core stops being Meta-CSP. So the next milestone is necessarily a step up in scope: it begins the **write/mutation** service boundary, which is the plan's prescribed item 6 ("Hide Temporal Solver Types") minus the read half already done.
+They can be deleted wholesale (6 files, ~870 lines) with no impact on planning or tests. This is an optional cleanup, not a prerequisite for planner work. It is recorded here as approved-but-deferred; it can be done in a single small commit whenever it is useful to reduce noise.
 
-### Decision to surface
+## Milestone 7 (revised) — Planner Core: Break the Meta-CSP Search Inheritance
 
-Three directions are consistent with the plan. Per the AGENTS.md rule of not picking silently when interpretations differ, they are stated explicitly; the recommendation follows.
+### What "focus on the planner" means concretely
 
-- **(A) Commit to the core decoupling chain** — complete the temporal write/mutation port (this proposal), then unification/integer ports, then resource, then inheritance removal (M9). Ends with CHIMP off Meta-CSP. Largest commitment; M9 is explicitly the highest-risk step in the plan.
-- **(B) Pause Meta-CSP removal; pivot toward UP integration.** The long-term goal is UP integration. The existing read boundary (`FluentStore`/`FluentView`) may be enough to build a first UP bridge against a solved plan, which could be more valuable for a research project than finishing the removal. This defers the risky M9 work indefinitely.
-- **(C) A bounded first wedge of (A): only the temporal write/mutation port, driven by the smallest mutation consumer (`dispatching`), then stop and reassess.** Lower commitment than full (A); produces a concrete, tested port without committing to M9.
+The planner core is `HTNPlanner extends MetaConstraintSolver` and `HTNMetaConstraint extends MetaConstraint`. The CHIMP-specific search behavior lives in overridden hooks (`addResolverSub`, `retractResolverSub`, `preBacktrack`, `postBacktrack`, bounds, conflict clauses), but the **search engine itself** — backtracking, flaw enumeration, resolver application/retraction orchestration, rollback — is inherited from `MetaConstraintSolver` (755 lines). Removing this inheritance is the plan's item 9, explicitly flagged as the highest-risk step.
 
-**Recommendation: (C).** It is the plan's prescribed next milestone (the write half of "Hide Temporal Solver Types"), it has a forcing consumer so it is not speculative, it is bounded, and it leaves the option open for (A) or (B) at the next reassessment. (A) in one go is too large given the simplicity mandate; (B) is a direction change the user should choose explicitly rather than drift into.
+This is the only real planner work left. There is no shallow planner migration: every remaining `org.metacsp` coupling in the planner is either the inheritance itself or the `ConstraintNetwork`/`VariablePrototype`/`Constraint` types that flow through the inherited search protocol.
 
-### Scope for (C): Temporal Write/Mutation Service Boundary
+### Grounded scope (from reading `MetaConstraintSolver` + `HTNPlanner`)
 
-Define a CHIMP-owned mutation port for the operations the non-core mutation consumers currently perform directly on `AllenIntervalConstraint`/`FluentNetworkSolver`. Concretely, from `dispatching.FluentDispatcher`:
+The inherited search engine decomposes into:
 
-- Add a temporal relation between two fluents (Allen `Type` + `Bounds`), e.g. `Overlaps`.
-- Add a self deadline constraint (`Deadline` + `Bounds`).
-- Add/remove constraints on the fluent network and observe success/failure (propagation result).
-- Read EST/EET for bounds construction (already available via `FluentView`; reuse it).
+| Piece | Size | CHIMP-owned? | Coupling |
+| --- | --- | --- | --- |
+| `backtrack()` + `backtrackHelper()` — the recursive backtracking loop | ~70 lines | No (inherited) | `MetaVariable`, `ConstraintNetwork`, `valOH` |
+| `getConflict()` — enumerate flaws from meta-constraints | ~10 lines | No (inherited) | `MetaConstraint.getMetaVariable()` |
+| `addResolver()` / `retractResolver()` — distribute resolver constraints to ground solvers, propagate, rollback on failure | ~50 lines | No (inherited) | `Constraint`, `ConstraintSolver.addConstraints/removeConstraints` |
+| `addResolverSub()` / `retractResolverSub()` — CHIMP prototype→Fluent materialization, scope repair, marking | ~75 + ~20 lines | **Yes** (already overridden in `HTNPlanner`) | `VariablePrototype`, `ConstraintNetwork` substitution, `FluentConstraint.Type`, `Fluent` |
+| Bounds, conflict clauses, pre/post backtrack | small | **Yes** (already overridden) | minimal |
+| Meta-constraint list management, ground-solver access, resolver tracking maps, drawing, serialization backup | rest of 755 lines | No (inherited) | framework |
 
-Likely interface shape (to be confirmed against real call sites, not designed up front):
+The encouraging finding: the **CHIMP-specific logic is already owned** (the `@Override` hooks). What is not owned is the generic backtracking orchestration, which is a standard recursive search (~130 lines of actual algorithm across `backtrack`/`backtrackHelper`/`addResolver`/`retractResolver`/`getConflict`).
 
-```java
-// in chimp.model, alongside FluentStore
-public interface FluentMutationStore extends FluentStore {
-    boolean addTemporalRelation(FluentId from, FluentId to, TemporalRelation relation, TemporalBounds bounds);
-    boolean addDeadline(FluentId fluent, TemporalBounds bounds);
-    boolean removeConstraint(ChimpConstraint constraint);
-}
-```
+### The hard part, stated honestly
 
-`TemporalRelation` already exists in the independent model. The Meta-CSP adapter (`MetaCspFluentStore`) implements these by constructing `AllenIntervalConstraint` and calling `FluentNetworkSolver.addConstraint`, exactly as `FluentDispatcher` does today, so behavior is preserved.
+`HTNPlanner.addResolverSub` is deeply coupled to Meta-CSP: it materializes `VariablePrototype`s into `Fluent`s via `groundSolver.createVariable`, repairs constraint scopes by type-dispatching on `CompoundSymbolicValueConstraint`/`AllenIntervalConstraint`/`IntegerConstraint`, and sets markings via `FluentConstraint.Type.CLOSES`. This is the resolver-materialization path that Milestone 3 (`ResolverDescription` → `MetaCspResolverAdapter`) began to separate, but `addResolverSub` still operates on raw `ConstraintNetwork` resolver values.
 
-In-scope files:
-- `chimp.model.FluentMutationStore` (new interface) and any small value additions.
-- `chimp.adapter.metacsp.MetaCspFluentStore` (implement the mutation methods).
-- `dispatching.FluentDispatchingFunction` (40 lines, framework-only) and `dispatching.FluentDispatcher` (193 lines) — migrate to the port; drop their `org.metacsp.*` imports.
-- Characterization test asserting dispatching behavior is unchanged.
+The plan's original ordering puts M9 **after** solver-service isolation (M6 read done; M7 unification/integer, M8 resource not started). Jumping to M9 now skips that sequencing. The user has explicitly prioritized the planner over peripheral services, which is a legitimate call for a research project whose core is the planner — but it means M9 will touch the resolver-materialization path while it still uses Meta-CSP storage types. The first wedge keeps that storage underneath; only the search *loop* becomes CHIMP-owned.
 
-Out of scope (explicitly deferred):
-- `sensing.*` (marking transitions + `HTNMetaConstraint` coupling; migrate only if the port covers it trivially, otherwise leave).
-- `HTNPlanner`/`HTNMetaConstraint` resolver application and rollback (M9).
-- Unification, integer, resource ports (M7/M8).
-- Any change to `Fluent`/`FluentConstraint`/`FluentNetworkSolver` inheritance (M9).
+### Proposed wedge: own the search loop (first step of M9)
+
+Introduce a CHIMP-owned `ChimpSearchEngine` that owns `backtrack()` / `backtrackHelper()` / `getConflict()` / `addResolver()` / `retractResolver()`, ported from `MetaConstraintSolver` but operating against CHIMP-defined interfaces (a `FlawProvider`/`ResolverSource` port realized initially by `HTNMetaConstraint`, and the existing `FluentNetworkSolver` for ground-solver propagation). `HTNPlanner` stops extending `MetaConstraintSolver` and instead holds and delegates to `ChimpSearchEngine`.
+
+Still Meta-CSP underneath: the resolver networks remain `ConstraintNetwork`, `addResolver` still calls `FluentNetworkSolver.addConstraints`, and `addResolverSub` keeps its current `VariablePrototype` materialization. The headline goal — `HTNPlanner` no longer `extends MetaConstraintSolver` — is achieved without yet replacing the storage layer.
+
+This is intentionally the **first step** of M9, not all of M9. It is bounded: one new class + rewiring `HTNPlanner` delegation + a `FlawProvider` port for `HTNMetaConstraint`. Planning results must be identical on all existing domain tests.
 
 ### Ordered steps
 
-1. Enumerate the exact `AllenIntervalConstraint` constructions and `addConstraint`/`removeConstraint` calls in `FluentDispatcher` and `FluentDispatchingFunction`; confirm the minimal port method set. → verify: written list matches every `org.metacsp` usage in those two files.
-2. Add `FluentMutationStore` to `chimp.model` and implement in `MetaCspFluentStore` by delegating to the existing Meta-CSP calls. → verify: compiles; adapter unit test for each method against a small solved plan.
-3. Migrate `FluentDispatchingFunction` then `FluentDispatcher` to the port. → verify: no `org.metacsp.*` imports remain in `dispatching`; `./gradlew test` green; dispatching output/behavior byte-identical on a representative plan.
-4. Reassess: decide (A) continue the core chain, or (B) pivot to UP integration.
+1. **Enumerate the exact `MetaConstraintSolver` surface `HTNPlanner` and `CHIMP.java` rely on** — every `protected`/`public` method called or overridden, every field accessed. → verify: written list; every usage in `HTNPlanner.java` and `CHIMP.java` accounted for; nothing hidden.
+2. **Define `ChimpSearchEngine` + a minimal `FlawProvider`/`ResolverSource` port** in `chimp.search`, porting `backtrack`/`backtrackHelper`/`getConflict`/`addResolver`/`retractResolver`. Keep `ConstraintNetwork`/`Constraint` as the internal resolver representation for now. → verify: compiles in isolation; unit test with a stub flaw provider exercising the loop (find flaw → try resolvers → backtrack → succeed).
+3. **Repoint `HTNPlanner` to delegate to `ChimpSearchEngine`** instead of extending `MetaConstraintSolver`; move the `addResolverSub`/`retractResolverSub`/bounds/conflict hooks into delegates. `HTNMetaConstraint` implements the new port instead of extending `MetaConstraint`. → verify: `./gradlew test --rerun-tasks` green on all domain tests (DWR, RACE, TransTerra, mobipick, integer, resource, negative-precondition); resolver ordering and final plans identical.
+4. **Reassess.** At this point `HTNPlanner`/`HTNMetaConstraint` no longer inherit Meta-CSP search classes. Remaining Meta-CSP coupling is the storage layer (`Fluent`/`FluentConstraint`/`FluentNetworkSolver`) and `ConstraintNetwork`-based resolver materialization. Decide whether to continue down the storage layer (the rest of M9) or pause.
 
 ### Verification
 
-- `./gradlew test --rerun-tasks` green (full suite, including dispatching/sensing tests).
-- `dispatching` package has zero `org.metacsp.*` imports.
-- Diff dispatching behavior (constraint networks produced) before/after on a plan that exercises dispatching; expect identical.
+- `./gradlew test --rerun-tasks` green on the full suite (the domain JUnit tests are the behavioral contract for the search engine).
+- `HTNPlanner` no longer `extends MetaConstraintSolver`; `HTNMetaConstraint` no longer `extends MetaConstraint`.
 - No new production dependencies.
+- Planning results (plan found/not-found, action sequence, resolver counts where checked) unchanged on representative DWR/RACE/TransTerra/mobipick plans.
 
 ### Risks
 
-- The mutation port is a real abstraction (it has a forcing consumer), but getting the method shapes right matters: if `sensing` needs marking transitions the port doesn't cover, it stays on Meta-CSP and we accept a split boundary for now. Flagged, not forced.
-- `FluentDispatcher` sorts fluents by EST and reads `AllenIntervalConstraint.Type.Equals`; the port must expose relation-type reads or reuse `ChimpConstraint`/`ConstraintKind`. Confirm in step 1.
-- Behavior preservation depends on the adapter issuing the same `addConstraint` calls in the same order; verify by diff.
+- **Highest-risk item by the plan's own designation.** The search engine owns backtracking, rollback, and conflict-clause behavior. A faithful port must reproduce `MetaConstraintSolver`'s exact resolver application/retraction semantics, including the rollback-on-failure inside `addResolver` and the `markResolvedSub` calls. Mitigation: the existing domain tests are a strong behavioral contract; porting is mechanical (copy + retype), not a redesign.
+- `MetaConstraintSolver extends MultiConstraintSolver extends ConstraintSolver`. Breaking the inheritance means `HTNPlanner` loses framework-provided ground-solver management (`getConstraintSolvers()`, `addMetaConstraint()`, etc.). Some of this must be re-hosted on `HTNPlanner`/`ChimpSearchEngine` directly. Step 1 surfaces the full surface so there are no surprises.
+- `HTNMetaConstraint.getMetaValues()` returns `ConstraintNetwork[]` and uses `valOH` ordering; the `FlawProvider`/`ResolverSource` port must carry the value-ordering hook. The M5 lexicographic comparator work already neutralized the `valOH` types, so this should compose cleanly — confirm in step 2.
+- Branch-and-bound (`branchAndBound()`) and the serialization-based `backtrackHelperWithSerialization` exist in `MetaConstraintSolver`. CHIMP uses `backtrack()` (confirmed: `CHIMP.java` calls `planner.backtrack()`). Verify no consumer uses branch-and-bound or serialization backup; if unused, omit them from the port (simplicity mandate).
