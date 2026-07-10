@@ -5,6 +5,10 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomainPlanner;
 import integers.IntegerConstraint;
+import chimp.adapter.metacsp.MetaCspFlawProviderAdapter;
+import chimp.search.ChimpSearchEngine;
+import chimp.search.FlawProvider;
+import chimp.search.SearchHooks;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
@@ -16,18 +20,21 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import unify.CompoundSymbolicValueConstraint;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 
-public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlanner {
+public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlanner, SearchHooks {
 
 	private static final long serialVersionUID = 8031573555691611305L;
-	
+
 	private Map<String, String[]> typesInstancesMap;
 	private final FluentNetworkSolver groundSolver;
-	
+	private ChimpSearchEngine searchEngine;
+
 	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 
 	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols, 
@@ -66,6 +73,35 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	@Override
 	public void postBacktrack(MetaVariable mv) { }
 
+	@Override
+	public void postBacktrack(ConstraintNetwork flawNetwork) { }
+
+	/**
+	 * Initiates backtracking search via the CHIMP-owned {@link ChimpSearchEngine}.
+	 * Replaces the inherited {@code MetaConstraintSolver.backtrack()} which
+	 * runs the same algorithm inside the framework.
+	 */
+	@Override
+	public boolean backtrack() {
+		MetaConstraint[] metaConstraints = getMetaConstraints();
+		List<FlawProvider> providers = new ArrayList<>(metaConstraints.length);
+		for (MetaConstraint mc : metaConstraints) {
+			providers.add(new MetaCspFlawProviderAdapter(mc));
+		}
+		searchEngine = new ChimpSearchEngine(providers, this, this.animationTime);
+		return searchEngine.backtrack();
+	}
+
+	/**
+	 * Draws the search tree built by the last {@link #backtrack()} call.
+	 */
+	@Override
+	public void draw() {
+		if (searchEngine != null) {
+			searchEngine.draw();
+		}
+	}
+
 	/**
 	 * Defines extra operations that should happen
 	 * after retracting a meta-value in the meta-CSP search (e.g., when backtracking).
@@ -73,7 +109,7 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	 * @param metaValue The meta-value that has been retracted.
 	 */
 	@Override
-	protected void retractResolverSub(ConstraintNetwork metaVariable,
+	public void retractResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
 		
 		long startTime = System.nanoTime();
@@ -114,7 +150,7 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	 * @param metaValue The meta-value that has been selected (the branch). 
 	 */
 	@Override
-	protected boolean addResolverSub(ConstraintNetwork metaVariable,
+	public boolean addResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
 		
 		long startTime = System.nanoTime();
