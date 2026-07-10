@@ -651,7 +651,7 @@ The `FlawProvider`/`ResolverSource` port needs exactly: get-current-flaw, get-re
 | --- | --- |
 | `getConstraintSolvers()` | already effectively re-hosted — HTNPlanner stores `groundSolver` directly |
 | `addMetaConstraint(MetaConstraint)` | must re-host: adds to a list + sets meta-constraint's solver reference + extends constraint type array |
-| `draw()` | can be simplified to no-op or basic visualization |
+| `draw()` | preserved — delegates to `ChimpSearchEngine`'s search-tree visualization |
 | `getDescription()` | can be simplified |
 | `backtrack()` | becomes `ChimpSearchEngine.backtrack()` |
 | `getConflict()` / `addResolver()` / `retractResolver()` / `backtrackHelper()` | become `ChimpSearchEngine` internals |
@@ -661,13 +661,13 @@ The `FlawProvider`/`ResolverSource` port needs exactly: get-current-flaw, get-re
 The surface is **smaller than feared**. The real port is:
 - `ChimpSearchEngine`: ~150 lines of search algorithm (the 5 methods in F), re-hosted from `MetaConstraintSolver`.
 - `FlawProvider`/`ResolverSource` port: 4 methods (G).
-- `HTNPlanner` re-hosts: `addMetaConstraint` (trivial), `draw` (no-op/simplified), `getDescription` (simplified), `backtrack` (delegates to engine).
+- `HTNPlanner` re-hosts: `addMetaConstraint` (trivial), `draw` (preserved — search-tree visualization), `getDescription` (simplified), `backtrack` (delegates to engine).
 - The 11 override hooks (A) move to delegates or stay as CHIMP-owned callbacks.
 - 7 framework methods confirmed unused (H) — omitted per simplicity mandate.
 
 The `addResolverSub` hard coupling (prototype→Fluent materialization, type-dispatch on `CompoundSymbolicValueConstraint`/`AllenIntervalConstraint`/`IntegerConstraint`) remains in place for this wedge — it stays as a CHIMP-owned callback that the engine calls, still operating on `ConstraintNetwork` resolver values. That's the M9 storage-layer work that follows this wedge.
 
-The JUNG `DelegateForest<MetaVariable, ConstraintNetwork>` search-tree visualization (`g`) is used only by `draw()`. If `draw()` becomes a no-op, the JUNG dependency in the search engine drops entirely. `draw()` is called only from `CHIMP.drawSearchSpace()` and `ChimpIO` — confirm whether any test relies on it (it doesn't — all tests call `generatePlan()`, not `draw`).
+The JUNG `DelegateForest<MetaVariable, ConstraintNetwork>` search-tree visualization (`g`) is built by `backtrackHelper()` and exposed via `draw()`. It is actively used for debugging/inspection, so it must be preserved in the port: `ChimpSearchEngine` keeps the JUNG graph building and a working `draw()` method. The JUNG dependency stays in the search engine. The `MetaVariable`/`ConstraintNetwork` vertex/edge types can remain for this wedge since the resolver representation is still Meta-CSP.
 
 ### Verification
 
