@@ -33,12 +33,17 @@ public class FluentResourceUsageScheduler extends Schedulable {
 	private final int capacity;
 	private final String name;
 	private final Map<Activity, Integer> usageMap = new HashMap<Activity, Integer>();
+	private FluentNetworkSolver groundSolver;
 
 	public FluentResourceUsageScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String name, int cap) {
 		super(varOH, valOH);
 		this.setPeakCollectionStrategy(PEAKCOLLECTION.SAMPLING);
 		this.name = name;
 		this.capacity = cap;
+	}
+	
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 	
 	@Override
@@ -106,7 +111,7 @@ public class FluentResourceUsageScheduler extends Schedulable {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override

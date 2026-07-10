@@ -29,9 +29,14 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 	private static final long serialVersionUID = 8908231006136514834L;
 	private static final String NAVIGATE_TASK_NAME = "navigate";
 	private static final String CONNECTED_NAME = "connected";
+	private FluentNetworkSolver groundSolver;
 
 	public DWRNavigationMetaConstraint() {
 		super(null, null);
+	}
+
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 	/** 
 	 * @return All {@link MetaVariable}s with the marking UNPLANNED and which have no unplanned 
@@ -194,7 +199,7 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override

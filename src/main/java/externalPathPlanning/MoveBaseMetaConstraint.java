@@ -30,11 +30,16 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 	private static final int TO_AREA_INDEX = 1;
 	
 	private MoveBaseDurationEstimator durationEstimator;
+	private FluentNetworkSolver groundSolver;
 
 
 	public MoveBaseMetaConstraint(MoveBaseDurationEstimator durationEstimator) {
 		super(null, null);
 		this.durationEstimator = durationEstimator;
+	}
+
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 
 	
@@ -161,7 +166,7 @@ public class MoveBaseMetaConstraint extends MetaConstraint {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override

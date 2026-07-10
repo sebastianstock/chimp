@@ -36,12 +36,18 @@ public class HTNMetaConstraint extends MetaConstraint {
 	// try to unify tasks with planned tasks?
 	private boolean tryUnification = false;
 	
+	private FluentNetworkSolver groundSolver;
+	
 	public HTNMetaConstraint(ValueOrderingH valOH) {
 		super(null, valOH);
 	}
 	
 	public HTNMetaConstraint() {
 		super(null, null);
+	}
+	
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 	
 	private boolean checkApplied(Fluent task) {
@@ -301,7 +307,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override

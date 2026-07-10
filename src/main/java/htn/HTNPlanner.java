@@ -11,10 +11,10 @@ import chimp.search.FlawProvider;
 import chimp.search.SearchHooks;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
@@ -27,24 +27,20 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 
-public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlanner, SearchHooks {
-
-	private static final long serialVersionUID = 8031573555691611305L;
+public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 
 	private Map<String, String[]> typesInstancesMap;
 	private final FluentNetworkSolver groundSolver;
+	private final List<MetaConstraint> metaConstraints = new ArrayList<>();
+	private final long animationTime;
 	private ChimpSearchEngine searchEngine;
 
 	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
 
-	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols, 
+	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols,
 			int[] symbolicIngredients) {
-		// Currently only FluentConstraints. Other constraint should be added later.
-		super(new Class[] {FluentConstraint.class}, 
-				animationTime, 
-				new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients));//, 0, 1000, 2));
-
-		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
+		this.animationTime = animationTime;
+		this.groundSolver = new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients);
 	}
 
 	/**
@@ -59,43 +55,72 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	 */
 	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols,
 					  int[] symbolicIngredients, int minIntValue, int maxIntValue, int numIntVars ) {
-		// Currently only FluentConstraints. Other constraint should be added later.
-		super(new Class[] {FluentConstraint.class},
-				animationTime,
-				new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients, minIntValue, maxIntValue, numIntVars));
+		this.animationTime = animationTime;
+		this.groundSolver = new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients,
+				minIntValue, maxIntValue, numIntVars);
+	}
 
-		groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
+	/**
+	 * Adds a meta-constraint to this planner. Replaces
+	 * {@code MetaConstraintSolver.addMetaConstraint}: registers the
+	 * meta-constraint and sets its ground solver directly (instead of
+	 * via {@code setMetaSolver}).
+	 */
+	public void addMetaConstraint(MetaConstraint metaConstraint) {
+		metaConstraints.add(metaConstraint);
+		setGroundSolverOn(metaConstraint);
+	}
+
+	private void setGroundSolverOn(MetaConstraint mc) {
+		if (mc instanceof HTNMetaConstraint htn) {
+			htn.setGroundSolver(groundSolver);
+		} else if (mc instanceof resourceFluent.FluentResourceUsageScheduler frus) {
+			frus.setGroundSolver(groundSolver);
+		} else if (mc instanceof resourceFluent.FluentScheduler fs) {
+			fs.setGroundSolver(groundSolver);
+		} else if (mc instanceof htn.guessOrdering.GuessOrderingMetaConstraint go) {
+			go.setGroundSolver(groundSolver);
+		} else if (mc instanceof externalPathPlanning.MoveBaseMetaConstraint mb) {
+			mb.setGroundSolver(groundSolver);
+		} else if (mc instanceof dwr.DWRNavigationMetaConstraint nav) {
+			nav.setGroundSolver(groundSolver);
+		}
+	}
+
+	public MetaConstraint[] getMetaConstraints() {
+		return metaConstraints.toArray(new MetaConstraint[0]);
+	}
+
+	public ConstraintSolver[] getConstraintSolvers() {
+		return new ConstraintSolver[] { groundSolver };
+	}
+
+	public String getDescription() {
+		return "[" + this.getClass().getSimpleName() + " groundSolver: "
+				+ groundSolver.getDescription() + "]";
 	}
 
 	@Override
 	public void preBacktrack() { }
 
 	@Override
-	public void postBacktrack(MetaVariable mv) { }
-
-	@Override
 	public void postBacktrack(ConstraintNetwork flawNetwork) { }
 
 	/**
 	 * Initiates backtracking search via the CHIMP-owned {@link ChimpSearchEngine}.
-	 * Replaces the inherited {@code MetaConstraintSolver.backtrack()} which
-	 * runs the same algorithm inside the framework.
 	 */
-	@Override
 	public boolean backtrack() {
-		MetaConstraint[] metaConstraints = getMetaConstraints();
-		List<FlawProvider> providers = new ArrayList<>(metaConstraints.length);
+		List<FlawProvider> providers = new ArrayList<>(metaConstraints.size());
 		for (MetaConstraint mc : metaConstraints) {
 			providers.add(new MetaCspFlawProviderAdapter(mc));
 		}
-		searchEngine = new ChimpSearchEngine(providers, this, this.animationTime);
+		searchEngine = new ChimpSearchEngine(providers, this, animationTime);
 		return searchEngine.backtrack();
 	}
 
 	/**
 	 * Draws the search tree built by the last {@link #backtrack()} call.
 	 */
-	@Override
 	public void draw() {
 		if (searchEngine != null) {
 			searchEngine.draw();
@@ -111,9 +136,9 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	@Override
 	public void retractResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
-		
+
 		long startTime = System.nanoTime();
-		
+
 		// remove added fluents
 		Vector<Variable> varsToRemove = new Vector<Variable>();
 		for (Variable v : metaValue.getVariables()) {
@@ -127,15 +152,15 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 			}
 		}
 		groundSolver.removeVariables(varsToRemove.toArray(new Variable[varsToRemove.size()]));
-		
+
 		// change CLOSED fluents back to OPEN
 		for(Constraint c : metaValue.getConstraints()) {
-			if ((c instanceof FluentConstraint) && 
+			if ((c instanceof FluentConstraint) &&
 					(((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
 				((FluentConstraint) c).getTo().setMarking(HTNMetaConstraint.markings.OPEN);
 			}
 		}
-		
+
 		long endTime = System.nanoTime();
 		logger.finest("RECTRACT_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
 	}
@@ -143,20 +168,18 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 	/**
 	 * Defines additional operations that should happen before
 	 * adding a meta-value in the meta-CSP search (e.g., when branching).
-	 * 
+	 *
 	 * Make real {@link Variable}s from {@link VariablePrototype}s.
 	 * Involve real {@link Variable}s in the Constraints.
 	 * @param metaVariable The {@link MetaVariable} over which the search is branching.
-	 * @param metaValue The meta-value that has been selected (the branch). 
+	 * @param metaValue The meta-value that has been selected (the branch).
 	 */
 	@Override
 	public boolean addResolverSub(ConstraintNetwork metaVariable,
 			ConstraintNetwork metaValue) {
-		
+
 		long startTime = System.nanoTime();
-		
-		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getConstraintSolvers()[0];
-		
+
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
 			if (v instanceof VariablePrototype) {
@@ -167,12 +190,12 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 					continue;
 				}
 
-				// 	Parameters for real instantiation: the first is the component 
+				// 	Parameters for real instantiation: the first is the component
 				//  and the second is the type, the third are the arguments of the fluent
 				String component = (String) vp.getParameters()[0];
 				String symbol = (String) vp.getParameters()[1];
 				Fluent fluent = (Fluent)groundSolver.createVariable(component);
-				
+
 				String[] arguments = (String[]) vp.getParameters()[2];
 				fluent.setName(symbol, arguments);
 
@@ -183,14 +206,14 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 
 		//Involve real variables in the constraints
 		for (Constraint con : metaValue.getConstraints()) {
-			Constraint clonedConstraint = (Constraint)con.clone();  
+			Constraint clonedConstraint = (Constraint)con.clone();
 			Variable[] oldScope = con.getScope();
 			Variable[] newScope = new Variable[oldScope.length];
 			for (int i = 0; i < oldScope.length; i++) {
 				if (oldScope[i] instanceof VariablePrototype) {
 					if (con instanceof CompoundSymbolicValueConstraint){
 						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getCompoundSymbolicVariable();
-					} else if (con instanceof AllenIntervalConstraint){ 
+					} else if (con instanceof AllenIntervalConstraint){
 						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getAllenInterval();
 					} else if (con instanceof IntegerConstraint){
 						VariablePrototype oldScopePrototype = (VariablePrototype)oldScope[i];
@@ -210,7 +233,7 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 			metaValue.removeConstraint(con);
 			metaValue.addConstraint(clonedConstraint);
 		}
-		
+
 		// set marking of closed fluents to CLOSED
 		for (Constraint con : metaValue.getConstraints()) {
 			if (con instanceof FluentConstraint) {
@@ -222,44 +245,8 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 
 		long endTime = System.nanoTime();
 		logger.finest("ADD_RESOLVER_SUB Took: " + ((endTime - startTime) / 1000000) + " ms");
-				
+
 		return true;
-	}
-
-	@Override
-	protected double getUpperBound() {
-		// Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	protected void setUpperBound() {
-		// Auto-generated method stub
-
-	}
-
-	@Override
-	protected double getLowerBound() {
-		// Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	protected void setLowerBound() {
-		// Auto-generated method stub
-
-	}
-
-	@Override
-	protected boolean hasConflictClause(ConstraintNetwork metaValue) {
-		// Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	protected void resetFalseClause() {
-		// Auto-generated method stub
-
 	}
 
 	public Map<String, String[]> getTypesInstancesMap() {
@@ -272,11 +259,11 @@ public class HTNPlanner extends MetaConstraintSolver implements HybridDomainPlan
 
 	@Override
 	public FluentNetworkSolver getFluentNetworkSolver() {
-		return (FluentNetworkSolver) getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	public HTNMetaConstraint getHTNMetaConstraint() {
-		for (MetaConstraint mc : getMetaConstraints()) {
+		for (MetaConstraint mc : metaConstraints) {
 			if (mc instanceof HTNMetaConstraint)
 				return (HTNMetaConstraint) mc;
 		}

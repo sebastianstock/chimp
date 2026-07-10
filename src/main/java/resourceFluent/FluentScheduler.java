@@ -12,6 +12,7 @@ import org.metacsp.meta.symbolsAndTime.Schedulable;
 import org.metacsp.multi.activity.Activity;
 
 import fluentSolver.Fluent;
+import fluentSolver.FluentNetworkSolver;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
@@ -20,6 +21,7 @@ public class FluentScheduler extends Schedulable {
 	private final String predicateName;
 	private final int field;
 	private final String fieldValues;
+	private FluentNetworkSolver groundSolver;
 
 	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName, 
 			int field, String fieldValues) {
@@ -28,6 +30,10 @@ public class FluentScheduler extends Schedulable {
 		this.field = field;
 		this.fieldValues = fieldValues;
 		this.setPeakCollectionStrategy(PEAKCOLLECTION.BINARY);
+	}
+
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 
 	/**
@@ -84,7 +90,7 @@ public class FluentScheduler extends Schedulable {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override

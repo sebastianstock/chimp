@@ -23,9 +23,14 @@ public class GuessOrderingMetaConstraint extends MetaConstraint {
 	private static final long serialVersionUID = 5778589636096352891L;
 	
 	private List<List<Integer>> previousConflicts = new ArrayList<List<Integer>>();
+	private FluentNetworkSolver groundSolver;
 
 	public GuessOrderingMetaConstraint(ValueOrderingH valOH) {
 		super(null, valOH);
+	}
+
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 
 	@Override
@@ -150,7 +155,7 @@ public class GuessOrderingMetaConstraint extends MetaConstraint {
 
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override
