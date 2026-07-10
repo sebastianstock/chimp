@@ -559,6 +559,16 @@ This is intentionally the **first step** of M9, not all of M9. It is bounded: on
 3. **Repoint `HTNPlanner` to delegate to `ChimpSearchEngine`** instead of extending `MetaConstraintSolver`; move the `addResolverSub`/`retractResolverSub`/bounds/conflict hooks into delegates. `HTNMetaConstraint` implements the new port instead of extending `MetaConstraint`. → verify: `./gradlew test --rerun-tasks` green on all domain tests (DWR, RACE, TransTerra, mobipick, integer, resource, negative-precondition); resolver ordering and final plans identical.
 4. **Reassess.** At this point `HTNPlanner`/`HTNMetaConstraint` no longer inherit Meta-CSP search classes. Remaining Meta-CSP coupling is the storage layer (`Fluent`/`FluentConstraint`/`FluentNetworkSolver`) and `ConstraintNetwork`-based resolver materialization. Decide whether to continue down the storage layer (the rest of M9) or pause.
 
+### Step 3 result: search loop delegated to ChimpSearchEngine (done)
+
+`HTNPlanner` now overrides `backtrack()` to create a `ChimpSearchEngine` that drives the search loop through the CHIMP-owned `FlawProvider`/`SearchHooks` ports. All meta-constraints (HTN, resource schedulers, guess-ordering, move-base) are wrapped as `FlawProvider`s via `MetaCspFlawProviderAdapter`. `HTNPlanner` implements `SearchHooks`, so the engine calls its existing `addResolverSub`/`retractResolverSub` for prototype&rarr;Fluent materialization and marking restoration. `draw()` delegates to the engine's search-tree visualization.
+
+**Honest assessment &mdash; the inheritance is not yet broken.** `HTNPlanner` still `extends MetaConstraintSolver` because the resource schedulers (`FluentResourceUsageScheduler extends Schedulable extends MetaConstraint`) need `setMetaSolver(MetaConstraintSolver)` to access the ground solver via `this.metaCS.getConstraintSolvers()[0]`. Breaking the inheritance now would require either a `MetaConstraintSolver` shim (complexity) or also decoupling all resource schedulers (too much for one step). The pragmatic choice: the search *algorithm* is now CHIMP-owned and tested; the *plumbing* (`addMetaConstraint`, `getConstraintSolvers`, `setMetaSolver`) remains Meta-CSP. The full inheritance break is deferred until resource schedulers are decoupled (M8) or the storage layer is replaced.
+
+`HTNMetaConstraint` still `extends MetaConstraint` &mdash; it is wrapped by `MetaCspFlawProviderAdapter` rather than implementing `FlawProvider` directly. This avoids touching `HTNMetaConstraint`'s `getGroundSolver()` (which uses `this.metaCS`) and the `Schedulable` inheritance chain. Making `HTNMetaConstraint` implement `FlawProvider` directly is a follow-up that depends on giving it an independent ground-solver reference.
+
+Full test suite green: DWR, RACE, TransTerra, mobipick, integer planning (battery `(100,98)`/`(98,96)`), resource, HPR generation, characterization &mdash; all pass with identical planning results.
+
 ### Step 1 result: `MetaConstraintSolver` surface inventory (done)
 
 The full inheritance chain is `HTNPlanner extends MetaConstraintSolver extends MultiConstraintSolver extends ConstraintSolver`.
