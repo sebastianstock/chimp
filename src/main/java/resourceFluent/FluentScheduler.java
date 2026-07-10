@@ -13,10 +13,11 @@ import org.metacsp.multi.activity.Activity;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
+import htn.GroundSolverHolder;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
-public class FluentScheduler extends Schedulable {
+public class FluentScheduler extends Schedulable implements GroundSolverHolder {
 	
 	private final String predicateName;
 	private final int field;

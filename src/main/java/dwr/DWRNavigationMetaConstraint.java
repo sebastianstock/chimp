@@ -1,5 +1,6 @@
 package dwr;
 
+import htn.GroundSolverHolder;
 import java.util.List;
 import java.util.Vector;
 
@@ -24,7 +25,7 @@ import unify.CompoundSymbolicVariable;
 
 
 
-public class DWRNavigationMetaConstraint extends MetaConstraint {
+public class DWRNavigationMetaConstraint extends MetaConstraint implements GroundSolverHolder {
 
 	private static final long serialVersionUID = 8908231006136514834L;
 	private static final String NAVIGATE_TASK_NAME = "navigate";

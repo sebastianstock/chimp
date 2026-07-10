@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import htn.GroundSolverHolder;
 import htn.HTNMetaConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -24,7 +25,7 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
-public class FluentResourceUsageScheduler extends Schedulable {
+public class FluentResourceUsageScheduler extends Schedulable implements GroundSolverHolder {
 	
 	/**
 	 * 

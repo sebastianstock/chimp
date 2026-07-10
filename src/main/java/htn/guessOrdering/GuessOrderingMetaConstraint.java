@@ -1,5 +1,6 @@
 package htn.guessOrdering;
 
+import htn.GroundSolverHolder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,7 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 
-public class GuessOrderingMetaConstraint extends MetaConstraint {
+public class GuessOrderingMetaConstraint extends MetaConstraint implements GroundSolverHolder {
 
 
 	private static final long serialVersionUID = 5778589636096352891L;

@@ -15,7 +15,6 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.utility.logging.MetaCSPLogging;
 import unify.CompoundSymbolicValueConstraint;
@@ -68,22 +67,8 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 */
 	public void addMetaConstraint(MetaConstraint metaConstraint) {
 		metaConstraints.add(metaConstraint);
-		setGroundSolverOn(metaConstraint);
-	}
-
-	private void setGroundSolverOn(MetaConstraint mc) {
-		if (mc instanceof HTNMetaConstraint htn) {
-			htn.setGroundSolver(groundSolver);
-		} else if (mc instanceof resourceFluent.FluentResourceUsageScheduler frus) {
-			frus.setGroundSolver(groundSolver);
-		} else if (mc instanceof resourceFluent.FluentScheduler fs) {
-			fs.setGroundSolver(groundSolver);
-		} else if (mc instanceof htn.guessOrdering.GuessOrderingMetaConstraint go) {
-			go.setGroundSolver(groundSolver);
-		} else if (mc instanceof externalPathPlanning.MoveBaseMetaConstraint mb) {
-			mb.setGroundSolver(groundSolver);
-		} else if (mc instanceof dwr.DWRNavigationMetaConstraint nav) {
-			nav.setGroundSolver(groundSolver);
+		if (metaConstraint instanceof GroundSolverHolder holder) {
+			holder.setGroundSolver(groundSolver);
 		}
 	}
 
@@ -130,7 +115,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	/**
 	 * Defines extra operations that should happen
 	 * after retracting a meta-value in the meta-CSP search (e.g., when backtracking).
-	 * @param metaVariable The {@link MetaVariable} over which backtracking occurs.
+	 * @param metaVariable The flaw network over which backtracking occurs.
 	 * @param metaValue The meta-value that has been retracted.
 	 */
 	@Override
@@ -171,7 +156,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 *
 	 * Make real {@link Variable}s from {@link VariablePrototype}s.
 	 * Involve real {@link Variable}s in the Constraints.
-	 * @param metaVariable The {@link MetaVariable} over which the search is branching.
+	 * @param metaVariable The flaw network over which the search is branching.
 	 * @param metaValue The meta-value that has been selected (the branch).
 	 */
 	@Override

@@ -1,5 +1,6 @@
 package externalPathPlanning;
 
+import htn.GroundSolverHolder;
 import java.util.List;
 import java.util.Vector;
 
@@ -18,7 +19,7 @@ import unify.CompoundSymbolicVariable;
 
 
 
-public class MoveBaseMetaConstraint extends MetaConstraint {
+public class MoveBaseMetaConstraint extends MetaConstraint implements GroundSolverHolder {
 
 	/**
 	 * 

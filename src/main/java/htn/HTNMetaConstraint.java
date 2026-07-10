@@ -16,7 +16,7 @@ import chimp.search.TaskPlanningFlaw;
 import java.util.*;
 
 
-public class HTNMetaConstraint extends MetaConstraint {
+public class HTNMetaConstraint extends MetaConstraint implements GroundSolverHolder {
 	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
 			new MetaCspResourceRequirementAdapter();
 	private static final MetaCspSearchAdapter SEARCH_ADAPTER = new MetaCspSearchAdapter();
