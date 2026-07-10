@@ -559,6 +559,116 @@ This is intentionally the **first step** of M9, not all of M9. It is bounded: on
 3. **Repoint `HTNPlanner` to delegate to `ChimpSearchEngine`** instead of extending `MetaConstraintSolver`; move the `addResolverSub`/`retractResolverSub`/bounds/conflict hooks into delegates. `HTNMetaConstraint` implements the new port instead of extending `MetaConstraint`. → verify: `./gradlew test --rerun-tasks` green on all domain tests (DWR, RACE, TransTerra, mobipick, integer, resource, negative-precondition); resolver ordering and final plans identical.
 4. **Reassess.** At this point `HTNPlanner`/`HTNMetaConstraint` no longer inherit Meta-CSP search classes. Remaining Meta-CSP coupling is the storage layer (`Fluent`/`FluentConstraint`/`FluentNetworkSolver`) and `ConstraintNetwork`-based resolver materialization. Decide whether to continue down the storage layer (the rest of M9) or pause.
 
+### Step 1 result: `MetaConstraintSolver` surface inventory (done)
+
+The full inheritance chain is `HTNPlanner extends MetaConstraintSolver extends MultiConstraintSolver extends ConstraintSolver`.
+
+#### A. `HTNPlanner` overrides (11 methods — all CHIMP-owned hooks, already `@Override`)
+
+| # | Method | Abstract in parent? | HTNPlanner body |
+| --- | --- | --- | --- |
+| 1 | `preBacktrack()` | yes | empty |
+| 2 | `postBacktrack(MetaVariable)` | yes | empty |
+| 3 | `retractResolverSub(ConstraintNetwork, ConstraintNetwork)` | yes | CHIMP marking restoration + variable removal |
+| 4 | `addResolverSub(ConstraintNetwork, ConstraintNetwork)` | yes | prototype→Fluent materialization + scope repair |
+| 5 | `getUpperBound()` | yes | returns `Double.POSITIVE_INFINITY` |
+| 6 | `setUpperBound()` | yes | empty |
+| 7 | `getLowerBound()` | yes | returns `0` |
+| 8 | `setLowerBound()` | yes | empty |
+| 9 | `hasConflictClause(ConstraintNetwork)` | yes | returns `false` |
+| 10 | `resetFalseClause()` | yes | empty |
+| 11 | `getFluentNetworkSolver()` | no — from `HybridDomainPlanner` interface | returns `groundSolver` |
+
+Key finding: 7 of the 11 overrides are trivial (empty/constant-return). Only `addResolverSub` and `retractResolverSub` carry real logic.
+
+#### B. `HTNPlanner` constructor → `super` call
+
+`super(new Class[]{FluentConstraint.class}, animationTime, new FluentNetworkSolver(...))` → `MetaConstraintSolver(Class<?>[], long, ConstraintSolver...)`. The constructor passes the constraint type array, animation time, and the ground solver. HTNPlanner then stores `getConstraintSolvers()[0]` as its own `groundSolver` field.
+
+#### C. Parent-chain methods called by `HTNPlanner` body
+
+Only one: `this.getConstraintSolvers()[0]` (from `MetaConstraintSolver`, which returns `this.constraintSolvers`). **No `super.` calls at all. No direct field access from any parent class.** HTNPlanner's own fields: `groundSolver`, `typesInstancesMap`, `logger`, `serialVersionUID`.
+
+#### D. Parent-chain methods called by `CHIMP.java` on the `planner` instance
+
+| Call | Source | Purpose |
+| --- | --- | --- |
+| `planner.getConstraintSolvers()[0]` | `MetaConstraintSolver` | gets `FluentNetworkSolver` |
+| `planner.backtrack()` | `MetaConstraintSolver` | the search entry point |
+| `planner.addMetaConstraint(...)` ×5 | `MetaConstraintSolver` | registers HTN/resource/guess/move-base meta-constraints |
+| `planner.draw()` | `MetaConstraintSolver` | visualization (called from `drawSearchSpace`) |
+| `planner.getDescription()` | `MetaConstraintSolver` (overrides `MultiConstraintSolver`) | string description (called from `printDescription`) |
+| `planner.setTypesInstancesMap(...)` | `HTNPlanner` own | not from parent |
+
+#### E. Other consumers of `HTNPlanner` (via `CHIMP.getPlanner()`)
+
+| Consumer | Call | Source |
+| --- | --- | --- |
+| `HPRGenerator` | `getHTNMetaConstraint().getOperators()/getMethods()` | `HTNPlanner` own |
+| `ChimpIO` | `getPlanner().draw()` | `MetaConstraintSolver` |
+
+All example/eval `main()` demos also call `planner.backtrack()` and `planner.addMetaConstraint(...)`. These are the same two methods CHIMP uses.
+
+#### F. The search loop internals (what `ChimpSearchEngine` must own)
+
+| Method | Lines | Calls |
+| --- | --- | --- |
+| `backtrack()` | ~20 | `getConflict()`, `backtrackHelper()` |
+| `backtrackHelper()` | ~75 | `getMetaValues()`, `addResolver()`, `getConflict()`, `retractResolver()`, `markResolvedSub()`, `preBacktrack()`, `postBacktrack()`, JUNG `g.addEdge/addVertex` |
+| `getConflict()` | ~10 | iterates `metaConstraints`, calls `MetaConstraint.getMetaVariable()` |
+| `addResolver()` | ~25 | `addResolverSub()`, `ConstraintSolver.addConstraints()`, rollback on failure |
+| `retractResolver()` | ~20 | `ConstraintSolver.removeConstraints()`, `retractResolverSub()` |
+
+Total: ~150 lines of algorithm to port.
+
+#### G. The `MetaConstraint`/`MetaVariable` coupling (the port boundary)
+
+The search loop uses these from `MetaConstraint`:
+- `getMetaVariable()` → returns `ConstraintNetwork` (the current flaw)
+- `getMetaValues(MetaVariable)` → returns `ConstraintNetwork[]` (resolver candidates)
+- `markResolvedSub(MetaVariable, ConstraintNetwork)` → notification (no-op in HTNMetaConstraint)
+- `valOH` field → `ValueOrderingH` for resolver ordering (already neutralized by M5's lexicographic comparator)
+
+`MetaVariable` wraps `(MetaConstraint, ConstraintNetwork)` and provides `getConstraintNetwork()`, `getMetaConstraint()`. It is a thin wrapper — the port can replace it with a CHIMP-owned `Flaw` value carrying the same two references.
+
+The `FlawProvider`/`ResolverSource` port needs exactly: get-current-flaw, get-resolvers-for-flaw, notify-resolved, value-ordering. That's 4 methods.
+
+#### H. What can be omitted (confirmed unused — no caller in CHIMP, examples, eval, or tests)
+
+| Method | Status |
+| --- | --- |
+| `branchAndBound()` | **unused** — no caller anywhere; omit from port |
+| `backtrackHelperWithSerialization()` | **unused** — no caller; omit |
+| `backupCNs()` / `restoreCNs()` | only used by serialization variant; omit |
+| `getAddedResolvers()` / `retractResolvers()` / `clearResolvers()` | **unused**; omit |
+| `breakSearch()` | **unused**; omit |
+| `propagate()` | **unused**; omit |
+| `getMetaConstraints()` | **unused** by external callers (the field is used internally by the search loop) |
+
+#### I. What must be re-hosted from the parent chain on `HTNPlanner`/`ChimpSearchEngine`
+
+| Method | Why |
+| --- | --- |
+| `getConstraintSolvers()` | already effectively re-hosted — HTNPlanner stores `groundSolver` directly |
+| `addMetaConstraint(MetaConstraint)` | must re-host: adds to a list + sets meta-constraint's solver reference + extends constraint type array |
+| `draw()` | can be simplified to no-op or basic visualization |
+| `getDescription()` | can be simplified |
+| `backtrack()` | becomes `ChimpSearchEngine.backtrack()` |
+| `getConflict()` / `addResolver()` / `retractResolver()` / `backtrackHelper()` | become `ChimpSearchEngine` internals |
+
+#### Summary
+
+The surface is **smaller than feared**. The real port is:
+- `ChimpSearchEngine`: ~150 lines of search algorithm (the 5 methods in F), re-hosted from `MetaConstraintSolver`.
+- `FlawProvider`/`ResolverSource` port: 4 methods (G).
+- `HTNPlanner` re-hosts: `addMetaConstraint` (trivial), `draw` (no-op/simplified), `getDescription` (simplified), `backtrack` (delegates to engine).
+- The 11 override hooks (A) move to delegates or stay as CHIMP-owned callbacks.
+- 7 framework methods confirmed unused (H) — omitted per simplicity mandate.
+
+The `addResolverSub` hard coupling (prototype→Fluent materialization, type-dispatch on `CompoundSymbolicValueConstraint`/`AllenIntervalConstraint`/`IntegerConstraint`) remains in place for this wedge — it stays as a CHIMP-owned callback that the engine calls, still operating on `ConstraintNetwork` resolver values. That's the M9 storage-layer work that follows this wedge.
+
+The JUNG `DelegateForest<MetaVariable, ConstraintNetwork>` search-tree visualization (`g`) is used only by `draw()`. If `draw()` becomes a no-op, the JUNG dependency in the search engine drops entirely. `draw()` is called only from `CHIMP.drawSearchSpace()` and `ChimpIO` — confirm whether any test relies on it (it doesn't — all tests call `generatePlan()`, not `draw`).
+
 ### Verification
 
 - `./gradlew test --rerun-tasks` green on the full suite (the domain JUnit tests are the behavioral contract for the search engine).
