@@ -569,6 +569,28 @@ This is intentionally the **first step** of M9, not all of M9. It is bounded: on
 
 Full test suite green: DWR, RACE, TransTerra, mobipick, integer planning (battery `(100,98)`/`(98,96)`), resource, HPR generation, characterization &mdash; all pass with identical planning results.
 
+### Step 4 result: HTNPlanner MetaConstraintSolver inheritance broken (done)
+
+`HTNPlanner` no longer `extends MetaConstraintSolver`. It now implements `HybridDomainPlanner` and `SearchHooks` directly, owning its own `groundSolver` field, meta-constraint list, `addMetaConstraint`, `getConstraintSolvers`, `getDescription`, and `backtrack` (delegated to `ChimpSearchEngine`).
+
+All 6 CHIMP meta-constraint subclasses (`HTNMetaConstraint`, `FluentResourceUsageScheduler`, `FluentScheduler`, `GuessOrderingMetaConstraint`, `MoveBaseMetaConstraint`, `DWRNavigationMetaConstraint`) now have a direct `groundSolver` field instead of using `this.metaCS.getConstraintSolvers()[0]`. `HTNPlanner.addMetaConstraint` sets the ground solver directly via `setGroundSolver` instead of the framework's `setMetaSolver`.
+
+The meta-constraints still extend `MetaConstraint`/`Schedulable` (for the `getMetaVariables`/`getMetaValues` protocol and `Schedulable`'s peak-collection engine), but they no longer depend on a `MetaConstraintSolver` reference. They are wrapped as `FlawProvider`s via `MetaCspFlawProviderAdapter` for the CHIMP-owned search engine.
+
+The 7 trivial `MetaConstraintSolver` overrides (bounds, conflict clauses, `preBacktrack`, `postBacktrack(MetaVariable)`) are removed &mdash; they were no-ops/constant returns needed only by the inherited abstract API.
+
+Full test suite green: DWR, RACE, TransTerra, mobipick, integer planning, resource, HPR generation, characterization &mdash; all pass with identical planning results.
+
+### M9 remaining: storage layer
+
+With the search engine CHIMP-owned and the `MetaConstraintSolver` inheritance broken, the remaining Meta-CSP coupling in the planner is the **storage layer**:
+- `Fluent extends MultiVariable`, `FluentConstraint extends MultiBinaryConstraint`, `FluentNetworkSolver extends MultiConstraintSolver` &mdash; these ARE Meta-CSP objects.
+- `HTNPlanner.addResolverSub` type-dispatches on `CompoundSymbolicValueConstraint`/`AllenIntervalConstraint`/`IntegerConstraint` to repair resolver scopes.
+- The meta-constraints still extend `MetaConstraint`/`Schedulable` (for the search protocol and peak-collection engine).
+- `ConstraintNetwork` remains the resolver representation throughout.
+
+This is a much larger scope &mdash; replacing the storage layer is effectively rewriting the solver. It is arguably a separate milestone (or where UP integration begins), not "M9 step 5."
+
 ### Step 1 result: `MetaConstraintSolver` surface inventory (done)
 
 The full inheritance chain is `HTNPlanner extends MetaConstraintSolver extends MultiConstraintSolver extends ConstraintSolver`.
