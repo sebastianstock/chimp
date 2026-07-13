@@ -396,6 +396,23 @@ After the core APIs stabilize, migrate:
 
 These classes contain broad but mostly shallow coupling and should follow the new APIs rather than drive their design.
 
+#### M10 progress
+
+- **Deleted dispatching/sensing** (7 files): `FluentDispatcher`, `FluentDispatchingFunction`, `FluentSensor`, `FluentConstraintNetworkAnimator`, `TestFluentDispatching`, `TestFluentConstraintNetworkAnimator`, `TestIncrementalMergingDispatching`. These were main()-only demo classes with no `@Test`, no core planner references, and deep Meta-CSP coupling. User-approved: deleted rather than migrated.
+- **Migrated `ValueOrderingH` → `CHIMPValOH`** (16 files): 8 test files + 8 example main()-only demos now declare their val-ordering heuristic variable as the CHIMP-owned `CHIMPValOH` type instead of the Meta-CSP `ValueOrderingH`. The `CHIMPValOH` hierarchy already extends `MetaCspResolverOrderingAdapter` (which extends `ValueOrderingH`), so this is a type-narrowing with no behavior change. 4 examples that use `GuessOrderingValOH` (extends `ValueOrderingH` directly, not `CHIMPValOH`) left as-is &mdash; migrating `GuessOrderingValOH` requires `ResolverCandidate` to expose constraint count (storage-layer work).
+- **Replaced `MetaCSPLogging` with `ChimpLogging`** (26 import lines): Created `chimp.logging.ChimpLogging`, a minimal CHIMP-owned logging utility providing the same `getLogger(Class)` and `setLevel(Class, Level)` / `setLevel(Level)` API with the same `[ClassName] message` formatter. Replaced 26 `MetaCSPLogging` import lines across main+test. `chimp.model.ChimpLogging` is Meta-CSP-free.
+
+**Result**: 75→67 main files importing `org.metacsp`; 21→15 test files importing `org.metacsp`. Full test suite green.
+
+#### M10 remaining (blocked by storage layer)
+
+The remaining peripheral coupling (15 example/ui files) is **all storage-layer types** (`Variable`, `Constraint`, `ConstraintNetwork`, `AllenInterval`, `MetaConstraint`, `Bounds`). These cannot be removed without:
+- A CHIMP-owned plan-extraction API that returns CHIMP types instead of `Variable[]` (currently `CHIMP.extractActions()` returns `Variable[]`).
+- A CHIMP-owned `Bounds` equivalent with `intersect`/`union`/etc. (currently `org.metacsp.time.Bounds` is returned by Meta-CSP solver methods).
+- A CHIMP-owned `AllenInterval` equivalent for temporal data access.
+
+This is the M9-remaining storage-layer boundary, not M10 peripheral cleanup. The remaining 8 non-adapter test files use the same storage-layer types for the same reason.
+
 ## Verification Strategy
 
 Each stage should preserve existing planning results before removing the corresponding Meta-CSP adapter. Verification should include:
