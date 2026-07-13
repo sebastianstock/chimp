@@ -16,17 +16,10 @@ import chimp.search.ExpansionCandidateDescription;
 import chimp.search.ResolverCandidate;
 import chimp.search.ResolverCandidateKind;
 import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
-import integers.IntegerConstraint;
 import org.junit.Test;
-import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import unify.CompoundSymbolicValueConstraint;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -97,12 +90,8 @@ public class PlanRepositoryItemResolverDescriptionTest {
         assertTrue(descriptions.stream().anyMatch(
                 description -> description.selectedPreconditions().get("p0") == second.getID()));
 
-        List<ConstraintNetwork> legacy =
-                operator.materializeResolverDescriptions(task, 3, solver, openFluents);
         List<ConstraintNetwork> delegated = operator.expand(task, 3, solver, openFluents);
-
-        assertEquals(selectedPreconditionIdMultiset(legacy), selectedPreconditionIdMultiset(delegated));
-        assertEquals(summarizeAsMultiset(legacy), summarizeAsMultiset(delegated));
+        assertEquals(2, delegated.size());
         for (ConstraintNetwork network : delegated) {
             ResolverCandidate candidate = (ResolverCandidate) network.getSpecilizedAnnotation();
             assertEquals(ResolverCandidateKind.EXPANSION, candidate.metadata().kind());
@@ -150,67 +139,5 @@ public class PlanRepositoryItemResolverDescriptionTest {
         assertTrue(description.semanticKinds().contains(ResolverSemanticKind.DECOMPOSITION));
         assertTrue(description.semanticKinds().contains(ResolverSemanticKind.ORDERING));
         assertEquals(List.of(new ResolverOrderingEdge("s0", "s1")), description.orderingEdges());
-    }
-
-    private List<List<Integer>> selectedPreconditionIds(List<ConstraintNetwork> networks) {
-        List<List<Integer>> selections = new ArrayList<>();
-        for (ConstraintNetwork network : networks) {
-            List<Integer> ids = new ArrayList<>();
-            for (Constraint constraint : network.getConstraints()) {
-                if (constraint instanceof FluentConstraint fluent
-                        && fluent.getType() == FluentConstraint.Type.PRE) {
-                    ids.add(fluent.getFrom().getID());
-                }
-            }
-            Collections.sort(ids);
-            selections.add(ids);
-        }
-        return selections;
-    }
-
-    private List<String> selectedPreconditionIdMultiset(List<ConstraintNetwork> networks) {
-        List<String> selections = selectedPreconditionIds(networks).stream()
-                .map(Object::toString)
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
-        Collections.sort(selections);
-        return selections;
-    }
-
-    private List<String> summarizeAsMultiset(List<ConstraintNetwork> networks) {
-        List<String> result = new ArrayList<>();
-        for (List<String> network : summarize(networks)) {
-            Collections.sort(network);
-            result.add(String.join(",", network));
-        }
-        Collections.sort(result);
-        return result;
-    }
-
-    private List<List<String>> summarize(List<ConstraintNetwork> networks) {
-        List<List<String>> result = new ArrayList<>();
-        for (ConstraintNetwork network : networks) {
-            List<String> constraints = new ArrayList<>();
-            for (Constraint constraint : network.getConstraints()) {
-                constraints.add(kind(constraint));
-            }
-            result.add(constraints);
-        }
-        return result;
-    }
-
-    private String kind(Constraint constraint) {
-        if (constraint instanceof FluentConstraint fluent) {
-            return "fluent:" + fluent.getType();
-        }
-        if (constraint instanceof AllenIntervalConstraint temporal) {
-            return "temporal:" + temporal.getType();
-        }
-        if (constraint instanceof CompoundSymbolicValueConstraint symbolic) {
-            return "symbolic:" + symbolic.getEdgeLabel();
-        }
-        if (constraint instanceof IntegerConstraint integer) {
-            return "integer:" + integer.getType();
-        }
-        return constraint.getClass().getName();
     }
 }

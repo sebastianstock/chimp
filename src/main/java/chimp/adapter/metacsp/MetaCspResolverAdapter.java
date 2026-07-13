@@ -5,7 +5,6 @@ import chimp.model.SubVariableKind;
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
 import htn.PlanReportroryItem;
-import fluentSolver.FluentConstraint;
 import integers.IntegerConstraint;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
@@ -15,7 +14,6 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import unify.CompoundSymbolicValueConstraint;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,42 +36,17 @@ public final class MetaCspResolverAdapter {
                 throw new IllegalArgumentException("Resolver description belongs to another repository item");
             }
         }
-        List<ConstraintNetwork> compiled =
-                item.materializeResolverDescriptions(taskFluent, depth, groundSolver, openFluents);
-        List<List<Long>> describedSelections = descriptions.stream()
-                .map(description -> sortedIds(description.selectedPreconditions().values()))
-                .toList();
-        List<ConstraintNetwork> validated = new ArrayList<>();
-        for (ConstraintNetwork network : compiled) {
-            List<Long> selection = selectedPreconditionIds(network);
-            for (int i = 0; i < descriptions.size(); i++) {
-                if (describedSelections.get(i).equals(selection)) {
-                    SEARCH_ADAPTER.annotateExpansion(network, taskFluent, descriptions.get(i));
-                    tagConstraints(network);
-                    validated.add(network);
-                    break;
-                }
+        List<ConstraintNetwork> compiled = new ArrayList<>();
+        for (ResolverDescription description : descriptions) {
+            ConstraintNetwork network =
+                    item.buildResolverFromDescription(description, taskFluent, depth, groundSolver, openFluents);
+            if (network != null) {
+                SEARCH_ADAPTER.annotateExpansion(network, taskFluent, description);
+                tagConstraints(network);
+                compiled.add(network);
             }
         }
-        return List.copyOf(validated);
-    }
-
-    private List<Long> selectedPreconditionIds(ConstraintNetwork network) {
-        List<Long> ids = new ArrayList<>();
-        for (Constraint constraint : network.getConstraints()) {
-            if (constraint instanceof FluentConstraint fluentConstraint
-                    && fluentConstraint.getType() == FluentConstraint.Type.PRE) {
-                ids.add((long) fluentConstraint.getFrom().getID());
-            }
-        }
-        Collections.sort(ids);
-        return List.copyOf(ids);
-    }
-
-    private List<Long> sortedIds(java.util.Collection<Long> values) {
-        List<Long> ids = new ArrayList<>(values);
-        Collections.sort(ids);
-        return List.copyOf(ids);
+        return List.copyOf(compiled);
     }
 
     private static void tagConstraints(ConstraintNetwork network) {

@@ -329,317 +329,216 @@ public abstract class PlanReportroryItem {
 		return RESOLVER_ADAPTER.compile(this, descriptions, taskFluent, depth, groundSolver, openFluents);
 	}
 
-	public List<ConstraintNetwork> materializeResolverDescriptions(
-			Fluent taskFluent, int depth, FluentNetworkSolver groundSolver, Fluent[] openFluents) {
-		List<ConstraintNetwork> ret = new ArrayList<ConstraintNetwork>();
-		
-		List<Set<FluentConstraint>> fluentConstraints = new ArrayList<Set<FluentConstraint>>();
-		
-		Map<FluentConstraint, String> constraintToPrecondition = 
-				new HashMap<FluentConstraint, String>();
-		
-		// Create set of potential precondition constraints.
-		if(this.preconditions != null) {
-			for (HTNPrecondition pre : this.preconditions) {
-				String preName = pre.getFluenttype();
-				Set<FluentConstraint> possiblePreconditions = new HashSet<FluentConstraint>();
-				for (Fluent openFluent : openFluents)  {
-					String oName = openFluent.getCompoundSymbolicVariable().getPredicateName();
-					if(preName.equals(oName)) {
-						if (testArguments(taskFluent, pre, openFluent)) {
-							/// For negative effects the fluent should not be closed
-							if (!MULT_ACTION_NEG_EFFECT) {
-								if (pre.isNegativeEffect()) {
-									if (openFluent.getMarking() == HTNMetaConstraint.markings.CLOSED) {
-//										System.out.println("Fluent is already closed");
-										continue;
-									}
-								}
-							}
-							
-//							System.out.println("true: " + taskFluent.getCompoundSymbolicVariable() + " " + openFluent.getCompoundSymbolicVariable() + " " + Arrays.toString(pre.getConnections()));
-							// potential match. Add PRE constraint.
-							FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE, 
-									pre.getConnections());
-							preCon.setFrom(openFluent);
-							preCon.setTo(taskFluent);
-							preCon.setNegativeEffect(pre.isNegativeEffect());
-							preCon.setAdditionalConstraints(pre.getAdditionalConstraints());
-							possiblePreconditions.add(preCon);
-							constraintToPrecondition.put(preCon, pre.getKey());
-						}
+	/**
+	 * Builds a single resolver {@link ConstraintNetwork} from one {@link ResolverDescription}.
+	 * This is the description-driven compilation path — one network per description,
+	 * no cartesian product (that's in {@link #describeResolvers}).
+	 *
+	 * @return the compiled network, or {@code null} if the description is infeasible
+	 *         (e.g. sub-different check fails)
+	 */
+	public ConstraintNetwork buildResolverFromDescription(
+			ResolverDescription description,
+			Fluent taskFluent,
+			int depth,
+			FluentNetworkSolver groundSolver,
+			Fluent[] openFluents) {
+
+		// Reconstruct preKeyToFluentMap from selected preconditions
+		Map<String, Fluent> preKeyToFluentMap = new HashMap<String, Fluent>();
+		Map<String, Long> selectedIds = description.selectedPreconditions();
+		if (preconditions != null) {
+			for (HTNPrecondition pre : preconditions) {
+				Long fluentId = selectedIds.get(pre.getKey());
+				if (fluentId == null) continue;
+				for (Fluent openFluent : openFluents) {
+					if (openFluent.getID() == fluentId) {
+						preKeyToFluentMap.put(pre.getKey(), openFluent);
+						break;
 					}
-				}
-				if (possiblePreconditions.size() > 0) {
-					fluentConstraints.add(possiblePreconditions);
-				} else {
-					return ret;  // Precondition cannot be fulfilled!
 				}
 			}
 		}
-		
-		long td_add = 0;
-		
-		// Create constraint networks as cartesian product of precondition constraints
-		Set<List<FluentConstraint>> combinations = Sets.cartesianProduct(fluentConstraints);
 
-//		System.out.println("combinations.size: " + combinations.size());
-//		System.out.println("Computing combinations took: " + ((System.nanoTime() - startTime) / 1000000) + " ms");
-		
-		// Create Constraint networks
-		for (List<FluentConstraint> comb : combinations) {
-			
-			Map<String, Fluent> preKeyToFluentMap = new HashMap<String, Fluent>();
-			Map<String, Variable> effKeyToVariableMap = new HashMap<String, Variable>();
-//			keyToFluentMap.put(HEAD_STRING, taskFluent);
-			for (EffectTemplate et : effects) {
-				effKeyToVariableMap.put(et.getKey(), et.getPrototype(groundSolver));
-			}
-			
-			for (FluentConstraint con : comb) {
-				preKeyToFluentMap.put(constraintToPrecondition.get(con), (Fluent) con.getFrom());
-			}
-			
-			// Analyze if values can possibly match
-			// by calculating the intersection of possible values of involved head and preconditions.
-			boolean feasibleCN = true;
-			if (variableOccurrencesMap != null) {
-				for (Entry<String, Map<String, Integer>> occs : variableOccurrencesMap.entrySet()) {
-					Set<String> possibleValues = null;
-					
-					if (variablesPossibleValuesMap != null && variablesPossibleValuesMap.size() > 0) {
-						String[] positiveValues = variablesPossibleValuesMap.get(occs.getKey());
-						if (positiveValues != null) {
-							possibleValues = new HashSet<String>(Arrays.asList(positiveValues));
-						}
-					}
-					
-					for (Entry<String, Integer> occ : occs.getValue().entrySet()) {
-						String id = occ.getKey();
-						Fluent fl = null;
-						if (id.equals(HEAD_KEYWORD_STRING)) {
-							fl = taskFluent;
-						} else {
-							fl = preKeyToFluentMap.get(id);
-						}
+		// Build effKeyToVariableMap from effects
+		Map<String, Variable> effKeyToVariableMap = new HashMap<String, Variable>();
+		for (EffectTemplate et : effects) {
+			effKeyToVariableMap.put(et.getKey(), et.getPrototype(groundSolver));
+		}
 
-						if (fl != null) { // head or pre-Key but not an effect key:
-							List<String> varSymbolsList = Arrays.asList(
-									fl.getCompoundSymbolicVariable().getSymbolsAt(occ.getValue().intValue() + 1));
-							if (possibleValues == null) {
-								possibleValues = new HashSet<String>(varSymbolsList);
-							} else {   // remove objects that are no possible symbols of fl
-								possibleValues.retainAll(varSymbolsList);
-							}
-						}
+		ConstraintNetwork cn = new ConstraintNetwork(null);
+
+		// Add PRE and CLOSES constraints
+		if (preconditions != null) {
+			for (HTNPrecondition pre : preconditions) {
+				Fluent openFluent = preKeyToFluentMap.get(pre.getKey());
+				if (openFluent == null) continue;
+
+				FluentConstraint preCon = new FluentConstraint(FluentConstraint.Type.PRE,
+						pre.getConnections());
+				preCon.setFrom(openFluent);
+				preCon.setTo(taskFluent);
+				preCon.setNegativeEffect(pre.isNegativeEffect());
+				preCon.setAdditionalConstraints(pre.getAdditionalConstraints());
+				cn.addConstraint(preCon);
+
+				// add closes for negative effects
+				if (pre.isNegativeEffect() && this instanceof HTNOperator) {
+					FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
+					closes.setFrom(preCon.getTo());
+					closes.setTo(preCon.getFrom());
+					if (preCon.hasAdditionalConstraints()) {
+						closes.setAdditionalConstraints(preCon.getAdditionalConstraints());
 					}
-					if (possibleValues != null) {
-						// subtract impossibleSymbols
-						if (variablesImpossibleValuesMap != null && variablesImpossibleValuesMap.size() > 0) {
-							String[] negativeValues = variablesImpossibleValuesMap.get(occs.getKey());
-							if (negativeValues != null) {
-								possibleValues.removeAll(Arrays.asList(negativeValues));
-							}
-						}
-						
-						if (possibleValues.isEmpty()) {
-							feasibleCN = false;
-							break;
-						}
-					}
+					cn.addConstraint(closes);
 				}
 			}
-			
-			if (feasibleCN) {
-				
-				// Add PRE and CLOSES constraints
-				long td1 = System.nanoTime();
-				ConstraintNetwork cn = new ConstraintNetwork(null);
-				for (FluentConstraint con : comb) {
-					cn.addConstraint(con);
-					
-					// add closes for negative effects
-					if (con.isNegativeEffect() && this instanceof HTNOperator) {
-						FluentConstraint closes = new FluentConstraint(FluentConstraint.Type.CLOSES);
-						closes.setFrom(con.getTo());
-						closes.setTo(con.getFrom());
-						if (con.hasAdditionalConstraints()) {
-							closes.setAdditionalConstraints(con.getAdditionalConstraints());
+		}
+
+		// add binding constraints between preconditions or effects
+		for (Constraint con : createPreconditionsEffectsBindings(preKeyToFluentMap, effKeyToVariableMap)) {
+			cn.addConstraint(con);
+		}
+
+		// add positive effects/decomposition
+		for (Constraint con : expandEffects(taskFluent, groundSolver)) {
+			cn.addConstraint(con);
+		}
+
+		// add additional constraints between preconditions and effects
+		for (AllenIntervalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+			cn.addConstraint(aCon);
+		}
+
+		// add sub-different constraints
+		try {
+			for (Constraint con : createSubDifferents(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+				cn.addConstraint(con);
+			}
+		} catch (IllegalStateException e) {
+			return null;
+		}
+
+		// add VALUERESTRICTION constraints for task, preconditions and effects
+		for (Constraint con : createValueRestrictions(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+			cn.addConstraint(con);
+		}
+
+		// Add a UNARYAPPLIED to remember which method/operator has been used.
+		FluentConstraint applicationCon =
+				new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, this);
+		applicationCon.setFrom(taskFluent);
+		applicationCon.setTo(taskFluent);
+		applicationCon.setDepth(depth);
+		cn.addConstraint(applicationCon);
+
+		// Add constraints for DURATION
+		if (durationBounds != null) {
+			AllenIntervalConstraint durationCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(
+					new TemporalConstraintTemplate(TemporalRelation.Duration, durationBounds));
+			durationCon.setFrom(taskFluent.getAllenInterval());
+			durationCon.setTo(taskFluent.getAllenInterval());
+			cn.addConstraint(durationCon);
+		}
+
+		// Add Constraints for RESOURCES
+		for (ResourceRequirement rt : this.resourceUsageIndicators) {
+			FluentConstraint resourceCon =
+					new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE,
+							RESOURCE_ADAPTER.toResourceUsageTemplate(rt));
+			resourceCon.setFrom(taskFluent);
+			resourceCon.setTo(taskFluent);
+			cn.addConstraint(resourceCon);
+		}
+
+		if (groundSolver.hasIntegerConstraintSolver()) {
+			// add integer constraints from templates
+			if (integerConstraintTemplates != null) {
+				for (IntegerConstraintTemplate ict : integerConstraintTemplates) {
+					String[] variableKeys = ict.variableKeys();
+					Variable[] icScope = new Variable[variableKeys.length];
+					for (int i = 0; i < variableKeys.length; i++) {
+						String key = variableKeys[i];
+						Map<String, Integer> keyOccurrences = integerVariableOccurrencesMap.get(key);
+						if (keyOccurrences == null) {
+							throw new IllegalArgumentException(
+									"Key " + key + " is used in IntegerConstraint but it is undefined!");
 						}
-						cn.addConstraint(closes);
-					}
-				}
-				td_add += (System.nanoTime() - td1);
-
-				// add binding constraints between preconditions or effects
-				for (Constraint con : createPreconditionsEffectsBindings(preKeyToFluentMap, effKeyToVariableMap)) {
-					cn.addConstraint(con);
-				}
-
-				// add positive effects/decomposition
-				for (Constraint con : expandEffects(taskFluent, groundSolver)) {
-					cn.addConstraint(con);
-				}
-				
-				// add additional constraints between preconditions and effects
-				for (AllenIntervalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
-					cn.addConstraint(aCon);
-				}
-				
-				try {
-					for (Constraint con : createSubDifferents(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
-						cn.addConstraint(con);
-					}
-				} catch (IllegalStateException e) {
-					continue;
-				}
-				
-				// add VALUERESTRICTION constraints for task, preconditions and effects
-				for (Constraint con : createValueRestrictions(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
-					cn.addConstraint(con);
-				}
-
-				// Add a UNARYAPPLIED to remember which method/operator has been used.
-				FluentConstraint applicationCon = 
-						new FluentConstraint(FluentConstraint.Type.UNARYAPPLIED, this);
-				applicationCon.setFrom(taskFluent);
-				applicationCon.setTo(taskFluent);
-				applicationCon.setDepth(depth);
-				cn.addConstraint(applicationCon);
-
-				// Add constraints for DURATION
-				if (durationBounds != null) {
-					AllenIntervalConstraint durationCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(
-							new TemporalConstraintTemplate(TemporalRelation.Duration, durationBounds));
-					durationCon.setFrom(taskFluent.getAllenInterval());
-					durationCon.setTo(taskFluent.getAllenInterval());
-					cn.addConstraint(durationCon);
-				}
-
-				// Add Constraints for RESOURCES
-				for (ResourceRequirement rt : this.resourceUsageIndicators) {
-					FluentConstraint resourceCon = 
-							new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE,
-									RESOURCE_ADAPTER.toResourceUsageTemplate(rt));
-					resourceCon.setFrom(taskFluent);
-					resourceCon.setTo(taskFluent);
-					cn.addConstraint(resourceCon);
-				}
-
-
-				if (groundSolver.hasIntegerConstraintSolver()) {
-					// add integer constraints from templates
-					if (integerConstraintTemplates != null) {
-						for (IntegerConstraintTemplate ict : integerConstraintTemplates) {
-							String[] variableKeys = ict.variableKeys();
-							Variable[] icScope = new Variable[variableKeys.length];
-							for (int i = 0; i < variableKeys.length; i++) {
-								String key = variableKeys[i];
-								Map<String, Integer> keyOccurrences = integerVariableOccurrencesMap.get(key);
-								if (keyOccurrences == null) {
-									throw new IllegalArgumentException(
-											"Key " + key + " is used in IntegerConstraint but it is undefined!");
-								}
-								// prefer IntegerVariables from the task
-								Integer positionInTask = keyOccurrences.get(HEAD_KEYWORD_STRING);
-								if (positionInTask != null) {
-									icScope[i] = taskFluent.getIntegerVariables()[positionInTask];
-								} else { // otherwise use first entry
-									for (Entry<String, Integer> occ : keyOccurrences.entrySet()) {
-										Variable v = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
-										if (v instanceof Fluent) {
-											icScope[i] = ((Fluent)v).getIntegerVariables()[occ.getValue()];
-										} else {
-											icScope[i] = new VariablePrototype(groundSolver, v, occ.getValue());
-										}
-										break;
-									}
-								}
-							}
-							Constraint ic = INTEGER_ADAPTER.toIntegerConstraint(ict, icScope);
-							cn.addConstraint(ic);
-						}
-					}
-
-					// add ALLEQUAL integer constraint for integer variables with the same name
-					for (Map<String, Integer> occurrences : integerVariableOccurrencesMap.values()) {
-						if (occurrences.size() > 0) {
-							List<Variable> vars = new ArrayList<>(occurrences.size());
-							for (Entry<String, Integer> occ : occurrences.entrySet()) {
-								if(occ.getKey().equals(HEAD_KEYWORD_STRING)) {
-									vars.add(taskFluent.getIntegerVariables()[occ.getValue()]);
+						// prefer IntegerVariables from the task
+						Integer positionInTask = keyOccurrences.get(HEAD_KEYWORD_STRING);
+						if (positionInTask != null) {
+							icScope[i] = taskFluent.getIntegerVariables()[positionInTask];
+						} else { // otherwise use first entry
+							for (Entry<String, Integer> occ : keyOccurrences.entrySet()) {
+								Variable v = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
+								if (v instanceof Fluent) {
+									icScope[i] = ((Fluent)v).getIntegerVariables()[occ.getValue()];
 								} else {
-									Variable v = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
-									if (v instanceof Fluent) {
-										vars.add(((Fluent)v).getIntegerVariables()[occ.getValue()]);
-									} else {
-										vars.add(new VariablePrototype(groundSolver, v, occ.getValue()));
-									}
+									icScope[i] = new VariablePrototype(groundSolver, v, occ.getValue());
 								}
-							}
-							cn.addConstraint(
-									INTEGER_ADAPTER.createAllEqualConstraint(
-											vars.toArray(new Variable[vars.size()])));
-						}
-					}
-
-					// add IntegerConstraints for constant values
-					for (int i = 0; i < integerArguments.length; i++) {
-						if(!integerArguments[i].isVariable()) {
-							cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
-									taskFluent.getIntegerVariables()[i], integerArguments[i].constValue));
-						}
-					}
-					for (EffectTemplate et : effects) {
-						for (int i = 0; i < et.getIntArgs().length; i++) {
-							if (!et.getIntArgs()[i].isVariable()) {
-								Variable v = et.getPrototype(groundSolver);
-								VariablePrototype vp = new VariablePrototype(groundSolver, v, i);
-								cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
-										vp, et.getIntArgs()[i].constValue));
+								break;
 							}
 						}
 					}
-					for (HTNPrecondition pre : preconditions) {
-						if (pre.getIntegerArguments() != null) {
-							IntArg[] intArgs = pre.getIntegerArguments();
-							for (int i = 0; i < intArgs.length; i++) {
-								if (!intArgs[i].isVariable()) {
-									Fluent preFluent = preKeyToFluentMap.get(pre.getKey());
-									cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
-											preFluent.getIntegerVariables()[i], intArgs[i].constValue));
-								}
-							}
-						}
-
-					}
-
-//					// add some integer constraints only for testing
-//					IntegerConstraint ic0 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-//							new IntegerVariable[]{taskFluent.getIntegerVariables()[0]},
-//							"=", 77);
-//					cn.addConstraint(ic0);
-//					IntegerConstraint ic1 = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-//							new IntegerVariable[]{taskFluent.getIntegerVariables()[0], taskFluent.getIntegerVariables()[1]},
-//							"+", ">=", 100);
-//					cn.addConstraint(ic1);
-//					// between first int variable of the task and third int variable of first effect
-//					for (Entry<String, Variable> e: effKeyToVariableMap.entrySet()) {
-//						VariablePrototype effectIntVar3 = new VariablePrototype(groundSolver, e.getValue(), 2);
-//						IntegerConstraint icEffect = new IntegerConstraint(IntegerConstraint.Type.ARITHM,
-//								new Variable[]{taskFluent.getIntegerVariables()[0], effectIntVar3},
-//								"+", ">=", 1000);
-//						cn.addConstraint(icEffect);
-//						break;
-//					}
+					Constraint ic = INTEGER_ADAPTER.toIntegerConstraint(ict, icScope);
+					cn.addConstraint(ic);
 				}
+			}
 
-				ret.add(cn);
-			} else {
-				logger.finest("Ommitting non-feasible CN");
+			// add ALLEQUAL integer constraint for integer variables with the same name
+			for (Map<String, Integer> occurrences : integerVariableOccurrencesMap.values()) {
+				if (occurrences.size() > 0) {
+					List<Variable> vars = new ArrayList<>(occurrences.size());
+					for (Entry<String, Integer> occ : occurrences.entrySet()) {
+						if(occ.getKey().equals(HEAD_KEYWORD_STRING)) {
+							vars.add(taskFluent.getIntegerVariables()[occ.getValue()]);
+						} else {
+							Variable v = findVariable(occ.getKey(), taskFluent, preKeyToFluentMap, effKeyToVariableMap);
+							if (v instanceof Fluent) {
+								vars.add(((Fluent)v).getIntegerVariables()[occ.getValue()]);
+							} else {
+								vars.add(new VariablePrototype(groundSolver, v, occ.getValue()));
+							}
+						}
+					}
+					cn.addConstraint(
+							INTEGER_ADAPTER.createAllEqualConstraint(
+									vars.toArray(new Variable[vars.size()])));
+				}
+			}
+
+			// add IntegerConstraints for constant values
+			for (int i = 0; i < integerArguments.length; i++) {
+				if(!integerArguments[i].isVariable()) {
+					cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+							taskFluent.getIntegerVariables()[i], integerArguments[i].constValue));
+				}
+			}
+			for (EffectTemplate et : effects) {
+				for (int i = 0; i < et.getIntArgs().length; i++) {
+					if (!et.getIntArgs()[i].isVariable()) {
+						Variable v = et.getPrototype(groundSolver);
+						VariablePrototype vp = new VariablePrototype(groundSolver, v, i);
+						cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+								vp, et.getIntArgs()[i].constValue));
+					}
+				}
+			}
+			for (HTNPrecondition pre : preconditions) {
+				if (pre.getIntegerArguments() != null) {
+					IntArg[] intArgs = pre.getIntegerArguments();
+					for (int i = 0; i < intArgs.length; i++) {
+						if (!intArgs[i].isVariable()) {
+							Fluent preFluent = preKeyToFluentMap.get(pre.getKey());
+							cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+										preFluent.getIntegerVariables()[i], intArgs[i].constValue));
+						}
+					}
+				}
 			}
 		}
-		return ret;		
+
+		return cn;
 	}
 
 	private boolean isSymbolicallyFeasible(
