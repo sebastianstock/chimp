@@ -4,19 +4,18 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.*;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
 import chimp.adapter.metacsp.MetaCspSearchAdapter;
 import chimp.model.ResourceRequirement;
+import chimp.search.ChimpMetaConstraint;
 import chimp.search.PlanningFlaw;
 import chimp.search.TaskPlanningFlaw;
 
 import java.util.*;
 
 
-public class HTNMetaConstraint extends MetaConstraint implements GroundSolverHolder {
+public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
 	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
 			new MetaCspResourceRequirementAdapter();
 	private static final MetaCspSearchAdapter SEARCH_ADAPTER = new MetaCspSearchAdapter();
@@ -121,17 +120,15 @@ public class HTNMetaConstraint extends MetaConstraint implements GroundSolverHol
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
+	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
 		long startTime = System.nanoTime();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-			
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
 		
-		PlanningFlaw flaw = SEARCH_ADAPTER.toPlanningFlaw(problematicNetwork);
+		PlanningFlaw flaw = SEARCH_ADAPTER.toPlanningFlaw(flawNetwork);
 		Map<Long, Variable> variablesById = new HashMap<>();
-		for (Variable variable : problematicNetwork.getVariables()) {
+		for (Variable variable : flawNetwork.getVariables()) {
 			variablesById.put((long) variable.getID(), variable);
 		}
 		for (long taskId : flaw.eligibleTaskIds()) {
@@ -155,7 +152,7 @@ public class HTNMetaConstraint extends MetaConstraint implements GroundSolverHol
 		}
 		
 		long endTime = System.nanoTime();
-		logger.finest("Computed metaValues for " + problematicNetwork.getVariables().length + " tasks");
+		logger.finest("Computed metaValues for " + flawNetwork.getVariables().length + " tasks");
 		logger.finest("Found " + ret.size() + " metaValues");
 		if (DEBUG) {
 			logger.info("  Found " + ret.size() + " metaValues");
@@ -299,13 +296,6 @@ public class HTNMetaConstraint extends MetaConstraint implements GroundSolverHol
 	}
 
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) { }
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
 		return groundSolver;
 	}
@@ -313,21 +303,6 @@ public class HTNMetaConstraint extends MetaConstraint implements GroundSolverHol
 	@Override
 	public String toString() {
 		return "PFD0MetaConstraint";
-	}
-
-	@Override
-	public String getEdgeLabel() {
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		return false;
 	}
 
 	public void addOperators(List<PlanReportroryItem> operators) {

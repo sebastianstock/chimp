@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.meta.MetaConstraint;
+import chimp.search.FlawProvider;
 import chimp.logging.ChimpLogging;
 
 import htn.HTNMethod;
@@ -144,7 +144,7 @@ public class HybridDomain implements ClassicHybridDomain {
 
 	/**
 	 * Parses a domain file (see domains/testDomain.ddl for an example) and instantiates
-	 * the necessary {@link MetaConstraint}s.
+	 * the necessary {@link FlawProvider}s.
 	 * @throws DomainParsingException Throws this exception if the domain cannot be parsed.
 	 */
 	public void parseDomain(Map<String, String[]> typesInstancesMap) throws DomainParsingException {

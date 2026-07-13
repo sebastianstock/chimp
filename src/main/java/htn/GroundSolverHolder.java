@@ -18,4 +18,11 @@ public interface GroundSolverHolder {
      * @param groundSolver the fluent network solver
      */
     void setGroundSolver(fluentSolver.FluentNetworkSolver groundSolver);
+
+    /**
+     * Returns the ground solver held by this meta-constraint.
+     *
+     * @return the fluent network solver
+     */
+    org.metacsp.framework.ConstraintSolver getGroundSolver();
 }

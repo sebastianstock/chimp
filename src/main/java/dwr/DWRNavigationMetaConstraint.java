@@ -10,9 +10,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import chimp.search.ChimpMetaConstraint;
 
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -25,7 +24,7 @@ import unify.CompoundSymbolicVariable;
 
 
 
-public class DWRNavigationMetaConstraint extends MetaConstraint implements GroundSolverHolder {
+public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
 
 	private static final long serialVersionUID = 8908231006136514834L;
 	private static final String NAVIGATE_TASK_NAME = "navigate";
@@ -111,9 +110,8 @@ public class DWRNavigationMetaConstraint extends MetaConstraint implements Groun
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
+	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
+		Fluent taskFluent = (Fluent)flawNetwork.getVariables()[0];
 		
 		logger.fine("getMetaValues for: " + taskFluent);
 		
@@ -121,7 +119,7 @@ public class DWRNavigationMetaConstraint extends MetaConstraint implements Groun
 		Graph<String, String> g = createGraph();
 		DijkstraShortestPath<String,String> dijk = new DijkstraShortestPath<String,String>(g);
 		
-		Variable[] conflicts = metaVariable.getConstraintNetwork().getVariables();
+		Variable[] conflicts = flawNetwork.getVariables();
 		ConstraintNetwork cn = new ConstraintNetwork(null);
 		for (int i = 0; i < conflicts.length; i++) {
 			Fluent nav = (Fluent) conflicts[i];
@@ -190,15 +188,6 @@ public class DWRNavigationMetaConstraint extends MetaConstraint implements Groun
 	
 	
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-		// nothing to do here
-	}
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
 		return groundSolver;
 	}
@@ -206,21 +195,6 @@ public class DWRNavigationMetaConstraint extends MetaConstraint implements Groun
 	@Override
 	public String toString() {
 		return "DWRNavigationMetaConstraint";
-	}
-
-	@Override
-	public String getEdgeLabel() {
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		return false;
 	}
 
 }

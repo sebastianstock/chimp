@@ -10,15 +10,14 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
+import chimp.search.ChimpMetaConstraint;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
 
-public class GuessOrderingMetaConstraint extends MetaConstraint implements GroundSolverHolder {
+public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
 
 
 	private static final long serialVersionUID = 5778589636096352891L;
@@ -114,13 +113,12 @@ public class GuessOrderingMetaConstraint extends MetaConstraint implements Groun
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
+	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
+		Fluent taskFluent = (Fluent)flawNetwork.getVariables()[0];
 		
 		logger.fine("getMetaValues for: " + taskFluent);
 		
-		Variable[] vars = problematicNetwork.getVariables();
+		Variable[] vars = flawNetwork.getVariables();
 		List<ConstraintNetwork> ret = new LinkedList<ConstraintNetwork>();
 		if (vars.length > 1) {
 			for (int i = 0; i < vars.length; i++) {
@@ -146,37 +144,13 @@ public class GuessOrderingMetaConstraint extends MetaConstraint implements Groun
 	
 	
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-		// nothing to do here
-	}
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
 		return groundSolver;
 	}
 
 	@Override
 	public String toString() {
-		return "DWRNavigationMetaConstraint";
-	}
-
-	@Override
-	public String getEdgeLabel() {
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		return false;
+		return "GuessOrderingMetaConstraint";
 	}
 
 }

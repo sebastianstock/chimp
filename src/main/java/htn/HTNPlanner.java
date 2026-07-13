@@ -4,7 +4,6 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomainPlanner;
-import chimp.adapter.metacsp.MetaCspFlawProviderAdapter;
 import chimp.adapter.metacsp.MetaCspResolverAdapter;
 import chimp.model.SubVariableKind;
 import chimp.search.ChimpSearchEngine;
@@ -15,7 +14,6 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.meta.MetaConstraint;
 import chimp.logging.ChimpLogging;
 
 import java.util.ArrayList;
@@ -29,7 +27,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 
 	private Map<String, String[]> typesInstancesMap;
 	private final FluentNetworkSolver groundSolver;
-	private final List<MetaConstraint> metaConstraints = new ArrayList<>();
+	private final List<FlawProvider> flawProviders = new ArrayList<>();
 	private final long animationTime;
 	private ChimpSearchEngine searchEngine;
 
@@ -64,15 +62,15 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 * meta-constraint and sets its ground solver directly (instead of
 	 * via {@code setMetaSolver}).
 	 */
-	public void addMetaConstraint(MetaConstraint metaConstraint) {
-		metaConstraints.add(metaConstraint);
-		if (metaConstraint instanceof GroundSolverHolder holder) {
+	public void addMetaConstraint(FlawProvider provider) {
+		flawProviders.add(provider);
+		if (provider instanceof GroundSolverHolder holder) {
 			holder.setGroundSolver(groundSolver);
 		}
 	}
 
-	public MetaConstraint[] getMetaConstraints() {
-		return metaConstraints.toArray(new MetaConstraint[0]);
+	public FlawProvider[] getMetaConstraints() {
+		return flawProviders.toArray(new FlawProvider[0]);
 	}
 
 	public ConstraintSolver[] getConstraintSolvers() {
@@ -94,10 +92,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 * Initiates backtracking search via the CHIMP-owned {@link ChimpSearchEngine}.
 	 */
 	public boolean backtrack() {
-		List<FlawProvider> providers = new ArrayList<>(metaConstraints.size());
-		for (MetaConstraint mc : metaConstraints) {
-			providers.add(new MetaCspFlawProviderAdapter(mc));
-		}
+		List<FlawProvider> providers = new ArrayList<>(flawProviders);
 		searchEngine = new ChimpSearchEngine(providers, this, animationTime);
 		return searchEngine.backtrack();
 	}
@@ -244,9 +239,9 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	}
 
 	public HTNMetaConstraint getHTNMetaConstraint() {
-		for (MetaConstraint mc : metaConstraints) {
-			if (mc instanceof HTNMetaConstraint)
-				return (HTNMetaConstraint) mc;
+		for (FlawProvider provider : flawProviders) {
+			if (provider instanceof HTNMetaConstraint)
+				return (HTNMetaConstraint) provider;
 		}
 		return null;
 	}

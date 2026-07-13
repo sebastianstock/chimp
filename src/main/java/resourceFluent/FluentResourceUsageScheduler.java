@@ -13,9 +13,9 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
+import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariableOrderingH;
-import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.meta.symbolsAndTime.Schedulable;
+import chimp.search.ChimpSchedulable;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.activity.ActivityComparator;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
@@ -25,7 +25,7 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 
-public class FluentResourceUsageScheduler extends Schedulable implements GroundSolverHolder {
+public class FluentResourceUsageScheduler extends ChimpSchedulable implements GroundSolverHolder {
 	
 	/**
 	 * 
@@ -38,7 +38,7 @@ public class FluentResourceUsageScheduler extends Schedulable implements GroundS
 
 	public FluentResourceUsageScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String name, int cap) {
 		super(varOH, valOH);
-		this.setPeakCollectionStrategy(PEAKCOLLECTION.SAMPLING);
+		this.setPeakCollectionStrategy(PeakCollection.SAMPLING);
 		this.name = name;
 		this.capacity = cap;
 	}
@@ -55,8 +55,8 @@ public class FluentResourceUsageScheduler extends Schedulable implements GroundS
 	}
 
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		ConstraintNetwork[] possiblResolvers = super.getMetaValues(metaVariable);
+	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
+		ConstraintNetwork[] possiblResolvers = super.resolvers(flawNetwork);
 		if(possiblResolvers == null) {
 			return null;
 		}
@@ -106,11 +106,6 @@ public class FluentResourceUsageScheduler extends Schedulable implements GroundS
 	}
 
 	@Override
-	public void draw(ConstraintNetwork network) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
 		return groundSolver;
 	}
@@ -124,24 +119,6 @@ public class FluentResourceUsageScheduler extends Schedulable implements GroundS
 		return sb.toString();
 	}
 
-	@Override
-	public String getEdgeLabel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
 	// Finds sets of overlapping activities and assesses whether they are conflicting (e.g., over-consuming a resource)
 	@Override
 	protected ConstraintNetwork[] samplingPeakCollection() {

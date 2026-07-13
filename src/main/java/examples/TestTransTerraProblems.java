@@ -11,7 +11,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.meta.MetaConstraint;
+import chimp.search.FlawProvider;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import chimp.logging.ChimpLogging;
@@ -133,7 +133,7 @@ public class TestTransTerraProblems {
 			}
 		}
 		
-		for (MetaConstraint mcon : planner.getMetaConstraints()) {
+		for (FlawProvider mcon : planner.getMetaConstraints()) {
 			if (mcon instanceof HTNMetaConstraint) {
 				System.out.println("#getMetaVariables-Invocations: " + ((HTNMetaConstraint) mcon).getVarsCNT);
 			}

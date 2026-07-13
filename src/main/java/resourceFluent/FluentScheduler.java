@@ -2,13 +2,12 @@ package resourceFluent;
 
 import java.util.Vector;
 
-import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariableOrderingH;
-import org.metacsp.meta.symbolsAndTime.Schedulable;
+import chimp.search.ChimpSchedulable;
 import org.metacsp.multi.activity.Activity;
 
 import fluentSolver.Fluent;
@@ -17,32 +16,26 @@ import htn.GroundSolverHolder;
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariable;
 
-public class FluentScheduler extends Schedulable implements GroundSolverHolder {
-	
+public class FluentScheduler extends ChimpSchedulable implements GroundSolverHolder {
+
 	private final String predicateName;
 	private final int field;
 	private final String fieldValues;
 	private FluentNetworkSolver groundSolver;
 
-	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName, 
+	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName,
 			int field, String fieldValues) {
 		super(varOH, valOH);
 		this.predicateName = predicateName;
 		this.field = field;
 		this.fieldValues = fieldValues;
-		this.setPeakCollectionStrategy(PEAKCOLLECTION.BINARY);
+		this.setPeakCollectionStrategy(PeakCollection.BINARY);
 	}
 
 	public void setGroundSolver(FluentNetworkSolver groundSolver) {
 		this.groundSolver = groundSolver;
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2767348254309353956L;
-	
-	
 	@Override
 	public ConstraintNetwork[] getMetaVariables() {
 		updateUsage();
@@ -50,7 +43,6 @@ public class FluentScheduler extends Schedulable implements GroundSolverHolder {
 	}
 
 	public void updateUsage() {
-		// TODO test if this is fast enough
 		if (activities == null) activities = new Vector<Activity>();
 		else activities.clear();
 		ConstraintSolver s = this.getGroundSolver();
@@ -64,7 +56,6 @@ public class FluentScheduler extends Schedulable implements GroundSolverHolder {
 			}
 		}
 	}
-	
 
 	@Override
 	public boolean isConflicting(Activity[] peak) {
@@ -74,19 +65,12 @@ public class FluentScheduler extends Schedulable implements GroundSolverHolder {
 		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
 		con.setFrom(f1.getCompoundSymbolicVariable());
 		con.setTo(f2.getCompoundSymbolicVariable());
-//		System.out.println("testing if constraint works:\n" + con);
 		if (f1.getCompoundSymbolicVariable().getConstraintSolver().addConstraint(con)) {
 			f1.getCompoundSymbolicVariable().getConstraintSolver().removeConstraint(con);
 			return false;
 		} else {
 			return true;
 		}
-	}
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -104,23 +88,4 @@ public class FluentScheduler extends Schedulable implements GroundSolverHolder {
 		sb.append(fieldValues);
 		return sb.toString();
 	}
-
-	@Override
-	public String getEdgeLabel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

@@ -8,8 +8,7 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
+import chimp.search.ChimpMetaConstraint;
 import org.metacsp.time.Bounds;
 
 import fluentSolver.Fluent;
@@ -19,7 +18,7 @@ import unify.CompoundSymbolicVariable;
 
 
 
-public class MoveBaseMetaConstraint extends MetaConstraint implements GroundSolverHolder {
+public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
 
 	/**
 	 * 
@@ -92,9 +91,8 @@ public class MoveBaseMetaConstraint extends MetaConstraint implements GroundSolv
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
+	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
+		Fluent taskFluent = (Fluent)flawNetwork.getVariables()[0];
 		
 		logger.fine("getMetaValues for: " + taskFluent);
 		
@@ -157,15 +155,6 @@ public class MoveBaseMetaConstraint extends MetaConstraint implements GroundSolv
 	
 	
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-		// nothing to do here
-	}
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
 		return groundSolver;
 	}
@@ -173,21 +162,6 @@ public class MoveBaseMetaConstraint extends MetaConstraint implements GroundSolv
 	@Override
 	public String toString() {
 		return "MoveBaseMetaConstraint";
-	}
-
-	@Override
-	public String getEdgeLabel() {
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		return false;
 	}
 
 }
