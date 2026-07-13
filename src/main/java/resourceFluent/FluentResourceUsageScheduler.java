@@ -19,7 +19,7 @@ import chimp.search.ChimpSchedulable;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.activity.ActivityComparator;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
+import chimp.model.TemporalBounds;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -156,7 +156,7 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 				if ((groundVars[i]).getTemporalVariable().getLET() == horizon) {  // for open fluents we use horizon instead of EET
 					end = horizon;
 				}
-				Bounds intersection = new Bounds(start, end);
+				TemporalBounds intersection = new TemporalBounds(start, end);
 				// starting from act[i] all the forthcoming activities are evaluated to see if they temporally
 				// overlaps with act[i]
 				for (int j = 0; j < groundVars.length; j++) {
@@ -166,8 +166,8 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 						if ((groundVars[j]).getTemporalVariable().getLET() == horizon) {     // for open fluents we use horizon instead of EET
 							end = horizon;
 						}
-						Bounds nextInterval = new Bounds(start, end);
-						Bounds intersectionNew = intersection.intersectStrict(nextInterval);
+						TemporalBounds nextInterval = new TemporalBounds(start, end);
+						TemporalBounds intersectionNew = intersection.intersectStrict(nextInterval);
 						// if act[j] overlaps it is added to the temporary (wrt i) set of activities
 						if (intersectionNew != null) {
 							overlapping.add(groundVars[j]);

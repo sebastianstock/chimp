@@ -16,6 +16,8 @@ import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.PowerSet;
 
+import chimp.model.TemporalBounds;
+
 import java.util.Comparator;
 
 /**
@@ -108,13 +110,13 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
                 overlapping.add(groundVars[i]);
                 long start = groundVars[i].getTemporalVariable().getEST();
                 long end = groundVars[i].getTemporalVariable().getEET();
-                Bounds intersection = new Bounds(start, end);
+                TemporalBounds intersection = new TemporalBounds(start, end);
                 for (int j = 0; j < groundVars.length; j++) {
                     if (i != j) {
                         start = groundVars[j].getTemporalVariable().getEST();
                         end = groundVars[j].getTemporalVariable().getEET();
-                        Bounds nextInterval = new Bounds(start, end);
-                        Bounds intersectionNew = intersection.intersectStrict(nextInterval);
+                        TemporalBounds nextInterval = new TemporalBounds(start, end);
+                        TemporalBounds intersectionNew = intersection.intersectStrict(nextInterval);
                         if (intersectionNew != null) {
                             overlapping.add(groundVars[j]);
                             if (isConflicting(overlapping.toArray(new Activity[overlapping.size()]))) {
@@ -166,12 +168,12 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
             for (int i = 0; i < discontinuitiesArray.length - 1; i++) {
                 HashSet<Activity> onePeak = new HashSet<>();
                 superPeaks.add(onePeak);
-                Bounds interval = new Bounds(discontinuitiesArray[i], discontinuitiesArray[i + 1]);
+                TemporalBounds interval = new TemporalBounds(discontinuitiesArray[i], discontinuitiesArray[i + 1]);
                 for (Activity a : groundVars) {
-                    Bounds interval1 = new Bounds(
+                    TemporalBounds interval1 = new TemporalBounds(
                             a.getTemporalVariable().getEST(),
                             a.getTemporalVariable().getEET());
-                    Bounds intersection = interval.intersectStrict(interval1);
+                    TemporalBounds intersection = interval.intersectStrict(interval1);
                     if (intersection != null && !intersection.isSingleton()) {
                         onePeak.add(a);
                     }
@@ -213,10 +215,10 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
             }
             for (int i = 0; i < groundVars.length - 1; i++) {
                 for (int j = i + 1; j < groundVars.length; j++) {
-                    Bounds bi = new Bounds(
+                    TemporalBounds bi = new TemporalBounds(
                             groundVars[i].getTemporalVariable().getEST(),
                             groundVars[i].getTemporalVariable().getEET());
-                    Bounds bj = new Bounds(
+                    TemporalBounds bj = new TemporalBounds(
                             groundVars[j].getTemporalVariable().getEST(),
                             groundVars[j].getTemporalVariable().getEET());
                     if (bi.intersectStrict(bj) != null

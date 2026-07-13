@@ -9,6 +9,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import chimp.search.ChimpMetaConstraint;
+import chimp.model.TemporalBounds;
 import org.metacsp.time.Bounds;
 
 import fluentSolver.Fluent;
@@ -100,7 +101,7 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	}
 	
 	private ConstraintNetwork[] estimateDuration(Fluent taskFluent) {
-		Bounds bounds = null;
+		TemporalBounds bounds = null;
 		String fromArea = getFromArea(taskFluent);
 		if (fromArea != null && fromArea.length() > 0) {
 			String toArea = getToArea(taskFluent);
@@ -114,7 +115,8 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 		}
 		
 		if (bounds != null) {
-			FluentConstraint duration = new FluentConstraint(FluentConstraint.Type.MOVEDURATION, bounds);
+			FluentConstraint duration = new FluentConstraint(FluentConstraint.Type.MOVEDURATION,
+					new Bounds(bounds.minimum(), bounds.maximum()));
 			duration.setFrom(taskFluent);
 			duration.setTo(taskFluent);
 			ConstraintNetwork ret = new ConstraintNetwork(null);
