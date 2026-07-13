@@ -3,9 +3,9 @@ package examples.chimp;
 import java.util.logging.Level;
 
 import htn.HTNMetaConstraint;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
@@ -23,7 +23,7 @@ public class TestIncrementalMerging {
 		String problemFile = "problems/iros/iros_incremental_merging_initial.pdl";
 		String domainFile = "domains/ordered_domain.ddl";
 		
-		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+		CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
 		CHIMP.CHIMPBuilder builder = null;
 		try {
@@ -37,9 +37,9 @@ public class TestIncrementalMerging {
 		builder.htnUnification(true);
 		CHIMP chimp = builder.build();
 		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-		MetaCSPLogging.setLevel(Level.OFF);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);		
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+		ChimpLogging.setLevel(Level.OFF);
 		
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);

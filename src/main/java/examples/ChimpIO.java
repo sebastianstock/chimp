@@ -7,9 +7,9 @@ import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import postprocessing.HPRGenerator;
 import postprocessing.PlanExtractor;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import picocli.CommandLine;
 import planner.CHIMP;
@@ -76,7 +76,7 @@ public class ChimpIO implements Callable<Integer> {
 
 	private void callCHIMP() throws DomainParsingException {
 		CHIMP.CHIMPBuilder builder;
-		ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+		CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 		try {
 			builder = new CHIMP.CHIMPBuilder(domainFile.getAbsolutePath(), problemFile.getAbsolutePath())
 					.horizon(horizon)
@@ -89,7 +89,7 @@ public class ChimpIO implements Callable<Integer> {
 		}
 		CHIMP chimp = builder.build();
 
-		MetaCSPLogging.setLevel(Level.OFF);
+		ChimpLogging.setLevel(Level.OFF);
 		
 		boolean result = chimp.generatePlan();
 		

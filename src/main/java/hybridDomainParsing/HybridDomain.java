@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import htn.HTNMethod;
 import htn.HTNOperator;
@@ -288,7 +288,7 @@ public class HybridDomain implements ClassicHybridDomain {
 			String[] parsedSymbols = parsed[0].split("\\s+");
 			return parsedSymbols;
 		} else  {
-			MetaCSPLogging.getLogger(HybridDomain.class).warning("Warning: No predicate symbols specified in domain!");
+			ChimpLogging.getLogger(HybridDomain.class).warning("Warning: No predicate symbols specified in domain!");
 			return new String[]{};
 		}
 	}

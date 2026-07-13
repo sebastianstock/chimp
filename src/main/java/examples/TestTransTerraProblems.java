@@ -9,12 +9,12 @@ import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.LookUpTableDurationEstimatorICO;
@@ -107,10 +107,10 @@ public class TestTransTerraProblems {
 		
 
 		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-//		MetaCSPLogging.setLevel(Level.FINEST);
-		MetaCSPLogging.setLevel(Level.OFF);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);		
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		ChimpLogging.setLevel(Level.FINEST);
+		ChimpLogging.setLevel(Level.OFF);
 		
 //		testScheduling(planner);
 		
@@ -231,8 +231,8 @@ public class TestTransTerraProblems {
 		}
 		
 		// init meta constraints based on domain
-//		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+//		CHIMPValOH valOH = new NewestFluentsValOH();
+		CHIMPValOH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		
 		HTNMetaConstraint selectionConstraint = new HTNMetaConstraint(valOH);
 		selectionConstraint.addOperators(dom.getOperators());
@@ -313,8 +313,8 @@ public class TestTransTerraProblems {
 		domain.parseDomain(planner.getTypesInstancesMap());
 		
 		// init meta constraints based on domain
-		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
-//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+		CHIMPValOH valOH = new UnifyEarlisttasksValOH();
+//		CHIMPValOH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());

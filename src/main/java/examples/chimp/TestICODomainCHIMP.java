@@ -3,7 +3,7 @@ package examples.chimp;
 import java.util.logging.Level;
 
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimatorICO;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
@@ -53,9 +53,9 @@ public class TestICODomainCHIMP {
 			return;
 		}
 		
-//		MetaCSPLogging.setLevel(chimp.getClass(), Level.FINEST);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
-		MetaCSPLogging.setLevel(Level.OFF);
+//		ChimpLogging.setLevel(chimp.getClass(), Level.FINEST);		
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+		ChimpLogging.setLevel(Level.OFF);
 		
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);

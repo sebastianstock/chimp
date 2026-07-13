@@ -7,7 +7,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.UI.Callback;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -17,7 +17,7 @@ import htn.HTNPlanner;
 public class TestResourceUsageScheduler {
 
 	public static void main(String[] args) {
-		Logger logger = MetaCSPLogging.getLogger(TestResourceUsageScheduler.class);
+		Logger logger = ChimpLogging.getLogger(TestResourceUsageScheduler.class);
 		String[] symbolsPredicates = {"on", "robotat", "get_mug"};
 		String[] symbolsMugs = {"mug1", "mug2", "mug3", "mug4", "mug5", "mug6", "mug7", "mug8", "mug9", "mug10", "none"};
 		String[] symbolsPlAreas = {"pl1", "pl2", "pl3", "pl4", "pl5", "pl6", "pl7", "pl8", "pl9", "pl10", "none"};
@@ -77,7 +77,7 @@ public class TestResourceUsageScheduler {
 //		FluentScheduler fs = new FluentScheduler(null, null, "get_mug", 1, "mug1");
 //		fs.setUsage(fluents);		
 		planner.addMetaConstraint(frs);
-		MetaCSPLogging.setLevel(Level.FINEST);
+		ChimpLogging.setLevel(Level.FINEST);
 
 	}
 

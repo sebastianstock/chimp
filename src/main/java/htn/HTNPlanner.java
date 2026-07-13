@@ -16,7 +16,7 @@ import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 import unify.CompoundSymbolicValueConstraint;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	private final long animationTime;
 	private ChimpSearchEngine searchEngine;
 
-	private Logger logger = MetaCSPLogging.getLogger(HTNPlanner.class);
+	private Logger logger = ChimpLogging.getLogger(HTNPlanner.class);
 
 	public HTNPlanner(long origin, long horizon, long animationTime, String[][] symbols,
 			int[] symbolicIngredients) {

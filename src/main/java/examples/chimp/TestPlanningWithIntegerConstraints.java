@@ -11,9 +11,9 @@ import hybridDomainParsing.classic.antlr.ChimpClassicParser;
 import hybridDomainParsing.classic.antlr.ChimpClassicReader;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 import planner.CHIMP;
 import planner.CHIMPProblem;
 
@@ -26,7 +26,7 @@ public class TestPlanningWithIntegerConstraints {
 
         String problemFile = "problems/simple_integer_problem.pdl";
         String domainFile = "domains/simple_integer_domain.ddl";
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
         ChimpClassicLexer lexer = null;
         try {
@@ -50,8 +50,8 @@ public class TestPlanningWithIntegerConstraints {
                     .htnUnification(true);
             CHIMP chimp = builder.build();
 
-            MetaCSPLogging.setLevel(HTNPlanner.class, Level.FINEST);
-            MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+            ChimpLogging.setLevel(HTNPlanner.class, Level.FINEST);
+            ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
             System.out.println("Found plan? " + chimp.generatePlan());
             chimp.printStats(System.out);

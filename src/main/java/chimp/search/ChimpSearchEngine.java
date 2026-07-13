@@ -13,7 +13,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
 import org.metacsp.framework.meta.NullConstraintNetwork;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 import org.metacsp.utility.UI.SearchTreeFrame;
 
 import edu.uci.ics.jung.graph.DelegateForest;
@@ -35,7 +35,7 @@ import edu.uci.ics.jung.graph.DelegateForest;
  */
 public final class ChimpSearchEngine {
 
-    private static final Logger logger = MetaCSPLogging.getLogger(ChimpSearchEngine.class);
+    private static final Logger logger = ChimpLogging.getLogger(ChimpSearchEngine.class);
 
     private final List<FlawProvider> flawProviders;
     private final SearchHooks hooks;

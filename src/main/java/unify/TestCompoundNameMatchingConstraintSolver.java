@@ -3,17 +3,17 @@ package unify;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import unify.CompoundSymbolicValueConstraint.Type;
 
 public class TestCompoundNameMatchingConstraintSolver {
-	private static Logger logger = MetaCSPLogging.getLogger(TestCompoundNameMatchingConstraintSolver.class);
+	private static Logger logger = ChimpLogging.getLogger(TestCompoundNameMatchingConstraintSolver.class);
 	
 	private static String[][] symbols;
 
 	public static void main(String[] args) {
-		logger = MetaCSPLogging.getLogger(TestCompoundNameMatchingConstraintSolver.class);
+		logger = ChimpLogging.getLogger(TestCompoundNameMatchingConstraintSolver.class);
 		
 		String[] symbolsPredicates = {"on", "robotat", "get_mug"};
 		String[] symbolsMugs = {"mug1", "mug2", "mug3", "mug4", "mug5", "mug6", "mug7", "mug8", "mug9", "mug10", "none"};

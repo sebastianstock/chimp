@@ -12,7 +12,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
@@ -118,12 +118,12 @@ public class EvalRACEDomain {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);		
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.FINE);
+//		ChimpLogging.setLevel(Level.FINE);
 		if (! LOGGING) {
-			MetaCSPLogging.setLevel(Level.OFF);
+			ChimpLogging.setLevel(Level.OFF);
 		}
 		
 //		planner.createInitialMeetsFutureConstraints();

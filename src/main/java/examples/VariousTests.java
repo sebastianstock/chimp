@@ -9,9 +9,9 @@ import java.util.logging.Level;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import externalPathPlanning.MoveBaseDurationEstimator;
@@ -92,11 +92,11 @@ public class VariousTests {
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
 		
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);		
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);		
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.FINE);
-		MetaCSPLogging.setLevel(Level.OFF);
+//		ChimpLogging.setLevel(Level.FINE);
+		ChimpLogging.setLevel(Level.OFF);
 		
 //		planner.createInitialMeetsFutureConstraints();
 		plan(planner, fluentSolver);
@@ -206,8 +206,8 @@ public class VariousTests {
 		domain.parseDomain(planner.getTypesInstancesMap());
 		
 		// init meta constraints based on domain
-//		ValueOrderingH valOH = new NewestFluentsValOH();
-		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
+//		CHIMPValOH valOH = new NewestFluentsValOH();
+		CHIMPValOH valOH = new UnifyFewestsubsNewestbindingsValOH();
 		
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
 		htnConstraint.addOperators(domain.getOperators());

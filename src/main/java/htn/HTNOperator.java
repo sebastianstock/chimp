@@ -5,7 +5,7 @@ import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.VariablePrototype;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class HTNOperator extends PlanReportroryItem {
 		
 		super(taskname, arguments, intArgs, preconditions, effects, preferenceWeight);
 
-		this.logger = MetaCSPLogging.getLogger(HTNOperator.class);
+		this.logger = ChimpLogging.getLogger(HTNOperator.class);
 	}
 
 	public HTNOperator(String taskname, String[] arguments, HTNPrecondition[] preconditions,

@@ -2,7 +2,7 @@ package integers;
 
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import java.util.logging.Logger;
 
@@ -12,7 +12,7 @@ public class IntegerDomain extends Domain {
     boolean isInstantiated;
     boolean isConstant;
 
-    protected transient Logger logger = MetaCSPLogging.getLogger(this.getClass());
+    protected transient Logger logger = ChimpLogging.getLogger(this.getClass());
 
     protected IntegerDomain(Variable v) {
         super(v);

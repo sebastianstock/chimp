@@ -12,7 +12,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import dwr.DWRNavigationMetaConstraint;
 import fluentSolver.Fluent;
@@ -121,13 +121,13 @@ public class TestDWRDomain {
 		new MetaCspProblemCompiler().compile(pp.getProblemDefinition(), fluentSolver, domain);
 		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
 		
-		MetaCSPLogging.setLevel(Level.INFO);
-		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);		
+		ChimpLogging.setLevel(Level.INFO);
+		ChimpLogging.setLevel(planner.getClass(), Level.FINE);		
 		if (! LOGGING) {
-			MetaCSPLogging.setLevel(Level.OFF);
+			ChimpLogging.setLevel(Level.OFF);
 		}
 
-		MetaCSPLogging.setLevel(planner.getClass(), Level.FINE);
+		ChimpLogging.setLevel(planner.getClass(), Level.FINE);
 		
 		double planning_time = plan(planner, fluentSolver);
 		

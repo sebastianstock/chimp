@@ -2,9 +2,9 @@ package examples.chimp;
 
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 import planner.CHIMP;
 
 import java.util.logging.Level;
@@ -25,7 +25,7 @@ public class TestMobipickSimple {
 //        String problemFile = "problems/test_m_serve_coffee_problem_1.pdl";
 //        String domainFile = "domains/ordered_domain.ddl";
 
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
         CHIMP.CHIMPBuilder builder;
 
@@ -43,12 +43,12 @@ public class TestMobipickSimple {
         }
         CHIMP chimp = builder.build();
 
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.FINE);
+//		ChimpLogging.setLevel(Level.FINE);
         if (!LOGGING) {
-            MetaCSPLogging.setLevel(Level.OFF);
+            ChimpLogging.setLevel(Level.OFF);
         }
 
         System.out.println("Found plan? " + chimp.generatePlan());

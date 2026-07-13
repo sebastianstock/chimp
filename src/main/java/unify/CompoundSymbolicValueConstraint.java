@@ -8,7 +8,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.multi.MultiBinaryConstraint;
 import org.metacsp.framework.multi.MultiVariable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 
@@ -24,7 +24,7 @@ public class CompoundSymbolicValueConstraint extends MultiBinaryConstraint {
 	private int[] restrictionIndices;
 	private String[][] restrictions;
 	
-	private static final Logger logger = MetaCSPLogging.getLogger(CompoundSymbolicValueConstraint.class);
+	private static final Logger logger = ChimpLogging.getLogger(CompoundSymbolicValueConstraint.class);
 	
 	
 	public CompoundSymbolicValueConstraint(Type type) {

@@ -9,7 +9,7 @@ import hybridDomainParsing.ProblemParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 import planner.CHIMP;
 import planner.CHIMPProblem;
 
@@ -78,8 +78,8 @@ public class TestDomainReader {
                     .htnUnification(true);
             CHIMP chimp = builder.build();
 
-            MetaCSPLogging.setLevel(HTNPlanner.class, Level.FINEST);
-            MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+            ChimpLogging.setLevel(HTNPlanner.class, Level.FINEST);
+            ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
             System.out.println("Found plan? " + chimp.generatePlan());
             chimp.printStats(System.out);

@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import integers.IntegerConstraint;
 import integers.IntegerVariable;
 import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import unify.CompoundSymbolicValueConstraint;
 import unify.CompoundSymbolicVariableConstraintSolver;
@@ -13,7 +13,7 @@ import unify.CompoundSymbolicVariableConstraintSolver;
 public class TestFluentNetworkSolver {
 
 	public static void main(String[] args) {
-		Logger logger = MetaCSPLogging.getLogger(TestFluentNetworkSolver.class);
+		Logger logger = ChimpLogging.getLogger(TestFluentNetworkSolver.class);
 		String[] symbolsPredicates = {"on", "robotat", "get_mug"};
 		String[] symbolsMugs = {"mug1", "mug2", "mug3", "mug4", "mug5", "mug6", "mug7", "mug8", "mug9", "mug10", "none"};
 		String[] symbolsPlAreas = {"pl1", "pl2", "pl3", "pl4", "pl5", "pl6", "pl7", "pl8", "pl9", "pl10", "none"};

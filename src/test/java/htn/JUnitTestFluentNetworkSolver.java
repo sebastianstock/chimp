@@ -93,7 +93,7 @@ public class JUnitTestFluentNetworkSolver {
 	public void test() {
 		Fluent[] fluents = (Fluent[]) solver.createVariables(3);
 		
-//		MetaCSPLogging.setLevel(Level.FINEST);
+//		ChimpLogging.setLevel(Level.FINEST);
 		
 		fluents[0].setName("on(mug1 pl1 none none)");
 		fluents[1].setName("on(?mug pl1 none none)");

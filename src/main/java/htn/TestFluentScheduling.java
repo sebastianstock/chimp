@@ -6,7 +6,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.UI.Callback;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
@@ -15,7 +15,7 @@ import resourceFluent.FluentScheduler;
 public class TestFluentScheduling {
 
 	public static void main(String[] args) {
-		Logger logger = MetaCSPLogging.getLogger(TestFluentScheduling.class);
+		Logger logger = ChimpLogging.getLogger(TestFluentScheduling.class);
 		String[] symbolsPredicates = {"on", "robotat", "get_mug"};
 		String[] symbolsMugs = {"mug1", "mug2", "mug3", "mug4", "mug5", "mug6", "mug7", "mug8", "mug9", "mug10", "none"};
 		String[] symbolsPlAreas = {"pl1", "pl2", "pl3", "pl4", "pl5", "pl6", "pl7", "pl8", "pl9", "pl10", "none"};

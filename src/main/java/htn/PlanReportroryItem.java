@@ -33,7 +33,7 @@ import chimp.model.ResolverSemanticKind;
 import chimp.model.ResolverTemporalConstraintDescription;
 import chimp.model.SymbolicConstraintDescription;
 import chimp.model.SymbolicRelationKind;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.logging.ChimpLogging;
 import unify.CompoundSymbolicVariable;
 
 import java.util.*;
@@ -80,7 +80,7 @@ public abstract class PlanReportroryItem {
 	
 	public static final String HEAD_KEYWORD_STRING = "task";
 	
-	Logger logger = MetaCSPLogging.getLogger(PlanReportroryItem.class);
+	Logger logger = ChimpLogging.getLogger(PlanReportroryItem.class);
 	
 	/**
 	 * The bounds that will be used for the duration constraint of this task.
