@@ -27,7 +27,7 @@ The search algorithm and CHIMP-specific planning logic are now CHIMP-owned. What
 
 ## Current Import Inventory (post-M10)
 
-There are **82 Java files** importing `org.metacsp.*`: 67 under `src/main/java` and 15 under `src/test/java`.
+There are **76 Java files** importing `org.metacsp.*`: 63 under `src/main/java` and 13 under `src/test/java`.
 
 ### By layer (main)
 
@@ -38,7 +38,7 @@ There are **82 Java files** importing `org.metacsp.*`: 67 under `src/main/java` 
 | Meta-constraints (6 classes) | 6 | Extend `MetaConstraint`/`Schedulable` |
 | Search engine (`chimp.search`) | 3 | Uses `ConstraintNetwork` as resolver repr |
 | HTN domain model | 5 | `PlanReportroryItem`, `HTNMethod`, `HTNOperator`, `EffectTemplate`, `HTNPlanner` |
-| CHIMP facade (`planner/CHIMP`) | 1 | `extractActions()` returns `Variable[]` |
+| CHIMP facade (`planner/CHIMP`) | 1 | `extractActions()` returns `PlannedAction[]` (M11) |
 | Domain parsing | 2 | `HybridDomain`, `TestDomainReader` |
 | UI | 2 | `HierarchicalLayout`, `PlanHierarchyFrame` |
 | External path planning | 4 | `MoveBaseMetaConstraint` + duration estimators |
@@ -136,6 +136,7 @@ Result: 75→67 main files, 21→15 test files importing `org.metacsp`. Full tes
 - **Search algorithm**: `ChimpSearchEngine` owns backtracking, flaw enumeration, resolver application/retraction, rollback, and search-tree visualization.
 - **HTNPlanner**: no longer inherits Meta-CSP. Owns meta-constraint list, ground solver, `addMetaConstraint`, `backtrack` (delegates to engine).
 - **Model types**: `chimp.model` and `chimp.search` packages are Meta-CSP-free (except `ChimpSearchEngine`/`FlawProvider`/`SearchHooks` which use `ConstraintNetwork` as the resolver representation).
+- **Plan extraction**: `CHIMP.extractActions()` returns `PlannedAction[]` (CHIMP-owned, Meta-CSP-free).
 - **Parsing**: both parser paths produce neutral `chimp.model` values.
 - **Resolver descriptions**: `ResolverDescription` values are produced before compilation to Meta-CSP networks.
 - **Postprocessing**: `PlanExtractor` and `HPRGenerator` read through `FluentStore`/`FluentView`.
@@ -154,7 +155,7 @@ The concrete blockers:
 
 3. **`Fluent`/`FluentConstraint`/`FluentNetworkSolver`** are Meta-CSP subclasses. They ARE the storage layer. The `unify` and `integers` packages are Meta-CSP solver families.
 
-4. **`CHIMP.extractActions()`** returns `Variable[]` (Meta-CSP type), forcing all consumers to import `Variable`.
+4. **`CHIMP.extractActions()`** used to return `Variable[]` — migrated to `PlannedAction[]` (M11). No longer forces consumers to import `Variable`.
 
 5. **`ConstraintNetwork`** is the resolver representation throughout `ChimpSearchEngine`/`FlawProvider`/`SearchHooks` and the flaw/resolver annotation system.
 
@@ -162,15 +163,18 @@ The concrete blockers:
 
 ## Proposed Next Milestones
 
-### 11. Plan Extraction API
+### 11. Plan Extraction API (done)
 
-**Goal**: Remove `Variable` from CHIMP's public API and all test/example consumers.
+`CHIMP.extractActions()` now returns `PlannedAction[]` instead of `Variable[]`.
 
-`CHIMP.extractActions()` currently returns `Variable[]` (Meta-CSP). Create a CHIMP-owned `PlannedAction` value type (id, name, arguments, temporal interval) and return `PlannedAction[]` instead. Migrate the ~10 test/example files that iterate over `extractActions()`.
+- Created `chimp.model.PlannedAction` record: immutable snapshot of a planned action (id, component, name, arguments, temporal bounds, integer values). Meta-CSP-free.
+- Internal conversion (`toPlannedAction` in `CHIMP.java`) reads Fluent internals at extraction time, replicating the `getShortName()` filtering logic (skip `NONESYMBOL` "n" args, break at first one) for `toString()` compatibility.
+- All 10 consumers migrated (5 examples, 4 tests, 1 adapter-boundary test that gets Fluents directly from solver).
+- 4 example files now have zero `org.metacsp` imports.
+- Main files importing `org.metacsp`: 67→63. Test files: 15→13.
+- Full test suite green.
 
-**Scope**: 1 new type + 1 method signature change + ~10 consumer migrations.
-**Risk**: Low — pure read extraction, no search or mutation involved.
-**Verify**: `./gradlew test` green; domain tests assert the same action names/counts/timing.
+**Remaining**: The internal conversion still reads Meta-CSP types (`CompoundSymbolicVariable`, `AllenInterval`, `IntegerVariable`) — this is expected to access the storage layer at extraction time. The external API is clean.
 
 ### 12. Complete Resolver Materialization (M3 completion)
 
