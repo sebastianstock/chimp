@@ -219,20 +219,19 @@ The concrete blockers:
 
 **Remaining coupling**: `ChimpSearchEngine` still uses `MetaVariable` for JUNG search-tree visualization (`DelegateForest<MetaVariable, ConstraintNetwork>`). This is a container type for graph nodes, not search protocol usage — M14 work.
 
-### 14. Storage Layer Interface
+### 14. Storage Layer Interface — 14c done, 14a partial
 
-**Goal**: Define CHIMP-owned interfaces for the storage layer and keep Meta-CSP implementations behind adapters.
+**14c (Temporal bounds) — done**: `chimp.model.TemporalBounds` is now a full drop-in for `org.metacsp.time.Bounds`. Added `intersectStrict`, `intersect`, `isIntersecting`, `union`, `isSingleton`, `compareTo`. Migrated `ChimpSchedulable`, `FluentResourceUsageScheduler`, `MoveBaseDurationEstimator` interface + implementations, and `MoveBaseMetaConstraint` to use `TemporalBounds`. Converts to `Bounds` at Meta-CSP constructor boundaries. Bounds imports: 14→10 main files.
 
-This is the largest milestone. It breaks into wedges:
+**14a (Fluent mutation) — partial**: Added write operations to `FluentStore` interface (`createFluent`, `removeFluents`, `setMarking`). Implemented in `MetaCspFluentStore`. `HTNPlanner.addResolverSub` still uses `groundSolver` directly because the resolver representation is `ConstraintNetwork` (14b work). Also replaced `NullConstraintNetwork` with empty `ConstraintNetwork` in `ChimpSearchEngine`.
 
-- **14a. Fluent mutation port**: Extend `FluentStore` with write operations (create fluent, add/remove constraint, set marking). Migrate `HTNPlanner.addResolverSub`/`retractResolverSub` to use `FluentStore` writes instead of direct `groundSolver` calls.
-- **14b. Resolver network replacement**: Define a CHIMP-owned resolver-network representation to replace `ConstraintNetwork` in `ChimpSearchEngine`/`FlawProvider`/`SearchHooks`. The `ResolverDescription` layer (M3/M12) is the foundation.
-- **14c. Temporal bounds**: Make `chimp.model.TemporalBounds` a full drop-in for `org.metacsp.time.Bounds` (add `intersect`/`union`/`isSingleton`/`compareTo`). Convert at the Meta-CSP boundary.
-- **14d. Unification and integer solver ports**: Define runtime service ports for symbolic matching/restriction/binding and integer variable creation/arithmetic. Wrap current Meta-CSP-backed implementations.
+**Remaining wedges**:
+- **14b (Resolver network replacement)**: Define a CHIMP-owned resolver-network representation to replace `ConstraintNetwork` in `ChimpSearchEngine`/`FlawProvider`/`SearchHooks`. This is the core of the remaining coupling — `ConstraintNetwork` is the flaw representation, resolver representation, and JUNG graph edge type. Replacing it requires changing all 6 meta-constraints, `HTNPlanner`, and the search engine. High risk, large scope.
+- **14d (Unification/integer solver ports)**: Define runtime service ports for symbolic matching/restriction/binding and integer variable creation/arithmetic. Wrap current Meta-CSP-backed implementations. Medium risk.
 
-**Scope**: Major — this is effectively building the CHIMP-native solver kernel.
-**Risk**: High — the storage layer is woven into every planning operation. Must be done incrementally, one wedge at a time, with tests green after each.
-**Verify**: `./gradlew test` green after each wedge; planning results identical.
+**Import counts**: Main files importing `org.metacsp`: 63→60. Test files: 13.
+
+**Honest assessment**: The remaining coupling is fundamentally in the storage layer. The `fluentSolver/`, `unify/`, and `integers/` packages ARE the Meta-CSP implementation — 14 files that can't be "migrated away" without writing a completely new solver kernel (which is M15/UP integration). The 14b and 14d wedges would add interface indirection without real decoupling until M15 replaces the backend. The most impactful next step is likely M15 (UP integration) rather than completing 14b/14d as pure indirection.
 
 ### 15. UP Integration
 
