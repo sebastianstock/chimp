@@ -119,11 +119,6 @@ public final class ChimpSearchEngine {
         logger.fine("Solving conflict: " + flaw);
 
         ConstraintNetwork[] values = flaw.provider().resolvers(flawNetwork);
-        if (values != null) {
-            for (ConstraintNetwork value : values) {
-                value.setAnnotation(flaw);
-            }
-        }
         Comparator<ConstraintNetwork> ordering = flaw.provider().resolverOrdering();
         if (ordering != null && values != null) {
             Arrays.sort(values, ordering);

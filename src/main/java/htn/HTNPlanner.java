@@ -4,8 +4,9 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomainPlanner;
-import integers.IntegerConstraint;
 import chimp.adapter.metacsp.MetaCspFlawProviderAdapter;
+import chimp.adapter.metacsp.MetaCspResolverAdapter;
+import chimp.model.SubVariableKind;
 import chimp.search.ChimpSearchEngine;
 import chimp.search.FlawProvider;
 import chimp.search.SearchHooks;
@@ -15,9 +16,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import chimp.logging.ChimpLogging;
-import unify.CompoundSymbolicValueConstraint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,30 +188,27 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 			}
 		}
 
+		// Read sub-variable kind tags (set during compilation)
+		Map<Constraint, SubVariableKind> kindMap = null;
+		Object annotation = metaValue.getAnnotation();
+		if (annotation instanceof Map<?, ?>) {
+			@SuppressWarnings("unchecked")
+			Map<Constraint, SubVariableKind> cast =
+					(Map<Constraint, SubVariableKind>) annotation;
+			kindMap = cast;
+		}
+
 		//Involve real variables in the constraints
 		for (Constraint con : metaValue.getConstraints()) {
 			Constraint clonedConstraint = (Constraint)con.clone();
 			Variable[] oldScope = con.getScope();
 			Variable[] newScope = new Variable[oldScope.length];
+			SubVariableKind kind = kindMap != null
+					? kindMap.getOrDefault(con, SubVariableKind.FLUENT)
+					: MetaCspResolverAdapter.subVariableKindOf(con);
 			for (int i = 0; i < oldScope.length; i++) {
-				if (oldScope[i] instanceof VariablePrototype) {
-					if (con instanceof CompoundSymbolicValueConstraint){
-						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getCompoundSymbolicVariable();
-					} else if (con instanceof AllenIntervalConstraint){
-						newScope[i] = ((Fluent) metaValue.getSubstitution((VariablePrototype)oldScope[i])).getAllenInterval();
-					} else if (con instanceof IntegerConstraint){
-						VariablePrototype oldScopePrototype = (VariablePrototype)oldScope[i];
-						VariablePrototype oldFluentPrototype = (VariablePrototype) oldScopePrototype.getParameters()[0];
-						int intVarIndex = (int) oldScopePrototype.getParameters()[1];
-						Fluent fl = (Fluent) metaValue.getSubstitution(oldFluentPrototype);
-						newScope[i] = fl.getIntegerVariables()[intVarIndex];
-					} else {
-						newScope[i] = metaValue.getSubstitution((VariablePrototype)oldScope[i]);
-					}
-				}
-				else {
-					newScope[i] = oldScope[i];
-				}
+				newScope[i] = MetaCspResolverAdapter.resolveScopeVariable(
+						oldScope[i], kind, metaValue);
 			}
 			clonedConstraint.setScope(newScope);
 			metaValue.removeConstraint(con);
