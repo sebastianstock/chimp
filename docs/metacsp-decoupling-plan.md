@@ -176,20 +176,26 @@ The concrete blockers:
 
 **Remaining**: The internal conversion still reads Meta-CSP types (`CompoundSymbolicVariable`, `AllenInterval`, `IntegerVariable`) — this is expected to access the storage layer at extraction time. The external API is clean.
 
-### 12. Complete Resolver Materialization (M3 completion) — Steps 1–2 done
+### 12. Complete Resolver Materialization (M3 completion) — done
 
-**Steps 1–2 complete**: `addResolverSub` scope repair is now driven by CHIMP-owned metadata.
+**M12 complete**: `compile()` builds resolver networks directly from `ResolverDescription` values. The legacy `materializeResolverDescriptions()` method is deleted.
 
+**Steps 1–2 (scope-repair isolation)**:
 - Created `chimp.model.SubVariableKind` enum: `FLUENT`, `SYMBOLIC`, `TEMPORAL`, `INTEGER`.
 - Added `MetaCspResolverAdapter.subVariableKindOf(Constraint)` — isolates the `instanceof` dispatch in the adapter.
 - Added `MetaCspResolverAdapter.resolveScopeVariable(Variable, SubVariableKind, ConstraintNetwork)` — handles the `Fluent`→sub-variable extraction (including the nested-prototype case for `INTEGER`).
-- `compile()` now tags each constraint in the compiled network with its `SubVariableKind` via `tagConstraints()` and stores the map on `ConstraintNetwork.annotation`.
+- `compile()` tags each constraint with its `SubVariableKind` via `tagConstraints()` and stores the map on `ConstraintNetwork.annotation`.
 - `HTNPlanner.addResolverSub` reads the tag map and delegates scope repair to `resolveScopeVariable()`. Falls back to `subVariableKindOf()` for untagged resolvers (task unification, non-HTN meta-constraints).
-- Removed dead `setAnnotation(flaw)` call in `ChimpSearchEngine` (the flaw annotation was never read).
+- Removed dead `setAnnotation(flaw)` call in `ChimpSearchEngine`.
 - **`HTNPlanner` no longer imports `CompoundSymbolicValueConstraint`, `AllenIntervalConstraint`, or `IntegerConstraint`.**
-- Full test suite green.
 
-**Remaining (M12 Steps 4–8)**: Make `compile()` truly compile from `ResolverDescription` instead of delegating to `materializeResolverDescriptions()`. The `SubVariableKind` tagging infrastructure is in place; the actual constraint-by-constraint compilation from descriptions is the next work. See `docs/m12-plan.md` for the full plan.
+**Steps 4–8 (description-driven compilation)**:
+- Added `PlanReportroryItem.buildResolverFromDescription()` — builds one `ConstraintNetwork` from one `ResolverDescription`. Reconstructs `preKeyToFluentMap` from `selectedPreconditions` (fluent ID lookup), then creates all constraints in the same order as the legacy method.
+- `compile()` calls `buildResolverFromDescription()` per description; skips null results (infeasible sub-different). No validation-by-ID matching needed.
+- Deleted `materializeResolverDescriptions()` (~310 lines). The cartesian product and feasibility checking live exclusively in `describeResolvers()`.
+- Net: -201 lines. Full test suite green.
+
+**Remaining coupling**: `buildResolverFromDescription()` still accesses `PlanReportroryItem` internal templates (`preconditions`, `effects`, `variableOccurrencesMap`, `additionalConstraints`, `integerConstraintTemplates`, etc.) to create constraints. The `ResolverDescription` carries structural summaries but not all wiring details. Full description-driven compilation (without accessing templates) is M14 work (storage layer interfaces).
 
 ### 13. MetaConstraint/Schedulable Inheritance Break
 
