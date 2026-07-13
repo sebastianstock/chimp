@@ -176,20 +176,20 @@ The concrete blockers:
 
 **Remaining**: The internal conversion still reads Meta-CSP types (`CompoundSymbolicVariable`, `AllenInterval`, `IntegerVariable`) — this is expected to access the storage layer at extraction time. The external API is clean.
 
-### 12. Complete Resolver Materialization (M3 completion)
+### 12. Complete Resolver Materialization (M3 completion) — Steps 1–2 done
 
-**Goal**: Make `addResolverSub` work from `ResolverDescription` metadata instead of type-dispatching on raw `ConstraintNetwork` constraints.
+**Steps 1–2 complete**: `addResolverSub` scope repair is now driven by CHIMP-owned metadata.
 
-Currently `PlanReportroryItem.expand()` produces `ResolverDescription` values, then calls `MetaCspResolverAdapter.compile()` which delegates to the legacy `materializeResolverDescriptions()` path. The compiled `ConstraintNetwork` is then passed to `addResolverSub`, which type-dispatches on `CompoundSymbolicValueConstraint`/`AllenIntervalConstraint`/`IntegerConstraint` to repair scopes.
+- Created `chimp.model.SubVariableKind` enum: `FLUENT`, `SYMBOLIC`, `TEMPORAL`, `INTEGER`.
+- Added `MetaCspResolverAdapter.subVariableKindOf(Constraint)` — isolates the `instanceof` dispatch in the adapter.
+- Added `MetaCspResolverAdapter.resolveScopeVariable(Variable, SubVariableKind, ConstraintNetwork)` — handles the `Fluent`→sub-variable extraction (including the nested-prototype case for `INTEGER`).
+- `compile()` now tags each constraint in the compiled network with its `SubVariableKind` via `tagConstraints()` and stores the map on `ConstraintNetwork.annotation`.
+- `HTNPlanner.addResolverSub` reads the tag map and delegates scope repair to `resolveScopeVariable()`. Falls back to `subVariableKindOf()` for untagged resolvers (task unification, non-HTN meta-constraints).
+- Removed dead `setAnnotation(flaw)` call in `ChimpSearchEngine` (the flaw annotation was never read).
+- **`HTNPlanner` no longer imports `CompoundSymbolicValueConstraint`, `AllenIntervalConstraint`, or `IntegerConstraint`.**
+- Full test suite green.
 
-The completion path:
-1. Make `MetaCspResolverAdapter.compile()` truly compile from `ResolverDescription` values (not just validate the legacy output).
-2. Carry enough metadata in the compiled resolver (or alongside it) for `addResolverSub` to materialize prototypes and repair scopes without `instanceof` dispatch.
-3. The `ResolverDescription` already carries prototype, constraint, and binding information — the adapter just needs to expose it to `addResolverSub`.
-
-**Scope**: The core M3 work. Touches `MetaCspResolverAdapter`, `PlanReportroryItem`, `HTNPlanner.addResolverSub`.
-**Risk**: Medium-high — resolver application/retraction is the most semantically delicate path. But the `ResolverDescription` layer is already in place and tested.
-**Verify**: `./gradlew test` green on all domain tests; integer planning battery values unchanged; resolver ordering unchanged.
+**Remaining (M12 Steps 4–8)**: Make `compile()` truly compile from `ResolverDescription` instead of delegating to `materializeResolverDescriptions()`. The `SubVariableKind` tagging infrastructure is in place; the actual constraint-by-constraint compilation from descriptions is the next work. See `docs/m12-plan.md` for the full plan.
 
 ### 13. MetaConstraint/Schedulable Inheritance Break
 
