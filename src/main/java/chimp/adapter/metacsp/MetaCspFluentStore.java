@@ -32,6 +32,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import integers.IntegerDomain;
 import integers.IntegerVariable;
+import org.metacsp.framework.Variable;
 
 public final class MetaCspFluentStore implements FluentStore {
 
@@ -116,6 +117,42 @@ public final class MetaCspFluentStore implements FluentStore {
     @Override
     public List<ChimpConstraint> outgoing(FluentId id, ConstraintKind kind) {
         return constraints(id, Objects.requireNonNull(kind, "kind"), true);
+    }
+
+    // --- Write operations ---
+
+    @Override
+    public FluentId createFluent(String component, String name, String[] arguments, FluentMarking marking) {
+        Objects.requireNonNull(component, "component");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(arguments, "arguments");
+        Objects.requireNonNull(marking, "marking");
+        Fluent fluent = (Fluent) solver.createVariable(component);
+        fluent.setName(name, arguments);
+        fluent.setMarking(fromMarking(marking));
+        return new FluentId(fluent.getID());
+    }
+
+    @Override
+    public void removeFluents(List<FluentId> ids) {
+        Objects.requireNonNull(ids, "ids");
+        Variable[] toRemove = new Variable[ids.size()];
+        for (int i = 0; i < ids.size(); i++) {
+            toRemove[i] = requireFluent(ids.get(i));
+        }
+        solver.removeVariables(toRemove);
+    }
+
+    @Override
+    public void setMarking(FluentId id, FluentMarking marking) {
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(marking, "marking");
+        Fluent fluent = requireFluent(id);
+        fluent.setMarking(fromMarking(marking));
+    }
+
+    private HTNMetaConstraint.markings fromMarking(FluentMarking marking) {
+        return HTNMetaConstraint.markings.valueOf(marking.name());
     }
 
     private FluentView toView(Fluent fluent) {

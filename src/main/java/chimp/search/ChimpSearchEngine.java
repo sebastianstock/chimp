@@ -12,7 +12,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.framework.meta.NullConstraintNetwork;
 import chimp.logging.ChimpLogging;
 import org.metacsp.utility.UI.SearchTreeFrame;
 
@@ -36,6 +35,9 @@ import edu.uci.ics.jung.graph.DelegateForest;
 public final class ChimpSearchEngine {
 
     private static final Logger logger = ChimpLogging.getLogger(ChimpSearchEngine.class);
+
+    /** Edge value for failure branches in the search tree. */
+    private static final ConstraintNetwork FAILURE_EDGE = new ConstraintNetwork(null);
 
     private final List<FlawProvider> flawProviders;
     private final SearchHooks hooks;
@@ -125,7 +127,7 @@ public final class ChimpSearchEngine {
         }
 
         if (values == null || values.length == 0) {
-            searchTree.addEdge(new NullConstraintNetwork(null), currentVertex, new TerminalNode(false));
+            searchTree.addEdge(FAILURE_EDGE, currentVertex, new TerminalNode(false));
             logger.fine("Failure (1)...");
         } else {
             for (ConstraintNetwork value : values) {
