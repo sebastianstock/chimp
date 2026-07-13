@@ -197,15 +197,27 @@ The concrete blockers:
 
 **Remaining coupling**: `buildResolverFromDescription()` still accesses `PlanReportroryItem` internal templates (`preconditions`, `effects`, `variableOccurrencesMap`, `additionalConstraints`, `integerConstraintTemplates`, etc.) to create constraints. The `ResolverDescription` carries structural summaries but not all wiring details. Full description-driven compilation (without accessing templates) is M14 work (storage layer interfaces).
 
-### 13. MetaConstraint/Schedulable Inheritance Break
+### 13. MetaConstraint/Schedulable Inheritance Break — done
 
-**Goal**: Drop `extends MetaConstraint`/`extends Schedulable` from the 6 meta-constraint classes. Make them implement `FlawProvider` directly (drop `MetaCspFlawProviderAdapter`).
+**M13 complete**: All 6 meta-constraint classes no longer inherit from `MetaConstraint` or `Schedulable`. They implement `FlawProvider` directly via CHIMP-owned base classes. `MetaCspFlawProviderAdapter` is deleted.
 
-This requires porting `Schedulable`'s peak-collection logic (`getMetaValues` via `super`) into CHIMP-owned code for `FluentScheduler` and `FluentResourceUsageScheduler`. The other 4 meta-constraints (`HTNMetaConstraint`, `GuessOrderingMetaConstraint`, `MoveBaseMetaConstraint`, `DWRNavigationMetaConstraint`) already have their `getMetaVariables`/`getMetaValues` logic in CHIMP code — the `MetaConstraint` inheritance is only for the protocol interface.
+**New base classes**:
+- `chimp.search.ChimpMetaConstraint` — abstract base implementing `FlawProvider`. Provides `varOH`/`valOH` fields, `logger`, `currentFlaw()` (varOH-sorted `getMetaVariables`), `resolverOrdering()` (returns `valOH`), `markResolved()` (no-op). Replaces `MetaConstraint`.
+- `chimp.search.ChimpSchedulable extends ChimpMetaConstraint` — ports `Schedulable`'s peak-collection (sampling/complete/binary) and MCS resolution logic. Replaces `Schedulable`.
 
-**Scope**: Port `Schedulable` peak-collection (~200 lines) + 6 class declaration changes + drop `MetaCspFlawProviderAdapter`.
-**Risk**: Medium — `Schedulable`'s peak-collection is well-tested by resource scheduling tests (DWR 1 resource, TransTerra 23 resources).
-**Verify**: `./gradlew test` green; resource scheduling tests pass with identical conflict detection.
+**Migrated 6 meta-constraints**:
+- `HTNMetaConstraint`, `GuessOrderingMetaConstraint`, `DWRNavigationMetaConstraint`, `MoveBaseMetaConstraint`: `extends ChimpMetaConstraint`. `getMetaValues(MetaVariable)` → `resolvers(ConstraintNetwork)`. Removed `draw()`, `markResolvedSub()`, `getEdgeLabel()`, `clone()`, `isEquivalent()` stubs.
+- `FluentScheduler`, `FluentResourceUsageScheduler`: `extends ChimpSchedulable`. `PEAKCOLLECTION` → `PeakCollection` enum.
+
+**HTNPlanner**: `metaConstraints` list → `List<FlawProvider>`; `addMetaConstraint` accepts `FlawProvider`; `backtrack()` adds providers directly (no adapter wrapping).
+
+**GroundSolverHolder**: Added `getGroundSolver()` to interface (was inherited from `MetaConstraint` abstract method).
+
+**Deleted**: `MetaCspFlawProviderAdapter.java` (49 lines).
+
+**Full test suite green** (170 tests). Net: +572/-329 lines (new base classes add ~450 lines, deletion of adapter + stubs removes ~200).
+
+**Remaining coupling**: `ChimpSearchEngine` still uses `MetaVariable` for JUNG search-tree visualization (`DelegateForest<MetaVariable, ConstraintNetwork>`). This is a container type for graph nodes, not search protocol usage — M14 work.
 
 ### 14. Storage Layer Interface
 
