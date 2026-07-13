@@ -13,6 +13,7 @@ import fluentSolver.FluentNetworkSolver;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
+import chimp.model.PlannedAction;
 
 public class TestIncrementalMerging {
 	
@@ -58,10 +59,10 @@ public class TestIncrementalMerging {
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);
 		
-		Variable[] planVector = chimp.extractActions();
+		PlannedAction[] planVector = chimp.extractActions();
 		int c = 0;
-		for (Variable act : planVector) {
-			if (act.getComponent() != null)
+		for (PlannedAction act : planVector) {
+			if (act.component() != null)
 				System.out.println(c++ +".\t" + act);	
 		}
 

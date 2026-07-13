@@ -7,6 +7,7 @@ import externalPathPlanning.MoveBaseMetaConstraint;
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
+import integers.IntegerVariable;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.PlanReportroryItem;
@@ -22,16 +23,19 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
+import org.metacsp.multi.allenInterval.AllenInterval;
 import chimp.adapter.metacsp.MetaCspResourceCapacityAdapter;
 import chimp.adapter.metacsp.MetaCspStateVariableAdapter;
 import chimp.adapter.metacsp.MetaCspProblemCompiler;
 import chimp.adapter.metacsp.MetaCspResolverOrderingAdapter;
+import chimp.model.PlannedAction;
 import chimp.model.ResourceCapacity;
 import chimp.search.ResolverCandidate;
 import ui.PlanHierarchyFrame;
+import unify.CompoundSymbolicVariable;
 import unify.CompoundSymbolicVariableConstraintSolver;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.PrintStream;
 import java.util.*;
 
@@ -269,30 +273,63 @@ public class CHIMP {
 		ConstraintNetwork.draw(cn);
 	}
 	
-	public Variable[] extractActions() {
+	public PlannedAction[] extractActions() {
 		if (foundPlan) {
-			ArrayList<Variable> plan = new ArrayList<Variable>();
+			ArrayList<Fluent> plan = new ArrayList<Fluent>();
 			for (Variable var : fluentSolver.getVariables()) {
 				if (var instanceof Fluent) {
 					String fluentType = ((Fluent) var).getTypeStr();
 					if (fluentType.equals(Fluent.ACTIVITY_TYPE_STR)) {
-						plan.add(var);
+						plan.add((Fluent) var);
 					}
 				}
 			}
-			Variable[] planVector = plan.toArray(new Variable[plan.size()]);
-			Arrays.sort(planVector, new Comparator<Variable>() {
-				@Override
-				public int compare(Variable o1, Variable o2) {
-					Fluent f1 = (Fluent)o1;
-					Fluent f2 = (Fluent)o2;
-					return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
-				}
-			});
-			return planVector;
+			plan.sort(Comparator.comparingLong(f -> f.getTemporalVariable().getEST()));
+
+			PlannedAction[] result = new PlannedAction[plan.size()];
+			for (int i = 0; i < plan.size(); i++) {
+				result[i] = toPlannedAction(plan.get(i));
+			}
+			return result;
 		} else {
-			return new Variable[0];
+			return new PlannedAction[0];
 		}
+	}
+
+	private static PlannedAction toPlannedAction(Fluent fluent) {
+		CompoundSymbolicVariable csv = fluent.getCompoundSymbolicVariable();
+		String name = csv.getSymbolsAt(0)[0];
+		int argCount = csv.getInternalVariables().length - 1;
+		List<String> arguments = new ArrayList<>(argCount);
+		for (int i = 1; i <= argCount; i++) {
+			String[] symbols = csv.getSymbolsAt(i);
+			String symbol = symbols.length > 0 ? symbols[0] : "";
+			// Match CompoundSymbolicVariable.getShortName(): stop at NONESYMBOL ("n")
+			if (symbol.isEmpty() || CompoundSymbolicVariable.NONESYMBOL.equals(symbol)) {
+				break;
+			}
+			arguments.add(symbol);
+		}
+
+		AllenInterval interval = fluent.getAllenInterval();
+		long est = interval.getEST();
+		long lst = interval.getLST();
+		long eet = interval.getEET();
+		long let = interval.getLET();
+
+		IntegerVariable[] intVars = fluent.getIntegerVariables();
+		List<String> intValues = new ArrayList<>(intVars.length);
+		for (IntegerVariable iv : intVars) {
+			intValues.add(iv.toString());
+		}
+
+		return new PlannedAction(
+				fluent.getID(),
+				fluent.getComponent(),
+				name,
+				arguments,
+				est, lst, eet, let,
+				intValues);
 	}
 	
 	/**

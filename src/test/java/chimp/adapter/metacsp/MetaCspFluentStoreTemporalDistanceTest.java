@@ -3,6 +3,9 @@ package chimp.adapter.metacsp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -71,12 +74,16 @@ public class MetaCspFluentStoreTemporalDistanceTest {
     }
 
     private Fluent[] actions(CHIMP chimp) {
-        Variable[] extracted = chimp.extractActions();
-        Fluent[] actions = new Fluent[extracted.length];
-        for (int i = 0; i < extracted.length; i++) {
-            actions[i] = (Fluent) extracted[i];
+        FluentNetworkSolver solver = chimp.getFluentSolver();
+        List<Fluent> plan = new ArrayList<>();
+        for (Variable var : solver.getVariables()) {
+            if (var instanceof Fluent f
+                    && f.getTypeStr().equals(Fluent.ACTIVITY_TYPE_STR)) {
+                plan.add(f);
+            }
         }
-        return actions;
+        plan.sort(Comparator.comparingLong(f -> f.getTemporalVariable().getEST()));
+        return plan.toArray(new Fluent[0]);
     }
 
     private SimpleDistanceConstraint apspConstraint(FluentNetworkSolver solver,

@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.StringWriter;
 
 import org.junit.Test;
-import org.metacsp.framework.Variable;
 
+import chimp.model.PlannedAction;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
@@ -41,17 +41,17 @@ public class PlanExtractorSnapshotTest {
 
         extractor.writeActions(writer);
 
-        Variable[] actions = chimp.extractActions();
+        PlannedAction[] actions = chimp.extractActions();
         String expected = String.join(System.lineSeparator(),
-                "- id: " + actions[0].getID(),
+                "- id: " + actions[0].id(),
                 "  name: \"!move_torso\"",
                 "  arguments: [\"TorsoDownPosture\"]",
                 "  time: [[1, 1], [4001, 3599997]]",
-                "- id: " + actions[1].getID(),
+                "- id: " + actions[1].id(),
                 "  name: \"!tuck_arms\"",
                 "  arguments: [\"ArmTuckedPosture\", \"ArmTuckedPosture\"]",
                 "  time: [[1, 3595997], [4001, 3599997]]",
-                "- id: " + actions[2].getID(),
+                "- id: " + actions[2].id(),
                 "  name: \"!move_base\"",
                 "  arguments: [\"preManipulationAreaNorthTable1\"]",
                 "  time: [[4002, 3599998], [4004, 3600000]]",

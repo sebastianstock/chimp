@@ -4,7 +4,7 @@ import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import org.junit.Test;
 import htn.valOrderingHeuristics.CHIMPValOH;
-import org.metacsp.framework.Variable;
+import chimp.model.PlannedAction;
 import planner.CHIMP;
 
 import static org.junit.Assert.assertEquals;
@@ -41,11 +41,11 @@ public class JUnitTestIntegerPlanning {
 
         assertTrue("Planning with integer constraints should find a plan", chimp.generatePlan());
 
-        Variable[] planVector = chimp.extractActions();
+        PlannedAction[] planVector = chimp.extractActions();
         StringBuilder planText = new StringBuilder();
         int actionCount = 0;
-        for (Variable act : planVector) {
-            if (act.getComponent() != null) {
+        for (PlannedAction act : planVector) {
+            if (act.component() != null) {
                 actionCount++;
                 planText.append(act).append('\n');
             }

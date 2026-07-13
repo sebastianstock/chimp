@@ -3,17 +3,18 @@ package characterization;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.metacsp.framework.Constraint;
 import htn.valOrderingHeuristics.CHIMPValOH;
-import org.metacsp.framework.Variable;
 
 import chimp.adapter.metacsp.MetaCspModelAdapter;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
 import chimp.model.FluentNode;
+import chimp.model.PlannedAction;
 import chimp.model.FluentType;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import fluentSolver.Fluent;
@@ -30,25 +31,25 @@ public class JUnitTestPlannerCharacterization {
     public void plansPrimitiveDwrMove() throws DomainParsingException {
         CHIMP chimp = plan("domains/dwr/dwr.ddl", "domains/dwr/test/test_op_move.pdl");
 
-        Fluent[] actions = extractActions(chimp);
+        PlannedAction[] actions = extractActions(chimp);
         assertTrue("Expected the primitive DWR problem to produce an action", actions.length > 0);
-        assertTrue("Expected the DWR move action", actions[0].getName().contains("!move"));
+        assertTrue("Expected the DWR move action", actions[0].name().contains("!move"));
 
-        FluentNode snapshot = modelAdapter.toFluentNode(actions[0]);
-        assertEquals(new FluentId(actions[0].getID()), snapshot.id());
+        FluentNode snapshot = modelAdapter.toFluentNode(findFluentById(chimp, actions[0].id()));
+        assertEquals(new FluentId(actions[0].id()), snapshot.id());
         assertEquals(FluentType.ACTIVITY, snapshot.type());
         assertEquals("!move", snapshot.signature().predicate());
-        assertEquals(actions[0].getAllenInterval().getEST(), snapshot.temporalInterval().earliestStart());
-        assertEquals(actions[0].getAllenInterval().getLET(), snapshot.temporalInterval().latestEnd());
+        assertEquals(actions[0].est(), snapshot.temporalInterval().earliestStart());
+        assertEquals(actions[0].let(), snapshot.temporalInterval().latestEnd());
     }
 
     @Test
     public void decomposesDwrNavigationIntoActions() throws DomainParsingException {
         CHIMP chimp = plan("domains/dwr/dwr.ddl", "domains/dwr/test/test_m_navigate0.pdl");
 
-        Fluent[] actions = extractActions(chimp);
+        PlannedAction[] actions = extractActions(chimp);
         assertTrue("Expected the DWR navigation method to produce an action", actions.length > 0);
-        assertTrue("Expected navigation to contain a move action", actions[0].getName().contains("!move"));
+        assertTrue("Expected navigation to contain a move action", actions[0].name().contains("!move"));
     }
 
     @Test
@@ -57,10 +58,10 @@ public class JUnitTestPlannerCharacterization {
                 "domains/mobipick/simple_navigation/domain.ddl",
                 "domains/mobipick/simple_navigation/problem.pdl");
 
-        Fluent[] actions = extractActions(chimp);
+        PlannedAction[] actions = extractActions(chimp);
         assertTrue("Expected at least two actions in the Mobipick plan", actions.length >= 2);
         assertTrue("Expected the first action to finish before the second starts",
-                actions[0].getAllenInterval().getEET() < actions[1].getAllenInterval().getEST());
+                actions[0].eet() < actions[1].est());
 
         FluentConstraint before = findBeforeConstraint(chimp);
         assertNotNull("Expected the method ordering to remain in the fluent network", before);
@@ -87,21 +88,17 @@ public class JUnitTestPlannerCharacterization {
         return chimp;
     }
 
-    private Fluent[] extractActions(CHIMP chimp) {
-        Variable[] extracted = chimp.extractActions();
-        assertNotNull("Action extraction returned null", extracted);
-        assertTrue("Expected a non-empty plan", extracted.length > 0);
+    private PlannedAction[] extractActions(CHIMP chimp) {
+        PlannedAction[] actions = chimp.extractActions();
+        assertNotNull("Action extraction returned null", actions);
+        assertTrue("Expected a non-empty plan", actions.length > 0);
 
-        Fluent[] actions = new Fluent[extracted.length];
         long previousEst = Long.MIN_VALUE;
-        for (int i = 0; i < extracted.length; i++) {
-            assertTrue("Expected extracted actions to be fluents", extracted[i] instanceof Fluent);
-            actions[i] = (Fluent) extracted[i];
-
-            long est = actions[i].getAllenInterval().getEST();
-            long lst = actions[i].getAllenInterval().getLST();
-            long eet = actions[i].getAllenInterval().getEET();
-            long let = actions[i].getAllenInterval().getLET();
+        for (PlannedAction act : actions) {
+            long est = act.est();
+            long lst = act.lst();
+            long eet = act.eet();
+            long let = act.let();
             assertTrue("Extracted actions must be sorted by earliest start", est >= previousEst);
             assertTrue("Earliest start must not exceed latest start", est <= lst);
             assertTrue("Earliest end must not exceed latest end", eet <= let);
@@ -109,6 +106,16 @@ public class JUnitTestPlannerCharacterization {
             previousEst = est;
         }
         return actions;
+    }
+
+    private Fluent findFluentById(CHIMP chimp, int id) {
+        for (Object obj : chimp.getFluentSolver().getVariables()) {
+            if (obj instanceof Fluent f && f.getID() == id) {
+                return f;
+            }
+        }
+        fail("No Fluent found with ID " + id);
+        return null;
     }
 
     private FluentConstraint findBeforeConstraint(CHIMP chimp) {

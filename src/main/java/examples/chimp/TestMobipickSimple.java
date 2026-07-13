@@ -3,11 +3,11 @@ package examples.chimp;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import htn.valOrderingHeuristics.CHIMPValOH;
-import org.metacsp.framework.Variable;
 import chimp.logging.ChimpLogging;
 import planner.CHIMP;
 
 import java.util.logging.Level;
+import chimp.model.PlannedAction;
 
 public class TestMobipickSimple {
 
@@ -55,10 +55,10 @@ public class TestMobipickSimple {
         chimp.printStats(System.out);
 
         if (PRINT_PLAN) {
-            Variable[] planVector = chimp.extractActions();
+            PlannedAction[] planVector = chimp.extractActions();
             int c = 0;
-            for (Variable act : planVector) {
-                if (act.getComponent() != null)
+            for (PlannedAction act : planVector) {
+                if (act.component() != null)
                     System.out.println(c++ + ".\t" + act);
             }
 

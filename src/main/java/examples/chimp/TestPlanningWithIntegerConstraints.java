@@ -12,13 +12,13 @@ import hybridDomainParsing.classic.antlr.ChimpClassicReader;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import htn.valOrderingHeuristics.CHIMPValOH;
-import org.metacsp.framework.Variable;
 import chimp.logging.ChimpLogging;
 import planner.CHIMP;
 import planner.CHIMPProblem;
 
 import java.io.IOException;
 import java.util.logging.Level;
+import chimp.model.PlannedAction;
 
 public class TestPlanningWithIntegerConstraints {
 
@@ -56,10 +56,10 @@ public class TestPlanningWithIntegerConstraints {
             System.out.println("Found plan? " + chimp.generatePlan());
             chimp.printStats(System.out);
 
-            Variable[] planVector = chimp.extractActions();
+            PlannedAction[] planVector = chimp.extractActions();
             int c = 0;
-            for (Variable act : planVector) {
-                if (act.getComponent() != null)
+            for (PlannedAction act : planVector) {
+                if (act.component() != null)
                     System.out.println(c++ + ".\t" + act);
             }
 

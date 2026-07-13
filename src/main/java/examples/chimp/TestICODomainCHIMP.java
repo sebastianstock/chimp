@@ -2,13 +2,13 @@ package examples.chimp;
 
 import java.util.logging.Level;
 
-import org.metacsp.framework.Variable;
 import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimatorICO;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
+import chimp.model.PlannedAction;
 
 public class TestICODomainCHIMP {
 	
@@ -60,10 +60,10 @@ public class TestICODomainCHIMP {
 		System.out.println("Found plan? " + chimp.generatePlan());
 		chimp.printStats(System.out);
 
-		Variable[] planVector = chimp.extractActions();
+		PlannedAction[] planVector = chimp.extractActions();
 		int c = 0;
-		for (Variable act : planVector) {
-			if (act.getComponent() != null)
+		for (PlannedAction act : planVector) {
+			if (act.component() != null)
 				System.out.println(c++ +".\t" + act);	
 		}
 		
