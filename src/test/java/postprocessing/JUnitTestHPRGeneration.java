@@ -2,7 +2,7 @@ package postprocessing;
 
 import org.junit.Test;
 import planner.CHIMP;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import externalPathPlanning.LookUpTableDurationEstimator;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
@@ -18,7 +18,7 @@ public class JUnitTestHPRGeneration {
 
     @Test
     public void testPlanning() {
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
         try {
             CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
                     .valHeuristic(valOH)

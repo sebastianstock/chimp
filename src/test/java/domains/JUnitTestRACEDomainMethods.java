@@ -4,7 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
@@ -17,7 +17,7 @@ public class JUnitTestRACEDomainMethods {
 
 
     private void testPlanning(String problemFile) {
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
         try {
             CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
                     .valHeuristic(valOH)

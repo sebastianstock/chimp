@@ -3,9 +3,9 @@ package domains;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.metacsp.framework.ValueOrderingH;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
@@ -15,7 +15,7 @@ public class JUnitTestDWRDomain {
     private String domainFile = "domains/dwr/dwr.ddl";
 
     private void testPlanning(String problemFile) {
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
         try {
             CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)

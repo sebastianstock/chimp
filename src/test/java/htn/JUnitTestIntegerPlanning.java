@@ -3,7 +3,7 @@ package htn;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import org.junit.Test;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
 import planner.CHIMP;
 
@@ -33,7 +33,7 @@ public class JUnitTestIntegerPlanning {
 
     @Test
     public void testPlanWithIntegerConstraints() throws DomainParsingException {
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
         CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
                 .valHeuristic(valOH)
                 .htnUnification(true);

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import org.metacsp.framework.Variable;
 
 import chimp.adapter.metacsp.MetaCspModelAdapter;
@@ -76,7 +76,7 @@ public class JUnitTestPlannerCharacterization {
     }
 
     private CHIMP plan(String domainFile, String problemFile) throws DomainParsingException {
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
         CHIMP chimp = new CHIMP.CHIMPBuilder(domainFile, problemFile)
                 .valHeuristic(valOH)
                 .mbEstimator(new LookUpTableDurationEstimator())

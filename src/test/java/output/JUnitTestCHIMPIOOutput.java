@@ -5,7 +5,7 @@ import externalPathPlanning.LookUpTableDurationEstimator;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import org.junit.Test;
-import org.metacsp.framework.ValueOrderingH;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import picocli.CommandLine;
 import planner.CHIMP;
 
@@ -21,7 +21,7 @@ public class JUnitTestCHIMPIOOutput {
     private String problemFile = "problems/test_m_drive_robot_1.pdl";
 
     public void testPlanning() {
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
         try {
             CHIMP.CHIMPBuilder builder = new CHIMP.CHIMPBuilder(domainFile, problemFile)
                     .valHeuristic(valOH)
