@@ -1,0 +1,106 @@
+# Step 0 baseline - reference for M15 regression checks
+# Format: LABEL | fluents | totalConstraints | allenConstraints | planLength | timeMs
+# Then: action summary per planned action
+
+Mobipick-simple_nav                 | f=   9  tc=  23  ac=  28  pl= 2  t=53ms
+  act[0] move_arm(ur5 undef tucked false) t=[1,593998]-[2001,595998]
+  act[1] move_base(lab1 lab1area) t=[2002,595999]-[6002,599999]
+DWR-m_bring0                        | f=  57  tc=  58  ac= 115  pl= 0  t=154ms
+DWR-m_bring1                        | f=  79  tc= 149  ac= 240  pl= 4  t=272ms
+  act[0] !unstack(k1 c12 p12) t=[1,559999]-[10001,569999]
+  act[1] !stack(k1 c12 p11) t=[10001,569999]-[20001,579999]
+  act[2] !unstack(k1 c11 p12) t=[20001,579999]-[30001,589999]
+  act[3] !stack(k1 c11 p11) t=[30001,589999]-[40001,599999]
+DWR-m_bring2                        | f= 107  tc= 252  ac= 370  pl=13  t=297ms
+  act[0] !leave(r1 d3 w3) t=[1,449999]-[10001,459999]
+  act[1] !move(r1 w3 w6) t=[10001,459999]-[20001,469999]
+  act[2] !move(r1 w6 w5) t=[20001,469999]-[30001,479999]
+  act[3] !move(r1 w5 w1) t=[30001,479999]-[40001,489999]
+  act[4] !enter(r1 d1 w1) t=[40001,489999]-[60001,509999]
+  act[5] !unstack(k1 c12 p12) t=[60001,509999]-[70001,519999]
+  act[6] !put(k1 c12 r1) t=[70001,519999]-[80001,529999]
+  act[7] !leave(r1 d1 w1) t=[80001,529999]-[90001,539999]
+  act[8] !move(r1 w1 w5) t=[90001,539999]-[100001,549999]
+  act[9] !move(r1 w5 w2) t=[100001,549999]-[110001,559999]
+  act[10] !enter(r1 d2 w2) t=[110001,559999]-[130001,579999]
+  act[11] !take(k2 c12 r1) t=[130001,579999]-[140001,589999]
+  act[12] !stack(k2 c12 p21) t=[140001,589999]-[150001,599999]
+RACE-move_base                      | f=   3  tc=   8  ac=   8  pl= 1  t=23ms
+  act[0] !move_base(preManipulationAreaEastCounter1) t=[1,1]-[10001,600000]
+TransTerra-pickup                   | f=   4  tc=   9  ac=  10  pl= 1  t=17ms
+  act[0] !pickup_basecamp(rover1 baseCamp1) t=[1,1]-[1,599999]
+RACE-place                          | f=  16  tc=  29  ac=  38  pl= 1  t=41ms
+  act[0] !place_object(mug1 leftArm1 placingAreaWestRightTable1) t=[1,1]-[4001,599999]
+TransTerra-sample                   | f=   4  tc=  17  ac=  12  pl= 1  t=25ms
+  act[0] !sample_regolith(rover1 b1) t=[1,1]-[3,599999]
+DWR-m_unload                        | f=  66  tc=  93  ac= 165  pl= 2  t=86ms
+  act[0] !take(k1 c12 r1) t=[1,579999]-[10001,589999]
+  act[1] !stack(k1 c12 p12) t=[10001,589999]-[20001,599999]
+TransTerra-place                    | f=   4  tc=   9  ac=  11  pl= 1  t=20ms
+  act[0] !place_basecamp(rover1 baseCamp1 b1) t=[1,1]-[3,599999]
+TransTerra-transfer_sample          | f=   5  tc=  19  ac=  14  pl= 1  t=22ms
+  act[0] !transfer_sample(rover1 shuttle1 sampleContainer1) t=[1,1]-[3,599999]
+DWR-m_uncover0                      | f=  57  tc=  59  ac= 115  pl= 0  t=59ms
+DWR-m_uncover1                      | f=  68  tc= 104  ac= 178  pl= 2  t=86ms
+  act[0] !unstack(k1 c12 p12) t=[1,579999]-[10001,589999]
+  act[1] !stack(k1 c12 p11) t=[10001,589999]-[20001,599999]
+TransTerra-move_to                  | f=   3  tc=   6  ac=   7  pl= 1  t=19ms
+  act[0] !move_to(rover1 b1) t=[1,1]-[3,600000]
+Integer-simple                      | f=  36  tc= 107  ac= 125  pl= 7  t=324ms
+  act[0] !move_arm(ur5 tucked false) t=[2,578992]-[2002,580992]
+  act[1] !move_base(table1Area) t=[2003,580993]-[6003,584993]
+  act[2] !recognize_objects(powerdrill0) t=[6004,584994]-[7004,585994]
+  act[3] !grasp_object(ur5 powerdrill0 transport_mobipick) t=[7006,585996]-[11006,589996]
+  act[4] !move_arm(ur5 transport true) t=[11007,589997]-[13007,591997]
+  act[5] !move_base(table0Area) t=[13008,591998]-[17008,595998]
+  act[6] !place_object(ur5 powerdrill0 table0) t=[17009,595999]-[21009,599999]
+RACE-move_torso                     | f=   3  tc=   7  ac=   9  pl= 1  t=26ms
+  act[0] !move_torso(TorsoDownPosture) t=[1,1000]-[5000,10000]
+RACE-move_base_blind                | f=  12  tc=  17  ac=  27  pl= 1  t=20ms
+  act[0] !move_base_blind(manipulationAreaEastCounter1) t=[1,1]-[4001,600000]
+DWR-move                            | f=  22  tc=  25  ac=  48  pl= 1  t=23ms
+  act[0] !move(r1 w3 w6) t=[1,589999]-[10001,599999]
+DWR-take                            | f=  60  tc=  68  ac= 131  pl= 1  t=50ms
+  act[0] !take(k3 c12 r1) t=[1,589999]-[10001,599999]
+RACE-move_arms_to_carryposture      | f=   6  tc=  14  ac=  17  pl= 1  t=23ms
+  act[0] !move_arms_to_carryposture() t=[1,1]-[5001,10001]
+RACE-observe                        | f=  11  tc=  14  ac=  25  pl= 1  t=41ms
+  act[0] !observe_objects_on_area(placingAreaEastRightCounter1) t=[1,1]-[4001,599999]
+DWR-m_load                          | f=  66  tc=  93  ac= 165  pl= 2  t=79ms
+  act[0] !unstack(k1 c12 p12) t=[1,579999]-[10001,589999]
+  act[1] !put(k1 c12 r1) t=[10001,589999]-[20001,599999]
+TransTerra-transfer_payload         | f=   5  tc=  11  ac=  14  pl= 1  t=20ms
+  act[0] !transfer_payload(rover1 shuttle1 payload1) t=[1,1]-[3,599999]
+RACE-tuck_arms                      | f=   5  tc=  11  ac=  15  pl= 1  t=40ms
+  act[0] !tuck_arms(ArmTuckedPosture ArmTuckedPosture) t=[1,594999]-[5001,599999]
+RACE-move_arm_to_side               | f=   4  tc=   9  ac=  11  pl= 1  t=38ms
+  act[0] !move_arm_to_side(leftArm1) t=[1,1]-[5001,10001]
+RACE-pick_up                        | f=  16  tc=  29  ac=  38  pl= 1  t=33ms
+  act[0] !pick_up_object(mug1 leftArm1) t=[1,1]-[4001,599999]
+DWR-unstack                         | f=  61  tc=  72  ac= 137  pl= 1  t=36ms
+  act[0] !unstack(k1 c12 p12) t=[1,589999]-[10001,599999]
+TransTerra-pickup2                  | f=   5  tc=  11  ac=  13  pl= 1  t=24ms
+  act[0] !pickup_basecamp(rover1 baseCamp1) t=[1,1]-[1,599999]
+DWR-m_navigate0                     | f=  59  tc=  64  ac= 123  pl= 1  t=55ms
+  act[0] !move(r1 w3 w6) t=[1,589999]-[10001,599999]
+DWR-m_navigate1                     | f=  65  tc=  84  ac= 151  pl= 3  t=558ms
+  act[0] !move(r1 w3 w6) t=[1,569999]-[10001,579999]
+  act[1] !move(r1 w6 w5) t=[10001,579999]-[20001,589999]
+  act[2] !move(r1 w5 w2) t=[20001,589999]-[30001,599999]
+DWR-enter                           | f=  23  tc=  28  ac=  53  pl= 1  t=20ms
+  act[0] !enter(r1 d3 w3) t=[1,579999]-[20001,599999]
+DWR-leave                           | f=  23  tc=  28  ac=  53  pl= 1  t=32ms
+  act[0] !leave(r1 d3 w3) t=[1,589999]-[10001,599999]
+DWR-stack                           | f=  55  tc=  66  ac= 125  pl= 1  t=48ms
+  act[0] !stack(k1 c12 p11) t=[1,589999]-[10001,599999]
+DWR-m_goto0                         | f=  57  tc=  58  ac= 114  pl= 0  t=47ms
+DWR-m_goto1                         | f=  72  tc= 112  ac= 186  pl= 5  t=244ms
+  act[0] !leave(r2 d4 w4) t=[1,539999]-[10001,549999]
+  act[1] !move(r2 w4 w6) t=[10001,549999]-[20001,559999]
+  act[2] !move(r2 w6 w5) t=[20001,559999]-[30001,569999]
+  act[3] !move(r2 w5 w1) t=[30001,569999]-[40001,579999]
+  act[4] !enter(r2 d1 w1) t=[40001,579999]-[60001,599999]
+DWR-put                             | f=  60  tc=  68  ac= 131  pl= 1  t=37ms
+  act[0] !put(k1 c12 r1) t=[1,589999]-[10001,599999]
+
+# Total captured: 36  errors: 0
