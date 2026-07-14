@@ -235,11 +235,11 @@ The concrete blockers:
 
 ### 15. CHIMP-Native Solver Kernel
 
-**Goal**: Replace the Meta-CSP storage layer (`fluentSolver/`, `unify/`, `integers/`) with CHIMP-owned implementations that do not extend any Meta-CSP framework class.
+**Goal**: Replace the Meta-CSP storage layer (`fluentSolver/`, `unify/`, `integers/`) and Meta-CSP visualization classes with CHIMP-owned implementations that do not extend or use any Meta-CSP framework class.
 
-This is the milestone that achieves **decoupling of the planning core** from Meta-CSP. The 17 storage-layer files currently extend Meta-CSP framework classes (`Variable`, `Constraint`, `ConstraintSolver`, `MultiConstraintSolver`, `MultiVariable`, `MultiBinaryConstraint`, `Domain`, `BinaryConstraint`). They must be replaced with CHIMP-owned equivalents.
+This is the milestone that achieves **complete decoupling** from Meta-CSP. The 17 storage-layer files currently extend Meta-CSP framework classes (`Variable`, `Constraint`, `ConstraintSolver`, `MultiConstraintSolver`, `MultiVariable`, `MultiBinaryConstraint`, `Domain`, `BinaryConstraint`). They must be replaced with CHIMP-owned equivalents. The Meta-CSP visualization classes (`SearchTreeFrame`, `ConstraintNetworkFrame`, `MetaVariable`) are pure JUNG code with no framework coupling beyond generic type parameters — they are copied into `chimp.ui` and retyped.
 
-**Meta-CSP is kept as a visualization-only dependency.** The JUNG search-tree viewer (`SearchTreeFrame`) and plan hierarchy UI remain Meta-CSP-backed. The search engine has a thin adapter at the visualization boundary that converts CHIMP-native nodes/edges to `MetaVariable`/`ConstraintNetwork` for `SearchTreeFrame.draw()`. `org.metacsp:meta-csp-framework` stays in `build.gradle`. Only UI/visualization files retain `org.metacsp` imports after M15.
+After M15, `org.metacsp:meta-csp-framework` is removed from `build.gradle` and `grep -r "org.metacsp" src/` returns zero results.
 
 The CHIMP-native solver kernel needs to provide:
 - **Variable representation**: fluents with symbolic + temporal + integer sub-variables
@@ -252,7 +252,7 @@ The kernel may use any suitable constraint programming library for propagation (
 **Resolved decisions**:
 1. `VariablePrototype` kept as CHIMP-native placeholder (resolvers compiled before fluents materialized).
 2. All ~15 Allen relation types ported (including composites).
-3. Meta-CSP kept for visualization only (thin adapter at `draw()` boundary).
+3. Meta-CSP visualization replaced entirely (copied BSD-licensed viewers into `chimp.ui`, retyped generics).
 4. Propagation strategy: try both delegated and centralized, pick simpler.
 5. CHIMP-native `ConstraintNetwork` uses reference equality (avoids JUNG duplicate-edge bug).
 
@@ -260,9 +260,9 @@ The kernel may use any suitable constraint programming library for propagation (
 
 **Depends on**: M14b (resolver network replacement) and M14d (unification/integer solver ports) — both absorbed into this milestone's steps.
 
-**Scope**: Major — ~4,600-5,000 lines of new CHIMP-native code; ~25 production files + ~10 test files deleted.
+**Scope**: Major — ~4,600-5,000 lines of new CHIMP-native code; ~25 production files + ~10 test files deleted; ~5 visualization files copied/retyped.
 **Risk**: High — the storage layer is woven into every planning operation. Done incrementally, one solver family at a time, with tests green after each.
-**Verify**: `./gradlew test` green; planning results identical across all domains; zero `org.metacsp` imports in planning core (UI/visualization files excepted).
+**Verify**: `./gradlew test` green; planning results identical across all domains; zero `org.metacsp` imports in the entire codebase; `org.metacsp:meta-csp-framework` removed from `build.gradle`.
 
 ### 16. Unified Planning Integration (future, separate goal)
 

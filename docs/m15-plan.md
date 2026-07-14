@@ -2,18 +2,22 @@
 
 ## Goal
 
-Replace the 17 Meta-CSP storage-layer files (`fluentSolver/`, `unify/`, `integers/`) and
-all `org.metacsp.framework`/`org.metacsp.multi`/`org.metacsp.time` usage with CHIMP-owned
-implementations. After M15, the **planning core** has **zero** `import org.metacsp.*`.
+Replace the 17 Meta-CSP storage-layer files (`fluentSolver/`, `unify/`, `integers/`),
+all `org.metacsp.framework`/`org.metacsp.multi`/`org.metacsp.time` usage, **and** the
+Meta-CSP visualization classes with CHIMP-owned implementations. After M15, CHIMP has
+**zero** `import org.metacsp.*` across the entire codebase, and
+`org.metacsp:meta-csp-framework` is removed from `build.gradle`.
 
-**Exception**: Meta-CSP is kept as a **visualization-only** dependency. The JUNG
-search-tree viewer (`SearchTreeFrame`) and plan hierarchy UI remain Meta-CSP-backed
-until a CHIMP-owned viewer is written (post-M15, if ever). This means:
-- `org.metacsp:meta-csp-framework` stays in `build.gradle`.
-- A small number of UI/visualization files retain `org.metacsp` imports.
-- The search engine keeps a thin adapter at the visualization boundary that converts
-  CHIMP-native search-tree nodes/edges to `MetaVariable`/`ConstraintNetwork` for
-  `SearchTreeFrame.draw()`.
+**Visualization is replaced too.** The Meta-CSP visualization surface is only two
+self-contained JUNG viewers (`SearchTreeFrame` ~247 lines, `ConstraintNetworkFrame`
+~256 lines) plus `MetaVariable` as a JUNG vertex container (~100 lines). They have
+**zero** coupling to Meta-CSP framework logic — they are pure JUNG code whose only
+Meta-CSP dependency is their generic type parameters (`<MetaVariable,
+ConstraintNetwork>`) and `MetaVariable.toString()`. Replacing them is mechanical:
+copy the BSD-licensed viewers into `chimp.ui`, retype the generics to CHIMP-owned
+types, and update call sites. CHIMP's own `PlanHierarchyFrame` and
+`HierarchicalLayout` are already CHIMP-owned — they just need their JUNG types
+retyped when the storage layer is replaced.
 
 ## Current state (post-M14)
 
@@ -267,13 +271,12 @@ Replace `ConstraintNetwork` as the resolver representation in the search engine:
 - `ChimpSchedulable`: peak collection uses `chimp.kernel.temporal.TemporalVariable`
   instead of `AllenInterval`; `MCSData`/`PowerSet` replaced by CHIMP-owned equivalents
   (or inlined — `PowerSet` is trivial).
-- **JUNG visualization** (decision 3): The search tree keeps `MetaVariable`/
-  `ConstraintNetwork` as JUNG vertex/edge types. A thin adapter at the `draw()`
-  boundary converts CHIMP-native search-tree nodes/edges to `MetaVariable`/
-  `ConstraintNetwork` for `SearchTreeFrame.draw()`. The search engine's internal
-  types are CHIMP-native; only the visualization call converts.
+- **JUNG visualization** (decision 3): The search tree uses CHIMP-owned
+  `SearchTreeNode` (trivial container with `toString()`) instead of `MetaVariable`.
+  `draw()` calls `chimp.ui.SearchTreeFrame` (copied from Meta-CSP, retyped to
+  `<SearchTreeNode, SearchTreeEdge>`).
 
-**Scope**: ~8 files changed, ~250 lines new (including viz adapter).
+**Scope**: ~8 files changed, ~300 lines new (including copied viz viewer).
 **Verify**: full suite green; JUNG visualization still renders correctly (manual
 check on one example).
 
@@ -341,51 +344,53 @@ CHIMP-owned enum (or reuse `ConstraintKind` which already maps 1:1).
 **Scope**: ~6 files changed.
 **Verify**: full suite green.
 
-### Step 12: Migrate UI and visualization boundary → verify: test green + manual visualization check
+### Step 12: Migrate UI and visualization → verify: test green + manual visualization check
 
-`HierarchicalLayout`, `PlanHierarchyFrame` read fluents for visualization. Migrate
-them to read through `FluentView`/`FluentStore` (CHIMP-native).
+Replace the remaining Meta-CSP visualization code with CHIMP-owned equivalents:
 
-**Visualization stays Meta-CSP-backed** (decision 3): `SearchTreeFrame.draw()` and
-the JUNG `DelegateForest<MetaVariable, ConstraintNetwork>` remain. The search engine
-already has a thin adapter (from Step 6) that converts CHIMP-native nodes/edges to
-`MetaVariable`/`ConstraintNetwork` at the `draw()` boundary. This adapter is the only
-remaining `org.metacsp` import outside of UI files.
+- **`SearchTreeFrame`** (Meta-CSP, 247 lines): Copy to `chimp.ui.SearchTreeFrame`,
+  retype `Forest<MetaVariable, ConstraintNetwork>` → `Forest<SearchTreeNode,
+  SearchTreeEdge>`. Already partially done in Step 6; finalize here.
+- **`ConstraintNetworkFrame`** (Meta-CSP, 256 lines): Copy to `chimp.ui.NetworkViewer`,
+  retype to CHIMP-native `Variable`/`Constraint`. Used by `ConstraintNetwork.draw()`
+  in examples/tests — provide a CHIMP-native `draw()` method.
+- **`PlanHierarchyFrame`** (already CHIMP-owned, 147 lines): Retype
+  `Graph<Fluent, FluentConstraint>` → CHIMP-native `Fluent`/`FluentConstraint`.
+  Already done when the storage layer was replaced (Step 5); verify here.
+- **`HierarchicalLayout`** (already CHIMP-owned, 283 lines): Same — retyped in Step 5.
+- Update ~30 `ConstraintNetwork.draw()` / `planner.draw()` call sites in examples
+  and tests to use CHIMP-native `draw()` methods.
 
-**Scope**: ~3 files changed (fluent reads → FluentView).
-**Verify**: full suite green; visualization renders correctly.
+**Scope**: ~5 new files (copied viewers), ~30 call sites updated.
+**Verify**: full suite green; all visualizations render correctly (manual check:
+search tree, plan hierarchy, constraint network viewer).
 
-### Step 13: Delete Meta-CSP storage layer and narrow dependency → verify: test green + planning core has zero `org.metacsp` imports
+### Step 13: Delete Meta-CSP storage layer and remove dependency → verify: test green + zero `org.metacsp` imports
 
 Delete:
 - `fluentSolver/` package (4 production files)
 - `unify/` package (7 production + 3 test files)
 - `integers/` package (4 production + 1 test files)
-- `chimp.adapter.metacsp` package (10 files) — no longer needed for planning
+- `chimp.adapter.metacsp` package (10 files) — no longer needed
 - All Meta-CSP test files that directly test deleted classes
 
-**Keep** (decision 3):
-- `org.metacsp:meta-csp-framework` in `build.gradle` (visualization-only dependency)
-- The search-engine visualization adapter (converts CHIMP-native → `MetaVariable`/
-  `ConstraintNetwork` for `SearchTreeFrame.draw()`)
-- `SearchTreeFrame`, `HierarchicalLayout`, `PlanHierarchyFrame` UI imports
+**Remove** `org.metacsp:meta-csp-framework` from `build.gradle`.
 
-**Scope**: ~25 production files deleted, ~10 test files deleted.
+**Scope**: ~25 production files deleted, ~10 test files deleted, 1 build.gradle change.
 **Verify**: `./gradlew test` green. Confirm:
-- `grep -r "import org.metacsp" src/main/java | grep -v ui/ | grep -v SearchTreeAdapter`
-  → zero results (planning core is clean)
-- Only UI/visualization files retain `org.metacsp` imports.
+- `grep -r "import org.metacsp" src/` → **zero results** (entire codebase is clean)
+- `grep -r "org.metacsp" build.gradle` → zero results
 
-### Step 14: Final cleanup and documentation → verify: full suite green + clean planning core
+### Step 14: Final cleanup and documentation → verify: full suite green + zero `org.metacsp`
 
 - Remove any dead code orphaned by the deletion.
 - Update `docs/metacsp-decoupling-plan.md` to mark M15 complete.
 - Update `AGENTS.md` if architecture description changed.
-- Run `grep -r "org.metacsp" src/main/java | grep -v ui/` → expect zero results.
+- Run `grep -r "org.metacsp" src/` → expect **zero results**.
+- Run `grep "metacsp" build.gradle` → expect zero results.
 - Run full suite one final time.
-- Document the remaining Meta-CSP visualization dependency for future cleanup.
 
-**Verify**: `./gradlew test` green; zero `org.metacsp` references in planning core.
+**Verify**: `./gradlew test` green; zero `org.metacsp` references anywhere.
 
 ## Risk assessment
 
@@ -408,10 +413,13 @@ Delete:
    currently-used subset risks silent breakage if a domain uses a relation that
    wasn't enumerated.
 
-3. **JUNG visualization**: Keep Meta-CSP as a **visualization-only** dependency.
-   `SearchTreeFrame` and plan hierarchy UI stay Meta-CSP-backed. The search engine
-   converts CHIMP-native nodes/edges to `MetaVariable`/`ConstraintNetwork` at the
-   visualization boundary. M15 does not remove `org.metacsp` from `build.gradle`.
+3. **JUNG visualization**: Replace Meta-CSP visualization entirely. The Meta-CSP viz
+   surface (`SearchTreeFrame`, `ConstraintNetworkFrame`, `MetaVariable`) is pure JUNG
+   code with no framework coupling beyond generic type parameters. Copy these
+   BSD-licensed viewers into `chimp.ui`, retype generics to CHIMP-owned types, update
+   call sites. `org.metacsp:meta-csp-framework` is removed from `build.gradle`.
+   `PlanHierarchyFrame` and `HierarchicalLayout` are already CHIMP-owned and just need
+   their JUNG types retyped.
 
 4. **Constraint propagation strategy**: Try **both** options individually during
    implementation (Step 5), evaluate, and pick the simpler one that keeps tests
