@@ -15,6 +15,7 @@ import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import chimp.model.FluentId;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
+import chimp.search.ChimpResolver;
 
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -109,7 +110,7 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
 		Variable[] conflicts = new Variable[flaw.taskIds().size()];
 		for (int i = 0; i < flaw.taskIds().size(); i++) {
@@ -185,7 +186,7 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 			cn.addConstraint(applicationCon);	
 		}
 		
-		return new ConstraintNetwork[] {cn};
+		return new ChimpResolver[] { new ChimpResolver(cn) };
 
 	}
 	

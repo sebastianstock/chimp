@@ -15,28 +15,13 @@ import org.metacsp.framework.Variable;
 
 import chimp.model.FluentId;
 
-/**
- * Unit tests for {@link ChimpSearchEngine} using stub {@link FlawProvider}
- * and {@link SearchHooks}. Exercises the core search loop: finding flaws,
- * trying resolvers, backtracking, and succeeding.
- *
- * <p>The stubs use empty {@link ConstraintNetwork}s (no constraints), so
- * {@code addResolver}/{@code retractResolver} succeed trivially. The
- * tests verify the search-loop control flow, not ground-solver
- * propagation.
- */
 public class ChimpSearchEngineTest {
 
-    /**
-     * A simple scenario: one provider returns one flaw with two resolvers.
-     * The first resolver resolves the flaw (no further flaws). Search
-     * succeeds immediately.
-     */
     @Test
     public void findsSolutionWithFirstResolver() {
         RecordingHooks hooks = new RecordingHooks();
         ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(1)));
-        ConstraintNetwork resolver = new ConstraintNetwork(null);
+        ChimpResolver resolver = new ChimpResolver(new ConstraintNetwork(null));
         StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of(resolver)));
         ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), hooks, 0);
 
@@ -46,34 +31,24 @@ public class ChimpSearchEngineTest {
         assertEquals(1, engine.getCounterMoves());
     }
 
-    /**
-     * Two resolvers: the first creates a new flaw that has no resolvers
-     * (dead end), so the engine backtracks and tries the second, which
-     * resolves cleanly.
-     */
     @Test
     public void backtracksWhenFirstResolverLeadsToDeadEnd() {
         RecordingHooks hooks = new RecordingHooks();
         ChimpFlaw flaw1 = new ChimpFlaw(List.of(new FluentId(100)));
         ChimpFlaw flaw2 = new ChimpFlaw(List.of(new FluentId(101)));
-        ConstraintNetwork resolver1 = distinctNetwork(1);
-        ConstraintNetwork resolver2 = distinctNetwork(2);
+        ChimpResolver resolver1 = new ChimpResolver(distinctNetwork(1));
+        ChimpResolver resolver2 = new ChimpResolver(distinctNetwork(2));
 
-        // flaw1 has two resolvers; applying resolver1 produces flaw2,
-        // which has no resolvers (dead end). resolver2 resolves cleanly.
         StubProvider provider = new StubProvider(
                 List.of(flaw1, flaw2),
                 List.of(List.of(resolver1, resolver2), List.of()));
         ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), hooks, 0);
 
         assertTrue(engine.backtrack());
-        assertEquals(2, hooks.addResolverSubCalls);   // resolver1 + resolver2
-        assertEquals(1, hooks.retractResolverSubCalls); // retract resolver1
+        assertEquals(2, hooks.addResolverSubCalls);
+        assertEquals(1, hooks.retractResolverSubCalls);
     }
 
-    /**
-     * A flaw with no resolvers at all: search fails.
-     */
     @Test
     public void failsWhenNoResolvers() {
         RecordingHooks hooks = new RecordingHooks();
@@ -85,9 +60,6 @@ public class ChimpSearchEngineTest {
         assertEquals(0, hooks.addResolverSubCalls);
     }
 
-    /**
-     * No flaws at all: search succeeds trivially.
-     */
     @Test
     public void succeedsWhenNoFlaws() {
         RecordingHooks hooks = new RecordingHooks();
@@ -98,23 +70,19 @@ public class ChimpSearchEngineTest {
         assertEquals(0, hooks.addResolverSubCalls);
     }
 
-    /**
-     * addResolverSub returning false causes the engine to try the next
-     * resolver instead of accepting the current one.
-     */
     @Test
     public void rejectedResolverFallsThroughToNext() {
         ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(100)));
-        ConstraintNetwork rejected = distinctNetwork(1);
-        ConstraintNetwork accepted = distinctNetwork(2);
+        ChimpResolver rejected = new ChimpResolver(distinctNetwork(1));
+        ChimpResolver accepted = new ChimpResolver(distinctNetwork(2));
         StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of(rejected, accepted)));
         final int[] callCount = {0};
         RecordingHooks hooks = new RecordingHooks() {
             @Override
-            public boolean addResolverSub(ChimpFlaw f, ConstraintNetwork r) {
+            public boolean addResolverSub(ChimpFlaw f, ChimpResolver r) {
                 addResolverSubCalls++;
                 callCount[0]++;
-                return callCount[0] != 1; // reject first, accept second
+                return callCount[0] != 1;
             }
         };
         ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), hooks, 0);
@@ -125,53 +93,38 @@ public class ChimpSearchEngineTest {
 
     // --- Stubs ---
 
-    /**
-     * A stub flaw provider with a scripted sequence of flaws and
-     * resolvers. Each call to {@link #currentFlaw()} returns the next
-     * flaw in the list (cycling). Each call to {@link #resolvers}
-     * returns the resolvers for the corresponding flaw index.
-     */
     private static final class StubProvider implements FlawProvider {
         private final List<ChimpFlaw> flaws;
-        private final List<List<ConstraintNetwork>> resolversPerFlaw;
+        private final List<List<ChimpResolver>> resolversPerFlaw;
         private int flawIndex = 0;
 
-        StubProvider(List<ChimpFlaw> flaws, List<List<ConstraintNetwork>> resolversPerFlaw) {
+        StubProvider(List<ChimpFlaw> flaws, List<List<ChimpResolver>> resolversPerFlaw) {
             this.flaws = flaws;
             this.resolversPerFlaw = resolversPerFlaw;
         }
 
         @Override
         public ChimpFlaw currentFlaw() {
-            if (flawIndex >= flaws.size()) {
-                return null;
-            }
+            if (flawIndex >= flaws.size()) return null;
             return flaws.get(flawIndex);
         }
 
         @Override
-        public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+        public ChimpResolver[] resolvers(ChimpFlaw flaw) {
             int idx = flaws.indexOf(flaw);
-            if (idx < 0 || idx >= resolversPerFlaw.size()) {
-                return new ConstraintNetwork[0];
-            }
-            List<ConstraintNetwork> resolvers = resolversPerFlaw.get(idx);
-            flawIndex++; // advance so the next currentFlaw() call returns the next flaw
-            return resolvers.toArray(new ConstraintNetwork[0]);
+            if (idx < 0 || idx >= resolversPerFlaw.size()) return new ChimpResolver[0];
+            List<ChimpResolver> resList = resolversPerFlaw.get(idx);
+            flawIndex++;
+            return resList.toArray(new ChimpResolver[0]);
         }
 
         @Override
-        public void markResolved(ChimpFlaw flaw, ConstraintNetwork resolver) {
-            // no-op
-        }
+        public void markResolved(ChimpFlaw flaw, ChimpResolver resolver) { }
 
         @Override
-        public Comparator<ConstraintNetwork> resolverOrdering() {
-            return null;
-        }
+        public Comparator<ChimpResolver> resolverOrdering() { return null; }
     }
 
-    /** Recording hooks that count calls and accept all resolvers. */
     private static class RecordingHooks implements SearchHooks {
         int addResolverSubCalls = 0;
         int retractResolverSubCalls = 0;
@@ -185,50 +138,29 @@ public class ChimpSearchEngineTest {
         public void postBacktrack(ChimpFlaw flaw) { postBacktrackCalls++; }
 
         @Override
-        public boolean addResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver) {
+        public boolean addResolverSub(ChimpFlaw flaw, ChimpResolver resolver) {
             addResolverSubCalls++;
             return true;
         }
 
         @Override
-        public void retractResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver) {
+        public void retractResolverSub(ChimpFlaw flaw, ChimpResolver resolver) {
             retractResolverSubCalls++;
         }
     }
 
-    // --- Helpers ---
-
-    /**
-     * Creates a {@link ConstraintNetwork} with a single unique dummy
-     * variable, so that {@link ConstraintNetwork#equals} distinguishes
-     * networks by content. (Two empty networks are equal, which breaks
-     * JUNG edge identity.)
-     */
     private static ConstraintNetwork distinctNetwork(int id) {
         ConstraintNetwork cn = new ConstraintNetwork(null);
         cn.addVariable(new DummyVariable(id));
         return cn;
     }
 
-    /** Minimal concrete Variable for test networks. */
     private static final class DummyVariable extends Variable {
         private final int id;
-
-        DummyVariable(int id) {
-            super(null, id);
-            this.id = id;
-        }
-
-        @Override
-        public Domain getDomain() { return null; }
-
-        @Override
-        public void setDomain(Domain d) { }
-
-        @Override
-        public int compareTo(Variable o) { return Integer.compare(this.id, o.getID()); }
-
-        @Override
-        public String toString() { return "DummyVariable(" + id + ")"; }
+        DummyVariable(int id) { super(null, id); this.id = id; }
+        @Override public Domain getDomain() { return null; }
+        @Override public void setDomain(Domain d) { }
+        @Override public int compareTo(Variable o) { return Integer.compare(this.id, o.getID()); }
+        @Override public String toString() { return "DummyVariable(" + id + ")"; }
     }
 }

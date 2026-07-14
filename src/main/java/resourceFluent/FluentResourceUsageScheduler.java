@@ -15,6 +15,7 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
 import chimp.search.ChimpFlaw;
+import chimp.search.ChimpResolver;
 import chimp.search.ChimpSchedulable;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.activity.ActivityComparator;
@@ -55,25 +56,25 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 	}
 
 	@Override
-	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
-		ConstraintNetwork[] possiblResolvers = super.resolvers(flaw);
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
+		ChimpResolver[] possiblResolvers = super.resolvers(flaw);
 		if(possiblResolvers == null) {
 			return null;
 		}
 		// We need to filter the resolvers, because we don't want to finish open state fluents.
-		List<ConstraintNetwork> filtered = new ArrayList<ConstraintNetwork>();
-		for (ConstraintNetwork cn : possiblResolvers) {
-			// test if cn has a before constraint from an open state fluent.
-			for(Constraint c : cn.getConstraints()) {
+		List<ChimpResolver> filtered = new ArrayList<ChimpResolver>();
+		for (ChimpResolver resolver : possiblResolvers) {
+			// test if resolver has a before constraint from an open state fluent.
+			for(Constraint c : resolver.delegate.getConstraints()) {
 				if (c instanceof AllenIntervalConstraint) {
 					Fluent from = (Fluent) ((AllenIntervalConstraint) c).getFrom();
 					if (from.getMarking() != HTNMetaConstraint.markings.OPEN) {
-						filtered.add(cn);
+						filtered.add(resolver);
 					}
 				}
 			}
 		}
-		return filtered.toArray(new ConstraintNetwork[filtered.size()]);
+		return filtered.toArray(new ChimpResolver[filtered.size()]);
 	}
 
 	private void updateUsageMap() {

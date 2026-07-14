@@ -13,6 +13,7 @@ import org.metacsp.framework.Variable;
 import chimp.model.FluentId;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
+import chimp.search.ChimpResolver;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
@@ -114,7 +115,7 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
 		Variable[] vars = new Variable[flaw.taskIds().size()];
 		for (int i = 0; i < flaw.taskIds().size(); i++) {
@@ -144,7 +145,11 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 		for (ConstraintNetwork cn : ret) {
 			logger.info(cn.toString());
 		}
-		return ret.toArray(new ConstraintNetwork[ret.size()]);
+		ChimpResolver[] result = new ChimpResolver[ret.size()];
+		for (int i = 0; i < ret.size(); i++) {
+			result[i] = new ChimpResolver(ret.get(i));
+		}
+		return result;
 	}
 	
 	

@@ -2,19 +2,14 @@ package chimp.search;
 
 import java.util.Comparator;
 
-import org.metacsp.framework.ConstraintNetwork;
-
 /**
  * Provides flaws (open sub-problems) and resolver candidates for the
  * {@link ChimpSearchEngine} backtracking search. Each meta-constraint in
- * the planner implements this port. This is the CHIMP-owned replacement
- * for the {@code MetaConstraint} search protocol ({@code getMetaVariable},
- * {@code getMetaValues}, {@code markResolvedSub}, {@code valOH}).
+ * the planner implements this port.
  *
  * <p>The flaw representation is {@link ChimpFlaw} (CHIMP-owned, carries
- * task fluent IDs). The resolver representation remains Meta-CSP
- * {@link ConstraintNetwork} for this milestone; the resolver representation
- * will be replaced in a later storage-layer milestone.
+ * task fluent IDs). The resolver representation is {@link ChimpResolver}
+ * (CHIMP-owned, delegates to Meta-CSP internally for this milestone).
  */
 public interface FlawProvider {
 
@@ -31,18 +26,18 @@ public interface FlawProvider {
      * applies {@link #resolverOrdering()} to sort the result before
      * trying them.
      */
-    ConstraintNetwork[] resolvers(ChimpFlaw flaw);
+    ChimpResolver[] resolvers(ChimpFlaw flaw);
 
     /**
-     * Notifies this provider that {@code resolver} was successfully
-     * applied to {@code flaw}. Currently a no-op in all implementations
+     * Notifies this provider that the given resolver was successfully
+     * applied to the flaw. Currently a no-op in all implementations
      * but preserved for protocol completeness.
      */
-    void markResolved(ChimpFlaw flaw, ConstraintNetwork resolver);
+    void markResolved(ChimpFlaw flaw, ChimpResolver resolver);
 
     /**
      * Returns a comparator for ordering resolvers, or {@code null} if
      * no value-ordering heuristic is active.
      */
-    Comparator<ConstraintNetwork> resolverOrdering();
+    Comparator<ChimpResolver> resolverOrdering();
 }

@@ -7,6 +7,7 @@ import hybridDomainParsing.HybridDomainPlanner;
 import chimp.adapter.metacsp.MetaCspResolverAdapter;
 import chimp.model.SubVariableKind;
 import chimp.search.ChimpFlaw;
+import chimp.search.ChimpResolver;
 import chimp.search.ChimpSearchEngine;
 import chimp.search.FlawProvider;
 import chimp.search.SearchHooks;
@@ -115,9 +116,10 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 */
 	@Override
 	public void retractResolverSub(ChimpFlaw flaw,
-			ConstraintNetwork metaValue) {
+			ChimpResolver resolver) {
 
 		long startTime = System.nanoTime();
+		ConstraintNetwork metaValue = resolver.delegate;
 
 		// remove added fluents
 		Vector<Variable> varsToRemove = new Vector<Variable>();
@@ -163,9 +165,10 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 */
 	@Override
 	public boolean addResolverSub(ChimpFlaw flaw,
-			ConstraintNetwork metaValue) {
+			ChimpResolver resolver) {
 
 		long startTime = System.nanoTime();
+		ConstraintNetwork metaValue = resolver.delegate;
 
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {

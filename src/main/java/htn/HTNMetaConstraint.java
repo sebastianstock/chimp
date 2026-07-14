@@ -11,6 +11,7 @@ import chimp.model.FluentId;
 import chimp.model.ResourceRequirement;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
+import chimp.search.ChimpResolver;
 
 import java.util.*;
 
@@ -110,7 +111,7 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
 		long startTime = System.nanoTime();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 
@@ -150,7 +151,7 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
 
 		if (!ret.isEmpty())
-			return ret.toArray(new ConstraintNetwork[ret.size()]);
+			return ret.stream().map(ChimpResolver::new).toArray(ChimpResolver[]::new);
 		return null;
 	}
 	

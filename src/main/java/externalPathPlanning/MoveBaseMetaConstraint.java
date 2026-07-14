@@ -12,6 +12,7 @@ import org.metacsp.framework.Variable;
 import chimp.model.FluentId;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
+import chimp.search.ChimpResolver;
 import chimp.model.TemporalBounds;
 import org.metacsp.time.Bounds;
 
@@ -91,13 +92,18 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
 		Fluent taskFluent = (Fluent) groundSolver.getVariable((int) flaw.taskIds().get(0).value());
 
 		logger.fine("getMetaValues for: " + taskFluent);
 
-		return estimateDuration(taskFluent);
+		ConstraintNetwork[] nets = estimateDuration(taskFluent);
+		ChimpResolver[] result = new ChimpResolver[nets.length];
+		for (int i = 0; i < nets.length; i++) {
+			result[i] = new ChimpResolver(nets[i]);
+		}
+		return result;
 	}
 	
 	private ConstraintNetwork[] estimateDuration(Fluent taskFluent) {

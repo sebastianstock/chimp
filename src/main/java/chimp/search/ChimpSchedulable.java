@@ -76,7 +76,7 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
     }
 
     @Override
-    public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+    public ChimpResolver[] resolvers(ChimpFlaw flaw) {
         ConstraintNetwork conflict = peakForFlaw(flaw);
         MCSData[] mcsinfo = getOrderedMCSs(conflict);
 
@@ -99,7 +99,7 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
             ret.add(resolver);
         }
 
-        return ret.toArray(new ConstraintNetwork[ret.size()]);
+        return ret.stream().map(ChimpResolver::new).toArray(ChimpResolver[]::new);
     }
 
     /**

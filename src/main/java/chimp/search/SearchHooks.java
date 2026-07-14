@@ -1,17 +1,12 @@
 package chimp.search;
 
-import org.metacsp.framework.ConstraintNetwork;
-
 /**
  * Callbacks invoked by {@link ChimpSearchEngine} during resolver
- * application and retraction. This is the CHIMP-owned replacement for
- * the {@code MetaConstraintSolver} abstract hooks ({@code addResolverSub},
- * {@code retractResolverSub}, {@code preBacktrack},
- * {@code postBacktrack}).
+ * application and retraction.
  *
  * <p>The flaw representation is {@link ChimpFlaw} (CHIMP-owned). The
- * resolver representation remains Meta-CSP {@link ConstraintNetwork}
- * for this milestone.
+ * resolver representation is {@link ChimpResolver} (CHIMP-owned, delegates
+ * to Meta-CSP internally for this milestone).
  *
  * <p>The implementor (ultimately {@code HTNPlanner}) performs
  * prototype-to-fluent materialization in {@link #addResolverSub} and
@@ -19,18 +14,10 @@ import org.metacsp.framework.ConstraintNetwork;
  */
 public interface SearchHooks {
 
-    /**
-     * Called before branching over a flaw. Currently a no-op in CHIMP
-     * but preserved for protocol completeness.
-     */
+    /** Called before branching over a flaw. Currently a no-op. */
     void preBacktrack();
 
-    /**
-     * Called after backtracking over a flaw. Currently a no-op in CHIMP
-     * but preserved for protocol completeness.
-     *
-     * @param flaw the flaw that was branched upon
-     */
+    /** Called after backtracking over a flaw. Currently a no-op. */
     void postBacktrack(ChimpFlaw flaw);
 
     /**
@@ -42,11 +29,11 @@ public interface SearchHooks {
      *         state; {@code false} to reject it (the ground state is left
      *         unchanged)
      */
-    boolean addResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver);
+    boolean addResolverSub(ChimpFlaw flaw, ChimpResolver resolver);
 
     /**
      * Called after a resolver is retracted from the ground solvers. The
      * implementor restores markings and removes materialized variables.
      */
-    void retractResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver);
+    void retractResolverSub(ChimpFlaw flaw, ChimpResolver resolver);
 }

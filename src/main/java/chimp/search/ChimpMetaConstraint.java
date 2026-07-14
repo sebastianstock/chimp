@@ -11,20 +11,25 @@ import chimp.logging.ChimpLogging;
 /**
  * CHIMP-owned replacement for {@code org.metacsp.framework.meta.MetaConstraint}.
  * Provides the meta-constraint search protocol (flaw enumeration +
- * variable ordering) through the {@link FlawProvider} port, without inheriting
- * from the Meta-CSP framework.
+ * variable ordering) through the {@link FlawProvider} port.
  *
  * <p>Subclasses implement {@link #getMetaVariables()} (flaw enumeration) and
  * {@link #resolvers(ChimpFlaw)} (resolver generation). The
  * {@link #currentFlaw()} method applies the variable ordering heuristic and
- * returns the highest-priority flaw. {@link #resolverOrdering()} returns the
- * value ordering heuristic.
+ * returns the highest-priority flaw.
+ *
+ * <p>Value ordering ({@code valOH}) is stored internally as a
+ * {@code Comparator<ConstraintNetwork>} because all existing heuristics
+ * compare the internal Meta-CSP representation. The
+ * {@link #resolverOrdering()} method wraps it as a CHIMP-owned
+ * {@code Comparator<ChimpResolver>} for the search interface.
  */
 public abstract class ChimpMetaConstraint implements FlawProvider {
 
     protected final transient Logger logger = ChimpLogging.getLogger(this.getClass());
 
     protected Comparator<ChimpFlaw> varOH;
+    /** Internal: all existing heuristics compare ConstraintNetwork. */
     protected Comparator<ConstraintNetwork> valOH;
 
     public ChimpMetaConstraint(Comparator<ChimpFlaw> varOH,
@@ -33,23 +38,15 @@ public abstract class ChimpMetaConstraint implements FlawProvider {
         this.valOH = valOH;
     }
 
-    /**
-     * Returns all flaws according to this meta-constraint.
-     * Must be implemented by subclasses.
-     */
+    /** Returns all flaws according to this meta-constraint. */
     public abstract ChimpFlaw[] getMetaVariables();
 
-    /**
-     * Returns all resolver candidates for the given flaw.
-     * Replaces {@code getMetaValues(MetaVariable)} — the {@code MetaVariable}
-     * wrapper is no longer needed; the flaw is passed directly.
-     */
     @Override
-    public abstract ConstraintNetwork[] resolvers(ChimpFlaw flaw);
+    public abstract ChimpResolver[] resolvers(ChimpFlaw flaw);
 
     @Override
-    public void markResolved(ChimpFlaw flaw, ConstraintNetwork resolver) {
-        // no-op (matches legacy markResolvedSub)
+    public void markResolved(ChimpFlaw flaw, ChimpResolver resolver) {
+        // no-op
     }
 
     @Override
@@ -65,8 +62,9 @@ public abstract class ChimpMetaConstraint implements FlawProvider {
     }
 
     @Override
-    public Comparator<ConstraintNetwork> resolverOrdering() {
-        return valOH;
+    public Comparator<ChimpResolver> resolverOrdering() {
+        if (valOH == null) return null;
+        return (r1, r2) -> valOH.compare(r1.delegate, r2.delegate);
     }
 
     public void setValOH(Comparator<ConstraintNetwork> valOH) {
