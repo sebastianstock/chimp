@@ -160,6 +160,10 @@ public class Step0Baseline {
     @Test public void race_observe() { captureRACE("RACE-observe",
             "problems/test_op_observe_objects_on_area.pdl"); }
 
+    // RACE method decomposition — from TestRACEDomain.java
+    @Test public void race_serve_coffee() { captureRACE("RACE-serve_coffee",
+            "problems/test_m_serve_coffee_problem_1.pdl"); }
+
     // ============================================================
     // TransTerra — matches JUnitTestTransterraDomain exactly
     // ============================================================
