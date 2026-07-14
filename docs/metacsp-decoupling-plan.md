@@ -2,7 +2,7 @@
 
 ## Summary
 
-CHIMP is a hierarchical hybrid planner implemented in Java 17. It currently depends on the Meta-CSP Framework (`org.metacsp:meta-csp-framework:1.3.5`). The long-term goal is to make CHIMP independent of Meta-CSP and integrate it with the Unified Planning library (UP) while preserving planner semantics.
+CHIMP is a hierarchical hybrid planner implemented in Java 17. It currently depends on the Meta-CSP Framework (`org.metacsp:meta-csp-framework:1.3.5`). The primary goal is to make CHIMP completely independent of Meta-CSP, replacing the Meta-CSP storage layer with a CHIMP-native solver kernel. A separate, later goal is to make CHIMP available as a planner in the Unified Planning library (UP) — this is an *integration* (CHIMP as a UP planner provider), not a *dependency* (CHIMP must not depend on UP). CHIMP may also be ported to another programming language before UP integration. For constraint propagation, the CHIMP-native solver kernel may use any suitable constraint programming library, not necessarily UP.
 
 The dependency exists at two architectural levels:
 
@@ -231,16 +231,36 @@ The concrete blockers:
 
 **Import counts**: Main files importing `org.metacsp`: 63→60. Test files: 13.
 
-**Honest assessment**: The remaining coupling is fundamentally in the storage layer. The `fluentSolver/`, `unify/`, and `integers/` packages ARE the Meta-CSP implementation — 14 files that can't be "migrated away" without writing a completely new solver kernel (which is M15/UP integration). The 14b and 14d wedges would add interface indirection without real decoupling until M15 replaces the backend. The most impactful next step is likely M15 (UP integration) rather than completing 14b/14d as pure indirection.
+**Honest assessment**: The remaining coupling is fundamentally in the storage layer. The `fluentSolver/`, `unify/`, and `integers/` packages ARE the Meta-CSP implementation — 17 files that extend Meta-CSP framework classes (`Variable`, `Constraint`, `ConstraintSolver`, `MultiConstraintSolver`). They cannot be "migrated away" with refactoring — they must be **replaced** with a CHIMP-native solver kernel (M15). The 14b and 14d wedges define the interfaces that the CHIMP-native kernel will implement. They are necessary preparation, not pure indirection — they specify the contract that any backend (CHIMP-internal, a CP library, or otherwise) must fulfill.
 
-### 15. UP Integration
+### 15. CHIMP-Native Solver Kernel
 
-**Goal**: Replace the Meta-CSP solver backend with Unified Planning library implementations.
+**Goal**: Replace the Meta-CSP storage layer (`fluentSolver/`, `unify/`, `integers/`) with CHIMP-owned implementations that do not extend any Meta-CSP framework class.
 
-This is the long-term goal stated in the project instructions. It depends on M14 (storage layer interfaces must exist before the backend can be swapped). The CHIMP-owned interfaces from M14 become the integration points for UP-based implementations.
+This is the milestone that achieves **complete decoupling** from Meta-CSP. The 17 storage-layer files currently extend Meta-CSP framework classes (`Variable`, `Constraint`, `ConstraintSolver`, `MultiConstraintSolver`, `MultiVariable`, `MultiBinaryConstraint`, `Domain`, `BinaryConstraint`). They must be replaced with CHIMP-owned equivalents.
 
-**Scope**: TBD — depends on M14 outcome and UP library capabilities.
-**Risk**: High — new production dependency, semantic alignment between CHIMP's HTN/planning semantics and UP's.
+The CHIMP-native solver kernel needs to provide:
+- **Variable representation**: fluents with symbolic + temporal + integer sub-variables
+- **Constraint representation**: symbolic matching, temporal (Allen interval), integer arithmetic, fluent ordering
+- **Constraint propagation**: temporal consistency (STN/APSP), symbolic unification, integer bounds propagation
+- **Solver operations**: create/remove variables, add/remove constraints, query constraints by type/source/target
+
+The kernel may use any suitable constraint programming library for propagation (e.g., a Java CP solver, a native STN implementation, or a self-contained implementation). The choice of propagation library is an implementation detail behind the CHIMP-owned interfaces.
+
+**Depends on**: M14b (resolver network replacement — defines the CHIMP-owned flaw/resolver representation) and M14d (unification/integer solver ports — defines the runtime service interfaces).
+
+**Scope**: Major — this is writing a new solver kernel. ~2,800 lines of storage-layer code to replace.
+**Risk**: High — the storage layer is woven into every planning operation. Must be done incrementally, one solver family at a time, with tests green after each.
+**Verify**: `./gradlew test` green; planning results identical across all domains.
+
+### 16. Unified Planning Integration (future, separate goal)
+
+**Goal**: Make CHIMP available as a planner in the Unified Planning library (UP).
+
+This is **not** a dependency — CHIMP must not depend on UP. This is an *integration* where CHIMP acts as a UP planner provider, wrapping its planning capabilities behind the UP `Planner` interface. This may happen after M15, or after a port to another programming language.
+
+**Scope**: TBD — depends on M15 outcome and UP library capabilities.
+**Risk**: Medium — adapter layer, no changes to CHIMP core.
 
 ## Verification Strategy
 

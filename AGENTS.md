@@ -66,7 +66,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 CHIMP is a research project. Keep the overall architecture simple and avoid overcomplicating it during the Meta-CSP removal process. Do not introduce speculative abstractions, layers, or indirection beyond what the current step requires.
 
-CHIMP is a hierarchical hybrid planner implemented in Java 17. It currently depends on the Meta-CSP Framework. The long-term goal is to make CHIMP independent of Meta-CSP and integrate it with the Unified Planning library (UP) hile preserving planner semantics.
+CHIMP is a hierarchical hybrid planner implemented in Java 17. It currently depends on the Meta-CSP Framework. The primary goal is to make CHIMP completely independent of Meta-CSP, replacing the Meta-CSP storage layer with a CHIMP-native solver kernel. A separate, later goal is to make CHIMP available as a planner in the Unified Planning library (UP) — this is an integration (CHIMP as a UP planner provider), not a dependency (CHIMP must not depend on UP). CHIMP may be ported to another programming language before UP integration. For constraint propagation, the CHIMP-native solver kernel may use any suitable constraint programming library.
 
 ## Main engineering rule
 
