@@ -11,20 +11,19 @@ import org.metacsp.framework.ConstraintNetwork;
  * for the {@code MetaConstraint} search protocol ({@code getMetaVariable},
  * {@code getMetaValues}, {@code markResolvedSub}, {@code valOH}).
  *
- * <p>For this milestone the flaw and resolver representations remain
- * Meta-CSP {@link ConstraintNetwork}s. The port decouples the search
- * <em>engine</em> from the {@code MetaConstraintSolver} inheritance
- * without yet changing the storage layer.
+ * <p>The flaw representation is {@link ChimpFlaw} (CHIMP-owned, carries
+ * task fluent IDs). The resolver representation remains Meta-CSP
+ * {@link ConstraintNetwork} for this milestone; the resolver representation
+ * will be replaced in a later storage-layer milestone.
  */
 public interface FlawProvider {
 
     /**
-     * Returns the current flaw as a {@link ConstraintNetwork}, or
-     * {@code null} if this provider has no open flaw. If multiple flaws
-     * exist, the provider applies its own variable-ordering and returns
-     * the highest-priority one.
+     * Returns the current flaw, or {@code null} if this provider has no
+     * open flaw. If multiple flaws exist, the provider applies its own
+     * variable-ordering and returns the highest-priority one.
      */
-    ConstraintNetwork currentFlaw();
+    ChimpFlaw currentFlaw();
 
     /**
      * Returns all resolver candidates for the given flaw, or
@@ -32,14 +31,14 @@ public interface FlawProvider {
      * applies {@link #resolverOrdering()} to sort the result before
      * trying them.
      */
-    ConstraintNetwork[] resolvers(ConstraintNetwork flaw);
+    ConstraintNetwork[] resolvers(ChimpFlaw flaw);
 
     /**
      * Notifies this provider that {@code resolver} was successfully
      * applied to {@code flaw}. Currently a no-op in all implementations
      * but preserved for protocol completeness.
      */
-    void markResolved(ConstraintNetwork flaw, ConstraintNetwork resolver);
+    void markResolved(ChimpFlaw flaw, ConstraintNetwork resolver);
 
     /**
      * Returns a comparator for ordering resolvers, or {@code null} if

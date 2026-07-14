@@ -7,10 +7,10 @@ import org.metacsp.framework.*;
 import org.metacsp.multi.allenInterval.AllenInterval;
 import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
 import chimp.adapter.metacsp.MetaCspSearchAdapter;
+import chimp.model.FluentId;
 import chimp.model.ResourceRequirement;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
-import chimp.search.PlanningFlaw;
-import chimp.search.TaskPlanningFlaw;
 
 import java.util.*;
 
@@ -63,39 +63,29 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 	 * predecessors.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors 
-		// add it to the ConstraintNetwork network
-		ConstraintNetwork nw = new ConstraintNetwork(null);
+		List<FluentId> eligibleTaskIds = new ArrayList<>();
+		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors
+		// add it to the eligible task list
 		List<Variable> tasks = new LinkedList<Variable>(Arrays.asList(groundSolver.getVariables("Activity")));
 		tasks.addAll(Arrays.asList(groundSolver.getVariables("Task")));
 		for (Variable var : tasks) {
 			if (!checkApplied((Fluent)var)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-					nw.addVariable(var);
+					eligibleTaskIds.add(new FluentId(var.getID()));
 				}
 			}
 		}
-		
-		if (nw.getVariables().length > 0) {
-			List<Long> eligibleTaskIds = Arrays.stream(nw.getVariables())
-					.map(variable -> (long) variable.getID())
-					.toList();
-			SEARCH_ADAPTER.annotateFlaw(nw, new TaskPlanningFlaw(eligibleTaskIds));
-			ret.add(nw);
-		}
-//		logger.finest("MetaVariables: " + ret);
 
 		logger.info("getMetaVariables-Invocation: " + ++getVarsCNT);
 		if (DEBUG) {
-			logger.info("  Meta-Variables: " + ret);
-			//			if (applicationCNT == 300) {
-			//				ret.clear();
-			//			}
+			logger.info("  Meta-Variables: " + eligibleTaskIds);
 		}
-		return ret.toArray(new ConstraintNetwork[ret.size()]);
+		if (eligibleTaskIds.isEmpty()) {
+			return new ChimpFlaw[0];
+		}
+		return new ChimpFlaw[] { new ChimpFlaw(eligibleTaskIds) };
 	}
 	
 	
@@ -120,22 +110,22 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
+	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
 		long startTime = System.nanoTime();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-		
+
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		
-		PlanningFlaw flaw = SEARCH_ADAPTER.toPlanningFlaw(flawNetwork);
+
 		Map<Long, Variable> variablesById = new HashMap<>();
-		for (Variable variable : flawNetwork.getVariables()) {
-			variablesById.put((long) variable.getID(), variable);
-		}
-		for (long taskId : flaw.eligibleTaskIds()) {
-			Variable var = variablesById.get(taskId);
+		for (FluentId taskId : flaw.taskIds()) {
+			Variable var = groundSolver.getVariable((int) taskId.value());
 			if (var == null) {
 				throw new IllegalArgumentException("Planning flaw references unknown task ID " + taskId);
 			}
+			variablesById.put(taskId.value(), var);
+		}
+		for (FluentId taskId : flaw.taskIds()) {
+			Variable var = variablesById.get(taskId.value());
 			Fluent taskFluent = (Fluent) var;
 			String taskName = taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0];
 			if (operatorNames.contains(taskName)) {
@@ -150,16 +140,16 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, methods, groundSolver));
 			}
 		}
-		
+
 		long endTime = System.nanoTime();
-		logger.finest("Computed metaValues for " + flawNetwork.getVariables().length + " tasks");
+		logger.finest("Computed metaValues for " + flaw.taskIds().size() + " tasks");
 		logger.finest("Found " + ret.size() + " metaValues");
 		if (DEBUG) {
 			logger.info("  Found " + ret.size() + " metaValues");
 		}
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
-		
-		if (!ret.isEmpty()) 
+
+		if (!ret.isEmpty())
 			return ret.toArray(new ConstraintNetwork[ret.size()]);
 		return null;
 	}

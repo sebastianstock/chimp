@@ -10,6 +10,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
+import chimp.model.FluentId;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 
 import fluentSolver.Fluent;
@@ -34,9 +36,8 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 	}
 
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		ConstraintNetwork nw = new ConstraintNetwork(null);
 		ArrayList<Variable> tasks = new ArrayList<Variable>();
 		for (Variable var : groundSolver.getVariables("Activity")) {
 			tasks.add(var);
@@ -44,24 +45,24 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 		for (Variable var : groundSolver.getVariables("Task")) {
 			tasks.add(var);
 		}
-		
+
 		List<Integer> varIds = new ArrayList<Integer>();
+		List<FluentId> flawTaskIds = new ArrayList<>();
 		for (Variable var : tasks) {
 			if (!checkApplied((Fluent)var)) {
 				if (!checkIsDecomposition(var, groundSolver)) {
 					if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-						nw.addVariable(var);
 						varIds.add(var.getID());
+						flawTaskIds.add(new FluentId(var.getID()));
 					}
 				}
 			}
 		}
 		if (varIds.size() > 1 && ! isRepetition(varIds)) {
-			logger.info("MetaVariable: " + nw.toString());
 			previousConflicts.add(varIds);
-			return new ConstraintNetwork[] {nw};
+			return new ChimpFlaw[] { new ChimpFlaw(flawTaskIds) };
 		} else {
-			return new ConstraintNetwork[] {};
+			return new ChimpFlaw[0];
 		}
 	}
 	
@@ -113,12 +114,16 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
-		Fluent taskFluent = (Fluent)flawNetwork.getVariables()[0];
-		
+	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
+		Variable[] vars = new Variable[flaw.taskIds().size()];
+		for (int i = 0; i < flaw.taskIds().size(); i++) {
+			vars[i] = groundSolver.getVariable((int) flaw.taskIds().get(i).value());
+		}
+		Fluent taskFluent = (Fluent) vars[0];
+
 		logger.fine("getMetaValues for: " + taskFluent);
-		
-		Variable[] vars = flawNetwork.getVariables();
+
 		List<ConstraintNetwork> ret = new LinkedList<ConstraintNetwork>();
 		if (vars.length > 1) {
 			for (int i = 0; i < vars.length; i++) {

@@ -16,9 +16,12 @@ import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.PowerSet;
 
+import chimp.model.FluentId;
 import chimp.model.TemporalBounds;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * CHIMP-owned replacement for {@code org.metacsp.meta.symbolsAndTime.Schedulable}.
@@ -37,10 +40,10 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
     protected Vector<Activity> activities;
     protected PeakCollection peakCollectionStrategy = PeakCollection.SAMPLING;
 
-    public ChimpSchedulable(Comparator<ConstraintNetwork> varOH,
+	public ChimpSchedulable(Comparator<ChimpFlaw> varOH,
                             Comparator<ConstraintNetwork> valOH) {
-        super(varOH, valOH);
-    }
+		super(varOH, valOH);
+	}
 
     public long getBeforeParameter() { return beforeParameter; }
     public void setBeforeParameter(long beforeParameter) { this.beforeParameter = beforeParameter; }
@@ -51,17 +54,30 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
     }
 
     @Override
-    public ConstraintNetwork[] getMetaVariables() {
+    public ChimpFlaw[] getMetaVariables() {
         switch (peakCollectionStrategy) {
-            case SAMPLING: return samplingPeakCollection();
-            case BINARY:   return binaryPeakCollection();
-            default:       return completePeakCollection();
+            case SAMPLING: return toFlaws(samplingPeakCollection());
+            case BINARY:   return toFlaws(binaryPeakCollection());
+            default:       return toFlaws(completePeakCollection());
         }
     }
 
+    private static ChimpFlaw[] toFlaws(ConstraintNetwork[] networks) {
+        ChimpFlaw[] result = new ChimpFlaw[networks.length];
+        for (int i = 0; i < networks.length; i++) {
+            Variable[] vars = networks[i].getVariables();
+            List<FluentId> ids = new ArrayList<>(vars.length);
+            for (Variable v : vars) {
+                ids.add(new FluentId(v.getID()));
+            }
+            result[i] = new ChimpFlaw(ids);
+        }
+        return result;
+    }
+
     @Override
-    public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
-        ConstraintNetwork conflict = flawNetwork;
+    public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+        ConstraintNetwork conflict = peakForFlaw(flaw);
         MCSData[] mcsinfo = getOrderedMCSs(conflict);
 
         Vector<ConstraintNetwork> ret = new Vector<>();
@@ -84,6 +100,28 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
         }
 
         return ret.toArray(new ConstraintNetwork[ret.size()]);
+    }
+
+    /**
+     * Reconstructs the peak {@link ConstraintNetwork} for a given flaw
+     * by looking up the corresponding activities in the {@link #activities}
+     * vector. The peak network is what {@link #getOrderedMCSs} needs as
+     * input.
+     */
+    private ConstraintNetwork peakForFlaw(ChimpFlaw flaw) {
+        if (activities == null) {
+            return new ConstraintNetwork(null);
+        }
+        ConstraintNetwork cn = new ConstraintNetwork(null);
+        for (FluentId id : flaw.taskIds()) {
+            for (Activity act : activities) {
+                if (act.getVariable().getID() == id.value()) {
+                    cn.addVariable(act.getVariable());
+                    break;
+                }
+            }
+        }
+        return cn;
     }
 
     // --- Peak collection strategies ---

@@ -6,6 +6,7 @@ import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomainPlanner;
 import chimp.adapter.metacsp.MetaCspResolverAdapter;
 import chimp.model.SubVariableKind;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpSearchEngine;
 import chimp.search.FlawProvider;
 import chimp.search.SearchHooks;
@@ -86,7 +87,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	public void preBacktrack() { }
 
 	@Override
-	public void postBacktrack(ConstraintNetwork flawNetwork) { }
+	public void postBacktrack(ChimpFlaw flaw) { }
 
 	/**
 	 * Initiates backtracking search via the CHIMP-owned {@link ChimpSearchEngine}.
@@ -113,7 +114,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 * @param metaValue The meta-value that has been retracted.
 	 */
 	@Override
-	public void retractResolverSub(ConstraintNetwork metaVariable,
+	public void retractResolverSub(ChimpFlaw flaw,
 			ConstraintNetwork metaValue) {
 
 		long startTime = System.nanoTime();
@@ -121,7 +122,14 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 		// remove added fluents
 		Vector<Variable> varsToRemove = new Vector<Variable>();
 		for (Variable v : metaValue.getVariables()) {
-			if (!metaVariable.containsVariable(v)) {
+			boolean inFlaw = false;
+			for (chimp.model.FluentId flawId : flaw.taskIds()) {
+				if (v.getID() == flawId.value()) {
+					inFlaw = true;
+					break;
+				}
+			}
+			if (!inFlaw) {
 				if (v instanceof VariablePrototype) {
 					Variable vReal = metaValue.getSubstitution((VariablePrototype)v);
 					if (vReal != null) {
@@ -154,7 +162,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 	 * @param metaValue The meta-value that has been selected (the branch).
 	 */
 	@Override
-	public boolean addResolverSub(ConstraintNetwork metaVariable,
+	public boolean addResolverSub(ChimpFlaw flaw,
 			ConstraintNetwork metaValue) {
 
 		long startTime = System.nanoTime();

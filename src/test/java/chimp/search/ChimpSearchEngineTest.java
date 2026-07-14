@@ -13,6 +13,8 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Domain;
 import org.metacsp.framework.Variable;
 
+import chimp.model.FluentId;
+
 /**
  * Unit tests for {@link ChimpSearchEngine} using stub {@link FlawProvider}
  * and {@link SearchHooks}. Exercises the core search loop: finding flaws,
@@ -33,7 +35,7 @@ public class ChimpSearchEngineTest {
     @Test
     public void findsSolutionWithFirstResolver() {
         RecordingHooks hooks = new RecordingHooks();
-        ConstraintNetwork flaw = new ConstraintNetwork(null);
+        ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(1)));
         ConstraintNetwork resolver = new ConstraintNetwork(null);
         StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of(resolver)));
         ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), hooks, 0);
@@ -52,10 +54,10 @@ public class ChimpSearchEngineTest {
     @Test
     public void backtracksWhenFirstResolverLeadsToDeadEnd() {
         RecordingHooks hooks = new RecordingHooks();
-        ConstraintNetwork flaw1 = distinctNetwork(100);
+        ChimpFlaw flaw1 = new ChimpFlaw(List.of(new FluentId(100)));
+        ChimpFlaw flaw2 = new ChimpFlaw(List.of(new FluentId(101)));
         ConstraintNetwork resolver1 = distinctNetwork(1);
         ConstraintNetwork resolver2 = distinctNetwork(2);
-        ConstraintNetwork flaw2 = distinctNetwork(101);
 
         // flaw1 has two resolvers; applying resolver1 produces flaw2,
         // which has no resolvers (dead end). resolver2 resolves cleanly.
@@ -75,7 +77,7 @@ public class ChimpSearchEngineTest {
     @Test
     public void failsWhenNoResolvers() {
         RecordingHooks hooks = new RecordingHooks();
-        ConstraintNetwork flaw = new ConstraintNetwork(null);
+        ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(1)));
         StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of()));
         ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), hooks, 0);
 
@@ -102,14 +104,14 @@ public class ChimpSearchEngineTest {
      */
     @Test
     public void rejectedResolverFallsThroughToNext() {
-        ConstraintNetwork flaw = distinctNetwork(100);
+        ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(100)));
         ConstraintNetwork rejected = distinctNetwork(1);
         ConstraintNetwork accepted = distinctNetwork(2);
         StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of(rejected, accepted)));
         final int[] callCount = {0};
         RecordingHooks hooks = new RecordingHooks() {
             @Override
-            public boolean addResolverSub(ConstraintNetwork f, ConstraintNetwork r) {
+            public boolean addResolverSub(ChimpFlaw f, ConstraintNetwork r) {
                 addResolverSubCalls++;
                 callCount[0]++;
                 return callCount[0] != 1; // reject first, accept second
@@ -130,17 +132,17 @@ public class ChimpSearchEngineTest {
      * returns the resolvers for the corresponding flaw index.
      */
     private static final class StubProvider implements FlawProvider {
-        private final List<ConstraintNetwork> flaws;
+        private final List<ChimpFlaw> flaws;
         private final List<List<ConstraintNetwork>> resolversPerFlaw;
         private int flawIndex = 0;
 
-        StubProvider(List<ConstraintNetwork> flaws, List<List<ConstraintNetwork>> resolversPerFlaw) {
+        StubProvider(List<ChimpFlaw> flaws, List<List<ConstraintNetwork>> resolversPerFlaw) {
             this.flaws = flaws;
             this.resolversPerFlaw = resolversPerFlaw;
         }
 
         @Override
-        public ConstraintNetwork currentFlaw() {
+        public ChimpFlaw currentFlaw() {
             if (flawIndex >= flaws.size()) {
                 return null;
             }
@@ -148,7 +150,7 @@ public class ChimpSearchEngineTest {
         }
 
         @Override
-        public ConstraintNetwork[] resolvers(ConstraintNetwork flaw) {
+        public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
             int idx = flaws.indexOf(flaw);
             if (idx < 0 || idx >= resolversPerFlaw.size()) {
                 return new ConstraintNetwork[0];
@@ -159,7 +161,7 @@ public class ChimpSearchEngineTest {
         }
 
         @Override
-        public void markResolved(ConstraintNetwork flaw, ConstraintNetwork resolver) {
+        public void markResolved(ChimpFlaw flaw, ConstraintNetwork resolver) {
             // no-op
         }
 
@@ -180,16 +182,16 @@ public class ChimpSearchEngineTest {
         public void preBacktrack() { preBacktrackCalls++; }
 
         @Override
-        public void postBacktrack(ConstraintNetwork flawNetwork) { postBacktrackCalls++; }
+        public void postBacktrack(ChimpFlaw flaw) { postBacktrackCalls++; }
 
         @Override
-        public boolean addResolverSub(ConstraintNetwork flaw, ConstraintNetwork resolver) {
+        public boolean addResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver) {
             addResolverSubCalls++;
             return true;
         }
 
         @Override
-        public void retractResolverSub(ConstraintNetwork flaw, ConstraintNetwork resolver) {
+        public void retractResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver) {
             retractResolverSubCalls++;
         }
     }

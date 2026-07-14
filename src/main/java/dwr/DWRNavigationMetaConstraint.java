@@ -3,6 +3,7 @@ package dwr;
 import htn.GroundSolverHolder;
 import java.util.List;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import htn.HTNMetaConstraint;
 import org.metacsp.framework.Constraint;
@@ -11,6 +12,8 @@ import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import chimp.model.FluentId;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
@@ -43,25 +46,21 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 	 * predecessors.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
+		List<ChimpFlaw> ret = new ArrayList<>();
 		for (Variable var : groundSolver.getVariables()) {
 			if (((Fluent) var).getCompoundSymbolicVariable().getPredicateName().equals(NAVIGATE_TASK_NAME)) {
-				//			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
 				if ( !checkApplied((Fluent) var)) {
 					if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-						ConstraintNetwork nw = new ConstraintNetwork(null);
-						nw.addVariable(var);
-						ret.add(nw);
+						ret.add(new ChimpFlaw(List.of(new FluentId(var.getID()))));
 					}
 				}
 			}
-			//			}
 		}
 		logger.finest("MetaVariables: " + ret);
-		return ret.toArray(new ConstraintNetwork[ret.size()]);
-	
+		return ret.toArray(new ChimpFlaw[ret.size()]);
+
 	}
 	
 	/**
@@ -110,16 +109,20 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
-		Fluent taskFluent = (Fluent)flawNetwork.getVariables()[0];
-		
+	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
+		Variable[] conflicts = new Variable[flaw.taskIds().size()];
+		for (int i = 0; i < flaw.taskIds().size(); i++) {
+			conflicts[i] = groundSolver.getVariable((int) flaw.taskIds().get(i).value());
+		}
+		Fluent taskFluent = (Fluent) conflicts[0];
+
 		logger.fine("getMetaValues for: " + taskFluent);
-		
+
 //		return estimateDuration(taskFluent);
 		Graph<String, String> g = createGraph();
 		DijkstraShortestPath<String,String> dijk = new DijkstraShortestPath<String,String>(g);
-		
-		Variable[] conflicts = flawNetwork.getVariables();
+
 		ConstraintNetwork cn = new ConstraintNetwork(null);
 		for (int i = 0; i < conflicts.length; i++) {
 			Fluent nav = (Fluent) conflicts[i];

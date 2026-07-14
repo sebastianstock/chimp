@@ -6,9 +6,11 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariableOrderingH;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpSchedulable;
 import org.metacsp.multi.activity.Activity;
+
+import java.util.Comparator;
 
 import fluentSolver.Fluent;
 import fluentSolver.FluentNetworkSolver;
@@ -23,7 +25,7 @@ public class FluentScheduler extends ChimpSchedulable implements GroundSolverHol
 	private final String fieldValues;
 	private FluentNetworkSolver groundSolver;
 
-	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName,
+	public FluentScheduler(Comparator<ChimpFlaw> varOH, ValueOrderingH valOH, String predicateName,
 			int field, String fieldValues) {
 		super(varOH, valOH);
 		this.predicateName = predicateName;
@@ -37,7 +39,7 @@ public class FluentScheduler extends ChimpSchedulable implements GroundSolverHol
 	}
 
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		updateUsage();
 		return super.getMetaVariables();
 	}

@@ -3,11 +3,14 @@ package externalPathPlanning;
 import htn.GroundSolverHolder;
 import java.util.List;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
+import chimp.model.FluentId;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 import chimp.model.TemporalBounds;
 import org.metacsp.time.Bounds;
@@ -49,23 +52,19 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	 * predecessors.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
+		List<ChimpFlaw> ret = new ArrayList<>();
 		for (Variable var : groundSolver.getVariables()) {
 			if (((Fluent) var).getCompoundSymbolicVariable().getPredicateName().equals(MOVE_BASE_NAME)) {
-				//			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
 				if (checkApplied((Fluent) var) && ! checkDuration(var, groundSolver)) {
-					ConstraintNetwork nw = new ConstraintNetwork(null);
-					nw.addVariable(var);
-					ret.add(nw);
+					ret.add(new ChimpFlaw(List.of(new FluentId(var.getID()))));
 				}
 			}
-			//			}
 		}
 		logger.finest("MetaVariables: " + ret);
-		return ret.toArray(new ConstraintNetwork[ret.size()]);
-	
+		return ret.toArray(new ChimpFlaw[ret.size()]);
+
 	}
 	
 	private boolean checkApplied(Fluent task) {
@@ -92,11 +91,12 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
-		Fluent taskFluent = (Fluent)flawNetwork.getVariables()[0];
-		
+	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
+		Fluent taskFluent = (Fluent) groundSolver.getVariable((int) flaw.taskIds().get(0).value());
+
 		logger.fine("getMetaValues for: " + taskFluent);
-		
+
 		return estimateDuration(taskFluent);
 	}
 	

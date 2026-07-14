@@ -25,9 +25,11 @@ import edu.uci.ics.jung.graph.DelegateForest;
  *
  * <p>The engine operates against {@link FlawProvider}s (which replace
  * {@code MetaConstraint}s) and {@link SearchHooks} (which replace the
- * {@code MetaConstraintSolver} abstract hooks). The flaw and resolver
- * representations remain Meta-CSP {@link ConstraintNetwork}s for this
- * milestone; the storage layer is not yet replaced.
+ * {@code MetaConstraintSolver} abstract hooks). The flaw representation
+ * is {@link ChimpFlaw} (CHIMP-owned). The resolver representation remains
+ * Meta-CSP {@link ConstraintNetwork} for this milestone; the JUNG
+ * search-tree edge type also remains {@code ConstraintNetwork} for
+ * visualization compatibility.
  *
  * <p>Branch-and-bound, serialization-based backup, and other unused
  * {@code MetaConstraintSolver} features are omitted.
@@ -46,10 +48,10 @@ public final class ChimpSearchEngine {
     private DelegateForest<MetaVariable, ConstraintNetwork> searchTree;
     private MetaVariable currentVertex;
 
-    /** Maps flaw networks to the provider that produced them. */
-    private final Map<ConstraintNetwork, FlawProvider> flawToProvider = new HashMap<>();
-    private final Map<ConstraintNetwork, ConstraintNetwork> resolvers = new HashMap<>();
-    private final Map<ConstraintNetwork, ConstraintNetwork> resolversInverse = new HashMap<>();
+    /** Maps flaws to the provider that produced them. */
+    private final Map<ChimpFlaw, FlawProvider> flawToProvider = new HashMap<>();
+    private final Map<ChimpFlaw, ConstraintNetwork> resolvers = new HashMap<>();
+    private final Map<ConstraintNetwork, ChimpFlaw> resolversInverse = new HashMap<>();
     private int counterMoves;
 
     public ChimpSearchEngine(List<FlawProvider> flawProviders, SearchHooks hooks, long animationTime) {
@@ -104,9 +106,9 @@ public final class ChimpSearchEngine {
 
     private Flaw getConflict() {
         for (FlawProvider provider : flawProviders) {
-            ConstraintNetwork cn = provider.currentFlaw();
-            if (cn != null) {
-                return new Flaw(provider, cn);
+            ChimpFlaw flaw = provider.currentFlaw();
+            if (flaw != null) {
+                return new Flaw(provider, flaw);
             }
         }
         return null;
@@ -117,10 +119,10 @@ public final class ChimpSearchEngine {
         if (searchTree.getRoot() == null) {
             searchTree.addVertex(currentVertex);
         }
-        ConstraintNetwork flawNetwork = flaw.network();
+        ChimpFlaw flawObj = flaw.flaw();
         logger.fine("Solving conflict: " + flaw);
 
-        ConstraintNetwork[] values = flaw.provider().resolvers(flawNetwork);
+        ConstraintNetwork[] values = flaw.provider().resolvers(flawObj);
         Comparator<ConstraintNetwork> ordering = flaw.provider().resolverOrdering();
         if (ordering != null && values != null) {
             Arrays.sort(values, ordering);
@@ -144,13 +146,13 @@ public final class ChimpSearchEngine {
                 }
                 logger.fine("Trying value: " + valString);
 
-                if (addResolver(flawNetwork, value)) {
-                    resolvers.put(flawNetwork, value);
-                    resolversInverse.put(value, flawNetwork);
+                if (addResolver(flawObj, value)) {
+                    resolvers.put(flawObj, value);
+                    resolversInverse.put(value, flawObj);
                     counterMoves++;
                     logger.fine("Success...");
 
-                    flaw.provider().markResolved(flawNetwork, value);
+                    flaw.provider().markResolved(flawObj, value);
                     Flaw newConflict = getConflict();
 
                     if (newConflict == null) {
@@ -163,8 +165,8 @@ public final class ChimpSearchEngine {
                         return true;
                     }
                     logger.fine("Retracting value: " + Arrays.toString(value.getConstraints()));
-                    retractResolver(flawNetwork, value);
-                    resolvers.remove(flawNetwork);
+                    retractResolver(flawObj, value);
+                    resolvers.remove(flawObj);
                     resolversInverse.remove(value);
                     counterMoves--;
                 } else {
@@ -175,11 +177,11 @@ public final class ChimpSearchEngine {
         }
         logger.fine("Backtracking...");
         currentVertex = searchTree.getParent(currentVertex);
-        hooks.postBacktrack(flawNetwork);
+        hooks.postBacktrack(flawObj);
         return false;
     }
 
-    private boolean addResolver(ConstraintNetwork flaw, ConstraintNetwork resolver) {
+    private boolean addResolver(ChimpFlaw flaw, ConstraintNetwork resolver) {
         if (!hooks.addResolverSub(flaw, resolver)) {
             return false;
         }
@@ -206,7 +208,7 @@ public final class ChimpSearchEngine {
         return true;
     }
 
-    private void retractResolver(ConstraintNetwork flaw, ConstraintNetwork resolver) {
+    private void retractResolver(ChimpFlaw flaw, ConstraintNetwork resolver) {
         logger.finest("Retracting resolver:");
         logger.finest("  Flaw: " + flaw);
         logger.finest("  Resolver: " + resolver);
@@ -230,21 +232,23 @@ public final class ChimpSearchEngine {
 
     private final class Flaw {
         private final FlawProvider provider;
-        private final ConstraintNetwork network;
+        private final ChimpFlaw flaw;
         private final MetaVariable graphNode;
 
-        Flaw(FlawProvider provider, ConstraintNetwork network) {
+        Flaw(FlawProvider provider, ChimpFlaw flaw) {
             this.provider = provider;
-            this.network = network;
-            this.graphNode = new MetaVariable(null, network);
+            this.flaw = flaw;
+            // MetaVariable.toString() dereferences mv, so we need a non-null
+            // ConstraintNetwork even though we don't use it for search logic.
+            this.graphNode = new MetaVariable(null, new ConstraintNetwork(null));
         }
 
         FlawProvider provider() { return provider; }
-        ConstraintNetwork network() { return network; }
+        ChimpFlaw flaw() { return flaw; }
 
         @Override
         public String toString() {
-            return network.toString();
+            return flaw.toString();
         }
     }
 

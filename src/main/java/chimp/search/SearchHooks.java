@@ -9,6 +9,10 @@ import org.metacsp.framework.ConstraintNetwork;
  * {@code retractResolverSub}, {@code preBacktrack},
  * {@code postBacktrack}).
  *
+ * <p>The flaw representation is {@link ChimpFlaw} (CHIMP-owned). The
+ * resolver representation remains Meta-CSP {@link ConstraintNetwork}
+ * for this milestone.
+ *
  * <p>The implementor (ultimately {@code HTNPlanner}) performs
  * prototype-to-fluent materialization in {@link #addResolverSub} and
  * marking/variable cleanup in {@link #retractResolverSub}.
@@ -25,9 +29,9 @@ public interface SearchHooks {
      * Called after backtracking over a flaw. Currently a no-op in CHIMP
      * but preserved for protocol completeness.
      *
-     * @param flawNetwork the flaw that was branched upon
+     * @param flaw the flaw that was branched upon
      */
-    void postBacktrack(ConstraintNetwork flawNetwork);
+    void postBacktrack(ChimpFlaw flaw);
 
     /**
      * Called before a resolver is applied to the ground solvers. The
@@ -38,11 +42,11 @@ public interface SearchHooks {
      *         state; {@code false} to reject it (the ground state is left
      *         unchanged)
      */
-    boolean addResolverSub(ConstraintNetwork flaw, ConstraintNetwork resolver);
+    boolean addResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver);
 
     /**
      * Called after a resolver is retracted from the ground solvers. The
      * implementor restores markings and removes materialized variables.
      */
-    void retractResolverSub(ConstraintNetwork flaw, ConstraintNetwork resolver);
+    void retractResolverSub(ChimpFlaw flaw, ConstraintNetwork resolver);
 }

@@ -14,7 +14,7 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.ValueOrderingH;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariableOrderingH;
+import chimp.search.ChimpFlaw;
 import chimp.search.ChimpSchedulable;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.activity.ActivityComparator;
@@ -36,7 +36,7 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 	private final Map<Activity, Integer> usageMap = new HashMap<Activity, Integer>();
 	private FluentNetworkSolver groundSolver;
 
-	public FluentResourceUsageScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String name, int cap) {
+	public FluentResourceUsageScheduler(java.util.Comparator<ChimpFlaw> varOH, ValueOrderingH valOH, String name, int cap) {
 		super(varOH, valOH);
 		this.setPeakCollectionStrategy(PeakCollection.SAMPLING);
 		this.name = name;
@@ -48,15 +48,15 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 	}
 	
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		updateUsageMap();
 		activities = new Vector<Activity>(usageMap.keySet());
-		return samplingPeakCollection();
+		return super.getMetaVariables();
 	}
 
 	@Override
-	public ConstraintNetwork[] resolvers(ConstraintNetwork flawNetwork) {
-		ConstraintNetwork[] possiblResolvers = super.resolvers(flawNetwork);
+	public ConstraintNetwork[] resolvers(ChimpFlaw flaw) {
+		ConstraintNetwork[] possiblResolvers = super.resolvers(flaw);
 		if(possiblResolvers == null) {
 			return null;
 		}
