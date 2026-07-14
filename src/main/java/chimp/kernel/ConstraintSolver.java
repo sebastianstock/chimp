@@ -78,6 +78,12 @@ public abstract class ConstraintSolver {
         return constraints.toArray(new Constraint[0]);
     }
 
+    /**
+     * Direct access to the constraint list (for compound solvers that
+     * need to add sub-constraints without triggering auto-propagation).
+     */
+    public List<Constraint> constraintList() { return constraints; }
+
     // -- propagation --
 
     /**
