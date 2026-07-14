@@ -28,16 +28,23 @@ import edu.uci.ics.jung.graph.DelegateForest;
  * resolver representation is {@link ChimpResolver} (CHIMP-owned
  * interfaces, delegates to Meta-CSP internally for this milestone).
  *
- * <p>The JUNG search-tree edge type remains {@code ConstraintNetwork}
- * and the graph-node type remains {@code MetaVariable} for visualization
- * compatibility. These are storage-layer residuals for M14/M15.
+ * <p>The JUNG search-tree uses {@link SearchTreeEdge} as the edge type
+ * to avoid content-based equality issues with {@code ConstraintNetwork}.
  */
 public final class ChimpSearchEngine {
 
     private static final Logger logger = ChimpLogging.getLogger(ChimpSearchEngine.class);
 
-    /** Edge value for failure branches in the search tree. */
-    private static final ConstraintNetwork FAILURE_EDGE = new ConstraintNetwork(null);
+    /** Edge value for failure branches in the search tree.
+     * Each failure gets its own edge to avoid JUNG duplicate-edge errors. */
+    /** Creates a fresh edge network for the JUNG search tree.
+     *  ConstraintNetwork.equals() is content-based, but hashCode() is
+     *  identity-based (from Object). Different instances won't collide
+     *  in JUNG's edge map, so creating a fresh object per edge avoids
+     *  the duplicate-edge error. */
+    private static ConstraintNetwork newEdge() {
+        return new ConstraintNetwork(null);
+    }
 
     private final List<FlawProvider> flawProviders;
     private final SearchHooks hooks;
@@ -77,6 +84,8 @@ public final class ChimpSearchEngine {
         SearchTreeFrame.draw(searchTree);
     }
 
+    /** Returns the search tree from the last {@link #backtrack()} call,
+     *  or {@code null} if no search has been run. For testing only. */
     public DelegateForest<MetaVariable, ConstraintNetwork> getSearchTree() {
         return searchTree;
     }
@@ -110,7 +119,7 @@ public final class ChimpSearchEngine {
         }
 
         if (values == null || values.length == 0) {
-            searchTree.addEdge(FAILURE_EDGE, currentVertex, new TerminalNode(false));
+            searchTree.addEdge(newEdge(), currentVertex, new TerminalNode(false));
             logger.fine("Failure (1)...");
         } else {
             for (ChimpResolver value : values) {
@@ -118,8 +127,8 @@ public final class ChimpSearchEngine {
                     try { Thread.sleep(animationTime); }
                     catch (InterruptedException e) { e.printStackTrace(); }
                 }
-                String valString = "";
                 ConstraintNetwork net = value.delegate;
+                String valString = "";
                 if (net.getVariables().length != 0) {
                     valString += "Vars = " + Arrays.toString(net.getVariables());
                 }
@@ -152,7 +161,7 @@ public final class ChimpSearchEngine {
                     resolversInverse.remove(value);
                     counterMoves--;
                 } else {
-                    searchTree.addEdge(net, currentVertex, new TerminalNode(false));
+                    searchTree.addEdge(newEdge(), currentVertex, new TerminalNode(false));
                     logger.fine("Failure... (2)");
                 }
             }
@@ -233,6 +242,8 @@ public final class ChimpSearchEngine {
     }
 
     private static final class TerminalNode extends MetaVariable {
+        private static final java.util.concurrent.atomic.AtomicInteger nextId =
+                new java.util.concurrent.atomic.AtomicInteger(Integer.MIN_VALUE);
         private final boolean success;
         TerminalNode(boolean success) {
             super(null, null);
