@@ -25,9 +25,11 @@ public class TemporalVariable extends Variable {
         this.startTimePoint = stn.addTimePoint();
         this.endTimePoint = stn.addTimePoint();
         // Implicit Duration[0, INF]: start ≤ end (end - start ≥ 0)
-        // Ported from AllenInterval.createInternalConstraints()
-        stn.addConstraint(startTimePoint, endTimePoint, 0,
+        // Add edges directly without propagation; the constraint is always
+        // consistent with origin bounds, so no need for Floyd-Warshall now.
+        stn.addEdgeSilent(startTimePoint, endTimePoint,
                 TemporalBounds.INFINITY);
+        stn.addEdgeSilent(endTimePoint, startTimePoint, 0);
     }
 
     /** Index of the start time point in the STN. */

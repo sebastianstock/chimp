@@ -116,6 +116,16 @@ public class SimpleTemporalNetwork {
         }
     }
 
+    /** Adds an edge without propagation (for batch initialization). */
+    public void addEdgeSilent(int from, int to, long bound) {
+        addEdge(from, to, bound);
+    }
+
+    /** Records a constraint in the edge list (already applied to the matrix). */
+    public void recordConstraint(DistanceEdge edge) {
+        constraints.add(edge);
+    }
+
     // --- propagation ---
 
     /**
