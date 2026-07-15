@@ -11,14 +11,15 @@ import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
 import org.metacsp.framework.VariablePrototype;
 import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import chimp.adapter.metacsp.MetaCspTemporalConstraintAdapter;
-import chimp.adapter.metacsp.MetaCspIntegerConstraintAdapter;
+import org.metacsp.time.Bounds;
+import unify.CompoundSymbolicValueConstraint;
+import unify.CompoundSymbolicVariable;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
 import chimp.model.ResourceRequirement;
+
 import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
-import chimp.adapter.metacsp.MetaCspSymbolicConstraintAdapter;
 import chimp.adapter.metacsp.MetaCspResolverAdapter;
 import chimp.model.FluentPrototypeDescription;
 import chimp.model.FluentSignature;
@@ -42,14 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public abstract class PlanReportroryItem {
-	private static final MetaCspTemporalConstraintAdapter TEMPORAL_ADAPTER =
-			new MetaCspTemporalConstraintAdapter();
-	private static final MetaCspIntegerConstraintAdapter INTEGER_ADAPTER =
-			new MetaCspIntegerConstraintAdapter();
 	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
 			new MetaCspResourceRequirementAdapter();
-	private static final MetaCspSymbolicConstraintAdapter SYMBOLIC_ADAPTER =
-			new MetaCspSymbolicConstraintAdapter();
 	private static final MetaCspResolverAdapter RESOLVER_ADAPTER =
 			new MetaCspResolverAdapter();
 	
@@ -434,7 +429,7 @@ public abstract class PlanReportroryItem {
 
 		// Add constraints for DURATION
 		if (durationBounds != null) {
-			AllenIntervalConstraint durationCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(
+			AllenIntervalConstraint durationCon = toAllenIntervalConstraint(
 					new TemporalConstraintTemplate(TemporalRelation.Duration, durationBounds));
 			durationCon.setFrom(taskFluent.getAllenInterval());
 			durationCon.setTo(taskFluent.getAllenInterval());
@@ -480,7 +475,7 @@ public abstract class PlanReportroryItem {
 							}
 						}
 					}
-					Constraint ic = INTEGER_ADAPTER.toIntegerConstraint(ict, icScope);
+					Constraint ic = toIntegerConstraint(ict, icScope);
 					cn.addConstraint(ic);
 				}
 			}
@@ -502,7 +497,7 @@ public abstract class PlanReportroryItem {
 						}
 					}
 					cn.addConstraint(
-							INTEGER_ADAPTER.createAllEqualConstraint(
+							createAllEqualConstraint(
 									vars.toArray(new Variable[vars.size()])));
 				}
 			}
@@ -510,7 +505,7 @@ public abstract class PlanReportroryItem {
 			// add IntegerConstraints for constant values
 			for (int i = 0; i < integerArguments.length; i++) {
 				if(!integerArguments[i].isVariable()) {
-					cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+					cn.addConstraint(createConstantConstraint(
 							taskFluent.getIntegerVariables()[i], integerArguments[i].constValue));
 				}
 			}
@@ -519,7 +514,7 @@ public abstract class PlanReportroryItem {
 					if (!et.getIntArgs()[i].isVariable()) {
 						Variable v = et.getPrototype(groundSolver);
 						VariablePrototype vp = new VariablePrototype(groundSolver, v, i);
-						cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+						cn.addConstraint(createConstantConstraint(
 								vp, et.getIntArgs()[i].constValue));
 					}
 				}
@@ -530,7 +525,7 @@ public abstract class PlanReportroryItem {
 					for (int i = 0; i < intArgs.length; i++) {
 						if (!intArgs[i].isVariable()) {
 							Fluent preFluent = preKeyToFluentMap.get(pre.getKey());
-							cn.addConstraint(INTEGER_ADAPTER.createConstantConstraint(
+							cn.addConstraint(createConstantConstraint(
 										preFluent.getIntegerVariables()[i], intArgs[i].constValue));
 						}
 					}
@@ -856,12 +851,12 @@ public abstract class PlanReportroryItem {
 							+ toKey + " in " + taskname );
 				}
 				
-				AllenIntervalConstraint newCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(act.getConstraint());
+				AllenIntervalConstraint newCon = toAllenIntervalConstraint(act.getConstraint());
 				newCon.setFrom(from);
 				newCon.setTo(to);
 				ret.add(newCon);
 			} else if (act.headToHead()) {    // HEAD -> HEAD
-				AllenIntervalConstraint newCon = TEMPORAL_ADAPTER.toAllenIntervalConstraint(act.getConstraint());
+				AllenIntervalConstraint newCon = toAllenIntervalConstraint(act.getConstraint());
 				newCon.setFrom(taskFluent.getAllenInterval());
 				newCon.setTo(taskFluent.getAllenInterval());
 				ret.add(newCon);
@@ -893,7 +888,7 @@ public abstract class PlanReportroryItem {
 						if (possibleValues != null) {
 							// TODO merge multiple constraints into one.
 							Constraint rcon =
-									SYMBOLIC_ADAPTER.createPositiveValueRestriction(
+									createPositiveValueRestriction(
 											var, indices, positiveRestrictions);
 							ret.add(rcon);
 						}
@@ -901,7 +896,7 @@ public abstract class PlanReportroryItem {
 						if (impossibleValues != null) {
 							// TODO merge multiple constraints into one.
 							Constraint rcon =
-									SYMBOLIC_ADAPTER.createNegativeValueRestriction(
+									createNegativeValueRestriction(
 											var, indices, negativeRestrictions);
 							ret.add(rcon);
 						}
@@ -972,7 +967,7 @@ public abstract class PlanReportroryItem {
 								throw new IllegalStateException();
 							}
 						}
-						Constraint scon = SYMBOLIC_ADAPTER.createSubDifferent(fromVar, toVar, connections);
+						Constraint scon = createSubDifferent(fromVar, toVar, connections);
 						ret.add(scon);
 					}
 				}
@@ -1027,7 +1022,7 @@ public abstract class PlanReportroryItem {
 							to = ((Fluent) to).getCompoundSymbolicVariable();
 						} // else: Variable Prototype (will be set in addResolverSub)
 						
-						Constraint bcon = SYMBOLIC_ADAPTER.createSubMatches(from, to, connections);
+						Constraint bcon = createSubMatches(from, to, connections);
 						ret.add(bcon);
 					}
 				}
@@ -1103,5 +1098,85 @@ public abstract class PlanReportroryItem {
 
 	public String[] getStringArgumentNames() {
 		return arguments;
+	}
+
+	// --- Inlined adapter methods (formerly in MetaCspTemporalConstraintAdapter
+	//     and MetaCspSymbolicConstraintAdapter) ---
+
+	private static AllenIntervalConstraint toAllenIntervalConstraint(
+			TemporalConstraintTemplate template) {
+		AllenIntervalConstraint.Type type =
+				AllenIntervalConstraint.Type.valueOf(template.relation().name());
+		if (template.bounds().isEmpty()) {
+			return new AllenIntervalConstraint(type);
+		}
+		Bounds[] bounds = template.bounds().stream()
+				.map(b -> new Bounds(b.minimum(), b.maximum()))
+				.toArray(Bounds[]::new);
+		return new AllenIntervalConstraint(type, bounds);
+	}
+
+	private static Constraint createPositiveValueRestriction(
+			Variable var, int[] indices, String[][] restrictions) {
+		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
+				CompoundSymbolicValueConstraint.Type.POSITIVEVALUERESTRICTION,
+				indices, restrictions);
+		con.setFrom(var);
+		con.setTo(var);
+		return con;
+	}
+
+	private static Constraint createNegativeValueRestriction(
+			Variable var, int[] indices, String[][] restrictions) {
+		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
+				CompoundSymbolicValueConstraint.Type.NEGATIVEVALUERESTRICTION,
+				indices, restrictions);
+		con.setFrom(var);
+		con.setTo(var);
+		return con;
+	}
+
+	private static Constraint createSubDifferent(
+			Variable from, Variable to, int[] connections) {
+		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
+				CompoundSymbolicValueConstraint.Type.SUBDIFFERENT, connections);
+		con.setFrom(from);
+		con.setTo(to);
+		return con;
+	}
+
+	private static Constraint createSubMatches(
+			Variable from, Variable to, int[] connections) {
+		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
+				CompoundSymbolicValueConstraint.Type.SUBMATCHES, connections);
+		con.setFrom(from);
+		con.setTo(to);
+		return con;
+	}
+
+	// --- Inlined adapter methods (formerly in MetaCspIntegerConstraintAdapter) ---
+
+	private static integers.IntegerConstraint toIntegerConstraint(
+			IntegerConstraintTemplate template, Variable[] scope) {
+		integers.IntegerConstraint.Type type = switch (template.kind()) {
+			case ARITHMETIC -> integers.IntegerConstraint.Type.ARITHM;
+			case ALL_DIFFERENT -> integers.IntegerConstraint.Type.ALLDIFFERENT;
+			case ALL_EQUAL -> integers.IntegerConstraint.Type.ALLEQUAL;
+		};
+		return new integers.IntegerConstraint(
+				type, scope,
+				template.operator1(), template.operator2(), template.constant());
+	}
+
+	private static integers.IntegerConstraint createAllEqualConstraint(Variable[] scope) {
+		return new integers.IntegerConstraint(
+				integers.IntegerConstraint.Type.ALLEQUAL, scope);
+	}
+
+	private static integers.IntegerConstraint createConstantConstraint(
+			Variable variable, int constant) {
+		return new integers.IntegerConstraint(
+				integers.IntegerConstraint.Type.ARITHM,
+				new Variable[]{variable}, "=", constant);
 	}
 }
