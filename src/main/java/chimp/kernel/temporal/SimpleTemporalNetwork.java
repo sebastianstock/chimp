@@ -76,13 +76,14 @@ public class SimpleTemporalNetwork {
      * @return true if the network remains consistent after propagation
      */
     public boolean addConstraint(int from, int to, long min, long max) {
-        // Convert to upper-bound edges:
-        //   t_to - t_from <= max  →  d[from][to] = min(d[from][to], max)
-        //   t_from - t_to <= -min →  d[to][from] = min(d[to][from], -min)
         addEdge(from, to, max);
         addEdge(to, from, -min);
+        if (!propagate()) {
+            // Propagation failed — don't store the constraint
+            return false;
+        }
         constraints.add(new DistanceEdge(from, to, min, max));
-        return propagate();
+        return true;
     }
 
     /**

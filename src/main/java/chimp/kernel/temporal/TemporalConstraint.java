@@ -62,8 +62,8 @@ public class TemporalConstraint extends Constraint {
      * Compiles this Allen relation into distance constraints between the
      * start/end time points of the two variables.
      *
-     * <p>Full compilation for all ~35 types is in Step 4c. This stub handles
-     * the most common types.
+     * <p>All ~35 relation types are handled with explicit compilation
+     * ported from Meta-CSP's {@code AllenIntervalConstraint}.
      */
     public List<DistanceEdge> compileToDistanceConstraints() {
         TemporalVariable f = fromVariable();
@@ -137,7 +137,12 @@ public class TemporalConstraint extends Constraint {
                 result.add(new DistanceEdge(0, fs, bnd(0).minimum(), bnd(0).maximum()));
             }
             case Deadline -> {
-                result.add(new DistanceEdge(fs, 0, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(0, fe, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case At -> {
+                // Unary: bounds on start and end relative to origin
+                result.add(new DistanceEdge(0, fs, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(0, fe, bnd(1).minimum(), bnd(1).maximum()));
             }
             // -- compound relations (ported from Meta-CSP AllenIntervalConstraint) --
             case BeforeOrMeets -> {
@@ -148,20 +153,22 @@ public class TemporalConstraint extends Constraint {
                 result.add(new DistanceEdge(te, fs, bnd(0).minimum(), bnd(0).maximum()));
             }
             case MetByOrOverlappedBy -> {
-                result.add(new DistanceEdge(fe, te, 1, INF));
-                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(ts, fs, 1, INF));       // from-start strictly after to-start
+                result.add(new DistanceEdge(fs, te, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(te, fe, 1, INF));       // from-end strictly after to-end
             }
             case MetByOrOverlappedByOrAfter -> {
-                result.add(new DistanceEdge(fe, te, 1, INF));
-                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(ts, fs, 1, INF));       // from-start strictly after to-start
+                result.add(new DistanceEdge(te, fe, 1, INF));       // from-end strictly after to-end
             }
             case MetByOrOverlappedByOrIsFinishedByOrDuring -> {
                 result.add(new DistanceEdge(ts, fs, 1, INF));       // to-start strictly after from-start
                 result.add(new DistanceEdge(fs, te, 0, INF));       // to-end after from-start
             }
             case MeetsOrOverlapsOrBefore -> {
-                result.add(new DistanceEdge(fs, fe, 1, INF));       // from has non-zero duration
-                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+                // from is strictly after to (both start and end)
+                result.add(new DistanceEdge(ts, fs, 1, INF));
+                result.add(new DistanceEdge(te, fe, 1, INF));
             }
             case DuringOrEquals -> {
                 result.add(new DistanceEdge(ts, fs, bnd(0).minimum(), bnd(0).maximum()));
@@ -190,10 +197,6 @@ public class TemporalConstraint extends Constraint {
             }
             case EndsOrEndedBy -> {
                 result.add(new DistanceEdge(fe, te, bnd(0).minimum(), bnd(0).maximum()));
-            }
-            case At -> {
-                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
-                result.add(new DistanceEdge(fe, te, bnd(1).minimum(), bnd(1).maximum()));
             }
             case NotBeforeAndNotAfter -> {
                 result.add(new DistanceEdge(fs, te, 0, INF));      // from-start before to-end

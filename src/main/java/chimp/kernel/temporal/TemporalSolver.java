@@ -60,25 +60,24 @@ public class TemporalSolver extends ConstraintSolver {
     @Override
     public boolean addConstraint(Constraint c) {
         if (c instanceof TemporalConstraint tc) {
-            // Compile to distance constraints and add to STN
             List<DistanceEdge> edges = tc.compileToDistanceConstraints();
-            // Record which edges we added first, for rollback
             List<DistanceEdge> added = new ArrayList<>();
             for (DistanceEdge edge : edges) {
                 if (!stn.addConstraint(edge.fromTimePoint(), edge.toTimePoint(),
                         edge.min(), edge.max())) {
-                    // Rollback: remove the edges we already added
+                    // Rollback: remove edges we already added, then rebuild
                     for (DistanceEdge ae : added) {
-                        stn.removeConstraint(ae.fromTimePoint(), ae.toTimePoint(),
+                        stn.removeConstraintSilent(ae.fromTimePoint(), ae.toTimePoint(),
                                 ae.min(), ae.max());
                     }
+                    stn.rebuild();
                     return false;
                 }
                 added.add(edge);
             }
         }
         constraintList().add(c);
-        return true; // propagation already done per-edge by STN
+        return true;
     }
 
     @Override
