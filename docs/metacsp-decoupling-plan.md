@@ -273,6 +273,17 @@ This is **not** a dependency — CHIMP must not depend on UP. This is an *integr
 **Scope**: TBD — depends on M15 outcome and UP library capabilities.
 **Risk**: Medium — adapter layer, no changes to CHIMP core.
 
+### 17. STN Incremental Propagation (follow-on optimization, post-M15)
+
+**Goal**: Replace the O(n³) Floyd-Warshall per-constraint-batch with an incremental algorithm.
+
+**Context**: M15 Step 4 performance tests show CHIMP's constraint addition is ~30× slower than Meta-CSP for large networks (100 vars × 50 cons: 207ms vs 6ms). Meta-CSP's `APSPSolver` uses an optimized incremental Floyd-Warshall that avoids full recomputation for each constraint. Currently CHIMP rebuilds the full distance matrix on every `addConstraint`/`removeConstraint` batch.
+
+**Approach**: Research and implement an incremental APSP algorithm (e.g., incremental Floyd-Warshall or Ramalingam's algorithm for dynamic graphs) so that adding a single distance edge updates only the affected entries.
+
+**Depends on**: M15 complete (CHIMP using the new solver in production).
+**Verify**: `TemporalPerformanceTest.addConstraints` shows CHIMP within 2× of Meta-CSP.
+
 ## Verification Strategy
 
 Each milestone should preserve existing planning results. Verification includes:
