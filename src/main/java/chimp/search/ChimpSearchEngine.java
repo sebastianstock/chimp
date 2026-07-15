@@ -11,9 +11,7 @@ import java.util.logging.Logger;
 import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.meta.MetaVariable;
 import chimp.logging.ChimpLogging;
-import org.metacsp.utility.UI.SearchTreeFrame;
 
 import edu.uci.ics.jung.graph.DelegateForest;
 
@@ -25,33 +23,29 @@ import edu.uci.ics.jung.graph.DelegateForest;
  *
  * <p>The engine operates against {@link FlawProvider}s and
  * {@link SearchHooks}. Flaw representation is {@link ChimpFlaw};
- * resolver representation is {@link ChimpResolver} (CHIMP-owned
- * interfaces, delegates to Meta-CSP internally for this milestone).
+ * resolver representation is {@link ChimpResolver}.
  *
- * <p>The JUNG search-tree uses {@link SearchTreeEdge} as the edge type
- * to avoid content-based equality issues with {@code ConstraintNetwork}.
+ * <p>The JUNG search-tree uses {@link SearchTreeNode} as vertices and
+ * {@link SearchTreeEdge} as edges (replacing Meta-CSP {@code MetaVariable}
+ * and {@code ConstraintNetwork} respectively).
  */
 public final class ChimpSearchEngine {
 
     private static final Logger logger = ChimpLogging.getLogger(ChimpSearchEngine.class);
 
-    /** Edge value for failure branches in the search tree.
-     * Each failure gets its own edge to avoid JUNG duplicate-edge errors. */
-    /** Creates a fresh edge network for the JUNG search tree.
-     *  ConstraintNetwork.equals() is content-based, but hashCode() is
-     *  identity-based (from Object). Different instances won't collide
-     *  in JUNG's edge map, so creating a fresh object per edge avoids
-     *  the duplicate-edge error. */
-    private static ConstraintNetwork newEdge() {
-        return new ConstraintNetwork(null);
+    /** Creates a fresh edge label for the JUNG search tree.
+     *  Must create a new instance each time — JUNG rejects duplicate
+     *  edges based on identity (SearchTreeEdge uses reference equality). */
+    private static SearchTreeEdge newEdge(String resolverLabel) {
+        return new SearchTreeEdge(resolverLabel);
     }
 
     private final List<FlawProvider> flawProviders;
     private final SearchHooks hooks;
     private final long animationTime;
 
-    private DelegateForest<MetaVariable, ConstraintNetwork> searchTree;
-    private MetaVariable currentVertex;
+    private DelegateForest<SearchTreeNode, SearchTreeEdge> searchTree;
+    private SearchTreeNode currentVertex;
 
     private final Map<ChimpFlaw, FlawProvider> flawToProvider = new HashMap<>();
     private final Map<ChimpFlaw, ChimpResolver> resolvers = new HashMap<>();
@@ -80,13 +74,15 @@ public final class ChimpSearchEngine {
         return true;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void draw() {
-        SearchTreeFrame.draw(searchTree);
+        org.metacsp.utility.UI.SearchTreeFrame.draw(
+                (edu.uci.ics.jung.graph.DelegateForest) (Object) searchTree);
     }
 
     /** Returns the search tree from the last {@link #backtrack()} call,
      *  or {@code null} if no search has been run. For testing only. */
-    public DelegateForest<MetaVariable, ConstraintNetwork> getSearchTree() {
+    public DelegateForest<SearchTreeNode, SearchTreeEdge> getSearchTree() {
         return searchTree;
     }
 
@@ -119,7 +115,7 @@ public final class ChimpSearchEngine {
         }
 
         if (values == null || values.length == 0) {
-            searchTree.addEdge(newEdge(), currentVertex, new TerminalNode(false));
+            searchTree.addEdge(newEdge("FAILURE"), currentVertex, new TerminalNode(false));
             logger.fine("Failure (1)...");
         } else {
             for (ChimpResolver value : values) {
@@ -135,6 +131,7 @@ public final class ChimpSearchEngine {
                 if (net.getConstraints().length != 0) {
                     valString += " Cons = " + Arrays.toString(net.getConstraints());
                 }
+                SearchTreeEdge edge = newEdge(valString);
                 logger.fine("Trying value: " + valString);
 
                 if (addResolver(flawObj, value)) {
@@ -147,10 +144,10 @@ public final class ChimpSearchEngine {
                     Flaw newConflict = getConflict();
 
                     if (newConflict == null) {
-                        searchTree.addEdge(net, currentVertex, new TerminalNode(true));
+                        searchTree.addEdge(edge, currentVertex, new TerminalNode(true));
                         return true;
                     }
-                    searchTree.addEdge(net, currentVertex, newConflict.graphNode);
+                    searchTree.addEdge(edge, currentVertex, newConflict.graphNode);
                     currentVertex = newConflict.graphNode;
                     if (backtrackHelper(newConflict)) {
                         return true;
@@ -161,7 +158,7 @@ public final class ChimpSearchEngine {
                     resolversInverse.remove(value);
                     counterMoves--;
                 } else {
-                    searchTree.addEdge(newEdge(), currentVertex, new TerminalNode(false));
+                    searchTree.addEdge(newEdge("FAILURE"), currentVertex, new TerminalNode(false));
                     logger.fine("Failure... (2)");
                 }
             }
@@ -224,12 +221,12 @@ public final class ChimpSearchEngine {
     private final class Flaw {
         private final FlawProvider provider;
         private final ChimpFlaw flaw;
-        private final MetaVariable graphNode;
+        private final SearchTreeNode graphNode;
 
         Flaw(FlawProvider provider, ChimpFlaw flaw) {
             this.provider = provider;
             this.flaw = flaw;
-            this.graphNode = new MetaVariable(null, new ConstraintNetwork(null));
+            this.graphNode = new SearchTreeNode(flaw.toString());
         }
 
         FlawProvider provider() { return provider; }
@@ -241,12 +238,10 @@ public final class ChimpSearchEngine {
         }
     }
 
-    private static final class TerminalNode extends MetaVariable {
-        private static final java.util.concurrent.atomic.AtomicInteger nextId =
-                new java.util.concurrent.atomic.AtomicInteger(Integer.MIN_VALUE);
+    private static final class TerminalNode extends SearchTreeNode {
         private final boolean success;
         TerminalNode(boolean success) {
-            super(null, null);
+            super(success ? "SUCCESS" : "FAILURE");
             this.success = success;
         }
         @Override
