@@ -86,14 +86,26 @@ public class SimpleTemporalNetwork {
     }
 
     /**
+     * Removes a distance constraint but does NOT rebuild the matrix.
+     * Call {@link #rebuild()} after all silent removals to recompute.
+     */
+    public void removeConstraintSilent(int from, int to, long min, long max) {
+        constraints.removeIf(c -> c.fromTimePoint() == from && c.toTimePoint() == to
+                && c.min() == min && c.max() == max);
+    }
+
+    /** Rebuilds the distance matrix from stored constraints and propagates. */
+    public boolean rebuild() {
+        return fromScratch();
+    }
+
+    /**
      * Removes a previously-added distance constraint.
      * Rebuilds the entire distance matrix from scratch.
      * @return true if the network remains consistent after propagation
      */
     public boolean removeConstraint(int from, int to, long min, long max) {
-        // Find and remove the matching constraint
-        constraints.removeIf(c -> c.fromTimePoint() == from && c.toTimePoint() == to
-                && c.min() == min && c.max() == max);
+        removeConstraintSilent(from, to, min, max);
         return fromScratch();
     }
 
