@@ -68,7 +68,7 @@ public class FluentNetworkSolver extends ConstraintSolver {
         // Build sub-solvers
         this.symbolicSolver = new CompoundSymbolicSolver(symbols, symbolicingredients);
         // Reserve enough time points: 1 origin + 2 per fluent (start/end)
-        this.temporalSolver = new TemporalSolver(origin, horizon, 200);
+        this.temporalSolver = new TemporalSolver(origin, horizon, 2000);
         if (hasIntegerSolver) {
             this.integerSolver = new IntegerSolver(minIntValue, maxIntValue);
         } else {
