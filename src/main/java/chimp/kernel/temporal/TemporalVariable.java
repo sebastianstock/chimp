@@ -24,6 +24,10 @@ public class TemporalVariable extends Variable {
         this.stn = stn;
         this.startTimePoint = stn.addTimePoint();
         this.endTimePoint = stn.addTimePoint();
+        // Implicit Duration[0, INF]: start ≤ end (end - start ≥ 0)
+        // Ported from AllenInterval.createInternalConstraints()
+        stn.addConstraint(startTimePoint, endTimePoint, 0,
+                TemporalBounds.INFINITY);
     }
 
     /** Index of the start time point in the STN. */
