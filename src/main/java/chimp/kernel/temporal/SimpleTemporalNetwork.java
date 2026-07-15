@@ -14,8 +14,14 @@ import java.util.List;
  * bounds all non-origin time points: {@code t_i ∈ [0, horizon]}.
  *
  * <p>Constraints are distance bounds {@code t_to - t_from ∈ [min, max]}.
- * Propagation computes the tightest transitive bounds via Floyd-Warshall
- * (O(n³) where n is the number of active time points).
+ * Propagation computes the tightest transitive bounds. Two strategies:
+ * <ul>
+ *   <li><b>Incremental</b> (O(n²)) — propagates only through newly-tightened
+ *       edges. Used by {@link #propagate()} when {@link #addEdgeSilent} was
+ *       called since the last propagation.</li>
+ *   <li><b>Full Floyd-Warshall</b> (O(n³)) — recomputes entire distance
+ *       matrix. Used by {@link #rebuild()} for constraint removal.</li>
+ * </ul>
  *
  * <p>Uses {@link TemporalBounds#INFINITY} as the sentinel for "no bound".
  */
@@ -27,6 +33,8 @@ public class SimpleTemporalNetwork {
     private final int maxTimePoints;
     private final long[][] distance;
     private final List<DistanceEdge> constraints;
+    private final List<int[]> tightenedEdges;
+    private boolean needsFullPropagation;
     private int timePointCount;
 
     /** Constructs an STN with the given horizon and maximum time points. */
@@ -35,6 +43,7 @@ public class SimpleTemporalNetwork {
         this.maxTimePoints = maxTimePoints;
         this.distance = new long[maxTimePoints][maxTimePoints];
         this.constraints = new ArrayList<>();
+        this.tightenedEdges = new ArrayList<>();
         this.timePointCount = 0;
         // Reserve time point 0 = origin
         addTimePointInternal();
@@ -60,6 +69,7 @@ public class SimpleTemporalNetwork {
             distance[0][idx] = horizon;   // t_idx - 0 <= horizon
             distance[idx][0] = 0;         // 0 - t_idx <= 0  =>  t_idx >= 0
         }
+        needsFullPropagation = true;
         return idx;
     }
 
@@ -73,11 +83,12 @@ public class SimpleTemporalNetwork {
 
     /**
      * Adds a distance constraint: {@code t_to - t_from ∈ [min, max]}.
+     * Uses incremental propagation for efficiency.
      * @return true if the network remains consistent after propagation
      */
     public boolean addConstraint(int from, int to, long min, long max) {
-        addEdge(from, to, max);
-        addEdge(to, from, -min);
+        addEdgeSilent(from, to, max);
+        addEdgeSilent(to, from, -min);
         if (!propagate()) {
             // Propagation failed — don't store the constraint
             return false;
@@ -116,9 +127,16 @@ public class SimpleTemporalNetwork {
         }
     }
 
-    /** Adds an edge without propagation (for batch initialization). */
+    /**
+     * Tightens an edge without propagating. If the bound improves the
+     * existing distance, records the edge for later incremental propagation.
+     * Use with {@link #propagate()} for batch-constrain-then-propagate.
+     */
     public void addEdgeSilent(int from, int to, long bound) {
-        addEdge(from, to, bound);
+        if (bound < distance[from][to]) {
+            distance[from][to] = bound;
+            tightenedEdges.add(new int[]{from, to});
+        }
     }
 
     /** Records a constraint in the edge list (already applied to the matrix). */
@@ -129,10 +147,80 @@ public class SimpleTemporalNetwork {
     // --- propagation ---
 
     /**
-     * Runs Floyd-Warshall all-pairs shortest paths.
+     * Propagates constraints. If the matrix needs full propagation
+     * (new time points or constraint removal), uses full Floyd-Warshall.
+     * Otherwise, if edges were tightened via {@link #addEdgeSilent} since
+     * the last propagation, uses incremental O(n² × |tightenedEdges|).
+     *
      * @return true if the network is consistent (no negative cycles)
      */
     public boolean propagate() {
+        if (needsFullPropagation) {
+            needsFullPropagation = false;
+            tightenedEdges.clear();
+            return propagateFull();
+        }
+        if (tightenedEdges.isEmpty()) return true;
+        return propagateIncremental();
+    }
+
+    /**
+     * Incremental propagation: for each tightened edge (u→v, w),
+     * updates all paths that can use it as a shortcut.
+     *
+     * <p>For each pair (i,j), the new shortest path is either:
+     * <ul>
+     *   <li>the existing distance[i][j], or</li>
+     *   <li>distance[i][u] + w + distance[v][j] (going through the new edge)</li>
+     * </ul>
+     *
+     * <p>Since edge weights only decrease, distance[i][u] and distance[v][j]
+     * are already optimal (they cannot be improved by the new edge).
+     * A single O(n²) pass per tightened edge is sufficient — no cascading
+     * needed.
+     */
+    private boolean propagateIncremental() {
+        int n = timePointCount;
+        for (int[] edge : tightenedEdges) {
+            int u = edge[0];
+            int v = edge[1];
+            long w = distance[u][v];
+
+            // Pre-check: negative self-loop via this edge
+            if (u == v && w < 0) {
+                tightenedEdges.clear();
+                return false;
+            }
+
+            for (int i = 0; i < n; i++) {
+                long diu = distance[i][u];
+                if (diu == INF) continue;
+                long[] di = distance[i];
+                long newBase = diu + w;
+                for (int j = 0; j < n; j++) {
+                    long dvj = distance[v][j];
+                    if (dvj == INF) continue;
+                    long newDist = newBase + dvj;
+                    if (newDist < di[j]) {
+                        di[j] = newDist;
+                        if (i == j && newDist < 0) {
+                            tightenedEdges.clear();
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        tightenedEdges.clear();
+        return true;
+    }
+
+    /**
+     * Runs full Floyd-Warshall all-pairs shortest paths.
+     * Used by {@link #rebuild()} after constraint removal.
+     * @return true if the network is consistent (no negative cycles)
+     */
+    private boolean propagateFull() {
         int n = timePointCount;
         for (int k = 0; k < n; k++) {
             long[] dk = distance[k];
@@ -176,7 +264,9 @@ public class SimpleTemporalNetwork {
             addEdge(c.fromTimePoint(), c.toTimePoint(), c.max());
             addEdge(c.toTimePoint(), c.fromTimePoint(), -c.min());
         }
-        return propagate();
+        tightenedEdges.clear();
+        needsFullPropagation = false;
+        return propagateFull();
     }
 
     // --- queries ---

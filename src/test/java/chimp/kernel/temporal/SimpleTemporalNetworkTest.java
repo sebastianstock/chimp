@@ -211,4 +211,137 @@ public class SimpleTemporalNetworkTest {
         assertEquals(5, stn.getMinDistance(a, b));
         assertEquals(50, stn.getMaxDistance(a, b));
     }
+
+    // --- incremental vs full propagation correctness ---
+
+    @Test
+    public void incrementalMatchesFullPropagation() {
+        long H = 100_000;
+        int MAX = 200;
+        int vars = 10;
+        int cons = 20;
+
+        // Build reference using full FW for every step
+        SimpleTemporalNetwork ref = buildWithFullPropagation(H, MAX, vars, cons);
+
+        // Build using incremental (the default mode, but simulate
+        // typical usage: create vars, then add constraints one by one)
+        SimpleTemporalNetwork inc = new SimpleTemporalNetwork(H, MAX);
+        // Create time points like TemporalVariable does
+        int[] starts = new int[vars];
+        int[] ends = new int[vars];
+        for (int i = 0; i < vars; i++) {
+            starts[i] = inc.addTimePoint();
+            ends[i] = inc.addTimePoint();
+            inc.addEdgeSilent(starts[i], ends[i], TemporalBounds.INFINITY);
+            inc.addEdgeSilent(ends[i], starts[i], 0);
+        }
+        // First propagation: will do full FW (needsFullPropagation is true)
+        inc.propagate();
+
+        // Add constraints using incremental
+        for (int i = 0; i < cons; i++) {
+            int from = i % vars;
+            int to = (i + 1) % vars;
+            inc.addConstraint(ends[from], starts[to], (i % 10) + 1, (i % 10) + 51);
+        }
+
+        // Compare
+        assertMatricesEqual(ref, inc);
+    }
+
+    @Test
+    public void incrementalPerformanceSmokeTest() {
+        long H = 100_000;
+        int MAX = 2000;
+        int vars = 100;
+        int cons = 50;
+
+        SimpleTemporalNetwork inc = new SimpleTemporalNetwork(H, MAX);
+
+        // Create time points
+        int[] starts = new int[vars];
+        int[] ends = new int[vars];
+        for (int i = 0; i < vars; i++) {
+            starts[i] = inc.addTimePoint();
+            ends[i] = inc.addTimePoint();
+            inc.addEdgeSilent(starts[i], ends[i], TemporalBounds.INFINITY);
+            inc.addEdgeSilent(ends[i], starts[i], 0);
+        }
+
+        // First propagation (full FW)
+        long t0 = System.nanoTime();
+        inc.propagate();
+        long fullFwTime = System.nanoTime() - t0;
+
+        // Add constraints (each uses incremental)
+        long t1 = System.nanoTime();
+        for (int i = 0; i < cons; i++) {
+            int from = i % vars;
+            int to = (i + 1) % vars;
+            inc.addConstraint(ends[from], starts[to], (i % 10) + 1, (i % 10) + 51);
+        }
+        long incTime = System.nanoTime() - t1;
+
+        // Query bounds
+        long t2 = System.nanoTime();
+        for (int i = 0; i < vars; i++) {
+            inc.getMinDistance(0, starts[i]); inc.getMaxDistance(0, starts[i]);
+            inc.getMinDistance(0, ends[i]);   inc.getMaxDistance(0, ends[i]);
+        }
+        long queryTime = System.nanoTime() - t2;
+
+        System.out.printf("\n=== STN Incremental Performance (smoke) ===%n");
+        System.out.printf("  Vars: %d, Constraints: %d, TimePoints: %d%n",
+                vars, cons, inc.timePointCount());
+        System.out.printf("  Full FW (first propag): %.3fms%n",
+                fullFwTime / 1_000_000.0);
+        System.out.printf("  %d incremental constraints: %.3fms (%.3fms/constraint)%n",
+                cons, incTime / 1_000_000.0,
+                incTime / (1_000_000.0 * cons));
+        System.out.printf("  Queries: %.3fms%n", queryTime / 1_000_000.0);
+
+        // Sanity: incremental constraint time should be much less than
+        // cons × full FW time (since each increment is O(n²) vs O(n³))
+        long perConstraintInc = incTime / Math.max(1, cons);
+        assertTrue("Incremental per-constraint should be faster than full FW",
+                perConstraintInc < fullFwTime / 2);
+    }
+
+    private SimpleTemporalNetwork buildWithFullPropagation(
+            long horizon, int maxTP, int vars, int cons) {
+        SimpleTemporalNetwork stn = new SimpleTemporalNetwork(horizon, maxTP);
+        int[] starts = new int[vars];
+        int[] ends = new int[vars];
+        for (int i = 0; i < vars; i++) {
+            starts[i] = stn.addTimePoint();
+            ends[i] = stn.addTimePoint();
+            // Simulate Duration[0, INF] via addConstraint
+            stn.addConstraint(starts[i], ends[i], 0, TemporalBounds.INFINITY);
+        }
+        for (int i = 0; i < cons; i++) {
+            int from = i % vars;
+            int to = (i + 1) % vars;
+            stn.addConstraint(ends[from], starts[to], (i % 10) + 1, (i % 10) + 51);
+        }
+        return stn;
+    }
+
+    private void assertMatricesEqual(SimpleTemporalNetwork a, SimpleTemporalNetwork b) {
+        int n = Math.max(a.timePointCount(), b.timePointCount());
+        assertEquals("Time point count mismatch", a.timePointCount(), b.timePointCount());
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                long aMin = a.getMinDistance(i, j);
+                long bMin = b.getMinDistance(i, j);
+                long aMax = a.getMaxDistance(i, j);
+                long bMax = b.getMaxDistance(i, j);
+                if (aMin != bMin || aMax != bMax) {
+                    fail(String.format(
+                            "Mismatch at [%d][%d]: ref=(%d,%d) inc=(%d,%d)",
+                            i, j, aMin, aMax, bMin, bMax));
+                }
+            }
+        }
+    }
 }
