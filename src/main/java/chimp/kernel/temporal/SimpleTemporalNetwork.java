@@ -26,7 +26,7 @@ public class SimpleTemporalNetwork {
     private final long horizon;
     private final int maxTimePoints;
     private final long[][] distance;
-    private final List<DistanceConstraint> constraints;
+    private final List<DistanceEdge> constraints;
     private int timePointCount;
 
     /** Constructs an STN with the given horizon and maximum time points. */
@@ -81,7 +81,7 @@ public class SimpleTemporalNetwork {
         //   t_from - t_to <= -min →  d[to][from] = min(d[to][from], -min)
         addEdge(from, to, max);
         addEdge(to, from, -min);
-        constraints.add(new DistanceConstraint(from, to, min, max));
+        constraints.add(new DistanceEdge(from, to, min, max));
         return propagate();
     }
 
@@ -92,8 +92,8 @@ public class SimpleTemporalNetwork {
      */
     public boolean removeConstraint(int from, int to, long min, long max) {
         // Find and remove the matching constraint
-        constraints.removeIf(c -> c.from == from && c.to == to
-                && c.min == min && c.max == max);
+        constraints.removeIf(c -> c.fromTimePoint() == from && c.toTimePoint() == to
+                && c.min() == min && c.max() == max);
         return fromScratch();
     }
 
@@ -149,9 +149,9 @@ public class SimpleTemporalNetwork {
             distance[i][0] = 0;
         }
         // Re-apply all stored constraints
-        for (DistanceConstraint c : constraints) {
-            addEdge(c.from, c.to, c.max);
-            addEdge(c.to, c.from, -c.min);
+        for (DistanceEdge c : constraints) {
+            addEdge(c.fromTimePoint(), c.toTimePoint(), c.max());
+            addEdge(c.toTimePoint(), c.fromTimePoint(), -c.min());
         }
         return propagate();
     }
@@ -198,8 +198,4 @@ public class SimpleTemporalNetwork {
         }
         return sb.toString();
     }
-
-    // --- internal types ---
-
-    private record DistanceConstraint(int from, int to, long min, long max) {}
 }
