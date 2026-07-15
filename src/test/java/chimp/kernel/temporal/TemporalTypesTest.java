@@ -345,4 +345,76 @@ public class TemporalTypesTest {
         TemporalBounds b = solver.getAdmissibleDistanceBounds(vars[0].end(), vars[1].start());
         assertEquals(0, b.minimum());
     }
+
+    // --- Rollback behavior ---
+
+    @Test
+    public void rollbackOnFirstEdgeFailure() {
+        // Tests that when the first edge of a multi-edge constraint fails,
+        // the STN matrix is properly rebuilt and left consistent.
+        TemporalSolver solver = new TemporalSolver(0, 100, 100);
+        TemporalVariable[] vars = solver.createVariables(2);
+
+        // Force vars[0] to be tightly constrained
+        TemporalConstraint tight = new TemporalConstraint(
+                TemporalRelation.Duration, new TemporalBounds(10, 10));
+        tight.setFrom(vars[0]);
+        tight.setTo(vars[0]);
+        assertTrue(solver.addConstraint(tight));
+
+        // Try Overlaps (3 edges) with bounds that should be fine
+        TemporalConstraint ok = new TemporalConstraint(
+                TemporalRelation.Overlaps,
+                new TemporalBounds(1, INF),
+                new TemporalBounds(1, INF),
+                new TemporalBounds(1, INF));
+        ok.setFrom(vars[0]);
+        ok.setTo(vars[1]);
+        assertTrue(solver.addConstraint(ok));
+
+        // Now try contradicting — vars[1] before vars[0] with impossible bounds
+        TemporalConstraint bad = new TemporalConstraint(
+                TemporalRelation.Before,
+                new TemporalBounds(1000, 2000)); // impossible with var0.end = 10 and horizon=100
+        bad.setFrom(vars[1]);
+        bad.setTo(vars[0]);
+        assertFalse(solver.addConstraint(bad));
+
+        // The solver should still be consistent — the failed constraint
+        // must not have corrupted the state
+        assertTrue(solver.propagate());
+    }
+
+    @Test
+    public void rollbackOnSecondEdgeFailure() {
+        // Tests multi-edge rollback: first edge succeeds, second fails.
+        TemporalSolver solver = new TemporalSolver(0, 100, 100);
+        TemporalVariable[] vars = solver.createVariables(2);
+
+        // Constrain variables so Overlaps with specific bounds is inconsistent
+        TemporalConstraint dur = new TemporalConstraint(
+                TemporalRelation.Duration, new TemporalBounds(5, 5));
+        dur.setFrom(vars[0]);
+        dur.setTo(vars[0]);
+        assertTrue(solver.addConstraint(dur));
+
+        TemporalConstraint eq = new TemporalConstraint(TemporalRelation.Equals);
+        eq.setFrom(vars[0]);
+        eq.setTo(vars[1]);
+        assertTrue(solver.addConstraint(eq));
+
+        // Now Overlaps should conflict because vars are equal
+        TemporalConstraint overlaps = new TemporalConstraint(
+                TemporalRelation.Overlaps,
+                new TemporalBounds(1, INF),
+                new TemporalBounds(1, INF),
+                new TemporalBounds(1, INF));
+        overlaps.setFrom(vars[0]);
+        overlaps.setTo(vars[1]);
+        // Overlaps requires fs < ts, but with Equals, fs = ts — contradiction
+        assertFalse(solver.addConstraint(overlaps));
+
+        // Solver should be consistent
+        assertTrue(solver.propagate());
+    }
 }

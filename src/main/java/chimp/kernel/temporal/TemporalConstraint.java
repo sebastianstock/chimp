@@ -100,11 +100,11 @@ public class TemporalConstraint extends Constraint {
             }
             case Starts -> {
                 result.add(new DistanceEdge(fs, ts, 0, 0));   // starts equal
-                result.add(new DistanceEdge(ts, fe, bnd(0).minimum(), bnd(0).maximum()));  // from_end after to_start
+                result.add(new DistanceEdge(fe, te, bnd(0).minimum(), bnd(0).maximum()));  // from_end before to_end
             }
             case Finishes -> {
+                result.add(new DistanceEdge(ts, fs, bnd(0).minimum(), bnd(0).maximum()));  // from_start after to_start
                 result.add(new DistanceEdge(fe, te, 0, 0));   // ends equal
-                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));  // from_start after to_start
             }
             case During -> {
                 result.add(new DistanceEdge(ts, fs, bnd(0).minimum(), bnd(0).maximum()));  // from_start after to_start
@@ -115,12 +115,12 @@ public class TemporalConstraint extends Constraint {
                 result.add(new DistanceEdge(te, fe, bnd(1).minimum(), bnd(1).maximum()));  // from_end after to_end
             }
             case StartedBy -> {
-                result.add(new DistanceEdge(ts, fs, 0, 0));   // starts equal (to_start = from_start... wait, "A StartedBy B" → B starts A → t_start = f_start)
-                result.add(new DistanceEdge(fs, te, bnd(0).minimum(), bnd(0).maximum()));  // to_end after from_start
+                result.add(new DistanceEdge(fs, ts, 0, 0));   // starts equal
+                result.add(new DistanceEdge(te, fe, bnd(0).minimum(), bnd(0).maximum()));  // from_end after to_end
             }
             case FinishedBy -> {
-                result.add(new DistanceEdge(te, fe, 0, 0));   // ends equal (to_end = from_end... wait, "A FinishedBy B" → B finishes A → t_end = f_end)
                 result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));  // from_start after to_start
+                result.add(new DistanceEdge(fe, te, 0, 0));   // ends equal
             }
             case Overlaps -> {
                 // from starts before to, from ends during to
