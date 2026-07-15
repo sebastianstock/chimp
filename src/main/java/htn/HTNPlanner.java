@@ -4,7 +4,12 @@ import fluentSolver.Fluent;
 import fluentSolver.FluentConstraint;
 import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomainPlanner;
+import chimp.adapter.metacsp.MetaCspFluentStore;
 import chimp.adapter.metacsp.MetaCspResolverAdapter;
+import chimp.kernel.VariablePrototype;
+import chimp.model.FluentId;
+import chimp.model.FluentMarking;
+import chimp.model.FluentStore;
 import chimp.model.SubVariableKind;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpResolver;
@@ -15,7 +20,6 @@ import org.metacsp.framework.Constraint;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
 import chimp.logging.ChimpLogging;
 
 import java.util.ArrayList;
@@ -29,6 +33,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 
 	private Map<String, String[]> typesInstancesMap;
 	private final FluentNetworkSolver groundSolver;
+	private final FluentStore fluentStore;
 	private final List<FlawProvider> flawProviders = new ArrayList<>();
 	private final long animationTime;
 	private ChimpSearchEngine searchEngine;
@@ -39,6 +44,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 			int[] symbolicIngredients) {
 		this.animationTime = animationTime;
 		this.groundSolver = new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients);
+		this.fluentStore = new MetaCspFluentStore(this.groundSolver);
 	}
 
 	/**
@@ -56,6 +62,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 		this.animationTime = animationTime;
 		this.groundSolver = new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients,
 				minIntValue, maxIntValue, numIntVars);
+		this.fluentStore = new MetaCspFluentStore(this.groundSolver);
 	}
 
 	/**
@@ -132,8 +139,8 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 				}
 			}
 			if (!inFlaw) {
-				if (v instanceof VariablePrototype) {
-					Variable vReal = metaValue.getSubstitution((VariablePrototype)v);
+				if (v instanceof org.metacsp.framework.VariablePrototype vp) {
+					Variable vReal = metaValue.getSubstitution(vp);
 					if (vReal != null) {
 							varsToRemove.add(vReal);
 					}
@@ -172,25 +179,31 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
-			if (v instanceof VariablePrototype) {
-				VariablePrototype vp = (VariablePrototype) v;
+			if (v instanceof org.metacsp.framework.VariablePrototype vp) {
 
+				Object[] params = vp.getParameters();
 				// IntegerConstraints use different kind of variable prototype
-				if (vp.getParameters()[0] instanceof VariablePrototype) {
+				if (params[0] instanceof org.metacsp.framework.VariablePrototype) {
 					continue;
 				}
 
 				// 	Parameters for real instantiation: the first is the component
 				//  and the second is the type, the third are the arguments of the fluent
-				String component = (String) vp.getParameters()[0];
-				String symbol = (String) vp.getParameters()[1];
-				Fluent fluent = (Fluent)groundSolver.createVariable(component);
+				String component = (String) params[0];
+				String symbol = (String) params[1];
+				String[] arguments = (String[]) params[2];
 
-				String[] arguments = (String[]) vp.getParameters()[2];
-				fluent.setName(symbol, arguments);
+				// Create fluent via FluentStore abstraction
+				HTNMetaConstraint.markings markVal =
+						(HTNMetaConstraint.markings) v.getMarking();
+				fluentStore.createFluent(component, symbol, arguments,
+						FluentMarking.fromIntValue(markVal.ordinal()));
 
+				// Get the last-created Fluent for substitution tracking
+				Fluent fluent = (Fluent) groundSolver.getVariables()[
+						groundSolver.getVariables().length - 1];
 				fluent.setMarking(v.getMarking());
-				metaValue.addSubstitution((VariablePrototype)v, fluent);
+				metaValue.addSubstitution(vp, fluent);
 			}
 		}
 

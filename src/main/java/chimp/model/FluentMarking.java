@@ -8,5 +8,13 @@ public enum FluentMarking {
     CLOSED,
     UNJUSTIFIED,
     JUSTIFIED,
-    UNIFIED
+    UNIFIED;
+
+    /**
+     * Returns the FluentMarking for the given ordinal (matching
+     * {@code HTNMetaConstraint.markings} ordinals).
+     */
+    public static FluentMarking fromIntValue(int ordinal) {
+        return values()[ordinal];
+    }
 }
