@@ -109,7 +109,42 @@ versions. This avoids a flag-day rewrite.
    types. `SearchTreeFrame.draw()` is replaced by a CHIMP-owned visualization wrapper
    (or the `draw()` method is adapted to use the new types).
 
-## Steps
+## Current State (post-Step 5)
+
+**COMPLETED**: Steps 0-5 (kernel implementation)
+- ✅ Step 0: Baseline characterization (36 domain/problem pairs)
+- ✅ Step 1: Base types (5 files, 650 lines)
+- ✅ Step 2: Symbolic solver (7 files, 1,154 lines)
+- ✅ Step 3: Integer solver (4 files, 369 lines)
+- ✅ Step 4: Temporal solver (5 files, 727 lines) — **11 bugs fixed through 3 review cycles**
+- ✅ Step 5: Fluent solver (3 files, 654 lines)
+
+**Total kernel**: 24 files, ~3,300 lines production code, ~2,400 lines test code
+**Test results**: 342 tests passing, baseline preserved
+**Zero Meta-CSP imports**: All kernel code is `org.metacsp`-free
+
+**CRITICAL ISSSES IDENTIFIED**:
+1. **33x performance regression** in constraint addition (blocking issue)
+   - Temporal solver: 207ms vs 6.2ms for 50 constraints on 100 variables
+   - Root cause: O(n³) Floyd-Warshall per batch vs. Meta-CSP's incremental updates
+   - **Must be fixed before integration**
+
+2. **Missing integration tests** — kernel tested in isolation only
+   - No tests with search engine, meta-constraints, or planning facade
+   - Integration may reveal missing functionality or API mismatches
+
+3. **Missing cross-validation** for symbolic and integer solvers
+   - Temporal solver had 11 bugs only caught through cross-validation
+   - Same systematic comparison needed for symbolic/integer solvers
+
+4. **Missing API documentation** for kernel
+   - No reference document for migration in Steps 6-14
+
+**LESSONS LEARNED**:
+1. Cross-validation is essential — unit tests alone caught 0 of 11 temporal solver bugs
+2. Adaptation > reimplementation — Step 2 took longer than Step 3 (which was adapted)
+3. Systematic review cycles are necessary for critical infrastructure
+4. Performance instrumentation must be part of initial implementation, not added later
 
 ### Step 0: Inventory and test scaffolding → verify: `./gradlew test` green
 
@@ -258,7 +293,114 @@ Write unit tests mirroring `JUnitTestFluentNetworkSolver`.
 **Scope**: ~3 files, ~700 lines + 1 test file.
 **Verify**: new unit tests pass; full suite green.
 
-### Step 6: CHIMP-native resolver representation → verify: compile + test green
+### Step 5a: Implement Incremental Floyd-Warshall (M17) → verify: performance test passes
+
+**CRITICAL PREREQUISITE** — Must be completed before proceeding to Step 6.
+
+**Goal**: Fix the 33x performance regression in temporal constraint addition.
+
+**Current problem**:
+- Temporal solver: 207ms vs 6.2ms (Meta-CSP) for 50 constraints on 100 variables
+- Root cause: O(n³) Floyd-Warshall executed per constraint batch
+- Meta-CSP uses incremental updates that only recompute affected entries
+
+**Implementation approach**:
+1. Research incremental APSP algorithms (incremental Floyd-Warshall or Ramalingam's algorithm)
+2. Modify `SimpleTemporalNetwork` to support incremental updates
+3. When adding a single distance edge, update only affected entries in the distance matrix
+4. Maintain the same correctness guarantees as full Floyd-Warshall
+
+**Verification**:
+- `TemporalPerformanceTest.addConstraints` shows CHIMP within 2× of Meta-CSP (not 33×)
+- All existing temporal solver tests still pass
+- Baseline preservation confirmed
+
+**Risk**: Medium-High — incremental algorithms are complex and error-prone. Requires careful testing.
+
+**Estimated effort**: 3-5 days
+
+### Step 5b: Add Cross-Validation for Symbolic and Integer Solvers → verify: cross-validation tests pass
+
+**Goal**: Apply the same systematic comparison against Meta-CSP that caught 11 temporal solver bugs.
+
+**Implementation**:
+1. Create `SymbolicSolverCrossValidationTest` comparing CHIMP vs Meta-CSP symbolic solver
+   - Test all symbolic constraint types (MATCHES, SUBMATCHES, etc.)
+   - Test compound symbolic variables with various argument patterns
+   - Compare domain reductions after constraint propagation
+
+2. Create `IntegerSolverCrossValidationTest` comparing CHIMP vs Meta-CSP integer solver
+   - Test all integer constraint types (ARITHM, ALLDIFFERENT, ALLEQUAL)
+   - Test various variable configurations
+   - Compare domain reductions after constraint propagation
+
+3. Run cross-validation tests and fix any bugs found
+
+**Verification**:
+- Cross-validation tests pass for both symbolic and integer solvers
+- All existing unit tests still pass
+- Any bugs found are fixed before proceeding
+
+**Risk**: Medium — may reveal bugs similar to temporal solver
+
+**Estimated effort**: 2-3 days
+
+### Step 5c: Add Integration Tests → verify: integration tests pass
+
+**Goal**: Add tests that use the new kernel with the search engine and meta-constraints to catch API mismatches early.
+
+**Implementation**:
+1. Create `KernelIntegrationTest` that:
+   - Creates a simple planning problem (e.g., DWR with 2 locations)
+   - Uses CHIMP-native kernel instead of Meta-CSP storage
+   - Runs search engine with the native kernel
+   - Verifies that a valid plan is produced
+
+2. Test meta-constraint integration:
+   - Use CHIMP-native constraints with meta-constraints
+   - Verify flaw detection and resolution
+
+3. Test fluent solver integration:
+   - Create fluent networks with native kernel
+   - Verify constraint propagation works correctly
+
+**Verification**:
+- Integration tests pass
+- Plans produced are valid (correct ordering, resource usage, temporal constraints)
+- No API mismatches between kernel and consumers
+
+**Risk**: High — integration may reveal missing functionality or API incompatibilities
+
+**Estimated effort**: 2-3 days
+
+### Step 5d: Create Kernel API Documentation → verify: documentation complete
+
+**Goal**: Document the kernel API to help with migration in Steps 6-14.
+
+**Implementation**:
+1. Create `docs/kernel-api.md` with:
+   - Overview of kernel architecture
+   - API reference for each solver family (temporal, symbolic, integer, fluent)
+   - Code examples showing common usage patterns
+   - Migration guide comparing old Meta-CSP API to new CHIMP-native API
+   - Performance characteristics and optimization notes
+
+2. Include:
+   - Class diagrams or descriptions
+   - Method signatures with explanations
+   - Cross-references to relevant tests
+   - Known limitations and workarounds
+
+**Verification**:
+- Documentation is complete and accurate
+- Examples in documentation compile and run
+- Migration guide covers all major API changes
+
+**Risk**: Low — documentation task
+
+**Estimated effort**: 1-2 days
+
+## Migration Steps (Steps 6-14) CHIMP-native resolver representation → verify: compile + test green
 
 Replace `ConstraintNetwork` as the resolver representation in the search engine:
 
@@ -396,11 +538,26 @@ Delete:
 
 | Step | Risk | Mitigation |
 | --- | --- | --- |
-| Step 4 (temporal STN) | **High** — STN correctness is critical for planning | Split into 4a/4b/4c; compare temporal bounds against baseline |
-| Step 7 (addResolverSub) | Medium — scope repair logic is subtle | Keep `MetaCspResolverAdapter.resolveScopeVariable` logic verbatim, just swap types |
+| **Step 5a (incremental FW)** | **High** — Incremental algorithms are complex and error-prone | Extensive testing against full Floyd-Warshall; performance benchmarks at multiple scales |
+| **Step 5b (cross-validation)** | **Medium** — May reveal bugs similar to temporal solver | Systematic comparison against Meta-CSP; fix bugs before proceeding |
+| **Step 5c (integration tests)** | **High** — Integration may reveal missing functionality | Test with simple problems first; iterate on API mismatches |
+| **Step 5d (documentation)** | **Low** — Documentation task | Include code examples that compile and run |
 | Step 6 (resolver repr) | Medium — touches search engine core | Keep JUNG visualization working at every sub-step |
-| Step 2 (symbolic solver) | Low — AC-3 is well-understood and self-contained | Port verbatim, test against existing unify tests |
-| Step 3 (integer solver) | Low — Choco wrapper, minimal logic | Re-host, not reimplement |
+| Step 7 (addResolverSub) | Medium — scope repair logic is subtle | Keep `MetaCspResolverAdapter.resolveScopeVariable` logic verbatim, just swap types |
+
+## Lessons learned from Steps 0-5
+
+1. **Cross-validation is essential**: The temporal solver had 11 bugs that were only caught through cross-validation testing against Meta-CSP. Unit tests alone caught 0 of these bugs. Cross-validation must be applied systematically to all solver families, not just temporal.
+
+2. **Adaptation > reimplementation**: Step 2 (symbolic solver) was reimplemented from scratch and took longer than Step 3 (integer solver) which was adapted from existing code. For remaining steps, prefer adaptation: copy existing code and change imports/superclasses rather than reimplementing from scratch.
+
+3. **Systematic review cycles are necessary**: Step 4 required 3 review cycles to get right. Each cycle caught different categories of bugs (edge direction errors, structural errors, state management errors). Critical infrastructure like solvers requires multiple review cycles.
+
+4. **Performance instrumentation must be early**: The 33x performance regression was only discovered after the kernel was complete. Performance tests should be part of the initial implementation, not added later. The incremental Floyd-Warshall optimization should have been planned from the start.
+
+5. **Integration testing is critical**: The kernel was tested in isolation but not with the search engine or meta-constraints. Integration tests should be added before migration to catch API mismatches early.
+
+6. **Pure additive approach works**: Keeping old Meta-CSP code untouched during kernel implementation allowed safe parallel development and easy rollback. This approach should continue through the migration steps.
 
 ## Resolved decisions
 
@@ -438,13 +595,12 @@ Delete:
 
 | Steps | Lines (new/changed) | Effort |
 | --- | --- | --- |
-| 0 | 0 | 0.5 day |
-| 1 | ~300 | 1 day |
-| 2 | ~1,500 | 2-3 days |
-| 3 | ~400 | 1 day |
-| 4 | ~500-800 | 3-5 days (highest risk) |
-| 5 | ~700 | 2 days |
+| 0-5 (completed) | ~3,300 new, ~2,400 test | 10 days |
+| 5a (incremental FW) | ~500 | 3-5 days |
+| 5b (cross-validation) | ~400 test | 2-3 days |
+| 5c (integration tests) | ~300 test | 2-3 days |
+| 5d (documentation) | ~200 docs | 1-2 days |
 | 6 | ~200 | 2 days |
 | 7-12 | ~1,000 (migrations) | 3-4 days |
 | 13-14 | deletions | 1 day |
-| **Total** | ~4,600-5,000 | **15-20 days** |
+| **Total** | ~4,600-5,000 | **24-30 days** (10 days done, 14-20 remaining) |
