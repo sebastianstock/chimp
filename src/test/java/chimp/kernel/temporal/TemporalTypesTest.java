@@ -272,4 +272,77 @@ public class TemporalTypesTest {
         assertEquals(10, b.minimum());
         assertEquals(50, b.maximum());
     }
+
+    // --- Composite type compilation (Step 4c) ---
+
+    @Test
+    public void duringOrEqualsOrStartsOrFinishesCompiles() {
+        TemporalSolver solver = new TemporalSolver(0, 1000, 100);
+        TemporalVariable[] vars = solver.createVariables(2);
+
+        TemporalConstraint c = new TemporalConstraint(
+                TemporalRelation.DuringOrEqualsOrStartsOrFinishes);
+        c.setFrom(vars[0]);
+        c.setTo(vars[1]);
+        assertTrue(solver.addConstraint(c));
+
+        // Two edges: ts→fs ∈ [0,INF] and fe→te ∈ [0,INF]
+        // Both end up bounded by horizon via transitive propagation
+        TemporalBounds b1 = solver.getAdmissibleDistanceBounds(vars[1].start(), vars[0].start());
+        assertEquals(0, b1.minimum());
+        // fe→te edge: vars[0].end→vars[1].end ∈ [0, INF], propagated via origin
+        TemporalBounds b2 = solver.getAdmissibleDistanceBounds(vars[0].end(), vars[1].end());
+        assertEquals(0, b2.minimum());
+    }
+
+    @Test
+    public void meetsOrOverlapsOrFinishedByOrContainsCompiles() {
+        TemporalSolver solver = new TemporalSolver(0, 1000, 100);
+        TemporalVariable[] vars = solver.createVariables(2);
+
+        TemporalConstraint c = new TemporalConstraint(
+                TemporalRelation.MeetsOrOverlapsOrFinishedByOrContains);
+        c.setFrom(vars[0]);
+        c.setTo(vars[1]);
+        assertTrue(solver.addConstraint(c));
+
+        // fs→ts ∈ [1,INF], ts→fe ∈ [0,INF]
+        TemporalBounds b1 = solver.getAdmissibleDistanceBounds(vars[0].start(), vars[1].start());
+        assertEquals(1, b1.minimum());
+        TemporalBounds b2 = solver.getAdmissibleDistanceBounds(vars[1].start(), vars[0].end());
+        assertEquals(0, b2.minimum());
+    }
+
+    @Test
+    public void metByOrOverlappedByOrIsFinishedByOrDuringCompiles() {
+        TemporalSolver solver = new TemporalSolver(0, 1000, 100);
+        TemporalVariable[] vars = solver.createVariables(2);
+
+        TemporalConstraint c = new TemporalConstraint(
+                TemporalRelation.MetByOrOverlappedByOrIsFinishedByOrDuring);
+        c.setFrom(vars[0]);
+        c.setTo(vars[1]);
+        assertTrue(solver.addConstraint(c));
+
+        // ts→fs ∈ [1,INF], fs→te ∈ [0,INF]
+        TemporalBounds b1 = solver.getAdmissibleDistanceBounds(vars[1].start(), vars[0].start());
+        assertEquals(1, b1.minimum());
+        TemporalBounds b2 = solver.getAdmissibleDistanceBounds(vars[0].start(), vars[1].end());
+        assertEquals(0, b2.minimum());
+    }
+
+    @Test
+    public void beforeOrMeetsCompiles() {
+        TemporalSolver solver = new TemporalSolver(0, 1000, 100);
+        TemporalVariable[] vars = solver.createVariables(2);
+
+        TemporalConstraint c = new TemporalConstraint(TemporalRelation.BeforeOrMeets);
+        c.setFrom(vars[0]);
+        c.setTo(vars[1]);
+        assertTrue(solver.addConstraint(c));
+
+        // fe→ts ∈ [0,INF]
+        TemporalBounds b = solver.getAdmissibleDistanceBounds(vars[0].end(), vars[1].start());
+        assertEquals(0, b.minimum());
+    }
 }

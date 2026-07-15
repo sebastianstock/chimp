@@ -20,6 +20,8 @@ import chimp.model.TemporalRelation;
  */
 public class TemporalConstraint extends Constraint {
 
+    private static final long INF = TemporalBounds.INFINITY;
+
     private final TemporalRelation type;
     private final TemporalBounds[] bounds;
 
@@ -137,36 +139,78 @@ public class TemporalConstraint extends Constraint {
             case Deadline -> {
                 result.add(new DistanceEdge(fs, 0, bnd(0).minimum(), bnd(0).maximum()));
             }
-            default -> {
-                // Composite types and remaining — fully handled in Step 4c
-                // For now, fall through to the default bounds via the four-interval pattern
-                compileComposite(fs, fe, ts, te, result);
+            // -- compound relations (ported from Meta-CSP AllenIntervalConstraint) --
+            case BeforeOrMeets -> {
+                // from ends before or meets to: fe → ts
+                result.add(new DistanceEdge(fe, ts, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case MetByOrAfter -> {
+                result.add(new DistanceEdge(te, fs, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case MetByOrOverlappedBy -> {
+                result.add(new DistanceEdge(fe, te, 1, INF));
+                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case MetByOrOverlappedByOrAfter -> {
+                result.add(new DistanceEdge(fe, te, 1, INF));
+                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case MetByOrOverlappedByOrIsFinishedByOrDuring -> {
+                result.add(new DistanceEdge(ts, fs, 1, INF));       // to-start strictly after from-start
+                result.add(new DistanceEdge(fs, te, 0, INF));       // to-end after from-start
+            }
+            case MeetsOrOverlapsOrBefore -> {
+                result.add(new DistanceEdge(fs, fe, 1, INF));       // from has non-zero duration
+                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case DuringOrEquals -> {
+                result.add(new DistanceEdge(ts, fs, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(fe, te, bnd(1).minimum(), bnd(1).maximum()));
+            }
+            case DuringOrEqualsOrStartsOrFinishes -> {
+                result.add(new DistanceEdge(ts, fs, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(fe, te, bnd(1).minimum(), bnd(1).maximum()));
+            }
+            case MeetsOrOverlapsOrFinishedByOrContains -> {
+                result.add(new DistanceEdge(fs, ts, 1, INF));       // to-start strictly after from-start
+                result.add(new DistanceEdge(ts, fe, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case ContainsOrStartedByOrOverlappedByOrMetBy -> {
+                result.add(new DistanceEdge(te, fe, 1, INF));       // from-end strictly after to-end
+                result.add(new DistanceEdge(fs, te, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case StartStart -> {
+                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case StartsOrStartedBy -> {
+                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case EndEnd -> {
+                result.add(new DistanceEdge(fe, te, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case EndsOrEndedBy -> {
+                result.add(new DistanceEdge(fe, te, bnd(0).minimum(), bnd(0).maximum()));
+            }
+            case At -> {
+                result.add(new DistanceEdge(fs, ts, bnd(0).minimum(), bnd(0).maximum()));
+                result.add(new DistanceEdge(fe, te, bnd(1).minimum(), bnd(1).maximum()));
+            }
+            case NotBeforeAndNotAfter -> {
+                result.add(new DistanceEdge(fs, te, 0, INF));      // from-start before to-end
+                result.add(new DistanceEdge(ts, fe, 0, INF));      // to-start before from-end
+            }
+            case Forever -> {
+                // No constraints
+            }
+            case EndsDuring -> {
+                // Not used by CHIMP — no constraints
+            }
+            case DisjunctionRelation -> {
+                // Disjunction handled at a higher level (types.length > 1);
+                // single-type case falls through with no constraints
             }
         }
         return result;
-    }
-
-    /** Stub for composite relations — uses the 4-bounds template from Meta-CSP. */
-    private void compileComposite(int fs, int fe, int ts, int te,
-                                   List<DistanceEdge> result) {
-        // bnd(0): fs → ts
-        if (!isUnconstrained(0)) result.add(new DistanceEdge(fs, ts,
-                bnd(0).minimum(), bnd(0).maximum()));
-        // bnd(1): fs → te
-        if (!isUnconstrained(1)) result.add(new DistanceEdge(fs, te,
-                bnd(1).minimum(), bnd(1).maximum()));
-        // bnd(2): fe → ts
-        if (!isUnconstrained(2)) result.add(new DistanceEdge(fe, ts,
-                bnd(2).minimum(), bnd(2).maximum()));
-        // bnd(3): fe → te
-        if (!isUnconstrained(3)) result.add(new DistanceEdge(fe, te,
-                bnd(3).minimum(), bnd(3).maximum()));
-    }
-
-    private boolean isUnconstrained(int i) {
-        TemporalBounds b = bnd(i);
-        return b.minimum() == -TemporalBounds.INFINITY
-                && b.maximum() == TemporalBounds.INFINITY;
     }
 
     private TemporalBounds bnd(int i) {
@@ -179,29 +223,50 @@ public class TemporalConstraint extends Constraint {
     private static TemporalBounds[] defaultBounds(TemporalRelation type) {
         long INF = TemporalBounds.INFINITY;
         return switch (type) {
-            case Before        -> bounds(1, INF);
-            case After         -> bounds(1, INF);
-            case Meets         -> bounds(0, 0);
-            case MetBy         -> bounds(0, 0);
-            case Overlaps      -> bounds(1, INF, 1, INF, 1, INF);
-            case OverlappedBy  -> bounds(1, INF, 1, INF, 1, INF);
-            case Starts        -> bounds(1, INF);
-            case StartedBy     -> bounds(1, INF);
-            case During        -> bounds(1, INF, 1, INF);
-            case Contains      -> bounds(1, INF, 1, INF);
-            case Finishes      -> bounds(1, INF);
-            case FinishedBy    -> bounds(1, INF);
-            case Equals        -> bounds(0, 0);
-            case Duration      -> bounds(0, INF);
-            case Release       -> bounds(0, INF);
-            case Deadline      -> bounds(0, INF);
-            case BeforeOrMeets -> bounds(0, INF);
-            case MetByOrAfter  -> bounds(0, INF);
-            default            -> bounds(0, INF, 0, INF, 0, INF, 0, INF); // 4-bounds default
+            // Atomic Allen relations
+            case Before        -> bs(1, INF);
+            case After         -> bs(1, INF);
+            case Meets         -> bs(0, 0);
+            case MetBy         -> bs(0, 0);
+            case Overlaps      -> bs(1, INF, 1, INF, 1, INF);
+            case OverlappedBy  -> bs(1, INF, 1, INF, 1, INF);
+            case Starts        -> bs(1, INF);
+            case StartedBy     -> bs(1, INF);
+            case During        -> bs(1, INF, 1, INF);
+            case Contains      -> bs(1, INF, 1, INF);
+            case Finishes      -> bs(1, INF);
+            case FinishedBy    -> bs(1, INF);
+            case Equals        -> bs(0, 0);
+            // Special
+            case Duration      -> bs(0, INF);
+            case Release       -> bs(0, INF);
+            case Deadline      -> bs(0, INF);
+            // Composite — 1 bound
+            case BeforeOrMeets                              -> bs(0, INF);
+            case MetByOrAfter                               -> bs(0, INF);
+            case MetByOrOverlappedByOrIsFinishedByOrDuring -> bs(0, INF);
+            case MeetsOrOverlapsOrFinishedByOrContains      -> bs(0, INF);
+            case ContainsOrStartedByOrOverlappedByOrMetBy   -> bs(0, INF);
+            case MetByOrOverlappedBy                        -> bs(0, INF);
+            case MetByOrOverlappedByOrAfter                 -> bs(0, 0);
+            case MeetsOrOverlapsOrBefore                    -> bs(0, 0);
+            case NotBeforeAndNotAfter                       -> bs(0, 0);
+            case EndEnd                                     -> bs(0, INF);
+            case EndsOrEndedBy                              -> bs(0, INF);
+            case StartStart                                 -> bs(0, INF);
+            case StartsOrStartedBy                          -> bs(0, INF);
+            // Composite — 2 bounds
+            case DuringOrEquals                             -> bs(0, INF, 0, INF);
+            case DuringOrEqualsOrStartsOrFinishes           -> bs(0, INF, 0, INF);
+            case At                                         -> bs(0, INF, 0, INF);
+            // No bounds
+            case Forever                -> bs();
+            case EndsDuring             -> bs();
+            case DisjunctionRelation    -> bs();
         };
     }
 
-    private static TemporalBounds[] bounds(long... pairs) {
+    private static TemporalBounds[] bs(long... pairs) {
         TemporalBounds[] ret = new TemporalBounds[pairs.length / 2];
         for (int i = 0; i < pairs.length; i += 2) {
             ret[i / 2] = new TemporalBounds(pairs[i], pairs[i + 1]);
