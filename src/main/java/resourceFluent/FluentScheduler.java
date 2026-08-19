@@ -1,22 +1,18 @@
 package resourceFluent;
 
+import java.util.Comparator;
 import java.util.Vector;
 
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.symbolic.CompoundSymbolicConstraint;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpSchedulable;
-import org.metacsp.multi.activity.Activity;
-
-import java.util.Comparator;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
 import htn.GroundSolverHolder;
-import unify.CompoundSymbolicValueConstraint;
-import unify.CompoundSymbolicVariable;
 
 public class FluentScheduler extends ChimpSchedulable implements GroundSolverHolder {
 
@@ -25,7 +21,7 @@ public class FluentScheduler extends ChimpSchedulable implements GroundSolverHol
 	private final String fieldValues;
 	private FluentNetworkSolver groundSolver;
 
-	public FluentScheduler(Comparator<ChimpFlaw> varOH, ValueOrderingH valOH, String predicateName,
+	public FluentScheduler(Comparator<ChimpFlaw> varOH, Comparator<ConstraintNetwork> valOH, String predicateName,
 			int field, String fieldValues) {
 		super(varOH, valOH);
 		this.predicateName = predicateName;
@@ -45,7 +41,7 @@ public class FluentScheduler extends ChimpSchedulable implements GroundSolverHol
 	}
 
 	public void updateUsage() {
-		if (activities == null) activities = new Vector<Activity>();
+		if (activities == null) activities = new Vector<Fluent>();
 		else activities.clear();
 		ConstraintSolver s = this.getGroundSolver();
 		for (Variable var : s.getVariables()) {
@@ -60,15 +56,16 @@ public class FluentScheduler extends ChimpSchedulable implements GroundSolverHol
 	}
 
 	@Override
-	public boolean isConflicting(Activity[] peak) {
+	public boolean isConflicting(Fluent[] peak) {
 		if (peak.length < 2) return false;
-		Fluent f1 = (Fluent)peak[0].getVariable();
-		Fluent f2 = (Fluent)peak[1].getVariable();
-		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
+		Fluent f1 = peak[0];
+		Fluent f2 = peak[1];
+		CompoundSymbolicConstraint con = new CompoundSymbolicConstraint(CompoundSymbolicConstraint.Type.MATCHES);
 		con.setFrom(f1.getCompoundSymbolicVariable());
 		con.setTo(f2.getCompoundSymbolicVariable());
-		if (f1.getCompoundSymbolicVariable().getConstraintSolver().addConstraint(con)) {
-			f1.getCompoundSymbolicVariable().getConstraintSolver().removeConstraint(con);
+		ConstraintSolver solver = f1.getCompoundSymbolicVariable().getConstraintSolver();
+		if (solver.addConstraint(con)) {
+			solver.removeConstraint(con);
 			return false;
 		} else {
 			return true;

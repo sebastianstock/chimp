@@ -2,56 +2,50 @@ package resourceFluent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import htn.GroundSolverHolder;
-import htn.HTNMetaConstraint;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.temporal.TemporalConstraint;
+import chimp.model.FluentMarking;
+import chimp.model.TemporalBounds;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpResolver;
 import chimp.search.ChimpSchedulable;
-import org.metacsp.multi.activity.Activity;
-import org.metacsp.multi.activity.ActivityComparator;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import chimp.model.TemporalBounds;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
+import htn.GroundSolverHolder;
 
 public class FluentResourceUsageScheduler extends ChimpSchedulable implements GroundSolverHolder {
-	
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 4496085871883286110L;
 	private final int capacity;
 	private final String name;
-	private final Map<Activity, Integer> usageMap = new HashMap<Activity, Integer>();
+	private final Map<Fluent, Integer> usageMap = new HashMap<Fluent, Integer>();
 	private FluentNetworkSolver groundSolver;
 
-	public FluentResourceUsageScheduler(java.util.Comparator<ChimpFlaw> varOH, ValueOrderingH valOH, String name, int cap) {
+	public FluentResourceUsageScheduler(Comparator<ChimpFlaw> varOH, Comparator<ConstraintNetwork> valOH, String name, int cap) {
 		super(varOH, valOH);
 		this.setPeakCollectionStrategy(PeakCollection.SAMPLING);
 		this.name = name;
 		this.capacity = cap;
 	}
-	
+
 	public void setGroundSolver(FluentNetworkSolver groundSolver) {
 		this.groundSolver = groundSolver;
 	}
-	
+
 	@Override
 	public ChimpFlaw[] getMetaVariables() {
 		updateUsageMap();
-		activities = new Vector<Activity>(usageMap.keySet());
+		activities = new Vector<Fluent>(usageMap.keySet());
 		return super.getMetaVariables();
 	}
 
@@ -66,9 +60,9 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 		for (ChimpResolver resolver : possiblResolvers) {
 			// test if resolver has a before constraint from an open state fluent.
 			for(Constraint c : resolver.delegate.getConstraints()) {
-				if (c instanceof AllenIntervalConstraint) {
-					Fluent from = (Fluent) ((AllenIntervalConstraint) c).getFrom();
-					if (from.getMarking() != HTNMetaConstraint.markings.OPEN) {
+				if (c instanceof TemporalConstraint) {
+					Fluent from = (Fluent) c.getFrom();
+					if (from.getMarking() != FluentMarking.OPEN.ordinal()) {
 						filtered.add(resolver);
 					}
 				}
@@ -83,7 +77,7 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 			if (con instanceof FluentConstraint) {
 				if(((FluentConstraint) con).getType() == FluentConstraint.Type.RESOURCEUSAGE) {
 					if (((FluentConstraint) con).isUsingResource(this.name)) {
-						usageMap.put((Fluent) ((FluentConstraint) con).getFrom(), 
+						usageMap.put((Fluent) ((FluentConstraint) con).getFrom(),
 								Integer.valueOf(((FluentConstraint) con).getResourceUsageLevel()));
 					}
 				}
@@ -92,17 +86,15 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 	}
 
 	@Override
-	public boolean isConflicting(Activity[] peak) {
-//		if (peak.length == 1 && peak[0].getVariable().getUsageAmount() > this.capacity) return true;
-		//sum; if sum > cap return true;
+	public boolean isConflicting(Fluent[] peak) {
 		int sum = 0;
-		for (Activity act : peak) {
+		for (Fluent act : peak) {
 			sum += usageMap.get(act);
 			if (sum > capacity) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -127,30 +119,30 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 		long horizon = ((FluentNetworkSolver) this.getGroundSolver()).getHorizon();
 
 		if (activities != null && !activities.isEmpty()) {
-			
-			Activity[] groundVars = activities.toArray(new Activity[activities.size()]);
-			
-			Arrays.sort(groundVars,new ActivityComparator(true));
-			
+
+			Fluent[] groundVars = activities.toArray(new Fluent[activities.size()]);
+
+			Arrays.sort(groundVars, new ChimpSchedulable.FluentActivityComparator(true));
+
 			Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-			
-			HashMap<Activity,ConstraintNetwork> usages = new HashMap<Activity,ConstraintNetwork>();
-			
-			Vector<Vector<Activity>> overlappingAll = new Vector<Vector<Activity>>();
-			
+
+			HashMap<Fluent,ConstraintNetwork> usages = new HashMap<Fluent,ConstraintNetwork>();
+
+			Vector<Vector<Fluent>> overlappingAll = new Vector<Vector<Fluent>>();
+
 			// this first block checks whether a single activity is over-consuming
 			// the resource
-			for (Activity act : activities) {
-				if (isConflicting(new Activity[] {act})) {
-					ConstraintNetwork temp = new ConstraintNetwork(null);
-					temp.addVariable(act.getVariable());
+			for (Fluent act : activities) {
+				if (isConflicting(new Fluent[] {act})) {
+					ConstraintNetwork temp = new ConstraintNetwork();
+					temp.addVariable(act);
 					ret.add(temp);
 				}
 			}
-	
+
 			//	groundVars are ordered activities
 			for (int i = 0; i < groundVars.length; i++) {
-				Vector<Activity> overlapping = new Vector<Activity>();
+				Vector<Fluent> overlapping = new Vector<Fluent>();
 				overlapping.add(groundVars[i]);
 				long start = (groundVars[i]).getTemporalVariable().getEST();
 				long end = (groundVars[i]).getTemporalVariable().getEET();
@@ -174,11 +166,11 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 							overlapping.add(groundVars[j]);
 							// the current set of overlapping activities is evaluated to see if
 							// the resource capacity is exceeded
-							if (isConflicting(overlapping.toArray(new Activity[overlapping.size()]))) {
+							if (isConflicting(overlapping.toArray(new Fluent[overlapping.size()]))) {
 								// if it is exceeded the Vector of activities gathered in this iteration is put
 								// in a Vector<Vector<Activity>>
 								overlappingAll.add(overlapping);
-								break;						
+								break;
 							}
 							// if they don't exceed the capacity, just the newIntersection is taken into account...
 							else intersection = intersectionNew;
@@ -186,22 +178,22 @@ public class FluentResourceUsageScheduler extends ChimpSchedulable implements Gr
 					}
 				}
 			}
-	
-			for (Vector<Activity> overlapping : overlappingAll) {
+
+			for (Vector<Fluent> overlapping : overlappingAll) {
 				if (overlapping.size() > 1) {
-					Activity first = overlapping.get(0);
-					ConstraintNetwork temp = new ConstraintNetwork(null);
-					for (Activity act : overlapping) temp.addVariable(act.getVariable());
+					Fluent first = overlapping.get(0);
+					ConstraintNetwork temp = new ConstraintNetwork();
+					for (Fluent act : overlapping) temp.addVariable(act);
 					usages.put(first, temp);
 				}
 			}
-			
-			for (Activity key : usages.keySet()) {
+
+			for (Fluent key : usages.keySet()) {
 				if (usages.get(key).getVariables().length > 1) ret.add(usages.get(key));
 			}
 			return ret.toArray(new ConstraintNetwork[ret.size()]);
 		}
-		return (new ConstraintNetwork[0]);		
+		return (new ConstraintNetwork[0]);
 	}
 
 }

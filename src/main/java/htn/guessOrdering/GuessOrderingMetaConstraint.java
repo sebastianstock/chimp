@@ -1,23 +1,22 @@
 package htn.guessOrdering;
 
-import htn.GroundSolverHolder;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
 import chimp.model.FluentId;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 import chimp.search.ChimpResolver;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
+import htn.GroundSolverHolder;
 
 
 public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
@@ -28,7 +27,7 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 	private List<List<Integer>> previousConflicts = new ArrayList<List<Integer>>();
 	private FluentNetworkSolver groundSolver;
 
-	public GuessOrderingMetaConstraint(ValueOrderingH valOH) {
+	public GuessOrderingMetaConstraint(Comparator<ConstraintNetwork> valOH) {
 		super(null, valOH);
 	}
 
@@ -128,7 +127,7 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 		List<ConstraintNetwork> ret = new LinkedList<ConstraintNetwork>();
 		if (vars.length > 1) {
 			for (int i = 0; i < vars.length; i++) {
-				ConstraintNetwork nw = new ConstraintNetwork(null);
+				ConstraintNetwork nw = new ConstraintNetwork();
 				for (int j = 0; j < vars.length; j++) {
 					if (j != i) {
 						FluentConstraint bc = new FluentConstraint(FluentConstraint.Type.BEFORE);
@@ -140,7 +139,7 @@ public class GuessOrderingMetaConstraint extends ChimpMetaConstraint implements 
 				ret.add(nw);
 			}
 		}
-		ret.add(new ConstraintNetwork(null));
+		ret.add(new ConstraintNetwork());
 		logger.info("Meta-Values:" );
 		for (ConstraintNetwork cn : ret) {
 			logger.info(cn.toString());

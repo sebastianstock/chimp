@@ -1,13 +1,30 @@
 package htn.valOrderingHeuristics;
 
-import chimp.adapter.metacsp.MetaCspResolverOrderingAdapter;
+import chimp.kernel.ConstraintNetwork;
+import chimp.search.ChimpSearchAdapter;
 import chimp.search.ResolverCandidate;
 
 import java.util.Comparator;
 
-/** Meta-CSP compatibility adapter for CHIMP-owned resolver ordering policies. */
-public abstract class CHIMPValOH extends MetaCspResolverOrderingAdapter {
+/**
+ * CHIMP-native resolver ordering heuristic.
+ *
+ * <p>Implements {@link Comparator}<{@link ConstraintNetwork}> so it can be used
+ * directly as the value-ordering heuristic in {@link planner.CHIMP.CHIMPBuilder}.
+ */
+public abstract class CHIMPValOH implements Comparator<ConstraintNetwork> {
+
+    private static final ChimpSearchAdapter SEARCH_ADAPTER = new ChimpSearchAdapter();
+    private final Comparator<ResolverCandidate> comparator;
+
     protected CHIMPValOH(Comparator<ResolverCandidate> comparator) {
-        super(comparator);
+        this.comparator = comparator;
+    }
+
+    @Override
+    public int compare(ConstraintNetwork left, ConstraintNetwork right) {
+        return comparator.compare(
+                SEARCH_ADAPTER.toResolverCandidate(left),
+                SEARCH_ADAPTER.toResolverCandidate(right));
     }
 }

@@ -22,6 +22,7 @@ public class ConstraintNetwork {
     private final List<Constraint> constraints = new ArrayList<>();
     private final Map<VariablePrototype, Variable> substitutions = new HashMap<>();
     private Object annotation;
+    private Object specializedAnnotation;
 
     public ConstraintNetwork() { }
 
@@ -39,6 +40,16 @@ public class ConstraintNetwork {
 
     public void addConstraint(Constraint c) {
         constraints.add(Objects.requireNonNull(c));
+        // Ensure all scope variables are present in the network.  This mirrors
+        // Meta-CSP behaviour where variables are derived from constraints.
+        Variable[] scope = c.scope();
+        if (scope != null) {
+            for (Variable v : scope) {
+                if (v != null && !variables.contains(v)) {
+                    variables.add(v);
+                }
+            }
+        }
     }
 
     public void removeConstraint(Constraint c) {
@@ -47,6 +58,21 @@ public class ConstraintNetwork {
 
     public Constraint[] getConstraints() {
         return constraints.toArray(new Constraint[0]);
+    }
+
+    /** Returns constraints whose scope includes both {@code from} and {@code to}. */
+    public Constraint[] getConstraints(Variable from, Variable to) {
+        List<Constraint> result = new ArrayList<>();
+        for (Constraint c : constraints) {
+            boolean hasFrom = false;
+            boolean hasTo = false;
+            for (Variable v : c.scope()) {
+                if (v.equals(from)) hasFrom = true;
+                if (v.equals(to)) hasTo = true;
+            }
+            if (hasFrom && hasTo) result.add(c);
+        }
+        return result.toArray(new Constraint[0]);
     }
 
     // -- substitutions --
@@ -74,12 +100,35 @@ public class ConstraintNetwork {
 
     // -- annotation (used for SubVariableKind tags during compilation) --
 
+    /**
+     * Sets the general-purpose annotation for this network.
+     */
     public void setAnnotation(Object annotation) {
         this.annotation = annotation;
     }
 
+    /**
+     * Returns the general-purpose annotation.
+     */
     public Object getAnnotation() {
         return annotation;
+    }
+
+    // -- specialized annotation (used by search engine for flaws/resolvers) --
+
+    /**
+     * Sets a specialized annotation object (e.g. a {@link PlanningFlaw}
+     * or {@link chimp.search.ResolverCandidate}).
+     */
+    public void setSpecilizedAnnotation(Object annotation) {
+        this.specializedAnnotation = annotation;
+    }
+
+    /**
+     * Returns the specialized annotation object.
+     */
+    public Object getSpecilizedAnnotation() {
+        return specializedAnnotation;
     }
 
     // -- standard --

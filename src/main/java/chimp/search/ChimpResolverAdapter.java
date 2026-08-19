@@ -1,25 +1,30 @@
-package chimp.adapter.metacsp;
-
-import chimp.model.ResolverDescription;
-import chimp.model.SubVariableKind;
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import htn.PlanReportroryItem;
-import integers.IntegerConstraint;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import unify.CompoundSymbolicValueConstraint;
+package chimp.search;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class MetaCspResolverAdapter {
-    private static final MetaCspSearchAdapter SEARCH_ADAPTER = new MetaCspSearchAdapter();
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.integer.IntegerConstraint;
+import chimp.kernel.symbolic.CompoundSymbolicConstraint;
+import chimp.kernel.temporal.TemporalConstraint;
+import chimp.model.ResolverDescription;
+import chimp.model.SubVariableKind;
+import htn.PlanReportroryItem;
+
+/**
+ * Compiles resolver descriptions into CHIMP-native resolver networks and
+ * performs scope repair during materialization.
+ */
+public final class ChimpResolverAdapter {
+
+    private static final ChimpSearchAdapter SEARCH_ADAPTER = new ChimpSearchAdapter();
 
     public List<ConstraintNetwork> compile(
             PlanReportroryItem item,
@@ -58,14 +63,14 @@ public final class MetaCspResolverAdapter {
     }
 
     /**
-     * Maps a Meta-CSP constraint to the sub-variable kind it operates on.
+     * Maps a CHIMP-native constraint to the sub-variable kind it operates on.
      * Used during scope repair to know which sub-variable to extract from a materialized Fluent.
      */
     public static SubVariableKind subVariableKindOf(Constraint constraint) {
-        if (constraint instanceof CompoundSymbolicValueConstraint) {
+        if (constraint instanceof CompoundSymbolicConstraint) {
             return SubVariableKind.SYMBOLIC;
         }
-        if (constraint instanceof AllenIntervalConstraint) {
+        if (constraint instanceof TemporalConstraint) {
             return SubVariableKind.TEMPORAL;
         }
         if (constraint instanceof IntegerConstraint) {
@@ -91,8 +96,8 @@ public final class MetaCspResolverAdapter {
             ConstraintNetwork network) {
         if (scopeEntry instanceof VariablePrototype vp) {
             if (kind == SubVariableKind.INTEGER) {
-                VariablePrototype fluentPrototype = (VariablePrototype) vp.getParameters()[0];
-                int index = (int) vp.getParameters()[1];
+                VariablePrototype fluentPrototype = vp.parentPrototype();
+                int index = vp.subIndex();
                 Fluent fluent = (Fluent) network.getSubstitution(fluentPrototype);
                 return fluent.getIntegerVariables()[index];
             }
@@ -100,7 +105,7 @@ public final class MetaCspResolverAdapter {
             return switch (kind) {
                 case FLUENT -> fluent;
                 case SYMBOLIC -> fluent.getCompoundSymbolicVariable();
-                case TEMPORAL -> fluent.getAllenInterval();
+                case TEMPORAL -> fluent.getTemporalVariable();
                 default -> fluent;
             };
         }

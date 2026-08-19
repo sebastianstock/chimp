@@ -1,11 +1,12 @@
 package htn;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.VariablePrototype;
+import chimp.kernel.Constraint;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
 import chimp.logging.ChimpLogging;
+import chimp.model.FluentMarking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class HTNOperator extends PlanReportroryItem {
 		if (effects != null) {
 			for(EffectTemplate et : effects) {
 				VariablePrototype p = et.getPrototype(groundSolver);
-				p.setMarking(HTNMetaConstraint.markings.OPEN);
+				p.setMarking(FluentMarking.OPEN.ordinal());
 				String[] arguments = (String[])p.getParameters()[2];
 				FluentConstraint opens = new FluentConstraint(FluentConstraint.Type.OPENS, 
 						createConnections(arguments));

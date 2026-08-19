@@ -1,34 +1,31 @@
 package chimp.search;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
-import org.metacsp.meta.symbolsAndTime.MCSData;
-import org.metacsp.multi.activity.Activity;
-import org.metacsp.multi.activity.ActivityComparator;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.APSPSolver;
-import org.metacsp.time.Bounds;
-import org.metacsp.utility.PowerSet;
-
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.temporal.TemporalConstraint;
+import chimp.kernel.temporal.TemporalVariable;
 import chimp.model.FluentId;
 import chimp.model.TemporalBounds;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import chimp.util.PowerSet;
 
 /**
  * CHIMP-owned replacement for {@code org.metacsp.meta.symbolsAndTime.Schedulable}.
  * Ports the peak-collection and minimal critical set (MCS) resolution logic
  * without inheriting from the Meta-CSP framework.
  *
- * <p>Subclasses implement {@link #isConflicting(Activity[])} to define what
+ * <p>Subclasses implement {@link #isConflicting(Fluent[])} to define what
  * constitutes a resource conflict, and populate the {@link #activities} vector
  * (typically in an overridden {@link #getMetaVariables()}).
  */
@@ -37,7 +34,7 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
     public enum PeakCollection { SAMPLING, COMPLETE, BINARY }
 
     protected long beforeParameter = 0;
-    protected Vector<Activity> activities;
+    protected Vector<Fluent> activities;
     protected PeakCollection peakCollectionStrategy = PeakCollection.SAMPLING;
 
 	public ChimpSchedulable(Comparator<ChimpFlaw> varOH,
@@ -86,15 +83,14 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
         }
 
         for (MCSData mcs : mcsinfo) {
-            AllenIntervalConstraint before = new AllenIntervalConstraint(
-                    AllenIntervalConstraint.Type.BeforeOrMeets,
-                    new Bounds(this.beforeParameter, APSPSolver.INF));
-            before.setFrom(mcs.mcsActFrom.getVariable());
-            before.setTo(mcs.mcsActTo.getVariable());
-            ConstraintNetwork resolver = new ConstraintNetwork(
-                    mcs.mcsActFrom.getVariable().getConstraintSolver());
-            resolver.addVariable(mcs.mcsActFrom.getVariable());
-            resolver.addVariable(mcs.mcsActTo.getVariable());
+            TemporalConstraint before = new TemporalConstraint(
+                    chimp.model.TemporalRelation.BeforeOrMeets,
+                    new TemporalBounds[] { new TemporalBounds(this.beforeParameter, TemporalBounds.INFINITY) });
+            before.setFrom(mcs.mcsActFrom);
+            before.setTo(mcs.mcsActTo);
+            ConstraintNetwork resolver = new ConstraintNetwork();
+            resolver.addVariable(mcs.mcsActFrom);
+            resolver.addVariable(mcs.mcsActTo);
             resolver.addConstraint(before);
             ret.add(resolver);
         }
@@ -110,13 +106,13 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
      */
     private ConstraintNetwork peakForFlaw(ChimpFlaw flaw) {
         if (activities == null) {
-            return new ConstraintNetwork(null);
+            return new ConstraintNetwork();
         }
-        ConstraintNetwork cn = new ConstraintNetwork(null);
+        ConstraintNetwork cn = new ConstraintNetwork();
         for (FluentId id : flaw.taskIds()) {
-            for (Activity act : activities) {
-                if (act.getVariable().getID() == id.value()) {
-                    cn.addVariable(act.getVariable());
+            for (Fluent act : activities) {
+                if (act.getID() == id.value()) {
+                    cn.addVariable(act);
                     break;
                 }
             }
@@ -128,23 +124,23 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
 
     protected ConstraintNetwork[] samplingPeakCollection() {
         if (activities != null && !activities.isEmpty()) {
-            Activity[] groundVars = activities.toArray(new Activity[activities.size()]);
-            Arrays.sort(groundVars, new ActivityComparator(true));
+            Fluent[] groundVars = activities.toArray(new Fluent[activities.size()]);
+            Arrays.sort(groundVars, new FluentActivityComparator(true));
 
             Vector<ConstraintNetwork> ret = new Vector<>();
-            HashMap<Activity, ConstraintNetwork> usages = new HashMap<>();
-            Vector<Vector<Activity>> overlappingAll = new Vector<>();
+            HashMap<Fluent, ConstraintNetwork> usages = new HashMap<>();
+            Vector<Vector<Fluent>> overlappingAll = new Vector<>();
 
-            for (Activity act : activities) {
-                if (isConflicting(new Activity[] {act})) {
-                    ConstraintNetwork temp = new ConstraintNetwork(null);
-                    temp.addVariable(act.getVariable());
+            for (Fluent act : activities) {
+                if (isConflicting(new Fluent[] {act})) {
+                    ConstraintNetwork temp = new ConstraintNetwork();
+                    temp.addVariable(act);
                     ret.add(temp);
                 }
             }
 
             for (int i = 0; i < groundVars.length; i++) {
-                Vector<Activity> overlapping = new Vector<>();
+                Vector<Fluent> overlapping = new Vector<>();
                 overlapping.add(groundVars[i]);
                 long start = groundVars[i].getTemporalVariable().getEST();
                 long end = groundVars[i].getTemporalVariable().getEET();
@@ -157,7 +153,7 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
                         TemporalBounds intersectionNew = intersection.intersectStrict(nextInterval);
                         if (intersectionNew != null) {
                             overlapping.add(groundVars[j]);
-                            if (isConflicting(overlapping.toArray(new Activity[overlapping.size()]))) {
+                            if (isConflicting(overlapping.toArray(new Fluent[overlapping.size()]))) {
                                 overlappingAll.add(overlapping);
                                 break;
                             } else {
@@ -168,16 +164,16 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
                 }
             }
 
-            for (Vector<Activity> overlapping : overlappingAll) {
+            for (Vector<Fluent> overlapping : overlappingAll) {
                 if (overlapping.size() > 1) {
-                    Activity first = overlapping.get(0);
-                    ConstraintNetwork temp = new ConstraintNetwork(null);
-                    for (Activity act : overlapping) temp.addVariable(act.getVariable());
+                    Fluent first = overlapping.get(0);
+                    ConstraintNetwork temp = new ConstraintNetwork();
+                    for (Fluent act : overlapping) temp.addVariable(act);
                     usages.put(first, temp);
                 }
             }
 
-            for (Activity key : usages.keySet()) {
+            for (Fluent key : usages.keySet()) {
                 if (usages.get(key).getVariables().length > 1) ret.add(usages.get(key));
             }
 
@@ -189,9 +185,9 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
     protected ConstraintNetwork[] completePeakCollection() {
         if (activities != null && !activities.isEmpty()) {
             logger.finest("Doing complete peak collection with " + activities.size() + " activities...");
-            Activity[] groundVars = activities.toArray(new Activity[activities.size()]);
+            Fluent[] groundVars = activities.toArray(new Fluent[activities.size()]);
             Vector<Long> discontinuities = new Vector<>();
-            for (Activity a : groundVars) {
+            for (Fluent a : groundVars) {
                 long start = a.getTemporalVariable().getEST();
                 long end = a.getTemporalVariable().getEET();
                 if (!discontinuities.contains(start)) discontinuities.add(start);
@@ -201,13 +197,13 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
             Long[] discontinuitiesArray = discontinuities.toArray(new Long[discontinuities.size()]);
             Arrays.sort(discontinuitiesArray);
 
-            HashSet<HashSet<Activity>> superPeaks = new HashSet<>();
+            HashSet<HashSet<Fluent>> superPeaks = new HashSet<>();
 
             for (int i = 0; i < discontinuitiesArray.length - 1; i++) {
-                HashSet<Activity> onePeak = new HashSet<>();
+                HashSet<Fluent> onePeak = new HashSet<>();
                 superPeaks.add(onePeak);
                 TemporalBounds interval = new TemporalBounds(discontinuitiesArray[i], discontinuitiesArray[i + 1]);
-                for (Activity a : groundVars) {
+                for (Fluent a : groundVars) {
                     TemporalBounds interval1 = new TemporalBounds(
                             a.getTemporalVariable().getEST(),
                             a.getTemporalVariable().getEET());
@@ -219,12 +215,12 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
             }
 
             Vector<ConstraintNetwork> ret = new Vector<>();
-            for (HashSet<Activity> superSet : superPeaks) {
-                for (Set<Activity> s : PowerSet.powerSet(superSet)) {
+            for (HashSet<Fluent> superSet : superPeaks) {
+                for (Set<Fluent> s : PowerSet.powerSet(superSet)) {
                     if (!s.isEmpty()) {
-                        ConstraintNetwork cn = new ConstraintNetwork(null);
-                        for (Activity a : s) cn.addVariable(a.getVariable());
-                        if (!ret.contains(cn) && isConflicting(s.toArray(new Activity[s.size()]))) {
+                        ConstraintNetwork cn = new ConstraintNetwork();
+                        for (Fluent a : s) cn.addVariable(a);
+                        if (!ret.contains(cn) && isConflicting(s.toArray(new Fluent[s.size()]))) {
                             ret.add(cn);
                         }
                     }
@@ -240,11 +236,11 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
         if (activities != null && !activities.isEmpty()) {
             Vector<ConstraintNetwork> ret = new Vector<>();
             logger.finest("Doing binary peak collection with " + activities.size() + " activities...");
-            Activity[] groundVars = activities.toArray(new Activity[activities.size()]);
-            for (Activity a : groundVars) {
-                if (isConflicting(new Activity[] {a})) {
-                    ConstraintNetwork cn = new ConstraintNetwork(null);
-                    cn.addVariable(a.getVariable());
+            Fluent[] groundVars = activities.toArray(new Fluent[activities.size()]);
+            for (Fluent a : groundVars) {
+                if (isConflicting(new Fluent[] {a})) {
+                    ConstraintNetwork cn = new ConstraintNetwork();
+                    cn.addVariable(a);
                     ret.add(cn);
                 }
             }
@@ -260,10 +256,10 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
                             groundVars[j].getTemporalVariable().getEST(),
                             groundVars[j].getTemporalVariable().getEET());
                     if (bi.intersectStrict(bj) != null
-                            && isConflicting(new Activity[] {groundVars[i], groundVars[j]})) {
-                        ConstraintNetwork cn = new ConstraintNetwork(null);
-                        cn.addVariable(groundVars[i].getVariable());
-                        cn.addVariable(groundVars[j].getVariable());
+                            && isConflicting(new Fluent[] {groundVars[i], groundVars[j]})) {
+                        ConstraintNetwork cn = new ConstraintNetwork();
+                        cn.addVariable(groundVars[i]);
+                        cn.addVariable(groundVars[j]);
                         ret.add(cn);
                     }
                 }
@@ -306,16 +302,16 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
             int mcsSize = currentMcs.length;
 
             for (int g = 0; g < mcsSize; g++) {
-                long est1 = ((Activity) currentMcs[g]).getTemporalVariable().getEST();
-                long eet1 = ((Activity) currentMcs[g]).getTemporalVariable().getEST();
-                long lst1 = ((Activity) currentMcs[g]).getTemporalVariable().getLST();
-                long let1 = ((Activity) currentMcs[g]).getTemporalVariable().getLET();
+                long est1 = ((Fluent) currentMcs[g]).getTemporalVariable().getEST();
+                long eet1 = ((Fluent) currentMcs[g]).getTemporalVariable().getEST();
+                long lst1 = ((Fluent) currentMcs[g]).getTemporalVariable().getLST();
+                long let1 = ((Fluent) currentMcs[g]).getTemporalVariable().getLET();
 
                 for (int h = g + 1; h < mcsSize; h++) {
-                    long est2 = ((Activity) currentMcs[h]).getTemporalVariable().getEST();
-                    long eet2 = ((Activity) currentMcs[h]).getTemporalVariable().getEET();
-                    long lst2 = ((Activity) currentMcs[h]).getTemporalVariable().getLST();
-                    long let2 = ((Activity) currentMcs[h]).getTemporalVariable().getLET();
+                    long est2 = ((Fluent) currentMcs[h]).getTemporalVariable().getEST();
+                    long eet2 = ((Fluent) currentMcs[h]).getTemporalVariable().getEET();
+                    long lst2 = ((Fluent) currentMcs[h]).getTemporalVariable().getLST();
+                    long let2 = ((Fluent) currentMcs[h]).getTemporalVariable().getLET();
 
                     long dmin = est2 - let1;
                     long dmax = lst2 - eet1;
@@ -365,9 +361,9 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
                 for (int g = 0; g < pcVector.size(); g++) {
                     kReciprocal += 1.0f / (1.0f + pcVector.elementAt(g) - pcmin);
                 }
-                mcsinfo.add(new MCSData(pcmin, (Activity) actFrom, (Activity) actTo,
+                mcsinfo.add(new MCSData(pcmin, (Fluent) actFrom, (Fluent) actTo,
                         (kReciprocal == 0.0f) ? 1 : 1.0f / kReciprocal));
-                mcsinfo.add(new MCSData(pcminBad, (Activity) actTo, (Activity) actFrom,
+                mcsinfo.add(new MCSData(pcminBad, (Fluent) actTo, (Fluent) actFrom,
                         (kReciprocal == 0.0f) ? 1 : 1.0f / kReciprocal));
                 index++;
             } else {
@@ -384,29 +380,48 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
         return mcsinfoArray;
     }
 
-    protected boolean temporalOverlap(Activity a1, Activity a2) {
+    protected boolean temporalOverlap(Fluent a1, Fluent a2) {
         return !(a1.getTemporalVariable().getEET() <= a2.getTemporalVariable().getEST()
                 || a2.getTemporalVariable().getEET() <= a1.getTemporalVariable().getEST());
     }
 
-    public abstract boolean isConflicting(Activity[] peak);
+    public abstract boolean isConflicting(Fluent[] peak);
 
-    public void setUsage(Activity... acts) {
+    public void setUsage(Fluent... acts) {
         if (activities == null) activities = new Vector<>();
-        for (Activity act : acts) {
+        for (Fluent act : acts) {
             if (!activities.contains(act)) {
                 activities.add(act);
             }
         }
     }
 
-    public void removeUsage(Activity... acts) {
+    public void removeUsage(Fluent... acts) {
         if (activities != null) {
-            for (Activity act : acts) activities.removeElement(act);
+            for (Fluent act : acts) activities.removeElement(act);
         }
     }
 
-    public Vector<Activity> getActivityOnUse() {
+    public Vector<Fluent> getActivityOnUse() {
         return activities;
+    }
+
+    // --- Comparator for Fluent activities (replaces ActivityComparator) ---
+
+    public static final class FluentActivityComparator implements Comparator<Fluent> {
+        private final boolean byStart;
+
+        public FluentActivityComparator(boolean byStart) {
+            this.byStart = byStart;
+        }
+
+        @Override
+        public int compare(Fluent a1, Fluent a2) {
+            TemporalVariable tv1 = a1.getTemporalVariable();
+            TemporalVariable tv2 = a2.getTemporalVariable();
+            long v1 = byStart ? tv1.getEST() : tv1.getLET();
+            long v2 = byStart ? tv2.getEST() : tv2.getLET();
+            return Long.compare(v1, v2);
+        }
     }
 }

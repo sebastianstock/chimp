@@ -92,6 +92,14 @@ public class CompoundSymbolicSolver extends ConstraintSolver {
     // -- constraint management --
 
     @Override
+    public boolean addConstraints(Constraint[] cs) {
+        for (Constraint c : cs) {
+            if (!addConstraint(c)) return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean addConstraint(Constraint c) {
         if (c instanceof CompoundSymbolicConstraint cc) {
             // Generate sub-constraints and route to sub-solvers

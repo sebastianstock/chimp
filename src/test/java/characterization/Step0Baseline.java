@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 
 import chimp.model.PlannedAction;
 import externalPathPlanning.LookUpTableDurationEstimator;
-import fluentSolver.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentNetworkSolver;
 import htn.valOrderingHeuristics.CHIMPValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;

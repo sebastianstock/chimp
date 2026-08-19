@@ -1,19 +1,4 @@
-package chimp.adapter.metacsp;
-
-import chimp.model.ResolverDescription;
-import chimp.search.ExpansionCandidateDescription;
-import chimp.search.PlanningFlaw;
-import chimp.search.ResolverCandidate;
-import chimp.search.ResolverCandidateKind;
-import chimp.search.ResolverCandidateMetadata;
-import chimp.search.TaskPlanningFlaw;
-import chimp.search.TaskUnificationCandidateDescription;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import htn.PlanReportroryItem;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
+package chimp.search;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,7 +6,19 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
-public final class MetaCspSearchAdapter {
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.model.ResolverDescription;
+import htn.PlanReportroryItem;
+
+/**
+ * Annotates CHIMP-native resolver networks with the metadata required by
+ * the search engine (flaws, expansion candidates, task unifications).
+ */
+public final class ChimpSearchAdapter {
 
     public void annotateFlaw(ConstraintNetwork network, TaskPlanningFlaw flaw) {
         network.setSpecilizedAnnotation(flaw);
@@ -123,7 +120,7 @@ public final class MetaCspSearchAdapter {
                 if (fluentConstraint.getType() == FluentConstraint.Type.DC) {
                     subtaskCount++;
                 } else if (fluentConstraint.getType() == FluentConstraint.Type.PRE) {
-                    preconditionEstSum += ((Fluent) fluentConstraint.getFrom()).getAllenInterval().getEST();
+                    preconditionEstSum += ((Fluent) fluentConstraint.getFrom()).getTemporalVariable().getEST();
                 }
             }
         }
@@ -135,7 +132,7 @@ public final class MetaCspSearchAdapter {
                 applied == null ? 0 : depth(applied),
                 weight,
                 subtaskCount,
-                task.getAllenInterval().getEST(),
+                task.getTemporalVariable().getEST(),
                 preconditionEstSum,
                 bindingCount);
     }

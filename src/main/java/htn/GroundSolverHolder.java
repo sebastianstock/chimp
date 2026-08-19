@@ -1,5 +1,8 @@
 package htn;
 
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.fluent.FluentNetworkSolver;
+
 /**
  * Marker interface for meta-constraints that hold a direct reference to
  * the ground solver, set by {@code HTNPlanner.addMetaConstraint}.
@@ -17,12 +20,12 @@ public interface GroundSolverHolder {
      *
      * @param groundSolver the fluent network solver
      */
-    void setGroundSolver(fluentSolver.FluentNetworkSolver groundSolver);
+    void setGroundSolver(FluentNetworkSolver groundSolver);
 
     /**
      * Returns the ground solver held by this meta-constraint.
      *
      * @return the fluent network solver
      */
-    org.metacsp.framework.ConstraintSolver getGroundSolver();
+    ConstraintSolver getGroundSolver();
 }

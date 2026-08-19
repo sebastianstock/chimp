@@ -25,6 +25,24 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+sourceSets {
+    main {
+        java {
+            // These examples are kept for reference/benchmarking but still
+            // depend on the removed Meta-CSP storage layer.  They are compiled
+            // only on the legacy-metacsp branch.
+            exclude 'examples/TestDWRDomain.java'
+            exclude 'examples/TestRuntimes.java'
+            exclude 'examples/TestTransTerraProblems.java'
+            exclude 'examples/VariousTests.java'
+            exclude 'examples/negative_precondition_resource/TestRemoveAllSamples.java'
+            exclude 'examples/eval/*.java'
+            exclude 'examples/chimp/TestIncrementalMerging.java'
+            exclude 'examples/chimp/TestPlanningWithIntegerConstraints.java'
+        }
+    }
+}
+
 repositories {
 
   mavenCentral()
@@ -37,9 +55,6 @@ version = ''
 group = 'chimp'
 
 dependencies {
-
-  implementation group: 'org.metacsp', name: 'meta-csp-framework', version: '1.3.5'
-  //compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
 
   implementation group: 'info.picocli', name: 'picocli', version: '4.7.7'
 

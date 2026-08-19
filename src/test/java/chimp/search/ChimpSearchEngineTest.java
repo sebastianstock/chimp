@@ -9,10 +9,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Domain;
-import org.metacsp.framework.Variable;
 
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.Variable;
 import chimp.model.FluentId;
 
 public class ChimpSearchEngineTest {
@@ -21,7 +20,7 @@ public class ChimpSearchEngineTest {
     public void findsSolutionWithFirstResolver() {
         RecordingHooks hooks = new RecordingHooks();
         ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(1)));
-        ChimpResolver resolver = new ChimpResolver(new ConstraintNetwork(null));
+        ChimpResolver resolver = new ChimpResolver(new ConstraintNetwork());
         StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of(resolver)));
         ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), hooks, 0);
 
@@ -150,7 +149,7 @@ public class ChimpSearchEngineTest {
     }
 
     private static ConstraintNetwork distinctNetwork(int id) {
-        ConstraintNetwork cn = new ConstraintNetwork(null);
+        ConstraintNetwork cn = new ConstraintNetwork();
         cn.addVariable(new DummyVariable(id));
         return cn;
     }
@@ -158,9 +157,6 @@ public class ChimpSearchEngineTest {
     private static final class DummyVariable extends Variable {
         private final int id;
         DummyVariable(int id) { super(null, id); this.id = id; }
-        @Override public Domain getDomain() { return null; }
-        @Override public void setDomain(Domain d) { }
-        @Override public int compareTo(Variable o) { return Integer.compare(this.id, o.getID()); }
         @Override public String toString() { return "DummyVariable(" + id + ")"; }
     }
 }

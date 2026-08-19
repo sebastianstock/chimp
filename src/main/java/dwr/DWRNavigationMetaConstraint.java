@@ -1,30 +1,31 @@
 package dwr;
 
-import htn.GroundSolverHolder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.ArrayList;
 
-import htn.HTNMetaConstraint;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.kernel.temporal.TemporalConstraint;
 import chimp.model.FluentId;
+import chimp.model.FluentMarking;
+import chimp.model.TemporalBounds;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 import chimp.search.ChimpResolver;
-
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
+import htn.GroundSolverHolder;
+import htn.HTNMetaConstraint;
 import hybridDomainParsing.HybridDomain;
-import unify.CompoundSymbolicVariable;
 
 
 
@@ -118,13 +119,14 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 		}
 		Fluent taskFluent = (Fluent) conflicts[0];
 
+
 		logger.fine("getMetaValues for: " + taskFluent);
 
 //		return estimateDuration(taskFluent);
 		Graph<String, String> g = createGraph();
 		DijkstraShortestPath<String,String> dijk = new DijkstraShortestPath<String,String>(g);
 
-		ConstraintNetwork cn = new ConstraintNetwork(null);
+		ConstraintNetwork cn = new ConstraintNetwork();
 		for (int i = 0; i < conflicts.length; i++) {
 			Fluent nav = (Fluent) conflicts[i];
 			if (! nav.getCompoundSymbolicVariable().getPredicateName().equals(NAVIGATE_TASK_NAME)) {
@@ -146,8 +148,8 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 				args[2] = s_items[1].substring(0, s_items[1].length()-1);
 				args[3] = HybridDomain.EMPTYSTRING;
 				args[4] = HybridDomain.EMPTYSTRING;
-				VariablePrototype vp = new VariablePrototype(this.getGroundSolver(), "Activity", "!move", args);
-				vp.setMarking(HTNMetaConstraint.markings.UNPLANNED);
+				VariablePrototype vp = VariablePrototype.forFluent(this.getGroundSolver(), "Activity", "!move", args);
+				vp.setMarking(FluentMarking.UNPLANNED.ordinal());
 				prototypes[j] = vp;
 				FluentConstraint dc = new FluentConstraint(FluentConstraint.Type.DC);
 				dc.setFrom(nav);
@@ -158,8 +160,9 @@ public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements 
 					bc.setFrom(prev);
 					bc.setTo(vp);
 					cn.addConstraint(bc);
-					AllenIntervalConstraint aiCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before, 
-							AllenIntervalConstraint.Type.Before.getDefaultBounds());
+					TemporalConstraint aiCon = new TemporalConstraint(
+							chimp.model.TemporalRelation.Before,
+							new TemporalBounds[] { new TemporalBounds(0, TemporalBounds.INFINITY) });
 					aiCon.setFrom(prev);
 					aiCon.setTo(vp);
 					cn.addConstraint(aiCon);

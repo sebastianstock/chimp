@@ -1,22 +1,4 @@
-package chimp.adapter.metacsp;
-
-import chimp.model.InitialFluentDefinition;
-import chimp.model.InitialTaskDefinition;
-import chimp.model.ProblemDefinition;
-import chimp.model.ProblemMarking;
-import chimp.model.ProblemOrderingEdge;
-import chimp.model.ProblemTemporalConstraint;
-import chimp.model.ResourceRequirement;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import hybridDomainParsing.ClassicHybridDomain;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import resourceFluent.ResourceUsageTemplate;
-import unify.CompoundSymbolicVariable;
+package chimp.kernel.fluent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,11 +7,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public final class MetaCspProblemCompiler {
-    private final MetaCspTemporalConstraintAdapter temporalAdapter =
-            new MetaCspTemporalConstraintAdapter();
-    private final MetaCspResourceRequirementAdapter resourceAdapter =
-            new MetaCspResourceRequirementAdapter();
+import chimp.kernel.Constraint;
+import chimp.kernel.Variable;
+import chimp.kernel.temporal.TemporalConstraint;
+import chimp.model.FluentMarking;
+import chimp.model.InitialFluentDefinition;
+import chimp.model.InitialTaskDefinition;
+import chimp.model.ProblemDefinition;
+import chimp.model.ProblemMarking;
+import chimp.model.ProblemOrderingEdge;
+import chimp.model.ProblemTemporalConstraint;
+import chimp.model.ResourceRequirement;
+import htn.HTNMetaConstraint;
+import hybridDomainParsing.ClassicHybridDomain;
+import resourceFluent.ResourceUsageTemplate;
+
+/**
+ * CHIMP-native problem compiler — populates a {@link FluentNetworkSolver}
+ * from a {@link ProblemDefinition}.
+ */
+public final class ProblemCompiler {
+
+    private final ResourceRequirementAdapter resourceAdapter = new ResourceRequirementAdapter();
 
     public void compile(
             ProblemDefinition problem,
@@ -44,7 +43,7 @@ public final class MetaCspProblemCompiler {
                 fluent.getIntegerVariables()[i]
                         .setConstantValue(definition.integerConstants().get(i));
             }
-            fluent.setMarking(toMetaCspMarking(definition.marking()));
+            fluent.setMarking(toMarking(definition.marking()));
             variables.put(definition.id(), fluent);
         }
 
@@ -55,14 +54,14 @@ public final class MetaCspProblemCompiler {
                     : Fluent.TASK_TYPE_STR;
             Fluent task = (Fluent) fluentSolver.createVariable(component);
             setName(task, definition.signature().predicate(), definition.signature().arguments());
-            task.setMarking(toMetaCspMarking(definition.marking()));
+            task.setMarking(toMarking(definition.marking()));
             variables.put(definition.id(), task);
         }
 
         List<Constraint> temporalConstraints = new ArrayList<>();
         for (ProblemTemporalConstraint definition : problem.temporalConstraints()) {
-            AllenIntervalConstraint constraint =
-                    temporalAdapter.toAllenIntervalConstraint(definition.template());
+            TemporalConstraintAdapter adapter = new TemporalConstraintAdapter();
+            TemporalConstraint constraint = adapter.toTemporalConstraint(definition.template());
             constraint.setFrom(requireVariable(variables, definition.fromId()));
             constraint.setTo(requireVariable(variables, definition.toId()));
             temporalConstraints.add(constraint);
@@ -86,10 +85,10 @@ public final class MetaCspProblemCompiler {
         fluent.setName(predicate, arguments.toArray(String[]::new));
     }
 
-    private Object toMetaCspMarking(ProblemMarking marking) {
+    private int toMarking(ProblemMarking marking) {
         return switch (marking) {
-            case OPEN -> HTNMetaConstraint.markings.OPEN;
-            case UNPLANNED -> HTNMetaConstraint.markings.UNPLANNED;
+            case OPEN -> FluentMarking.OPEN.ordinal();
+            case UNPLANNED -> FluentMarking.UNPLANNED.ordinal();
         };
     }
 
@@ -108,7 +107,7 @@ public final class MetaCspProblemCompiler {
         Map<String, List<ResourceRequirement>> requirementsByPredicate =
                 HTNMetaConstraint.createResourceUsagesMap(requirements);
         for (Variable variable : variables) {
-            CompoundSymbolicVariable symbolic =
+            chimp.kernel.symbolic.CompoundSymbolicVariable symbolic =
                     ((Fluent) variable).getCompoundSymbolicVariable();
             List<ResourceRequirement> matching =
                     requirementsByPredicate.get(symbolic.getPredicateName());
@@ -125,5 +124,16 @@ public final class MetaCspProblemCompiler {
             }
         }
         return constraints.toArray(Constraint[]::new);
+    }
+
+    /** Small helper that converts problem templates to CHIMP-native temporal constraints. */
+    private static final class TemporalConstraintAdapter {
+        TemporalConstraint toTemporalConstraint(chimp.model.TemporalConstraintTemplate template) {
+            if (template.bounds().isEmpty()) {
+                return new TemporalConstraint(template.relation());
+            }
+            return new TemporalConstraint(template.relation(),
+                    template.bounds().toArray(chimp.model.TemporalBounds[]::new));
+        }
     }
 }

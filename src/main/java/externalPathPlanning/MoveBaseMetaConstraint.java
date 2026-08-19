@@ -1,33 +1,27 @@
 package externalPathPlanning;
 
-import htn.GroundSolverHolder;
-import java.util.List;
-import java.util.Vector;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.Variable;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
 import chimp.model.FluentId;
+import chimp.model.TemporalBounds;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 import chimp.search.ChimpResolver;
-import chimp.model.TemporalBounds;
-import org.metacsp.time.Bounds;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import unify.CompoundSymbolicVariable;
+import htn.GroundSolverHolder;
 
 
 
 public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2789371087819357936L;
 	private static final String MOVE_BASE_NAME = "!move_base";
 	private static final String ROBOTAT_NAME = "RobotAt";
@@ -48,10 +42,6 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	}
 
 	
-	/** 
-	 * @return All {@link MetaVariable}s with the marking UNPLANNED and which have no unplanned 
-	 * predecessors.
-	 */
 	@Override
 	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
@@ -86,11 +76,6 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	}
 
 	
-	/**
-	 * Get all values for a given {@link MetaVariable}.
-	 * @param metaVariable The {@link MetaVariable} for which we seek meta values.
-	 * @return All meta values for the given{@link MetaVariable}s.
-	 */
 	@Override
 	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
@@ -121,11 +106,10 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 		}
 		
 		if (bounds != null) {
-			FluentConstraint duration = new FluentConstraint(FluentConstraint.Type.MOVEDURATION,
-					new Bounds(bounds.minimum(), bounds.maximum()));
+			FluentConstraint duration = new FluentConstraint(FluentConstraint.Type.MOVEDURATION, bounds);
 			duration.setFrom(taskFluent);
 			duration.setTo(taskFluent);
-			ConstraintNetwork ret = new ConstraintNetwork(null);
+			ConstraintNetwork ret = new ConstraintNetwork();
 			ret.addConstraint(duration);
 			return new ConstraintNetwork[] {ret};
 		} else {

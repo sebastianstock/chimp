@@ -91,4 +91,18 @@ public abstract class ConstraintSolver {
      * state is consistent, {@code false} if a conflict is detected.
      */
     public abstract boolean propagate();
+
+    // -- network access for visualization / debugging --
+
+    /**
+     * Returns a {@link ConstraintNetwork} representing this solver's
+     * current state.  Default implementation returns a snapshot;
+     * subclasses may override to provide a live network view.
+     */
+    public ConstraintNetwork getConstraintNetwork() {
+        ConstraintNetwork net = new ConstraintNetwork();
+        for (Variable v : getVariables()) net.addVariable(v);
+        for (Constraint c : getConstraints()) net.addConstraint(c);
+        return net;
+    }
 }

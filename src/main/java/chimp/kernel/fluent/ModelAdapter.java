@@ -1,13 +1,10 @@
-package chimp.adapter.metacsp;
+package chimp.kernel.fluent;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-import org.metacsp.time.Bounds;
-
+import chimp.kernel.Variable;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
@@ -16,17 +13,19 @@ import chimp.model.FluentSignature;
 import chimp.model.FluentType;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalInterval;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import unify.CompoundSymbolicVariable;
 
-public final class MetaCspModelAdapter {
+/**
+ * Converts CHIMP-native fluent/constraint objects into CHIMP model objects
+ * used by the public API (FluentStore, PlanExtractor, etc.).
+ */
+public final class ModelAdapter {
 
     public FluentNode toFluentNode(Fluent fluent) {
         Objects.requireNonNull(fluent, "fluent");
 
-        CompoundSymbolicVariable symbolic = fluent.getCompoundSymbolicVariable();
-        AllenInterval interval = fluent.getAllenInterval();
+        chimp.kernel.symbolic.CompoundSymbolicVariable symbolic =
+                fluent.getCompoundSymbolicVariable();
+        chimp.kernel.temporal.TemporalVariable interval = fluent.getTemporalVariable();
         return new FluentNode(
                 new FluentId(fluent.getID()),
                 toFluentType(fluent.getTypeStr()),
@@ -43,8 +42,7 @@ public final class MetaCspModelAdapter {
 
         FluentId from = toFluentId(constraint.getFrom(), "from");
         FluentId to = toFluentId(constraint.getTo(), "to");
-        Optional<TemporalBounds> bounds = Optional.ofNullable(constraint.getBounds())
-                .map(this::toTemporalBounds);
+        Optional<TemporalBounds> bounds = Optional.ofNullable(constraint.getBounds());
         return new ChimpConstraint(toConstraintKind(constraint.getType()), from, to, bounds);
     }
 
@@ -78,9 +76,4 @@ public final class MetaCspModelAdapter {
         }
         return new FluentId(variable.getID());
     }
-
-    private TemporalBounds toTemporalBounds(Bounds bounds) {
-        return new TemporalBounds(bounds.min, bounds.max);
-    }
-
 }

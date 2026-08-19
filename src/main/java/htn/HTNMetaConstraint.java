@@ -1,25 +1,30 @@
 package htn;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.*;
-import org.metacsp.multi.allenInterval.AllenInterval;
-import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
-import chimp.adapter.metacsp.MetaCspSearchAdapter;
+import java.util.*;
+
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.ResourceRequirementAdapter;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.kernel.temporal.TemporalVariable;
 import chimp.model.FluentId;
 import chimp.model.ResourceRequirement;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpMetaConstraint;
 import chimp.search.ChimpResolver;
-
-import java.util.*;
+import chimp.search.ChimpSearchAdapter;
 
 
 public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
-	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
-			new MetaCspResourceRequirementAdapter();
-	private static final MetaCspSearchAdapter SEARCH_ADAPTER = new MetaCspSearchAdapter();
+	private static final ResourceRequirementAdapter RESOURCE_ADAPTER =
+			new ResourceRequirementAdapter();
+	private static final ChimpSearchAdapter SEARCH_ADAPTER = new ChimpSearchAdapter();
 
 	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}
 
@@ -38,7 +43,7 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 	
 	private FluentNetworkSolver groundSolver;
 	
-	public HTNMetaConstraint(ValueOrderingH valOH) {
+	public HTNMetaConstraint(Comparator<ConstraintNetwork> valOH) {
 		super(null, valOH);
 	}
 	
@@ -181,7 +186,7 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 		}
 		
 		for (Fluent fl : possibleMatchingTasks) {
-			ConstraintNetwork cn = new ConstraintNetwork(null);
+			ConstraintNetwork cn = new ConstraintNetwork();
 			// add unification
 			FluentConstraint mc = new FluentConstraint(FluentConstraint.Type.MATCHES);
 			mc.setFrom(task);
@@ -204,7 +209,7 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 		return ret;
 	}
 	
-	private boolean checkTime(AllenInterval taskInterval, AllenInterval varInterval) {
+	private boolean checkTime(TemporalVariable taskInterval, TemporalVariable varInterval) {
 
 		return varInterval.getEST() <= taskInterval.getLST()
 				&& taskInterval.getEST() <= varInterval.getLST()
@@ -252,7 +257,7 @@ public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolv
 			}
 		}
 
-		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
+		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getTemporalVariable());
 
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {

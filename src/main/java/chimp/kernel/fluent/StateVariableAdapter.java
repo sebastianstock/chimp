@@ -1,11 +1,15 @@
-package chimp.adapter.metacsp;
+package chimp.kernel.fluent;
+
+import java.util.List;
 
 import chimp.model.StateVariableDefinition;
 import resourceFluent.FluentScheduler;
 
-import java.util.List;
-
-public final class MetaCspStateVariableAdapter {
+/**
+ * Converts a {@link StateVariableDefinition} into the
+ * {@link FluentScheduler}s that enforce mutual exclusion of its values.
+ */
+public final class StateVariableAdapter {
 
     public List<FluentScheduler> toFluentSchedulers(StateVariableDefinition definition) {
         return definition.exclusiveValues().stream()

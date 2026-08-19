@@ -9,14 +9,14 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Table;
 
-import fluentSolver.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentStoreImpl;
 import htn.PlanReportroryItem;
 
 import planner.CHIMP;
 import postprocessing.HPRtypes.KeyValue;
 import postprocessing.HPRtypes.*;
 
-import chimp.adapter.metacsp.MetaCspFluentStore;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
@@ -45,7 +45,7 @@ public class HPRGenerator {
         this.chimp = chimp;
         this.writer = writer;
         FluentNetworkSolver fluentSolver = chimp.getFluentSolver();
-        this.store = new MetaCspFluentStore(fluentSolver);
+        this.store = new FluentStoreImpl(fluentSolver);
         this.hprPlan = new HPRPlan();
         this.fluentsConstraintsMultiMap = ArrayListMultimap.create();
         this.beforesTable = HashBasedTable.create();

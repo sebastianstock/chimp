@@ -30,6 +30,9 @@ public class TemporalVariable extends Variable {
         stn.addEdgeSilent(startTimePoint, endTimePoint,
                 TemporalBounds.INFINITY);
         stn.addEdgeSilent(endTimePoint, startTimePoint, 0);
+        // Record the implicit duration edge so STN rebuilds keep it.
+        stn.recordConstraint(new chimp.kernel.temporal.DistanceEdge(
+                startTimePoint, endTimePoint, 0, TemporalBounds.INFINITY));
     }
 
     /** Index of the start time point in the STN. */

@@ -2,6 +2,7 @@ package chimp.kernel;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Placeholder variable used in resolver networks before fluent materialization.
@@ -23,6 +24,8 @@ public class VariablePrototype extends Variable {
 
     /** What kind of variable this prototype will become. */
     public enum Kind { FLUENT, INTEGER }
+
+    private static final AtomicInteger NEXT_ID = new AtomicInteger(-1);
 
     private final Kind kind;
 
@@ -48,7 +51,7 @@ public class VariablePrototype extends Variable {
         this.subIndex = subIndex;
     }
 
-    /** Creates a fluent placeholder. */
+    /** Creates a fluent placeholder with an explicit id. */
     public static VariablePrototype forFluent(ConstraintSolver solver, int id,
                                                String component, String symbol,
                                                String[] arguments) {
@@ -56,12 +59,26 @@ public class VariablePrototype extends Variable {
                 component, symbol, arguments, null, -1);
     }
 
-    /** Creates an integer sub-variable placeholder. */
+    /** Creates a fluent placeholder with an auto-generated id. */
+    public static VariablePrototype forFluent(ConstraintSolver solver,
+                                               String component, String symbol,
+                                               String[] arguments) {
+        return forFluent(solver, NEXT_ID.decrementAndGet(), component, symbol, arguments);
+    }
+
+    /** Creates an integer sub-variable placeholder with an explicit id. */
     public static VariablePrototype forInteger(ConstraintSolver solver, int id,
                                                 VariablePrototype parentPrototype,
                                                 int subIndex) {
         return new VariablePrototype(solver, id, Kind.INTEGER,
                 null, null, null, parentPrototype, subIndex);
+    }
+
+    /** Creates an integer sub-variable placeholder with an auto-generated id. */
+    public static VariablePrototype forInteger(ConstraintSolver solver,
+                                                VariablePrototype parentPrototype,
+                                                int subIndex) {
+        return forInteger(solver, NEXT_ID.decrementAndGet(), parentPrototype, subIndex);
     }
 
     // -- typed accessors --

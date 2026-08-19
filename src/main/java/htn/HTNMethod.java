@@ -1,11 +1,12 @@
 package htn;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
+import chimp.kernel.Constraint;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.model.FluentMarking;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,7 +45,7 @@ public class HTNMethod extends PlanReportroryItem {
 		if (effects != null) {
 			for (EffectTemplate et : effects) {
 				VariablePrototype subPrototype = et.getPrototype(groundSolver);
-				subPrototype.setMarking(HTNMetaConstraint.markings.UNPLANNED);
+				subPrototype.setMarking(FluentMarking.UNPLANNED.ordinal());
 				// create dc constraint
 				String[] arguments = (String[])subPrototype.getParameters()[2];
 				FluentConstraint dc = 

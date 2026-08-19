@@ -1,7 +1,7 @@
 package htn;
 
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
 
 public class OrderingConstraintTemplate {
 

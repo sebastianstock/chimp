@@ -3,7 +3,8 @@ package postprocessing;
 import java.io.*;
 import java.util.*;
 
-import chimp.adapter.metacsp.MetaCspFluentStore;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentStoreImpl;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
@@ -12,7 +13,6 @@ import chimp.model.FluentStore;
 import chimp.model.FluentType;
 import chimp.model.FluentView;
 import chimp.model.TemporalInterval;
-import fluentSolver.FluentNetworkSolver;
 
 public class PlanExtractor {
 	
@@ -21,7 +21,7 @@ public class PlanExtractor {
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	public PlanExtractor(FluentNetworkSolver fluentSolver) {
-		this.fluentStore = new MetaCspFluentStore(fluentSolver);
+		this.fluentStore = new FluentStoreImpl(fluentSolver);
 	}
 
 	public void printActions() {

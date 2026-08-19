@@ -1,18 +1,16 @@
 package chimp.search;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
 
 /**
  * CHIMP-owned resolver representation for the backtracking search engine.
  *
  * <p>A resolver carries constraints to apply to ground solvers, variable
  * prototypes for materialization, and a substitution map for scope repair.
- * For this milestone it delegates to a Meta-CSP {@link ConstraintNetwork};
- * the CHIMP-native constraint representation will replace the delegate in
- * M15.
+ * This class uses the CHIMP-native {@link ConstraintNetwork} delegate.
  *
  * <p>The public API is intentionally narrow — it exposes only what
  * {@link SearchHooks} and {@link ChimpSearchEngine} need. Internal
@@ -22,7 +20,7 @@ import org.metacsp.framework.VariablePrototype;
  */
 public class ChimpResolver {
 
-    /** Internal delegate; will be replaced by CHIMP-native types in M15. */
+    /** Internal delegate backed by CHIMP-native types. */
     public final ConstraintNetwork delegate;
 
     public ChimpResolver(ConstraintNetwork delegate) {

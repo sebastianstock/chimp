@@ -1,4 +1,4 @@
-package chimp.adapter.metacsp;
+package chimp.kernel.fluent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,14 +6,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-import org.metacsp.multi.allenInterval.AllenIntervalNetworkSolver;
-import org.metacsp.time.APSPSolver;
-import org.metacsp.time.SimpleDistanceConstraint;
-import org.metacsp.time.TimePoint;
-
+import chimp.kernel.Constraint;
+import chimp.kernel.Variable;
+import chimp.kernel.integer.IntegerDomain;
+import chimp.kernel.integer.IntegerVariable;
+import chimp.kernel.temporal.TemporalSolver;
+import chimp.kernel.temporal.TemporalVariable;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
@@ -26,27 +24,27 @@ import chimp.model.IntegerValue;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalEndpoint;
 import chimp.model.TemporalInterval;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNMetaConstraint;
-import integers.IntegerDomain;
-import integers.IntegerVariable;
-import org.metacsp.framework.Variable;
 
-public final class MetaCspFluentStore implements FluentStore {
+/**
+ * CHIMP-native implementation of {@link FluentStore}.
+ *
+ * <p>Backed by a {@link FluentNetworkSolver} and provides both read and
+ * write operations for fluent variables, their temporal intervals, and
+ * their constraints.
+ */
+public final class FluentStoreImpl implements FluentStore {
 
     private final FluentNetworkSolver solver;
-    private final MetaCspModelAdapter modelAdapter = new MetaCspModelAdapter();
+    private final ModelAdapter modelAdapter = new ModelAdapter();
 
-    public MetaCspFluentStore(FluentNetworkSolver solver) {
+    public FluentStoreImpl(FluentNetworkSolver solver) {
         this.solver = Objects.requireNonNull(solver, "solver");
     }
 
     @Override
     public Optional<TemporalBounds> temporalDistance(FluentId from, FluentId to,
-                                                       TemporalEndpoint fromEndpoint,
-                                                       TemporalEndpoint toEndpoint) {
+                                                     TemporalEndpoint fromEndpoint,
+                                                     TemporalEndpoint toEndpoint) {
         Objects.requireNonNull(from, "from");
         Objects.requireNonNull(to, "to");
         Objects.requireNonNull(fromEndpoint, "fromEndpoint");
@@ -55,14 +53,10 @@ public final class MetaCspFluentStore implements FluentStore {
         Fluent fromFluent = requireFluent(from);
         Fluent toFluent = requireFluent(to);
 
-        TimePoint fromTimePoint = timePoint(fromFluent, fromEndpoint);
-        TimePoint toTimePoint = timePoint(toFluent, toEndpoint);
-
-        SimpleDistanceConstraint distance = apspSolver().getConstraint(fromTimePoint, toTimePoint);
-        if (distance == null) {
-            return Optional.empty();
-        }
-        return Optional.of(new TemporalBounds(distance.getMinimum(), distance.getMaximum()));
+        TemporalSolver temporalSolver = solver.getTemporalSolver();
+        int fromPoint = timePoint(fromFluent, fromEndpoint);
+        int toPoint = timePoint(toFluent, toEndpoint);
+        return Optional.of(temporalSolver.getAdmissibleDistanceBounds(fromPoint, toPoint));
     }
 
     @Override
@@ -129,7 +123,7 @@ public final class MetaCspFluentStore implements FluentStore {
         Objects.requireNonNull(marking, "marking");
         Fluent fluent = (Fluent) solver.createVariable(component);
         fluent.setName(name, arguments);
-        fluent.setMarking(fromMarking(marking));
+        fluent.setMarking(marking.ordinal());
         return new FluentId(fluent.getID());
     }
 
@@ -148,28 +142,26 @@ public final class MetaCspFluentStore implements FluentStore {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(marking, "marking");
         Fluent fluent = requireFluent(id);
-        fluent.setMarking(fromMarking(marking));
+        fluent.setMarking(marking.ordinal());
     }
 
-    private HTNMetaConstraint.markings fromMarking(FluentMarking marking) {
-        return HTNMetaConstraint.markings.valueOf(marking.name());
-    }
+    // --- helpers ---
 
     private FluentView toView(Fluent fluent) {
         FluentNode node = modelAdapter.toFluentNode(fluent);
         List<IntegerValue> integerValues = new ArrayList<>();
         for (IntegerVariable variable : fluent.getIntegerVariables()) {
-            IntegerDomain domain = (IntegerDomain) variable.getDomain();
+            IntegerDomain domain = variable.getDomain();
             OptionalInt value = domain.isInstantiated()
                     ? OptionalInt.of(domain.getValue())
                     : OptionalInt.empty();
             integerValues.add(new IntegerValue(value, domain.isConstant()));
         }
-        return new MetaCspFluentView(
+        return new FluentViewRecord(
                 node.id(),
                 node.type(),
                 node.signature(),
-                toMarking(fluent.getMarking()),
+                FluentMarking.fromIntValue(fluent.getMarking()),
                 node.temporalInterval(),
                 List.copyOf(integerValues),
                 fluent.toString());
@@ -203,24 +195,12 @@ public final class MetaCspFluentStore implements FluentStore {
         throw new IllegalArgumentException("Unknown fluent ID: " + id.value());
     }
 
-    private TimePoint timePoint(Fluent fluent, TemporalEndpoint endpoint) {
-        AllenInterval interval = fluent.getAllenInterval();
+    private int timePoint(Fluent fluent, TemporalEndpoint endpoint) {
+        TemporalVariable interval = fluent.getTemporalVariable();
         return endpoint == TemporalEndpoint.START ? interval.getStart() : interval.getEnd();
     }
 
-    private APSPSolver apspSolver() {
-        AllenIntervalNetworkSolver allenSolver = (AllenIntervalNetworkSolver) solver.getConstraintSolvers()[1];
-        return (APSPSolver) allenSolver.getConstraintSolvers()[0];
-    }
-
-    private FluentMarking toMarking(Object marking) {
-        if (!(marking instanceof HTNMetaConstraint.markings metaCspMarking)) {
-            throw new IllegalArgumentException("Unsupported fluent marking: " + marking);
-        }
-        return FluentMarking.valueOf(metaCspMarking.name());
-    }
-
-    private record MetaCspFluentView(
+    private record FluentViewRecord(
             FluentId id,
             FluentType type,
             chimp.model.FluentSignature signature,

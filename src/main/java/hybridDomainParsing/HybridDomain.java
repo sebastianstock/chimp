@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import fluentSolver.FluentNetworkSolver;
 import chimp.search.FlawProvider;
 import chimp.logging.ChimpLogging;
 

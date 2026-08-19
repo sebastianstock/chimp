@@ -1,10 +1,16 @@
-package chimp.adapter.metacsp;
+package chimp.kernel.fluent;
+
+import java.util.stream.IntStream;
 
 import chimp.model.ResourceParameterRequirement;
 import chimp.model.ResourceRequirement;
 import resourceFluent.ResourceUsageTemplate;
 
-public final class MetaCspResourceRequirementAdapter {
+/**
+ * Converts a CHIMP {@link ResourceRequirement} into the
+ * {@link ResourceUsageTemplate} used by resource schedulers.
+ */
+public final class ResourceRequirementAdapter {
 
     public ResourceUsageTemplate toResourceUsageTemplate(ResourceRequirement requirement) {
         int[] positions = requirement.parameterRequirements().stream()

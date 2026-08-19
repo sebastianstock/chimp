@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
 import chimp.kernel.ConstraintSolver;
 import chimp.kernel.Variable;
 import chimp.kernel.integer.IntegerConstraint;
@@ -35,6 +36,8 @@ public class FluentNetworkSolver extends ConstraintSolver {
     private final long origin;
     private final long horizon;
     private final int numIntVars;
+    private final ConstraintNetwork network;
+    private final ConstraintSolver[] subSolvers;
 
     /**
      * Create a FluentNetworkSolver without integer variables.
@@ -74,9 +77,31 @@ public class FluentNetworkSolver extends ConstraintSolver {
         } else {
             this.integerSolver = null;
         }
+        this.network = new ConstraintNetwork();
+        this.subSolvers = buildSubSolverArray();
+    }
+
+    private ConstraintSolver[] buildSubSolverArray() {
+        List<ConstraintSolver> list = new ArrayList<>();
+        list.add(symbolicSolver);
+        list.add(temporalSolver);
+        if (hasIntegerSolver) list.add(integerSolver);
+        return list.toArray(new ConstraintSolver[0]);
     }
 
     // -- fluent creation --
+
+    /** Creates a single fluent with the default component (State). */
+    public Fluent createVariable() {
+        return createVariable(Fluent.STATE_TYPE_STR);
+    }
+
+    /** Creates a single fluent with the given component type. */
+    public Fluent createVariable(String component) {
+        Fluent f = createVariables(1)[0];
+        f.setComponent(component);
+        return f;
+    }
 
     /**
      * Creates {@code num} fluents, each with one symbolic variable,
@@ -103,7 +128,24 @@ public class FluentNetworkSolver extends ConstraintSolver {
         return fluents;
     }
 
+    /** Overridden to also add to the constraint network. */
+    @Override
+    protected void registerVariable(Variable v) {
+        super.registerVariable(v);
+        network.addVariable(v);
+    }
+
     // -- constraint management --
+
+    @Override
+    public boolean addConstraints(Constraint[] cs) {
+        for (Constraint c : cs) {
+            if (!addConstraint(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     public boolean addConstraint(Constraint c) {
@@ -131,7 +173,72 @@ public class FluentNetworkSolver extends ConstraintSolver {
             }
         }
         constraintList().add(c);
+        network.addConstraint(c);
         return true;
+    }
+
+    // -- variable removal --
+
+    /** Removes variables and all their associated constraints. */
+    public void removeVariables(Variable... vars) {
+        for (Variable v : vars) {
+            // Remove constraints that involve this variable
+            List<Constraint> toRemove = new ArrayList<>();
+            for (Constraint c : getConstraints()) {
+                for (Variable scopeVar : c.scope()) {
+                    if (scopeVar.equals(v)) {
+                        toRemove.add(c);
+                        break;
+                    }
+                }
+            }
+            for (Constraint c : toRemove) {
+                removeConstraint(c);
+                network.removeConstraint(c);
+            }
+            unregisterVariable(v);
+        }
+    }
+
+    // -- variable access --
+
+    /** Returns variables whose {@link Variable#component()} matches. */
+    public Variable[] getVariables(String component) {
+        List<Variable> result = new ArrayList<>();
+        for (Variable v : getVariables()) {
+            if (component.equals(v.component())) {
+                result.add(v);
+            }
+        }
+        return result.toArray(new Variable[0]);
+    }
+
+    // -- network access --
+
+    /** Returns the constraint network representing this solver's state. */
+    public ConstraintNetwork getConstraintNetwork() {
+        return network;
+    }
+
+    /** Returns the sub-solvers (symbolic, temporal, integer). */
+    public ConstraintSolver[] getConstraintSolvers() {
+        return subSolvers;
+    }
+
+    /** Propagates all sub-solvers (delegated strategy: already done on add). */
+    public void propagateAllSub() {
+        // Delegated strategy: sub-solvers propagate on addConstraint.
+        // This method exists for Meta-CSP compatibility.
+    }
+
+    /** Returns a human-readable description of this solver. */
+    public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("FluentNetworkSolver[fluents=").append(getVariables().length);
+        sb.append(", constrs=").append(getConstraints().length);
+        sb.append(", origin=").append(origin).append(", horizon=").append(horizon);
+        sb.append("]");
+        return sb.toString();
     }
 
     /** Route a sub-constraint to the right sub-solver. */

@@ -1,10 +1,10 @@
-CHIMP (Conflict-driven Hierarchical Meta-CSP Planner)
-=====================================================
+CHIMP (Conflict-driven Hierarchical Hybrid Planner)
+===================================================
 
 Summary
 -------
 
-CHIMP is a hierarchical hybrid planner. It combines HTN-Planning and meta-constraint reasoning and is based on the Meta-CSP Framework. Currently, it supports causal, temporal and resource knowledge as well as knowledge that is provided by an external path planner.
+CHIMP is a hierarchical hybrid planner. It combines HTN-Planning and meta-constraint reasoning using a CHIMP-native solver kernel. Currently, it supports causal, temporal and resource knowledge as well as knowledge that is provided by an external path planner.
 
 CHIMP aims at enabling a mobile robot to use different forms of knowledge in its planning process. Furthermore, it can produce plans that can be executed in parallel, and additional goal tasks can be inserted into an existing plan during the execution of the plan. For details please see our [paper at IROS 2015][iros-paper].
 
@@ -20,11 +20,9 @@ To import CHIMP into eclipse you can use the target `eclipse` which will generat
 
 ### Examples ###
 
-To test CHIMP you can try different example domains in the package examples/chimp. TestRACEDomain.java uses a domain description from the robot waiter scenario from the [RACE project](http://project-race.eu/). It creates a plan for serving a hot coffee with milk and sugar, i.e., all objects need to be served fast enough so that the coffee will not get cold.
+To test CHIMP you can try the command-line runner (`examples.ChimpIO`) with a domain and problem description. The domain contains the HTN-methods and operators and the problem contains the initial state of the world and the goal tasks.
 
-CHIMP needs a domain and a problem description in order to generate a plan. The domain contains the HTN-methods and operators and the problem contains the initial state of the world and the goal tasks.
-
-Other examples how to use CHIMP can be found in the packages `examples` and `examples.chimp`.
+An example domain for serving coffee in the robot waiter scenario from the [RACE project](http://project-race.eu/) is provided under `domains/ordered_domain.ddl`.
 
 ### Usage ###
 

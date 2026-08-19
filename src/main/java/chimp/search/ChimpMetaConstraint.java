@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
-import org.metacsp.framework.ConstraintNetwork;
+import chimp.kernel.ConstraintNetwork;
 
 import chimp.logging.ChimpLogging;
 

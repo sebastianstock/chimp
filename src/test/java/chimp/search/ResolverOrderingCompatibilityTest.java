@@ -13,7 +13,8 @@ import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH
 import htn.valOrderingHeuristics.UnifyFewestsubsNewestbindingsValOH;
 import htn.valOrderingHeuristics.UnifyWeightNewestbindingsValOH;
 import org.junit.Test;
-import org.metacsp.framework.ConstraintNetwork;
+
+import chimp.kernel.ConstraintNetwork;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,7 +82,7 @@ public class ResolverOrderingCompatibilityTest {
     }
 
     private ConstraintNetwork annotated(ResolverCandidate candidate) {
-        ConstraintNetwork network = new ConstraintNetwork(null);
+        ConstraintNetwork network = new ConstraintNetwork();
         network.setSpecilizedAnnotation(candidate);
         return network;
     }

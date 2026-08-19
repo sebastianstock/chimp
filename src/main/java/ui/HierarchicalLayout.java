@@ -29,12 +29,12 @@ import java.util.Set;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.map.LazyMap;
-import org.metacsp.multi.allenInterval.AllenInterval;
 
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.temporal.TemporalVariable;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
 
 public class HierarchicalLayout implements Layout<Fluent, FluentConstraint> {
 	
@@ -154,8 +154,8 @@ public class HierarchicalLayout implements Layout<Fluent, FluentConstraint> {
 
 			@Override
 			public int compare(Fluent o1, Fluent o2) {
-				AllenInterval ai1 = o1.getAllenInterval();
-				AllenInterval ai2 = o2.getAllenInterval();
+				TemporalVariable ai1 = o1.getTemporalVariable();
+				TemporalVariable ai2 = o2.getTemporalVariable();
 				if (ai1.getEST() < ai2.getEST()) {
 					return -1;
 				} else if (ai1.getEST() > ai2.getEST()) {

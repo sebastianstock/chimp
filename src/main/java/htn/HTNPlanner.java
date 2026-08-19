@@ -1,26 +1,26 @@
 package htn;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import hybridDomainParsing.HybridDomainPlanner;
-import chimp.adapter.metacsp.MetaCspFluentStore;
-import chimp.adapter.metacsp.MetaCspResolverAdapter;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
 import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentStoreImpl;
+import chimp.logging.ChimpLogging;
 import chimp.model.FluentId;
 import chimp.model.FluentMarking;
 import chimp.model.FluentStore;
 import chimp.model.SubVariableKind;
 import chimp.search.ChimpFlaw;
 import chimp.search.ChimpResolver;
+import chimp.search.ChimpResolverAdapter;
 import chimp.search.ChimpSearchEngine;
 import chimp.search.FlawProvider;
 import chimp.search.SearchHooks;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.Variable;
-import chimp.logging.ChimpLogging;
+import hybridDomainParsing.HybridDomainPlanner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 			int[] symbolicIngredients) {
 		this.animationTime = animationTime;
 		this.groundSolver = new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients);
-		this.fluentStore = new MetaCspFluentStore(this.groundSolver);
+		this.fluentStore = new FluentStoreImpl(this.groundSolver);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 		this.animationTime = animationTime;
 		this.groundSolver = new FluentNetworkSolver(origin, horizon, symbols, symbolicIngredients,
 				minIntValue, maxIntValue, numIntVars);
-		this.fluentStore = new MetaCspFluentStore(this.groundSolver);
+		this.fluentStore = new FluentStoreImpl(this.groundSolver);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 				}
 			}
 			if (!inFlaw) {
-				if (v instanceof org.metacsp.framework.VariablePrototype vp) {
+				if (v instanceof VariablePrototype vp) {
 					Variable vReal = metaValue.getSubstitution(vp);
 					if (vReal != null) {
 							varsToRemove.add(vReal);
@@ -153,7 +153,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 		for(Constraint c : metaValue.getConstraints()) {
 			if ((c instanceof FluentConstraint) &&
 					(((FluentConstraint) c).getType() == FluentConstraint.Type.CLOSES)) {
-				((FluentConstraint) c).getTo().setMarking(HTNMetaConstraint.markings.OPEN);
+				((FluentConstraint) c).getTo().setMarking(FluentMarking.OPEN.ordinal());
 			}
 		}
 
@@ -179,11 +179,11 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 
 		//Make real variables from variable prototypes
 		for (Variable v :  metaValue.getVariables()) {
-			if (v instanceof org.metacsp.framework.VariablePrototype vp) {
+			if (v instanceof VariablePrototype vp) {
 
 				Object[] params = vp.getParameters();
 				// IntegerConstraints use different kind of variable prototype
-				if (params[0] instanceof org.metacsp.framework.VariablePrototype) {
+				if (params[0] instanceof VariablePrototype) {
 					continue;
 				}
 
@@ -194,10 +194,8 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 				String[] arguments = (String[]) params[2];
 
 				// Create fluent via FluentStore abstraction
-				HTNMetaConstraint.markings markVal =
-						(HTNMetaConstraint.markings) v.getMarking();
 				fluentStore.createFluent(component, symbol, arguments,
-						FluentMarking.fromIntValue(markVal.ordinal()));
+						FluentMarking.fromIntValue(v.getMarking()));
 
 				// Get the last-created Fluent for substitution tracking
 				Fluent fluent = (Fluent) groundSolver.getVariables()[
@@ -224,9 +222,9 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 			Variable[] newScope = new Variable[oldScope.length];
 			SubVariableKind kind = kindMap != null
 					? kindMap.getOrDefault(con, SubVariableKind.FLUENT)
-					: MetaCspResolverAdapter.subVariableKindOf(con);
+					: ChimpResolverAdapter.subVariableKindOf(con);
 			for (int i = 0; i < oldScope.length; i++) {
-				newScope[i] = MetaCspResolverAdapter.resolveScopeVariable(
+				newScope[i] = ChimpResolverAdapter.resolveScopeVariable(
 						oldScope[i], kind, metaValue);
 			}
 			clonedConstraint.setScope(newScope);
@@ -238,7 +236,7 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 		for (Constraint con : metaValue.getConstraints()) {
 			if (con instanceof FluentConstraint) {
 				if (((FluentConstraint) con).getType() == FluentConstraint.Type.CLOSES) {
-					((FluentConstraint) con).getTo().setMarking(HTNMetaConstraint.markings.CLOSED); // TODO These markings are not really used and could be removed
+					((FluentConstraint) con).getTo().setMarking(FluentMarking.CLOSED.ordinal()); // TODO These markings are not really used and could be removed
 				}
 			}
 		}

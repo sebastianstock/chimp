@@ -58,6 +58,14 @@ public class TemporalSolver extends ConstraintSolver {
     // -- constraint management --
 
     @Override
+    public boolean addConstraints(Constraint[] cs) {
+        for (Constraint c : cs) {
+            if (!addConstraint(c)) return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean addConstraint(Constraint c) {
         if (c instanceof TemporalConstraint tc) {
             List<DistanceEdge> edges = tc.compileToDistanceConstraints();

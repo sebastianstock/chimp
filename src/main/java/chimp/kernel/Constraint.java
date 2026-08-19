@@ -33,6 +33,25 @@ public abstract class Constraint {
         return scope != null && scope.length > 1 ? scope[1] : null;
     }
 
+    /** Sets the first scope variable. */
+    public void setFrom(Variable f) {
+        if (scope == null) scope = new Variable[2];
+        else if (scope.length == 0) scope = new Variable[2];
+        scope[0] = f;
+    }
+
+    /** Sets the second scope variable. */
+    public void setTo(Variable t) {
+        if (scope == null) scope = new Variable[2];
+        else if (scope.length == 0) scope = new Variable[2];
+        else if (scope.length == 1) {
+            Variable[] newScope = new Variable[2];
+            newScope[0] = scope[0];
+            scope = newScope;
+        }
+        scope[1] = t;
+    }
+
     /** Use {@link #from()} in new code; kept for Meta-CSP compatibility. */
     public Variable getFrom() { return from(); }
 

@@ -1,26 +1,17 @@
 package examples;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
-import htn.HTNPlanner;
+import chimp.logging.ChimpLogging;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import postprocessing.HPRGenerator;
-import postprocessing.PlanExtractor;
-import htn.valOrderingHeuristics.CHIMPValOH;
-import org.metacsp.framework.Variable;
-import chimp.logging.ChimpLogging;
-
 import picocli.CommandLine;
 import planner.CHIMP;
-import unify.CompoundSymbolicVariableConstraintSolver;
+import postprocessing.HPRGenerator;
+import postprocessing.PlanExtractor;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
@@ -133,58 +124,6 @@ public class ChimpIO implements Callable<Integer> {
 	}
 
 
-	private static void printPlan(FluentNetworkSolver fluentSolver) {
-		Variable[] allFluents = fluentSolver.getVariables();
-		ArrayList<Variable> plan = new ArrayList<Variable>();
-		int opCount = 0;
-		int mCount = 0;
-		for (Variable var : allFluents) {
-			String component = var.getComponent();
-			if (component == null) {
-				plan.add(var);
-			}
-			else if (component.equals("Activity")) {
-				plan.add(var);
-				opCount++;
-			} else if (component.equals("Task")) {
-				mCount++;
-			}
-		}
-		System.out.println("#Ops: " + opCount);
-		System.out.println("#Compound Taks: " + mCount);
-		System.out.println("#Fluents: " + fluentSolver.getVariables().length);
-		System.out.println("#FluentConstraints: " + fluentSolver.getConstraints().length);
-
-		Variable[] planVector = plan.toArray(new Variable[plan.size()]);
-		Arrays.sort(planVector, new Comparator<Variable>() {
-			@Override
-			public int compare(Variable o1, Variable o2) {
-				Fluent f1 = (Fluent)o1;
-				Fluent f2 = (Fluent)o2;
-				return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
-			}
-		});
-		
-		int c = 0;
-		for (Variable act : planVector) {
-			if (act.getComponent() != null)
-				System.out.println(c++ +".\t" + act);	
-		}
-		
-	}
-
-	public static boolean plan(HTNPlanner planner, FluentNetworkSolver fluentSolver) {
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
-		
-		long startTime = System.nanoTime();
-		boolean result = planner.backtrack();
-		System.out.println("Found a plan? " + result);
-		long endTime = System.nanoTime();
-
-		System.out.println("Planning took "+((endTime - startTime) / 1000000) + " ms"); 
-		return result;
-	}
-	
 	private static boolean checkFile(File f) {
 		if(f.exists() && !f.isDirectory()) {
 			return true;

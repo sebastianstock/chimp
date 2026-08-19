@@ -23,6 +23,7 @@ public class Fluent extends Variable {
     private final CompoundSymbolicVariable symbolicVar;
     private final TemporalVariable temporalVar;
     private final IntegerVariable[] integerVars;
+    private java.awt.Color color;
 
     public Fluent(FluentNetworkSolver solver, int id,
                   CompoundSymbolicVariable symbolicVar,
@@ -85,6 +86,36 @@ public class Fluent extends Variable {
     /** @return true if this fluent represents an activity. */
     public boolean isActivity() {
         return ACTIVITY_TYPE_STR.equals(getTypeStr());
+    }
+
+    /** Sets the visualization color for this fluent. */
+    public void setColor(java.awt.Color color) {
+        this.color = color;
+    }
+
+    /** @return the visualization color, or {@code null} if not set. */
+    public java.awt.Color getColor() {
+        return color;
+    }
+
+    // -- Meta-CSP compatibility methods --
+
+    /**
+     * Compatibility method — returns {@code this}.
+     * In Meta-CSP, {@code Activity.getVariable()} returns the underlying
+     * {@code Variable}.  CHIMP-native Fluent IS a Variable, so this is
+     * an identity operation.
+     */
+    public Variable getVariable() {
+        return this;
+    }
+
+    /**
+     * Compatibility method — returns the predicate name as a single-element
+     * string array.
+     */
+    public String[] getSymbols() {
+        return new String[] { symbolicVar.getPredicateName() };
     }
 
     @Override

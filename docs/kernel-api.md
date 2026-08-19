@@ -849,13 +849,13 @@ solver.addConstraint(opens);
 
 ---
 
-## Related Cross-Validation Tests
+## Related Tests
 
 | Test file | What it validates |
 |-----------|-------------------|
-| `temporal/crossval/TemporalSolverCrossValidationTest` | STN bounds vs Meta-CSP APSP |
-| `temporal/perf/TemporalPerformanceTest` | Performance comparison |
 | `temporal/AllRelationTypesTest` | All 35 Allen relation types |
-| `symbolic/crossval/SymbolicSolverCrossValidationTest` | Symbolic matching vs Meta-CSP |
-| `integer/crossval/IntegerSolverCrossValidationTest` | Integer solving vs Meta-CSP |
 | `fluent/KernelIntegrationTest` | End-to-end integration scenarios |
+
+Cross-validation suites against the Meta-CSP framework were used during the
+kernel migration and have been removed now that the Meta-CSP dependency is
+gone.

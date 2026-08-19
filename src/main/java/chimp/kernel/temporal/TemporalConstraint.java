@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import chimp.kernel.Constraint;
 import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
 import chimp.model.TemporalBounds;
 import chimp.model.TemporalRelation;
 
@@ -48,12 +49,17 @@ public class TemporalConstraint extends Constraint {
     public void setFrom(TemporalVariable f) { setScope(new Variable[]{f, toVariable()}); }
     public void setTo(TemporalVariable t) { setScope(new Variable[]{fromVariable(), t}); }
 
+    private TemporalVariable asTemporalVariable(Variable v) {
+        if (v instanceof Fluent f) return f.getTemporalVariable();
+        return (TemporalVariable) v;
+    }
+
     private TemporalVariable fromVariable() {
-        return (TemporalVariable) (scope() != null && scope().length > 0 ? scope()[0] : null);
+        return asTemporalVariable(scope() != null && scope().length > 0 ? scope()[0] : null);
     }
 
     private TemporalVariable toVariable() {
-        return (TemporalVariable) (scope() != null && scope().length > 1 ? scope()[1] : null);
+        return asTemporalVariable(scope() != null && scope().length > 1 ? scope()[1] : null);
     }
 
     // -- compilation to distance constraints (core of Allen algebra) --

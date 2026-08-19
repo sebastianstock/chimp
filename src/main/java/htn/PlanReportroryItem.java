@@ -1,26 +1,25 @@
 package htn;
 
 import com.google.common.collect.Sets;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.Bounds;
-import unify.CompoundSymbolicValueConstraint;
-import unify.CompoundSymbolicVariable;
-import chimp.model.TemporalBounds;
-import chimp.model.TemporalConstraintTemplate;
-import chimp.model.TemporalRelation;
-import chimp.model.ResourceRequirement;
 
-import chimp.adapter.metacsp.MetaCspResourceRequirementAdapter;
-import chimp.adapter.metacsp.MetaCspResolverAdapter;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.ResourceRequirementAdapter;
+import chimp.kernel.integer.IntegerConstraint;
+import chimp.kernel.symbolic.CompoundSymbolicConstraint;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.kernel.temporal.TemporalConstraint;
+import chimp.kernel.temporal.TemporalVariable;
+
+import chimp.logging.ChimpLogging;
+import chimp.model.FluentMarking;
 import chimp.model.FluentPrototypeDescription;
 import chimp.model.FluentSignature;
 import chimp.model.IntegerArgumentDescription;
@@ -32,10 +31,12 @@ import chimp.model.ResolverIntegerConstraintDescription;
 import chimp.model.ResolverOrderingEdge;
 import chimp.model.ResolverSemanticKind;
 import chimp.model.ResolverTemporalConstraintDescription;
+import chimp.model.ResourceRequirement;
 import chimp.model.SymbolicConstraintDescription;
 import chimp.model.SymbolicRelationKind;
-import chimp.logging.ChimpLogging;
-import unify.CompoundSymbolicVariable;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalConstraintTemplate;
+import chimp.model.TemporalRelation;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -43,10 +44,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public abstract class PlanReportroryItem {
-	private static final MetaCspResourceRequirementAdapter RESOURCE_ADAPTER =
-			new MetaCspResourceRequirementAdapter();
-	private static final MetaCspResolverAdapter RESOLVER_ADAPTER =
-			new MetaCspResolverAdapter();
+	private static final ResourceRequirementAdapter RESOURCE_ADAPTER =
+			new ResourceRequirementAdapter();
+	private static final chimp.search.ChimpResolverAdapter RESOLVER_ADAPTER =
+			new chimp.search.ChimpResolverAdapter();
 	
 	private static final boolean MULT_ACTION_NEG_EFFECT = false;
 	
@@ -292,7 +293,7 @@ public abstract class PlanReportroryItem {
 							&& testArguments(taskFluent, precondition, openFluent)
 							&& (!precondition.isNegativeEffect()
 									|| MULT_ACTION_NEG_EFFECT
-									|| openFluent.getMarking() != HTNMetaConstraint.markings.CLOSED)) {
+									|| openFluent.getMarking() != FluentMarking.CLOSED.ordinal())) {
 						matching.add(new PreconditionSelection(precondition, openFluent));
 					}
 				}
@@ -361,7 +362,7 @@ public abstract class PlanReportroryItem {
 			effKeyToVariableMap.put(et.getKey(), et.getPrototype(groundSolver));
 		}
 
-		ConstraintNetwork cn = new ConstraintNetwork(null);
+		ConstraintNetwork cn = new ConstraintNetwork();
 
 		// Add PRE and CLOSES constraints
 		if (preconditions != null) {
@@ -401,7 +402,7 @@ public abstract class PlanReportroryItem {
 		}
 
 		// add additional constraints between preconditions and effects
-		for (AllenIntervalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
+		for (TemporalConstraint aCon : setVarsInAdditionalConstraints(taskFluent, preKeyToFluentMap, effKeyToVariableMap)) {
 			cn.addConstraint(aCon);
 		}
 
@@ -429,10 +430,10 @@ public abstract class PlanReportroryItem {
 
 		// Add constraints for DURATION
 		if (durationBounds != null) {
-			AllenIntervalConstraint durationCon = toAllenIntervalConstraint(
+			TemporalConstraint durationCon = toTemporalConstraint(
 					new TemporalConstraintTemplate(TemporalRelation.Duration, durationBounds));
-			durationCon.setFrom(taskFluent.getAllenInterval());
-			durationCon.setTo(taskFluent.getAllenInterval());
+			durationCon.setFrom(taskFluent.getTemporalVariable());
+			durationCon.setTo(taskFluent.getTemporalVariable());
 			cn.addConstraint(durationCon);
 		}
 
@@ -469,7 +470,7 @@ public abstract class PlanReportroryItem {
 								if (v instanceof Fluent) {
 									icScope[i] = ((Fluent)v).getIntegerVariables()[occ.getValue()];
 								} else {
-									icScope[i] = new VariablePrototype(groundSolver, v, occ.getValue());
+									icScope[i] = VariablePrototype.forInteger(groundSolver, (VariablePrototype) v, occ.getValue());
 								}
 								break;
 							}
@@ -492,7 +493,7 @@ public abstract class PlanReportroryItem {
 							if (v instanceof Fluent) {
 								vars.add(((Fluent)v).getIntegerVariables()[occ.getValue()]);
 							} else {
-								vars.add(new VariablePrototype(groundSolver, v, occ.getValue()));
+								vars.add(VariablePrototype.forInteger(groundSolver, (VariablePrototype) v, occ.getValue()));
 							}
 						}
 					}
@@ -512,8 +513,8 @@ public abstract class PlanReportroryItem {
 			for (EffectTemplate et : effects) {
 				for (int i = 0; i < et.getIntArgs().length; i++) {
 					if (!et.getIntArgs()[i].isVariable()) {
-						Variable v = et.getPrototype(groundSolver);
-						VariablePrototype vp = new VariablePrototype(groundSolver, v, i);
+						VariablePrototype v = et.getPrototype(groundSolver);
+						VariablePrototype vp = VariablePrototype.forInteger(groundSolver, v, i);
 						cn.addConstraint(createConstantConstraint(
 								vp, et.getIntArgs()[i].constValue));
 					}
@@ -823,9 +824,9 @@ public abstract class PlanReportroryItem {
 	 * @param preKeyToFluentMap Map of precondition keys to fluent variables.
 	 * @param effKeyToVariableMap Map of effect keys to variables
 	 */
-	private List<AllenIntervalConstraint> setVarsInAdditionalConstraints(Fluent taskFluent, 
+	private List<TemporalConstraint> setVarsInAdditionalConstraints(Fluent taskFluent,
 			Map<String, Fluent> preKeyToFluentMap, Map<String, Variable> effKeyToVariableMap) {
-		List<AllenIntervalConstraint> ret = new ArrayList<AllenIntervalConstraint>();
+		List<TemporalConstraint> ret = new ArrayList<TemporalConstraint>();
 		
 		for (AdditionalConstraintTemplate act : additionalConstraints) {
 			if (act.withoutHead()) {
@@ -851,14 +852,14 @@ public abstract class PlanReportroryItem {
 							+ toKey + " in " + taskname );
 				}
 				
-				AllenIntervalConstraint newCon = toAllenIntervalConstraint(act.getConstraint());
+				TemporalConstraint newCon = toTemporalConstraint(act.getConstraint());
 				newCon.setFrom(from);
 				newCon.setTo(to);
 				ret.add(newCon);
 			} else if (act.headToHead()) {    // HEAD -> HEAD
-				AllenIntervalConstraint newCon = toAllenIntervalConstraint(act.getConstraint());
-				newCon.setFrom(taskFluent.getAllenInterval());
-				newCon.setTo(taskFluent.getAllenInterval());
+				TemporalConstraint newCon = toTemporalConstraint(act.getConstraint());
+				newCon.setFrom(taskFluent.getTemporalVariable());
+				newCon.setTo(taskFluent.getTemporalVariable());
 				ret.add(newCon);
 			}
 		}
@@ -1103,23 +1104,20 @@ public abstract class PlanReportroryItem {
 	// --- Inlined adapter methods (formerly in MetaCspTemporalConstraintAdapter
 	//     and MetaCspSymbolicConstraintAdapter) ---
 
-	private static AllenIntervalConstraint toAllenIntervalConstraint(
+	private static TemporalConstraint toTemporalConstraint(
 			TemporalConstraintTemplate template) {
-		AllenIntervalConstraint.Type type =
-				AllenIntervalConstraint.Type.valueOf(template.relation().name());
+		TemporalRelation relation = template.relation();
 		if (template.bounds().isEmpty()) {
-			return new AllenIntervalConstraint(type);
+			return new TemporalConstraint(relation);
 		}
-		Bounds[] bounds = template.bounds().stream()
-				.map(b -> new Bounds(b.minimum(), b.maximum()))
-				.toArray(Bounds[]::new);
-		return new AllenIntervalConstraint(type, bounds);
+		TemporalBounds[] bounds = template.bounds().toArray(TemporalBounds[]::new);
+		return new TemporalConstraint(relation, bounds);
 	}
 
 	private static Constraint createPositiveValueRestriction(
 			Variable var, int[] indices, String[][] restrictions) {
-		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
-				CompoundSymbolicValueConstraint.Type.POSITIVEVALUERESTRICTION,
+		CompoundSymbolicConstraint con = new CompoundSymbolicConstraint(
+				CompoundSymbolicConstraint.Type.POSITIVEVALUERESTRICTION,
 				indices, restrictions);
 		con.setFrom(var);
 		con.setTo(var);
@@ -1128,8 +1126,8 @@ public abstract class PlanReportroryItem {
 
 	private static Constraint createNegativeValueRestriction(
 			Variable var, int[] indices, String[][] restrictions) {
-		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
-				CompoundSymbolicValueConstraint.Type.NEGATIVEVALUERESTRICTION,
+		CompoundSymbolicConstraint con = new CompoundSymbolicConstraint(
+				CompoundSymbolicConstraint.Type.NEGATIVEVALUERESTRICTION,
 				indices, restrictions);
 		con.setFrom(var);
 		con.setTo(var);
@@ -1138,8 +1136,8 @@ public abstract class PlanReportroryItem {
 
 	private static Constraint createSubDifferent(
 			Variable from, Variable to, int[] connections) {
-		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
-				CompoundSymbolicValueConstraint.Type.SUBDIFFERENT, connections);
+		CompoundSymbolicConstraint con = new CompoundSymbolicConstraint(
+				CompoundSymbolicConstraint.Type.SUBDIFFERENT, connections);
 		con.setFrom(from);
 		con.setTo(to);
 		return con;
@@ -1147,8 +1145,8 @@ public abstract class PlanReportroryItem {
 
 	private static Constraint createSubMatches(
 			Variable from, Variable to, int[] connections) {
-		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(
-				CompoundSymbolicValueConstraint.Type.SUBMATCHES, connections);
+		CompoundSymbolicConstraint con = new CompoundSymbolicConstraint(
+				CompoundSymbolicConstraint.Type.SUBMATCHES, connections);
 		con.setFrom(from);
 		con.setTo(to);
 		return con;
@@ -1156,27 +1154,27 @@ public abstract class PlanReportroryItem {
 
 	// --- Inlined adapter methods (formerly in MetaCspIntegerConstraintAdapter) ---
 
-	private static integers.IntegerConstraint toIntegerConstraint(
+	private static IntegerConstraint toIntegerConstraint(
 			IntegerConstraintTemplate template, Variable[] scope) {
-		integers.IntegerConstraint.Type type = switch (template.kind()) {
-			case ARITHMETIC -> integers.IntegerConstraint.Type.ARITHM;
-			case ALL_DIFFERENT -> integers.IntegerConstraint.Type.ALLDIFFERENT;
-			case ALL_EQUAL -> integers.IntegerConstraint.Type.ALLEQUAL;
+		IntegerConstraint.Type type = switch (template.kind()) {
+			case ARITHMETIC -> IntegerConstraint.Type.ARITHM;
+			case ALL_DIFFERENT -> IntegerConstraint.Type.ALLDIFFERENT;
+			case ALL_EQUAL -> IntegerConstraint.Type.ALLEQUAL;
 		};
-		return new integers.IntegerConstraint(
+		return new IntegerConstraint(
 				type, scope,
 				template.operator1(), template.operator2(), template.constant());
 	}
 
-	private static integers.IntegerConstraint createAllEqualConstraint(Variable[] scope) {
-		return new integers.IntegerConstraint(
-				integers.IntegerConstraint.Type.ALLEQUAL, scope);
+	private static IntegerConstraint createAllEqualConstraint(Variable[] scope) {
+		return new IntegerConstraint(
+				IntegerConstraint.Type.ALLEQUAL, scope);
 	}
 
-	private static integers.IntegerConstraint createConstantConstraint(
+	private static IntegerConstraint createConstantConstraint(
 			Variable variable, int constant) {
-		return new integers.IntegerConstraint(
-				integers.IntegerConstraint.Type.ARITHM,
+		return new IntegerConstraint(
+				IntegerConstraint.Type.ARITHM,
 				new Variable[]{variable}, "=", constant);
 	}
 }

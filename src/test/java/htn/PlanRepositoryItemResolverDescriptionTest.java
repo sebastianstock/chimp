@@ -13,12 +13,13 @@ import chimp.model.TemporalBounds;
 import chimp.model.TemporalConstraintTemplate;
 import chimp.model.TemporalRelation;
 import chimp.search.ExpansionCandidateDescription;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.model.FluentMarking;
 import chimp.search.ResolverCandidate;
 import chimp.search.ResolverCandidateKind;
-import fluentSolver.Fluent;
-import fluentSolver.FluentNetworkSolver;
 import org.junit.Test;
-import org.metacsp.framework.ConstraintNetwork;
 
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,10 @@ public class PlanRepositoryItemResolverDescriptionTest {
         task.setName("move", new String[] {"r1", "room2"});
         Fluent first = (Fluent) solver.createVariable();
         first.setName("at", new String[] {"r1", "room1"});
-        first.setMarking(HTNMetaConstraint.markings.OPEN);
+        first.setMarking(FluentMarking.OPEN.ordinal());
         Fluent second = (Fluent) solver.createVariable();
         second.setName("at", new String[] {"r1", "room2"});
-        second.setMarking(HTNMetaConstraint.markings.OPEN);
+        second.setMarking(FluentMarking.OPEN.ordinal());
 
         HTNPrecondition precondition = new HTNPrecondition(
                 "at", new String[] {"?robot", "?place"}, new int[] {0, 0}, 2, "n", "p0");

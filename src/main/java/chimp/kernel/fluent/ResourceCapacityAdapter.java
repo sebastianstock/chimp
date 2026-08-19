@@ -1,9 +1,13 @@
-package chimp.adapter.metacsp;
+package chimp.kernel.fluent;
 
 import chimp.model.ResourceCapacity;
 import resourceFluent.FluentResourceUsageScheduler;
 
-public final class MetaCspResourceCapacityAdapter {
+/**
+ * Converts a {@link ResourceCapacity} model object into the corresponding
+ * {@link FluentResourceUsageScheduler}.
+ */
+public final class ResourceCapacityAdapter {
 
     public FluentResourceUsageScheduler toResourceScheduler(ResourceCapacity resourceCapacity) {
         return new FluentResourceUsageScheduler(

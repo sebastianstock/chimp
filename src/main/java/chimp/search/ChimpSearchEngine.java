@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
 import chimp.logging.ChimpLogging;
 
 import edu.uci.ics.jung.graph.DelegateForest;
@@ -76,8 +76,9 @@ public final class ChimpSearchEngine {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void draw() {
-        org.metacsp.utility.UI.SearchTreeFrame.draw(
-                (edu.uci.ics.jung.graph.DelegateForest) (Object) searchTree);
+        // TODO: replace with CHIMP-native search-tree visualization
+        // (was org.metacsp.utility.UI.SearchTreeFrame.draw(...))
+        System.out.println("Search tree: " + searchTree);
     }
 
     /** Returns the search tree from the last {@link #backtrack()} call,

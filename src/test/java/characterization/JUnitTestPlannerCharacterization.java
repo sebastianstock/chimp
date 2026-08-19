@@ -6,26 +6,26 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.metacsp.framework.Constraint;
-import htn.valOrderingHeuristics.CHIMPValOH;
 
-import chimp.adapter.metacsp.MetaCspModelAdapter;
+import chimp.kernel.Constraint;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.ModelAdapter;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
 import chimp.model.FluentNode;
-import chimp.model.PlannedAction;
 import chimp.model.FluentType;
+import chimp.model.PlannedAction;
 import externalPathPlanning.LookUpTableDurationEstimator;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
+import htn.valOrderingHeuristics.CHIMPValOH;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
 
 public class JUnitTestPlannerCharacterization {
 
-    private final MetaCspModelAdapter modelAdapter = new MetaCspModelAdapter();
+    private final ModelAdapter modelAdapter = new ModelAdapter();
 
     @Test
     public void plansPrimitiveDwrMove() throws DomainParsingException {
