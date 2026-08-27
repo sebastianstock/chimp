@@ -103,6 +103,13 @@ public class TemporalSolver extends ConstraintSolver {
     }
 
     @Override
+    public void removeConstraints(Constraint[] cs) {
+        for (Constraint c : cs) {
+            removeConstraint(c);
+        }
+    }
+
+    @Override
     public boolean propagate() {
         return stn.propagate();
     }

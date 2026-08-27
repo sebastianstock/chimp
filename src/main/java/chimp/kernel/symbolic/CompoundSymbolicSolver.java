@@ -160,6 +160,13 @@ public class CompoundSymbolicSolver extends ConstraintSolver {
     }
 
     @Override
+    public void removeConstraints(Constraint[] cs) {
+        for (Constraint c : cs) {
+            removeConstraint(c);
+        }
+    }
+
+    @Override
     public boolean propagate() {
         for (SymbolicSolver ss : subSolvers) {
             if (!ss.propagate()) return false;
