@@ -104,8 +104,19 @@ public class TemporalSolver extends ConstraintSolver {
 
     @Override
     public void removeConstraints(Constraint[] cs) {
+        boolean anyRemoved = false;
         for (Constraint c : cs) {
-            removeConstraint(c);
+            if (c instanceof TemporalConstraint tc) {
+                for (DistanceEdge edge : tc.compileToDistanceConstraints()) {
+                    stn.removeConstraintSilent(edge.fromTimePoint(), edge.toTimePoint(),
+                            edge.min(), edge.max());
+                }
+                anyRemoved = true;
+            }
+            constraintList().remove(c);
+        }
+        if (anyRemoved) {
+            stn.rebuild();
         }
     }
 

@@ -120,7 +120,7 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 	private String getToArea(Fluent taskFluent) {
 		String[] possibleToAreas = taskFluent.getCompoundSymbolicVariable().getSymbolsAt(TO_AREA_INDEX);
 		if (possibleToAreas.length != 1) {
-			throw new IllegalStateException("FromArea is not ground");
+			return null;
 		} else {
 			return possibleToAreas[0];
 		}
@@ -136,13 +136,13 @@ public class MoveBaseMetaConstraint extends ChimpMetaConstraint implements Groun
 				String[] possibleFromAreas = from.getSymbolsAt(FROM_AREA_INDEX);
 				
 				if (possibleFromAreas.length != 1) {
-					throw new IllegalStateException("FromArea is not ground");
+					return null;
 				} else {
 					return possibleFromAreas[0];
 				}
 			}
 		}
-		throw new IllegalStateException("No RobotAt precondition found");
+		return null;
 	}
 	
 	

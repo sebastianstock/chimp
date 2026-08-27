@@ -37,6 +37,20 @@ public abstract class ConstraintSolver {
         variablesById.remove(v.id());
     }
 
+    /** Removes a variable and all constraints involving it from this solver. */
+    public void removeVariable(Variable v) {
+        List<Constraint> toRemove = new ArrayList<>();
+        for (Constraint c : getConstraints()) {
+            for (Variable sv : c.scope()) {
+                if (sv.equals(v)) { toRemove.add(c); break; }
+            }
+        }
+        for (Constraint c : toRemove) {
+            removeConstraint(c);
+        }
+        unregisterVariable(v);
+    }
+
     /** All variables currently in this solver. */
     public Variable[] getVariables() {
         return variablesById.values().toArray(new Variable[0]);

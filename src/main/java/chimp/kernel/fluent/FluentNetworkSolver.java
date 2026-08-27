@@ -179,26 +179,76 @@ public class FluentNetworkSolver extends ConstraintSolver {
 
     // -- variable removal --
 
-    /** Overridden to also remove from the live constraint network. */
+    /** Overridden to also remove compiled sub-constraints from sub-solvers
+     *  and from the live constraint network. Batches sub-solver removals
+     *  to avoid redundant STN rebuilds. */
+    @Override
+    public void removeConstraints(Constraint[] cs) {
+        // Collect sub-constraints per sub-solver for batch removal
+        List<Constraint> temporalToRemove = new ArrayList<>();
+        List<Constraint> symbolicToRemove = new ArrayList<>();
+        List<Constraint> integerToRemove = new ArrayList<>();
+        for (Constraint c : cs) {
+            if (c instanceof FluentConstraint fc) {
+                Constraint[] subs = fc.getCompiledSubConstraints();
+                if (subs != null) {
+                    for (Constraint sub : subs) {
+                        if (sub instanceof TemporalConstraint) temporalToRemove.add(sub);
+                        else if (sub instanceof CompoundSymbolicConstraint) symbolicToRemove.add(sub);
+                        else if (integerSolver != null && sub instanceof IntegerConstraint) integerToRemove.add(sub);
+                    }
+                }
+            }
+            super.removeConstraint(c);
+            network.removeConstraint(c);
+        }
+        // Batch-remove from sub-solvers (TemporalSolver.removeConstraints rebuilds STN once)
+        if (!temporalToRemove.isEmpty())
+            temporalSolver.removeConstraints(temporalToRemove.toArray(new Constraint[0]));
+        if (!symbolicToRemove.isEmpty())
+            symbolicSolver.removeConstraints(symbolicToRemove.toArray(new Constraint[0]));
+        if (integerSolver != null && !integerToRemove.isEmpty())
+            integerSolver.removeConstraints(integerToRemove.toArray(new Constraint[0]));
+    }
+
+    /** Overridden to also remove compiled sub-constraints from sub-solvers
+     *  and from the live constraint network. */
     @Override
     public void removeConstraint(Constraint c) {
+        if (c instanceof FluentConstraint fc) {
+            Constraint[] subs = fc.getCompiledSubConstraints();
+            if (subs != null) {
+                for (Constraint sub : subs) {
+                    dispatchRemove(sub);
+                }
+            }
+        }
         super.removeConstraint(c);
         network.removeConstraint(c);
     }
 
-    /** Overridden to also remove from the live constraint network. */
-    @Override
-    public void removeConstraints(Constraint[] cs) {
-        for (Constraint c : cs) {
-            super.removeConstraint(c);
-            network.removeConstraint(c);
+    /** Removes a sub-constraint from the appropriate sub-solver. */
+    private void dispatchRemove(Constraint sub) {
+        if (sub instanceof TemporalConstraint tc) {
+            temporalSolver.removeConstraint(tc);
+        } else if (sub instanceof CompoundSymbolicConstraint csc) {
+            symbolicSolver.removeConstraint(csc);
+        } else if (integerSolver != null && sub instanceof IntegerConstraint ic) {
+            integerSolver.removeConstraint(ic);
         }
     }
 
-    /** Removes variables and all their associated constraints. */
+    /** Removes variables and all their associated constraints,
+     *  including sub-variables from sub-solvers. Batches sub-solver
+     *  removals to avoid redundant STN rebuilds. */
     public void removeVariables(Variable... vars) {
+        // Collect sub-constraints per sub-solver for batch removal
+        List<Constraint> temporalToRemove = new ArrayList<>();
+        List<Constraint> symbolicToRemove = new ArrayList<>();
+        List<Constraint> integerToRemove = new ArrayList<>();
+
         for (Variable v : vars) {
-            // Remove constraints that involve this variable
+            // Remove FluentConstraints involving this variable
             List<Constraint> toRemove = new ArrayList<>();
             for (Constraint c : getConstraints()) {
                 for (Variable scopeVar : c.scope()) {
@@ -209,11 +259,39 @@ public class FluentNetworkSolver extends ConstraintSolver {
                 }
             }
             for (Constraint c : toRemove) {
-                removeConstraint(c);
+                if (c instanceof FluentConstraint fc) {
+                    Constraint[] subs = fc.getCompiledSubConstraints();
+                    if (subs != null) {
+                        for (Constraint sub : subs) {
+                            if (sub instanceof TemporalConstraint) temporalToRemove.add(sub);
+                            else if (sub instanceof CompoundSymbolicConstraint) symbolicToRemove.add(sub);
+                            else if (integerSolver != null && sub instanceof IntegerConstraint) integerToRemove.add(sub);
+                        }
+                    }
+                }
+                super.removeConstraint(c);
                 network.removeConstraint(c);
+            }
+            // Also remove sub-variables from sub-solvers
+            if (v instanceof Fluent f) {
+                temporalSolver.removeVariable(f.getTemporalVariable());
+                symbolicSolver.removeVariable(f.getCompoundSymbolicVariable());
+                if (integerSolver != null) {
+                    for (IntegerVariable iv : f.getIntegerVariables()) {
+                        integerSolver.removeVariable(iv);
+                    }
+                }
             }
             unregisterVariable(v);
         }
+
+        // Batch-remove sub-constraints from sub-solvers (rebuilds STN once)
+        if (!temporalToRemove.isEmpty())
+            temporalSolver.removeConstraints(temporalToRemove.toArray(new Constraint[0]));
+        if (!symbolicToRemove.isEmpty())
+            symbolicSolver.removeConstraints(symbolicToRemove.toArray(new Constraint[0]));
+        if (integerSolver != null && !integerToRemove.isEmpty())
+            integerSolver.removeConstraints(integerToRemove.toArray(new Constraint[0]));
     }
 
     // -- variable access --

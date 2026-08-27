@@ -44,6 +44,8 @@ public class FluentConstraint extends Constraint {
     private Vector<AdditionalConstraintTemplate> additionalConstraints;
     private int depth;
     private boolean depthIsSet;
+    /** Sub-constraints produced by the last compileToSubConstraints call. */
+    private Constraint[] compiledSubConstraints;
 
     public FluentConstraint(Type type) {
         this.type = type;
@@ -186,7 +188,8 @@ public class FluentConstraint extends Constraint {
         if (connections != null && connections.length > 0) {
             retList.add(createSubmatches(f, t));
         }
-        return retList.toArray(new Constraint[0]);
+        compiledSubConstraints = retList.toArray(new Constraint[0]);
+        return compiledSubConstraints;
     }
 
     private CompoundSymbolicConstraint createSubmatches(Variable f, Variable t) {
@@ -278,6 +281,12 @@ public class FluentConstraint extends Constraint {
         ret.depth = this.depth;
         ret.depthIsSet = this.depthIsSet;
         return ret;
+    }
+
+    /** Returns the sub-constraints produced by the last {@link #compileToSubConstraints} call,
+     *  or {@code null} if it was never compiled. Used during retraction to clean up sub-solvers. */
+    public Constraint[] getCompiledSubConstraints() {
+        return compiledSubConstraints;
     }
 
     @Override
