@@ -179,6 +179,22 @@ public class FluentNetworkSolver extends ConstraintSolver {
 
     // -- variable removal --
 
+    /** Overridden to also remove from the live constraint network. */
+    @Override
+    public void removeConstraint(Constraint c) {
+        super.removeConstraint(c);
+        network.removeConstraint(c);
+    }
+
+    /** Overridden to also remove from the live constraint network. */
+    @Override
+    public void removeConstraints(Constraint[] cs) {
+        for (Constraint c : cs) {
+            super.removeConstraint(c);
+            network.removeConstraint(c);
+        }
+    }
+
     /** Removes variables and all their associated constraints. */
     public void removeVariables(Variable... vars) {
         for (Variable v : vars) {
