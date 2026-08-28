@@ -55,6 +55,26 @@ public class TemporalSolver extends ConstraintSolver {
         return ret;
     }
 
+    @Override
+    public void removeVariable(Variable v) {
+        if (v instanceof TemporalVariable tv) {
+            // Drop the implicit duration edge (start <= end) so STN rebuilds
+            // do not keep re-applying edges of removed intervals, and free
+            // the two time points for reuse (keeps matrices small over the
+            // search, mirroring Meta-CSP's tpDelete).
+            stn.removeConstraintSilent(
+                    tv.start(), tv.end(), 0, chimp.model.TemporalBounds.INFINITY);
+            super.removeVariable(v);
+            stn.freeTimePoint(tv.end());
+            stn.freeTimePoint(tv.start());
+            // Closing paths that traversed the freed points may have become
+            // stale; recompute from the surviving constraints.
+            stn.rebuild();
+        } else {
+            super.removeVariable(v);
+        }
+    }
+
     // -- constraint management --
 
     @Override
@@ -77,6 +97,16 @@ public class TemporalSolver extends ConstraintSolver {
     public boolean addConstraint(Constraint c) {
         if (c instanceof TemporalConstraint tc) {
             List<DistanceEdge> edges = tc.compileToDistanceConstraints();
+            // Feasibility pre-check: an edge add that would close a negative
+            // cycle is detectable in O(1) against the closed matrix, so reject
+            // it before touching the matrix (the common infeasible-resolver
+            // case) instead of applying the edges and rebuilding after fail.
+            for (DistanceEdge edge : edges) {
+                if (!stn.isAddFeasible(edge.fromTimePoint(), edge.toTimePoint(),
+                        edge.min(), edge.max())) {
+                    return false;
+                }
+            }
             // Add all edges silently first
             for (DistanceEdge edge : edges) {
                 stn.addEdgeSilent(edge.fromTimePoint(), edge.toTimePoint(),

@@ -34,7 +34,7 @@ public class SimpleTemporalNetwork {
     private final long[][] distance;
     private final List<DistanceEdge> constraints;
     private final List<int[]> tightenedEdges;
-    private boolean needsFullPropagation;
+    private final List<Integer> freeTimePoints = new ArrayList<>();
     private int timePointCount;
 
     /** Constructs an STN with the given horizon and maximum time points. */
@@ -46,19 +46,24 @@ public class SimpleTemporalNetwork {
         this.tightenedEdges = new ArrayList<>();
         this.timePointCount = 0;
         // Reserve time point 0 = origin
-        addTimePointInternal();
+        addTimePoint();
     }
 
-    /** Allocates a new time point and returns its index. */
+    /**
+     * Allocates a new time point (reusing a freed index when available) and
+     * returns its index. Reuses the lowest freed index and shrinks the used
+     * range when the top index is freed, so the matrix stays compact.
+     */
     public int addTimePoint() {
-        if (timePointCount >= maxTimePoints) {
-            throw new IllegalStateException("Max time points exceeded: " + maxTimePoints);
+        int idx;
+        if (!freeTimePoints.isEmpty()) {
+            idx = freeTimePoints.remove(0);
+        } else {
+            if (timePointCount >= maxTimePoints) {
+                throw new IllegalStateException("Max time points exceeded: " + maxTimePoints);
+            }
+            idx = timePointCount++;
         }
-        return addTimePointInternal();
-    }
-
-    private int addTimePointInternal() {
-        int idx = timePointCount++;
         for (int i = 0; i < timePointCount; i++) {
             distance[idx][i] = INF;
             distance[i][idx] = INF;
@@ -69,8 +74,36 @@ public class SimpleTemporalNetwork {
             distance[0][idx] = horizon;   // t_idx - 0 <= horizon
             distance[idx][0] = 0;         // 0 - t_idx <= 0  =>  t_idx >= 0
         }
-        needsFullPropagation = true;
+        // A fresh time point only adds INF edges (plus its origin bounds);
+        // it cannot improve any existing distance, so the matrix stays
+        // fully propagated and only needs incremental propagation later.
+        // Close paths through the new point's origin edges right away so
+        // queries are exact even before the next constraint is added.
+        closeThroughOrigin();
         return idx;
+    }
+
+    /**
+     * Frees a time point for later reuse. The caller must ensure that all
+     * constraints touching this time point have been removed (or will be
+     * removed by a subsequent {@link #rebuild()}); the point's matrix row
+     * and column are neutralized immediately.
+     */
+    public void freeTimePoint(int idx) {
+        if (idx <= 0 || idx >= timePointCount) {
+            throw new IllegalArgumentException("Bad time point: " + idx);
+        }
+        for (int i = 0; i < timePointCount; i++) {
+            distance[idx][i] = INF;
+            distance[i][idx] = INF;
+        }
+        distance[idx][idx] = 0;
+        if (idx == timePointCount - 1) {
+            // Shrink the used range; the freed index is gone for good.
+            timePointCount--;
+        } else if (!freeTimePoints.contains(idx)) {
+            freeTimePoints.add(idx);
+        }
     }
 
     /** Returns the number of active time points (including origin). */
@@ -80,6 +113,26 @@ public class SimpleTemporalNetwork {
     public long horizon() { return horizon; }
 
     // --- constraint management ---
+
+    /**
+     * Returns true if a distance constraint {@code t_to - t_from ∈ [min, max]}
+     * can be added to the current (fully propagated) network.  Adding an edge
+     * is infeasible iff it closes a negative cycle: {@code max + d[to][from] < 0}
+     * (cycle through the new upper-bound edge) or {@code -min + d[from][to] < 0}
+     * (cycle through the new lower-bound edge).  Unbounded (INF sentinel)
+     * bounds add no edge and cannot close a cycle.
+     */
+    public boolean isAddFeasible(int from, int to, long min, long max) {
+        if (max != INF) {
+            long reverse = distance[to][from];
+            if (reverse != INF && max + reverse < 0) return false;
+        }
+        if (min != -INF) {
+            long forward = distance[from][to];
+            if (forward != INF && -min + forward < 0) return false;
+        }
+        return true;
+    }
 
     /**
      * Adds a distance constraint: {@code t_to - t_from ∈ [min, max]}.
@@ -155,11 +208,6 @@ public class SimpleTemporalNetwork {
      * @return true if the network is consistent (no negative cycles)
      */
     public boolean propagate() {
-        if (needsFullPropagation) {
-            needsFullPropagation = false;
-            tightenedEdges.clear();
-            return propagateFull();
-        }
         if (tightenedEdges.isEmpty()) return true;
         return propagateIncremental();
     }
@@ -181,38 +229,87 @@ public class SimpleTemporalNetwork {
      */
     private boolean propagateIncremental() {
         int n = timePointCount;
-        for (int[] edge : tightenedEdges) {
-            int u = edge[0];
-            int v = edge[1];
-            long w = distance[u][v];
+        // Repeatedly (a) relax all pairs through each recently-tightened edge and
+        // (b) close paths that cross the origin hub, until no further tightening
+        // occurs. Edge weights only decrease, so this reaches the exact all-pairs
+        // fixpoint. Guard against pathological cascades with a full-FW fallback.
+        for (int round = 0; round < 4; round++) {
+            boolean changed = false;
+            for (int[] edge : tightenedEdges) {
+                int u = edge[0];
+                int v = edge[1];
+                long w = distance[u][v];
 
-            // Pre-check: negative self-loop via this edge
-            if (u == v && w < 0) {
-                tightenedEdges.clear();
-                return false;
-            }
+                // Pre-check: negative self-loop via this edge
+                if (u == v && w < 0) {
+                    tightenedEdges.clear();
+                    return false;
+                }
 
-            for (int i = 0; i < n; i++) {
-                long diu = distance[i][u];
-                if (diu == INF) continue;
-                long[] di = distance[i];
-                long newBase = diu + w;
-                for (int j = 0; j < n; j++) {
-                    long dvj = distance[v][j];
-                    if (dvj == INF) continue;
-                    long newDist = newBase + dvj;
-                    if (newDist < di[j]) {
-                        di[j] = newDist;
-                        if (i == j && newDist < 0) {
-                            tightenedEdges.clear();
-                            return false;
+                for (int i = 0; i < n; i++) {
+                    long diu = distance[i][u];
+                    if (diu == INF) continue;
+                    long[] di = distance[i];
+                    long newBase = diu + w;
+                    for (int j = 0; j < n; j++) {
+                        long dvj = distance[v][j];
+                        if (dvj == INF) continue;
+                        long newDist = newBase + dvj;
+                        if (newDist < di[j]) {
+                            di[j] = newDist;
+                            changed = true;
+                            if (i == j && newDist < 0) {
+                                tightenedEdges.clear();
+                                return false;
+                            }
                         }
                     }
                 }
             }
+            if (closeThroughOrigin()) {
+                changed = true;
+            }
+            for (int i = 0; i < n; i++) {
+                if (distance[i][i] < 0) {
+                    tightenedEdges.clear();
+                    return false;
+                }
+            }
+            if (!changed) {
+                tightenedEdges.clear();
+                return true;
+            }
         }
+        // Slow but exact fallback for cascading tightenings.
         tightenedEdges.clear();
-        return true;
+        return propagateFull();
+    }
+
+    /**
+     * Closes all paths that cross the origin: {@code d[i][j] <= d[i][0] + d[0][j]}.
+     * Every time point connects to the origin with the horizon/monotonicity
+     * bounds, so the origin is a hub that full Floyd-Warshall would relabel;
+     * the incremental edge sweeps alone never re-visit those hub edges.
+     * @return true if any entry was tightened
+     */
+    private boolean closeThroughOrigin() {
+        int n = timePointCount;
+        boolean changed = false;
+        for (int i = 0; i < n; i++) {
+            long di0 = distance[i][0];
+            if (di0 == INF) continue;
+            long[] di = distance[i];
+            for (int j = 0; j < n; j++) {
+                long d0j = distance[0][j];
+                if (d0j == INF) continue;
+                long viaOrigin = di0 + d0j;
+                if (viaOrigin < di[j]) {
+                    di[j] = viaOrigin;
+                    changed = true;
+                }
+            }
+        }
+        return changed;
     }
 
     /**
@@ -265,7 +362,6 @@ public class SimpleTemporalNetwork {
             addEdge(c.toTimePoint(), c.fromTimePoint(), -c.min());
         }
         tightenedEdges.clear();
-        needsFullPropagation = false;
         return propagateFull();
     }
 
