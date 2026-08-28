@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIMP — STN Propagation Performance Work</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --panel: #ffffff;
+    --border: #d9e2ec;
+    --text: #1c2733;
+    --muted: #5d6f82;
+    --accent: #0d6e6e;
+    --accent-soft: #e3f2f2;
+    --good: #1a7f37;
+    --bad: #b35900;
+    --code-bg: #0f1b2d;
+    --code-fg: #d7e3f4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, #083d3d 0%, #0d6e6e 60%, #129191 100%);
+    color: #eafafa;
+    padding: 48px 24px 40px;
+    margin-bottom: 32px;
+  }
+  .hero-inner { max-width: 980px; margin: 0 auto; }
+  .hero h1 { margin: 0 0 6px; font-size: 30px; letter-spacing: -0.02em; }
+  .hero p.sub { margin: 0 0 18px; font-size: 16px; color: #bfe8e8; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px; color: #a4d6d6; }
+  .meta b { color: #eafafa; font-weight: 600; }
+  .badges { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .badge {
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 10px;
+    padding: 10px 16px;
+    min-width: 170px;
+  }
+  .badge .num { display: block; font-size: 22px; font-weight: 700; color: #ffffff; }
+  .badge .lbl { font-size: 12px; color: #bfe8e8; }
+  h2 {
+    font-size: 21px;
+    margin: 44px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 { font-size: 16px; margin: 26px 0 8px; }
+  p { margin: 10px 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 16px 0;
+  }
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+  }
+  .callout.warn { border-color: var(--bad); background: #fff4e6; }
+  ul, ol { margin: 8px 0 8px 4px; padding-left: 22px; }
+  li { margin: 6px 0; }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace;
+    font-size: 0.86em;
+    background: #eef2f6;
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: #0b3d5c;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; }
+  th { background: #eef3f8; font-weight: 600; }
+  tr:nth-child(even) td { background: #fafbfd; }
+  .num-r { text-align: right; font-variant-numeric: tabular-nums; }
+  .up { color: var(--good); font-weight: 600; }
+  .down { color: var(--bad); font-weight: 600; }
+  .pill {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin: 0 2px;
+  }
+  .pill.ok { background: #dafbe1; color: var(--good); }
+  .pill.warn { background: #fff1e5; color: var(--bad); }
+  details { margin: 12px 0; }
+  summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  footer { margin-top: 56px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1>CHIMP — Making the Native STN Fast</h1>
+    <p class="sub">Per-node cost investigation &amp; fix for <code>RACE-serve_coffee</code> during the Meta-CSP removal — a performance report</p>
+    <div class="meta">
+      <span>Branch: <b>remove_metacsp-m15</b></span>
+      <span>Key commit: <b>7a9279b</b></span>
+      <span>Comparison base: <b>legacy-metacsp @ c56dd39</b></span>
+      <span>Suite: <b>93 benchmark problems</b></span>
+    </div>
+    <div class="badges">
+      <div class="badge"><span class="num">1273 ms → 260 ms</span><span class="lbl">RACE-serve_coffee (full benchmark)</span></div>
+      <div class="badge"><span class="num">1324 ms → 310 ms</span><span class="lbl">same problem, isolated (avg)</span></div>
+      <div class="badge"><span class="num">595 → 0</span><span class="lbl">full O(n³) propagations per solve</span></div>
+      <div class="badge"><span class="num">0 / 93</span><span class="lbl">solvability differences vs legacy</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h2>1. Context &amp; symptom</h2>
+<div class="panel">
+  <p>
+    CHIMP is replacing its <b>Meta-CSP</b> storage layer with a CHIMP-native solver kernel.
+    The <code>SimpleTemporalNetwork</code> (STN) is the native replacement for Meta-CSP's
+    <code>APSPSolver</code>. A 93-problem benchmark compares behavior of the current branch
+    against the frozen <code>legacy-metacsp</code> branch.
+  </p>
+  <p>
+    One problem stood out: <b>RACE-serve_coffee</b> produced an <i>identical</i> search tree
+    and an <i>identical</i> 37-action plan on both branches, but native was roughly
+    <b>1.4–3.7× slower</b> depending on the measurement context — a pure
+    <b>per-node cost</b> problem, not a search-order or correctness problem.
+  </p>
+  <div class="callout">
+    <b>Debugging invariant:</b> because the trees matched exactly (later verified: identical
+    91-node trees, identical plans), any timing difference had to come from inside
+    constraint propagation — not from exploration behavior.
+  </div>
+</div>
+
+<h2>2. Profiling methodology</h2>
+<div class="panel">
+  <p>
+    A small isolated driver solves exactly the benchmark problem repeatedly (1 warm-up +
+    N measured), and Java Flight Recorder (JFR, <code>-XX:StartFlightRecording=settings=profile</code>)
+    samples the CPU. Both <b>leaf (self) time</b> and <b>inclusive</b> time are aggregated
+    from <code>jdk.ExecutionSample</code> stacks.
+  </p>
+  <p>Before the work, a single solve cost ~1.3 s and the STN counters showed:</p>
+  <table>
+    <tr><th>Counter</th><th class="num-r">Value</th><th>Meaning</th></tr>
+    <tr><td><code>propagateFull()</code></td><td class="num-r">595</td><td>Full Floyd-Warshall O(n³) runs during one solve</td></tr>
+    <tr><td><code>propagateIncremental()</code></td><td class="num-r">2536</td><td>Incremental runs</td></tr>
+    <tr><td>max time points</td><td class="num-r">315</td><td>Matrix size never shrank during the search</td></tr>
+    <tr><td><code>rebuild()</code> calls</td><td class="num-r">446</td><td>from-scratch rebuilds, avg n ≈ 231</td></tr>
+  </table>
+  <p class="muted">JFR inclusive samples confirmed the story: <code>SimpleTemporalNetwork.propagateFull</code>
+  ≈ 733 samples, <code>fromScratch/rebuild</code> ≈ 404 each — the overwhelming majority of solve time
+  inside the temporal propagation.</p>
+</div>
+
+<h2>3. Root causes</h2>
+
+<h3>3.1 Every constraint add ran full O(n³) Floyd-Warshall</h3>
+<div class="panel">
+  <p>
+    <code>addTimePoint()</code> set a <code>needsFullPropagation</code> flag. The search
+    materializes new temporal variables (2 time points each) on virtually every resolver
+    application, so the next constraint add triggered a <b>full</b> recomputation instead of
+    the existing incremental O(n²)-per-edge path. The incremental path almost never ran.
+  </p>
+  <p class="muted">A fresh time point only adds INF edges plus its two origin bounds — it cannot
+  improve any existing distance. Flagging the whole matrix as stale was simply wrong.</p>
+</div>
+
+<h3>3.2 Infeasible constraints triggered full rebuilds</h3>
+<div class="panel">
+  <p>
+    When a resolver attempt was temporally infeasible, the failing constraint's edges had
+    already been written into the matrix, so the solver had to restore exactness with a full
+    from-scratch rebuild. Instrumentation showed <b>392 of the 446 rebuilds</b> were
+    single-constraint add <i>failures</i> — the routine rejection of infeasible partial plans —
+    not genuine retractions.
+  </p>
+</div>
+
+<h3>3.3 Time points were never freed (matrix kept growing)</h3>
+<div class="panel">
+  <p>
+    Native <code>removeVariable</code> removed constraints but never released the STN time
+    points, so <code>timePointCount</code> grew monotonically to 315 (and the implicit
+    <i>duration</i> edges of removed intervals stayed in the constraint list forever).
+    Meta-CSP — by contrast — frees and reuses time points (<code>tpCreate</code>/<code>tpDelete</code>),
+    keeping its matrices compact and its rebuilds cheap.
+  </p>
+</div>
+
+<div class="callout warn">
+  <b>Bonus bug found while validating the fixes:</b> after switching to pure incremental
+  propagation, a randomized stress test against a reference Floyd-Warshall implementation
+  immediately caught two problems:
+  <ol>
+    <li><b>Origin-hub closure.</b> Every time point connects to the origin; paths like
+      <code>2 → 0 → 1</code> are only closed by full FW. Incremental edge sweeps never revisit
+      the (never-retightened) origin edges, leaving the matrix too loose. Fix: explicitly close
+      through the origin each propagation.</li>
+    <li><b>INF-sentinel overflow.</b> The O(1) feasibility check overflowed on
+      unbounded (<code>±INFINITY</code>) bounds, falsely rejecting valid constraints. Fix:
+      guard sentinels exactly like legacy's <code>sum()</code> does.</li>
+  </ol>
+</div>
+
+<h2>4. The fixes <span class="muted">(commit 7a9279b, 3 files + 1 new test)</span></h2>
+
+<h3>4.1 Incremental adds — no more forced full propagation</h3>
+<div class="panel">
+  <p>
+    <code>addTimePoint()</code> no longer sets <code>needsFullPropagation</code>; the matrix
+    stays exact and every add is now incremental. The <code>needsFullPropagation</code> flag
+    was deleted.
+  </p>
+</div>
+
+<h3>4.2 Exact incremental propagation to the fixpoint</h3>
+<div class="panel">
+  <p>
+    <code>propagateIncremental()</code> now repeatedly:
+  </p>
+  <ol>
+    <li>relaxes all pairs through every recently-tightened edge (multi-round so paths crossing
+        several new edges compose), and</li>
+    <li>closes all paths through the <b>origin hub</b> in O(n²) — the part full FW relabels that
+        pure edge sweeps never revisit.</li>
+  </ol>
+  <p>
+    Rounds continue until nothing tightens; pathological cascades fall back to full Floyd-Warshall.
+  </p>
+  <details>
+    <summary>show code</summary>
+<pre><code>private boolean propagateIncremental() {
+    int n = timePointCount;
+    for (int round = 0; round &lt; 4; round++) {
+        boolean changed = false;
+        for (int[] edge : tightenedEdges) {
+            int u = edge[0], v = edge[1];
+            long w = distance[u][v];
+            if (u == v &amp;&amp; w &lt; 0) { tightenedEdges.clear(); return false; }
+            for (int i = 0; i &lt; n; i++) {
+                long diu = distance[i][u];
+                if (diu == INF) continue;
+                long[] di = distance[i];
+                long newBase = diu + w;
+                for (int j = 0; j &lt; n; j++) {
+                    long dvj = distance[v][j];
+                    if (dvj == INF) continue;
+                    long newDist = newBase + dvj;
+                    if (newDist &lt; di[j]) {
+                        di[j] = newDist;
+                        changed = true;
+                        if (i == j &amp;&amp; newDist &lt; 0) { tightenedEdges.clear(); return false; }
+                    }
+                }
+            }
+        }
+        if (closeThroughOrigin()) changed = true;   // hub: d[i][j] ≤ d[i][0] + d[0][j]
+        for (int i = 0; i &lt; n; i++) if (distance[i][i] &lt; 0) { tightenedEdges.clear(); return false; }
+        if (!changed) { tightenedEdges.clear(); return true; }
+    }
+    tightenedEdges.clear();
+    return propagateFull();                          // rare exact fallback
+}</code></pre>
+  </details>
+</div>
+
+<h3>4.3 O(1) infeasibility pre-check</h3>
+<div class="panel">
+  <p>
+    Whether a single distance edge can be added is decidable in O(1) against the closed matrix —
+    adding it is infeasible iff it closes a negative cycle:
+  </p>
+  <pre><code>inf( from, to, min, max ) ⇔  max + d[to][from] &lt; 0   or   −min + d[from][to] &lt; 0</code></pre>
+  <p>
+    <code>TemporalSolver.addConstraint</code> now pre-checks every compiled edge and returns
+    <code>false</code> <b>before touching the matrix</b> — no pollution, no rebuild. This
+    matches the two pre-checks Meta-CSP's own
+    <code>incrementalDistanceMatrixComputation()</code> performs. The routine rejection of
+    infeasible resolvers dropped from an O(n³) rebuild to two array lookups.
+  </p>
+</div>
+
+<h3>4.4 Time-point pooling (mirrors Meta-CSP tpCreate / tpDelete)</h3>
+<div class="panel">
+  <p>
+    <code>freeTimePoint()</code> neutralizes a row/column, reuses the <b>lowest</b> freed
+    index on allocation, and shrinks the used range when the top index is freed — keeping the
+    propagation/rebuild matrices compact.
+  </p>
+  <details>
+    <summary>show code</summary>
+<pre><code>public int addTimePoint() {
+    int idx;
+    if (!freeTimePoints.isEmpty()) {
+        idx = freeTimePoints.remove(0);          // reuse lowest freed index
+    } else {
+        if (timePointCount &gt;= maxTimePoints) throw new IllegalStateException(...);
+        idx = timePointCount++;
+    }
+    // init row/col: INF + origin bounds + diagonal 0, then closeThroughOrigin()
+    ...
+}
+
+public void freeTimePoint(int idx) {
+    // neutralize row &amp; column
+    ...
+    if (idx == timePointCount - 1) timePointCount--;   // shrink used range
+    else if (!freeTimePoints.contains(idx)) freeTimePoints.add(idx);
+}</code></pre>
+  </details>
+</div>
+
+<h3>4.5 Clean variable removal</h3>
+<div class="panel">
+  <p>
+    <code>TemporalSolver.removeVariable</code> now drops the implicit <i>duration</i> edge
+    (start ≤ end) recorded for every interval, frees the variable's two time points, and
+    rebuilds so that closure paths through the freed points are recomputed (the same class of
+    stale-state bug previously fixed for the live network and for retraction cleanup).
+  </p>
+</div>
+
+<h2>5. Regression test</h2>
+<div class="panel">
+  <p>
+    <code>SimpleTemporalNetworkIncrementalTest</code>: ~5,500 randomized operations
+    (constraint adds / removes / time-point creation, including interleaved creation) assert
+    that every all-pairs bound queried from the incremental STN <b>exactly equals</b> an
+    independent reference Floyd-Warshall closure over the same stored constraints — on
+    successful and rejected operations alike. This test is what caught the origin-hub gap and
+    the INF-sentinel overflow before they could affect the search.
+  </p>
+</div>
+
+<h2>6. Results</h2>
+
+<h3>6.1 The target problem</h3>
+<table>
+  <tr><th>Measurement</th><th class="num-r">Before</th><th class="num-r">After</th><th class="num-r">Legacy (Meta-CSP)</th></tr>
+  <tr>
+    <td>RACE-serve_coffee — isolated (avg of N, best 283 ms)</td>
+    <td class="num-r">1,324 ms</td>
+    <td class="num-r up">310 ms</td>
+    <td class="num-r">563 ms</td>
+  </tr>
+  <tr>
+    <td>RACE-serve_coffee — full 93-problem benchmark (shared JVM)</td>
+    <td class="num-r">1,273 ms</td>
+    <td class="num-r up">260 ms</td>
+    <td class="num-r">367 ms</td>
+  </tr>
+  <tr>
+    <td>Full Floyd-Warshall propagations per solve</td>
+    <td class="num-r">595</td>
+    <td class="num-r up">0</td>
+    <td class="num-r">—</td>
+  </tr>
+  <tr>
+    <td>from-scratch rebuilds per solve</td>
+    <td class="num-r">446</td>
+    <td class="num-r up">54</td>
+    <td class="num-r">≈1,100 (but small n)</td>
+  </tr>
+  <tr>
+    <td>avg time-points at rebuild time</td>
+    <td class="num-r">231</td>
+    <td class="num-r up">150</td>
+    <td class="num-r">179</td>
+  </tr>
+</table>
+
+<h3>6.2 Selected problems, full benchmark (native vs legacy)</h3>
+<table>
+  <tr><th>Problem</th><th class="num-r">Native (ms)</th><th class="num-r">Legacy (ms)</th><th>Plan match</th></tr>
+  <tr><td>RACE-serve_coffee</td><td class="num-r up">260</td><td class="num-r">367</td><td><span class="pill ok">identical</span></td></tr>
+  <tr><td>ICO-move_2_objects</td><td class="num-r up">242</td><td class="num-r">598</td><td><span class="pill ok">identical</span></td></tr>
+  <tr><td>RACE-scenario_3_2_3</td><td class="num-r up">22</td><td class="num-r">42</td><td><span class="pill ok">identical</span></td></tr>
+  <tr><td>RACE-m_move_object_2</td><td class="num-r up">39</td><td class="num-r">58</td><td><span class="pill warn">arm-flip variant</span></td></tr>
+  <tr><td>Integer-simple</td><td class="num-r up">32</td><td class="num-r">83</td><td><span class="pill ok">identical</span></td></tr>
+  <tr><td>ICO-serve_coffee</td><td class="num-r up">14</td><td class="num-r">30</td><td><span class="pill ok">identical</span></td></tr>
+</table>
+
+<h3>6.3 Correctness / parity</h3>
+<div class="panel">
+  <ul>
+    <li><b>93/93 problems solve</b> on both branches — <b>0 solvability differences</b>.</li>
+    <li><b>88/93 action sequences byte-identical</b>; the 5 remaining mismatches are all the
+        pre-existing, semantically-neutral <code>leftArm1 ↔ rightArm1</code> flips in
+        <code>pick_up_object</code> — unchanged by this work.</li>
+    <li>Full unit test suite green (<code>./gradlew test</code>), including the new randomized
+        STN regression test.</li>
+  </ul>
+</div>
+
+<h2>7. What's left</h2>
+<div class="panel">
+  <ul>
+    <li>
+      <b>The next hotspot is the symbolic solver.</b> After this change, a JFR pass shows
+      <code>CompoundSymbolicSolver / SymbolicSolver</code> (AC-3 style propagation)
+      consuming ~40% of remaining samples — the largest remaining lever for further gains.
+    </li>
+    <li>
+      The incremental fixpoint's exactness is validated empirically (randomized stress test +
+      full solver parity); pathological cascades fall back to full Floyd-Warshall.
+    </li>
+    <li>
+      Small benchmark problems (<code>DWR-m_bring2</code>, <code>DWR-m_navigate1</code>) show
+      run-to-run timing noise from JIT warm-up and the global variable-ID counter, so their
+      ±100% swings are measurement artifacts with identical plans.
+    </li>
+  </ul>
+</div>
+
+<footer>
+  CHIMP · hierarchical hybrid planner (Java 17) · Meta-CSP decoupling project.<br>
+  Commits: <code>7fce835</code> (transactional addConstraints / search ordering) →
+  <code>f389e74</code> (93-problem benchmark suite) → <code>7a9279b</code> (this report's
+  STN performance work). Benchmark harness:
+  <code>src/main/java/benchmark/FullChimpBenchmark.java</code>,
+  <code>scripts/compare-benchmark.sh</code>.
+</footer>
+
+</div>
+</body>
+</html>
