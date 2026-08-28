@@ -25,6 +25,12 @@ public class VariablePrototype extends Variable {
     /** What kind of variable this prototype will become. */
     public enum Kind { FLUENT, INTEGER }
 
+    /**
+     * Global prototype counter (0,1,2,...). Mirrors Meta-CSP's
+     * {@code VariablePrototype.id} counter: ids increase with creation
+     * order, so id-sequenced iteration reproduces legacy resolution
+     * (VP materialization) ordering.
+     */
     private static final AtomicInteger NEXT_ID = new AtomicInteger(-1);
 
     private final Kind kind;
@@ -63,7 +69,7 @@ public class VariablePrototype extends Variable {
     public static VariablePrototype forFluent(ConstraintSolver solver,
                                                String component, String symbol,
                                                String[] arguments) {
-        return forFluent(solver, NEXT_ID.decrementAndGet(), component, symbol, arguments);
+        return forFluent(solver, NEXT_ID.incrementAndGet(), component, symbol, arguments);
     }
 
     /** Creates an integer sub-variable placeholder with an explicit id. */
@@ -78,7 +84,7 @@ public class VariablePrototype extends Variable {
     public static VariablePrototype forInteger(ConstraintSolver solver,
                                                 VariablePrototype parentPrototype,
                                                 int subIndex) {
-        return forInteger(solver, NEXT_ID.decrementAndGet(), parentPrototype, subIndex);
+        return forInteger(solver, NEXT_ID.incrementAndGet(), parentPrototype, subIndex);
     }
 
     // -- typed accessors --

@@ -139,10 +139,15 @@ public class FluentNetworkSolver extends ConstraintSolver {
 
     @Override
     public boolean addConstraints(Constraint[] cs) {
+        List<Constraint> added = new ArrayList<>();
         for (Constraint c : cs) {
             if (!addConstraint(c)) {
+                for (Constraint a : added) {
+                    removeConstraint(a);
+                }
                 return false;
             }
+            added.add(c);
         }
         return true;
     }
@@ -163,14 +168,16 @@ public class FluentNetworkSolver extends ConstraintSolver {
         if (from == null || to == null) return false;
 
         Constraint[] subs = fc.compileToSubConstraints(from, to);
+        List<Constraint> addedSubs = new ArrayList<>();
         for (Constraint sub : subs) {
-            boolean ok = dispatch(sub);
-            if (!ok) {
-                // Rollback previously added subs
-                // (In practice, conflict detection happens before constraint addition;
-                //  incomplete rollback mirrors the Meta-CSP behaviour)
+            if (!dispatch(sub)) {
+                // Roll back the subs added earlier in this batch
+                for (Constraint addedSub : addedSubs) {
+                    dispatchRemove(addedSub);
+                }
                 return false;
             }
+            addedSubs.add(sub);
         }
         constraintList().add(c);
         network.addConstraint(c);

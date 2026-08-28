@@ -32,8 +32,23 @@ public class ConstraintNetwork {
         variables.add(Objects.requireNonNull(v));
     }
 
+    /**
+     * Returns all variables.
+     *
+     * <p>Replicates Meta-CSP's {@code ConstraintNetwork.getVariables()}
+     * ordering exactly: variables are collected into a fresh id-hashed
+     * {@link HashSet} (keys hash by variable id, see {@link Variable#hashCode}),
+     * so iteration follows id-keyed bucket order.  Consumers that depend on
+     * ordering (e.g. resolver-sub variable materialization in
+     * {@link HTNPlanner#addResolverSub}, scheduler flaw construction) thereby
+     * reproduce the legacy search behavior.
+     */
     public Variable[] getVariables() {
-        return variables.toArray(new Variable[0]);
+        java.util.HashSet<Variable> set = new java.util.HashSet<>();
+        for (Variable v : variables) {
+            set.add(v);
+        }
+        return set.toArray(new Variable[0]);
     }
 
     // -- constraints --

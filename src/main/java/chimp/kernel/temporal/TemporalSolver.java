@@ -59,8 +59,16 @@ public class TemporalSolver extends ConstraintSolver {
 
     @Override
     public boolean addConstraints(Constraint[] cs) {
+        List<Constraint> added = new ArrayList<>();
         for (Constraint c : cs) {
-            if (!addConstraint(c)) return false;
+            if (!addConstraint(c)) {
+                // Roll back this batch's earlier constraints (full STN cleanup)
+                for (Constraint a : added) {
+                    removeConstraint(a);
+                }
+                return false;
+            }
+            added.add(c);
         }
         return true;
     }

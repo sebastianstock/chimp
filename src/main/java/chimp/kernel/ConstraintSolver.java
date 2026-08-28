@@ -1,7 +1,6 @@
 package chimp.kernel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +21,12 @@ public abstract class ConstraintSolver {
     /** Next variable id. */
     protected int nextId;
 
-    private final Map<Integer, Variable> variablesById = new HashMap<>();
+    private final Map<Integer, Variable> variablesById = new java.util.LinkedHashMap<>();
     private final List<Constraint> constraints = new ArrayList<>();
 
     // -- variable management --
 
-    protected int nextVariableId() { return ++nextId; }
+    protected int nextVariableId() { return nextId++; }
 
     protected void registerVariable(Variable v) {
         variablesById.put(v.id(), v);
@@ -66,13 +65,30 @@ public abstract class ConstraintSolver {
     /** Add a single constraint. Returns {@code true} on success. */
     public boolean addConstraint(Constraint c) {
         constraints.add(c);
-        return propagate();
+        if (!propagate()) {
+            constraints.remove(c);
+            return false;
+        }
+        return true;
     }
 
-    /** Add multiple constraints. Returns {@code true} on success. */
+    /**
+     * Add multiple constraints. Returns {@code true} on success and rolls
+     * back all constraints of this batch on failure (mirrors Meta-CSP's
+     * transactional resolver application).
+     */
     public boolean addConstraints(Constraint[] cs) {
-        Collections.addAll(constraints, cs);
-        return propagate();
+        List<Constraint> added = new ArrayList<>();
+        for (Constraint c : cs) {
+            if (!addConstraint(c)) {
+                for (Constraint a : added) {
+                    removeConstraint(a);
+                }
+                return false;
+            }
+            added.add(c);
+        }
+        return true;
     }
 
     /** Remove a single constraint. */
