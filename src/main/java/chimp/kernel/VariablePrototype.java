@@ -33,6 +33,16 @@ public class VariablePrototype extends Variable {
      */
     private static final AtomicInteger NEXT_ID = new AtomicInteger(-1);
 
+    /**
+     * Resets the prototype id counter so that each solve allocates ids from
+     * 0.  Ids feed {@code hashCode()}, hence hash-set iteration order; a
+     * per-solve reset makes results independent of how many prototypes
+     * previous solves in the same JVM allocated.
+     */
+    public static void resetIds() {
+        NEXT_ID.set(-1);
+    }
+
     private final Kind kind;
 
     // Fluent-prototype fields

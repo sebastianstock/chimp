@@ -7,6 +7,7 @@ import java.util.*;
 import chimp.kernel.Constraint;
 import chimp.kernel.ConstraintNetwork;
 import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
 import chimp.kernel.fluent.Fluent;
 import chimp.kernel.fluent.FluentConstraint;
 import chimp.kernel.fluent.FluentNetworkSolver;
@@ -180,6 +181,7 @@ public class CHIMP {
 	}
 	
 	public boolean generatePlan() {
+		VariablePrototype.resetIds();
 		long startTime = System.nanoTime();
 		boolean result = planner.backtrack();
 		long endTime = System.nanoTime();

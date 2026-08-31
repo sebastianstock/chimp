@@ -286,7 +286,11 @@ public abstract class PlanReportroryItem {
 		List<Set<PreconditionSelection>> possibleSelections = new ArrayList<>();
 		if (preconditions != null) {
 			for (HTNPrecondition precondition : preconditions) {
-				Set<PreconditionSelection> matching = new HashSet<>();
+				// LinkedHashSet (not HashSet): HTNPrecondition is identity-hashed,
+				// so plain HashSet iteration order would depend on allocation
+				// history across solves.  Insertion order (openFluents order) is
+				// deterministic.
+				Set<PreconditionSelection> matching = new LinkedHashSet<>();
 				for (Fluent openFluent : openFluents) {
 					if (precondition.getFluenttype().equals(
 							openFluent.getCompoundSymbolicVariable().getPredicateName())
