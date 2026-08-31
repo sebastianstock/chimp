@@ -76,8 +76,8 @@ public final class ChimpSearchEngine {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void draw() {
-        // TODO: replace with CHIMP-native search-tree visualization
-        // (was org.metacsp.utility.UI.SearchTreeFrame.draw(...))
+        // Text fallback; the interactive viewer is ui.SearchTreeFrame,
+        // opened via CHIMP.drawSearchSpace().
         System.out.println("Search tree: " + searchTree);
     }
 
@@ -242,7 +242,7 @@ public final class ChimpSearchEngine {
     private static final class TerminalNode extends SearchTreeNode {
         private final boolean success;
         TerminalNode(boolean success) {
-            super(success ? "SUCCESS" : "FAILURE");
+            super(success ? "SUCCESS" : "FAILURE", true);
             this.success = success;
         }
         @Override

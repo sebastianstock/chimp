@@ -20,6 +20,9 @@ import chimp.search.ChimpResolverAdapter;
 import chimp.search.ChimpSearchEngine;
 import chimp.search.FlawProvider;
 import chimp.search.SearchHooks;
+import chimp.search.SearchTreeEdge;
+import chimp.search.SearchTreeNode;
+import edu.uci.ics.jung.graph.DelegateForest;
 import hybridDomainParsing.HybridDomainPlanner;
 
 import java.util.ArrayList;
@@ -113,6 +116,14 @@ public class HTNPlanner implements HybridDomainPlanner, SearchHooks {
 		if (searchEngine != null) {
 			searchEngine.draw();
 		}
+	}
+
+	/**
+	 * @return The search tree built by the last {@link #backtrack()} call,
+	 *         or {@code null} if no search has run yet.
+	 */
+	public DelegateForest<SearchTreeNode, SearchTreeEdge> getSearchTree() {
+		return searchEngine != null ? searchEngine.getSearchTree() : null;
 	}
 
 	/**

@@ -30,7 +30,7 @@ public class SearchTreeNode {
     }
 
     /** Creates a search tree node. For internal use only. */
-    private SearchTreeNode(String label, boolean terminal) {
+    protected SearchTreeNode(String label, boolean terminal) {
         this.id = NEXT_ID.getAndIncrement();
         this.label = label;
         this.terminal = terminal;

@@ -13,6 +13,7 @@ import org.junit.Test;
 import chimp.kernel.ConstraintNetwork;
 import chimp.kernel.Variable;
 import chimp.model.FluentId;
+import edu.uci.ics.jung.graph.DelegateForest;
 
 public class ChimpSearchEngineTest {
 
@@ -67,6 +68,42 @@ public class ChimpSearchEngineTest {
 
         assertTrue(engine.backtrack());
         assertEquals(0, hooks.addResolverSubCalls);
+    }
+
+    @Test
+    public void searchTreeRecordsSuccessBranch() {
+        ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(1)));
+        ChimpResolver resolver = new ChimpResolver(distinctNetwork(1));
+        StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of(resolver)));
+        ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), new RecordingHooks(), 0);
+
+        assertTrue(engine.backtrack());
+        DelegateForest<SearchTreeNode, SearchTreeEdge> tree = engine.getSearchTree();
+        assertEquals("count=" + tree.getVertexCount() + " edges=" + tree.getEdgeCount() + " verts=" + tree.getVertices(), 2, tree.getVertexCount());
+        assertEquals(1, tree.getEdgeCount());
+        assertTrue(containsTerminal(tree, "SUCCESS"));
+    }
+
+    @Test
+    public void searchTreeRecordsFailureAndBacktracking() {
+        ChimpFlaw flaw = new ChimpFlaw(List.of(new FluentId(1)));
+        ChimpResolver resolver = new ChimpResolver(distinctNetwork(1));
+        StubProvider provider = new StubProvider(List.of(flaw), List.of(List.of()));
+        ChimpSearchEngine engine = new ChimpSearchEngine(List.of(provider), new RecordingHooks(), 0);
+
+        assertFalse(engine.backtrack());
+        DelegateForest<SearchTreeNode, SearchTreeEdge> tree = engine.getSearchTree();
+        assertEquals("count=" + tree.getVertexCount() + " edges=" + tree.getEdgeCount() + " verts=" + tree.getVertices(), 2, tree.getVertexCount());
+        assertEquals(1, tree.getEdgeCount());
+        assertTrue(containsTerminal(tree, "FAILURE"));
+    }
+
+    private static boolean containsTerminal(
+            DelegateForest<SearchTreeNode, SearchTreeEdge> tree, String label) {
+        for (SearchTreeNode v : tree.getVertices()) {
+            if (v.isTerminal() && label.equals(v.label())) return true;
+        }
+        return false;
     }
 
     @Test

@@ -8,6 +8,9 @@ import chimp.kernel.Constraint;
 import chimp.kernel.ConstraintNetwork;
 import chimp.kernel.Variable;
 import chimp.kernel.VariablePrototype;
+import chimp.search.SearchTreeEdge;
+import chimp.search.SearchTreeNode;
+import edu.uci.ics.jung.graph.DelegateForest;
 import chimp.kernel.fluent.Fluent;
 import chimp.kernel.fluent.FluentConstraint;
 import chimp.kernel.fluent.FluentNetworkSolver;
@@ -36,6 +39,7 @@ import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.classic.antlr.ChimpClassicReader;
 import postprocessing.PlanExtractor;
 import ui.PlanHierarchyFrame;
+import ui.SearchTreeFrame;
 
 /**
  * A wrapper for the HTN-Planner that bundles the features of the planner CHIMP.
@@ -56,6 +60,7 @@ public class CHIMP {
 	private boolean foundPlan = false;
 	private long planningTime = -1;
 	private PlanHierarchyFrame planHierarchyFrame = null;
+	private SearchTreeFrame searchTreeFrame = null;
 
 	public static class CHIMPBuilder {
 		
@@ -195,7 +200,28 @@ public class CHIMP {
 	 * Draws the search space of the meta-CSP.
 	 */
 	public void drawSearchSpace() {
-		planner.draw();
+		DelegateForest<SearchTreeNode, SearchTreeEdge> tree = planner.getSearchTree();
+		if (tree == null) {
+			System.err.println("No search tree to draw (run generatePlan() first)");
+			return;
+		}
+		if (this.searchTreeFrame != null) { // close the old frame
+			this.disposeSearchTreeFrame();
+		}
+		try {
+			this.searchTreeFrame = SearchTreeFrame.draw(tree);
+		} catch (Exception e) {
+			System.err.println("Caught exception while drawing search tree: " + e.toString());
+		}
+	}
+
+	public void disposeSearchTreeFrame() {
+		if (this.searchTreeFrame != null) { // close the old frame
+			this.searchTreeFrame.setVisible(false);
+			this.searchTreeFrame.dispose();
+		} else {
+			System.out.println("no active searchTreeFrame");
+		}
 	}
 	
 	/**
