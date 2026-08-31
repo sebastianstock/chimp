@@ -1,6 +1,14 @@
 package chimp.kernel.symbolic;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import chimp.kernel.Constraint;
@@ -18,6 +26,12 @@ import chimp.logging.ChimpLogging;
  * UNARYEQUALS, UNARYDIFFERENT).
  *
  * <p>Propagation uses the AC-3 arc-consistency algorithm.
+ *
+ * <p>The constraint adjacency map ({@link #varToConstraints}) is
+ * maintained incrementally by every constraint mutation path — the
+ * constraint list must therefore only be modified through
+ * {@link #addConstraint}, {@link #removeConstraint},
+ * {@link #addSubConstraint} or {@link #removeSubConstraint}.
  */
 public class SymbolicSolver extends ConstraintSolver {
 
@@ -26,6 +40,9 @@ public class SymbolicSolver extends ConstraintSolver {
     private final String[] symbols;
     private final Map<String, Integer> symbolsToIndex = new HashMap<>();
     private final Map<Variable, List<SymbolicConstraint>> varToConstraints = new HashMap<>();
+
+    /** Reusable AC-3 domain backups (avoid per-propagate allocation). */
+    private SymbolicDomain[] backupScratch;
 
     private long propagationTime;
     private int invocationCount;
@@ -69,17 +86,58 @@ public class SymbolicSolver extends ConstraintSolver {
         return ret;
     }
 
+    // -- constraint management --
+
+    @Override
+    public boolean addConstraint(Constraint c) {
+        if (c instanceof SymbolicConstraint sc) {
+            addToVarToConstraints(sc);
+        }
+        if (!super.addConstraint(c)) {
+            if (c instanceof SymbolicConstraint sc) {
+                removeFromVarToConstraints(sc);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void removeConstraint(Constraint c) {
+        super.removeConstraint(c);
+        if (c instanceof SymbolicConstraint sc) {
+            removeFromVarToConstraints(sc);
+        }
+    }
+
+    /** Adds a routed sub-constraint without auto-propagation
+     *  (used by {@link CompoundSymbolicSolver}). */
+    void addSubConstraint(SymbolicConstraint c) {
+        constraintList().add(c);
+        addToVarToConstraints(c);
+    }
+
+    /** Removes a routed sub-constraint (used by
+     *  {@link CompoundSymbolicSolver}, e.g. for rollback). */
+    void removeSubConstraint(SymbolicConstraint c) {
+        constraintList().remove(c);
+        removeFromVarToConstraints(c);
+    }
+
     // -- propagation (AC-3) --
 
     @Override
     public boolean propagate() {
-        buildVarToConstraints();
-
         Variable[] vars = getVariables();
-        SymbolicDomain[] backups = new SymbolicDomain[vars.length];
+        if (backupScratch == null || backupScratch.length < vars.length) {
+            backupScratch = new SymbolicDomain[vars.length];
+            for (int i = 0; i < backupScratch.length; i++) {
+                backupScratch[i] = new SymbolicDomain(symbols.length);
+            }
+        }
         for (int i = 0; i < vars.length; i++) {
             SymbolicDomain dom = ((SymbolicVariable) vars[i]).domain();
-            backups[i] = new SymbolicDomain(dom);
+            backupScratch[i].copyFrom(dom);
             dom.reset();
         }
 
@@ -87,7 +145,7 @@ public class SymbolicSolver extends ConstraintSolver {
 
         if (!success) {
             for (int i = 0; i < vars.length; i++) {
-                ((SymbolicVariable) vars[i]).domain().copyFrom(backups[i]);
+                ((SymbolicVariable) vars[i]).domain().copyFrom(backupScratch[i]);
             }
             logger.info("NameFailure");
         }
@@ -96,26 +154,45 @@ public class SymbolicSolver extends ConstraintSolver {
 
     private boolean ac3() {
         Deque<SymbolicConstraint> worklist = new ArrayDeque<>();
-        for (Constraint con : getConstraints()) {
-            worklist.add((SymbolicConstraint) con);
+        Set<SymbolicConstraint> queued =
+                Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Constraint con : constraintList()) {
+            enqueue((SymbolicConstraint) con, worklist, queued);
         }
 
         while (!worklist.isEmpty()) {
             SymbolicConstraint con = worklist.remove();
+            queued.remove(con);
             int changed = revise(con);
             if (changed > 0) {
                 if (!checkDomains(con)) return false;
                 if (changed == 1) {
-                    worklist.addAll(constraintsOfVarExcept(con.from(), con));
+                    enqueueAll(constraintsOfVarExcept(con.from(), con), worklist, queued);
                 } else if (changed == 2) {
-                    worklist.addAll(constraintsOfVarExcept(con.to(), con));
+                    enqueueAll(constraintsOfVarExcept(con.to(), con), worklist, queued);
                 } else {
-                    worklist.addAll(constraintsOfVarExcept(con.from(), con));
-                    worklist.addAll(constraintsOfVarExcept(con.to(), con));
+                    enqueueAll(constraintsOfVarExcept(con.from(), con), worklist, queued);
+                    enqueueAll(constraintsOfVarExcept(con.to(), con), worklist, queued);
                 }
             }
         }
         return true;
+    }
+
+    private static void enqueue(
+            SymbolicConstraint con,
+            Deque<SymbolicConstraint> worklist, Set<SymbolicConstraint> queued) {
+        if (queued.add(con)) {
+            worklist.add(con);
+        }
+    }
+
+    private static void enqueueAll(
+            List<SymbolicConstraint> cons,
+            Deque<SymbolicConstraint> worklist, Set<SymbolicConstraint> queued) {
+        for (SymbolicConstraint con : cons) {
+            enqueue(con, worklist, queued);
+        }
     }
 
     private boolean checkDomains(SymbolicConstraint con) {
@@ -156,20 +233,27 @@ public class SymbolicSolver extends ConstraintSolver {
         }
     }
 
-    // -- constraint adjacency --
+    // -- constraint adjacency (maintained incrementally) --
 
-    private void buildVarToConstraints() {
-        varToConstraints.clear();
-        for (Constraint con : getConstraints()) {
-            if (con instanceof SymbolicConstraint sc) {
-                addVarConstraint(sc.from(), sc);
-                addVarConstraint(sc.to(), sc);
-            }
-        }
+    private void addToVarToConstraints(SymbolicConstraint sc) {
+        addVarConstraint(sc.from(), sc);
+        addVarConstraint(sc.to(), sc);
+    }
+
+    private void removeFromVarToConstraints(SymbolicConstraint sc) {
+        removeVarConstraint(sc.from(), sc);
+        removeVarConstraint(sc.to(), sc);
     }
 
     private void addVarConstraint(Variable var, SymbolicConstraint con) {
         varToConstraints.computeIfAbsent(var, k -> new ArrayList<>()).add(con);
+    }
+
+    private void removeVarConstraint(Variable var, SymbolicConstraint con) {
+        List<SymbolicConstraint> all = varToConstraints.get(var);
+        if (all != null) {
+            all.remove(con);
+        }
     }
 
     private List<SymbolicConstraint> constraintsOfVarExcept(

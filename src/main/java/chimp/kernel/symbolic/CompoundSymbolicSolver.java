@@ -117,7 +117,7 @@ public class CompoundSymbolicSolver extends ConstraintSolver {
                 for (CompoundSymbolicConstraint.RoutedConstraint rc : routed) {
                     SymbolicSolver targetSolver = subSolvers[rc.solverIndex()];
                     // Don't auto-propagate yet — we'll propagate all at once
-                    targetSolver.constraintList().add(rc.constraint());
+                    targetSolver.addSubConstraint(rc.constraint());
                     added.add(rc.constraint());
                 }
                 // Now propagate all sub-solvers and roll back on failure
@@ -127,7 +127,7 @@ public class CompoundSymbolicSolver extends ConstraintSolver {
                             // Roll back: remove what we just added
                             for (SymbolicConstraint sc : added) {
                                 for (SymbolicSolver sss : subSolvers) {
-                                    sss.constraintList().remove(sc);
+                                    sss.removeSubConstraint(sc);
                                 }
                             }
                             return false;
@@ -137,7 +137,7 @@ public class CompoundSymbolicSolver extends ConstraintSolver {
                     // Roll back on exception too
                     for (SymbolicConstraint sc : added) {
                         for (SymbolicSolver sss : subSolvers) {
-                            sss.constraintList().remove(sc);
+                            sss.removeSubConstraint(sc);
                         }
                     }
                     return false;
@@ -158,8 +158,7 @@ public class CompoundSymbolicSolver extends ConstraintSolver {
                     cc.getRoutedConstraints();
             if (routed != null) {
                 for (CompoundSymbolicConstraint.RoutedConstraint rc : routed) {
-                    subSolvers[rc.solverIndex()].constraintList()
-                            .remove(rc.constraint());
+                    subSolvers[rc.solverIndex()].removeSubConstraint(rc.constraint());
                 }
             }
         }
