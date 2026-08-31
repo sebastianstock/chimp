@@ -80,9 +80,11 @@ were removed once superseded).
 
 In rough priority order:
 
-1. **Search-tree visualization gap** — the retyped JUNG viewer exists in `chimp.ui`,
-   but the interactive `draw()` flow should be re-verified end-to-end after the
-   storage-layer swap (user-facing debugging tool).
+1. ~~Search-tree visualization gap~~ — **restored and verified** (`e567faf`):
+   `ui.SearchTreeFrame` re-hosts the Meta-CSP viewer for the CHIMP-native forest;
+   `CHIMP.drawSearchSpace()` opens it.  Verified end-to-end on a live display
+   (mobipick and RACE serve_coffee render flaw chains, edge labels, terminal
+   coloring) plus headless forest assertions in `ChimpSearchEngineTest`.
 2. **Schedulable conflict-detection bug (upstream port, decision pending)** —
    `ChimpSchedulable` (~line 307) reads `eet1` via `getEST()`.  Decompiling
    Meta-CSP 1.3.5 (`Schedulable.getConflict`) shows the upstream code has the
