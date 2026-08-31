@@ -293,8 +293,8 @@ batches the STN edges (via `addEdgeSilent`) and propagates once.
 
 ### TemporalRelation
 
-All Allen interval relations are defined in `chimp.model.TemporalRelation`.
-See `docs/m15-plan.md` for the full list of ~35 relation types.
+All ~35 Allen interval relations are enumerated in
+`chimp.model.TemporalRelation`.
 
 ---
 

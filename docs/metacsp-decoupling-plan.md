@@ -36,8 +36,8 @@ suitable constraint programming library, not necessarily UP.
 
 ## Completed Milestones (history)
 
-Details for each milestone live in the git history and the per-milestone docs
-(`docs/m15-plan.md`, `docs/m12-plan.md`, `docs/m15-step4-plan.md`, …).
+Details for each milestone live in the git history (per-milestone plan docs
+were removed once superseded).
 
 - **M1–M5**: CHIMP-owned model and search-facing types (`chimp.model`, `chimp.search`),
   domain parsers emit neutral values, resolver-description layer (M3), value-ordering
