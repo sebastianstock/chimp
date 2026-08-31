@@ -21,14 +21,8 @@ suitable constraint programming library, not necessarily UP.
   integer, fluent solvers).
 - The adapter package `chimp.adapter.metacsp` was retired during the M15 migration
   (Steps 7–8 inlined the remaining adapters; Phase 3 deleted the storage layer).
-- **8 legacy example source files** still reference the old API
-  (`examples/TestDWRDomain.java`, `examples/TestRuntimes.java`,
-  `examples/TestTransTerraProblems.java`, `examples/VariousTests.java`,
-  `examples/negative_precondition_resource/TestRemoveAllSamples.java`,
-  `examples/eval/*`, `examples/chimp/TestIncrementalMerging.java`,
-  `examples/chimp/TestPlanningWithIntegerConstraints.java`). They are excluded from
-  compilation in `build.gradle` and kept only as reference for the `legacy-metacsp`
-  branch.
+- The 10 legacy example sources that referenced the removed API were deleted
+  (`dce822f`); the `legacy-metacsp` branch retains its own copies for reference.
 - Test suite green (~290 `@Test` methods); behavior verified against the legacy branch
   on a 93-problem benchmark suite (see Verification Strategy).
 - Search-tree visualization is preserved in `chimp.ui` (JUNG `DelegateForest` retyped,
@@ -86,17 +80,23 @@ were removed once superseded).
 
 In rough priority order:
 
-1. **Legacy example cleanup** — decide the fate of the 8 excluded Meta-CSP example
-   files: delete them, or keep them as reference-only (they are already excluded from
-   compilation and documented in `build.gradle`).
-2. **Search-tree visualization gap** — the retyped JUNG viewer exists in `chimp.ui`,
+1. **Search-tree visualization gap** — the retyped JUNG viewer exists in `chimp.ui`,
    but the interactive `draw()` flow should be re-verified end-to-end after the
    storage-layer swap (user-facing debugging tool).
-3. **Known small defects**:
-   - `ChimpSchedulable.java` (~line 306): pre-existing `getEST()` → `getEET()` typo.
-   - Static variable-prototype counter drift: search trees are benchmark-order
-     sensitive; consider a per-problem counter reset or a stable non-wrapping id
-     ordering.
+2. **Schedulable conflict-detection bug (upstream port, decision pending)** —
+   `ChimpSchedulable` (~line 307) reads `eet1` via `getEST()`.  Decompiling
+   Meta-CSP 1.3.5 (`Schedulable.getConflict`) shows the upstream code has the
+   identical defect, so CHIMP faithfully preserves buggy legacy behavior.  Fixing
+   it changes `dmax` in the direct-pair check and thus resource-conflict
+   detection — a semantic change that would diverge from legacy and requires a
+   benchmark-gate re-run plus an equivalence argument for any new plan
+   differences.  Kept as-is until decided.
+3. ~~Static variable-prototype counter drift~~ — **fixed** (`98cc6c7`):
+   `VariablePrototype.resetIds()` is called at the start of each solve, and
+   `describeResolvers` uses a `LinkedHashSet` (HTNPrecondition is
+   identity-hashed).  Running the 93-problem suite in reversed order now
+   produces byte-identical plans; benchmark gate: 3/93 known symmetric-variant
+   mismatches, 0 solvability differences.
 4. **Optional performance** — the temporal solver (STN) is now the dominant cost
    (~48% of solve time on RACE-serve_coffee) if further speedup is wanted.
 5. **Documentation refresh** — keep this plan and `docs/kernel-api.md` in sync with
