@@ -1,18 +1,20 @@
-# Meta-CSP Coupling and Decoupling Plan
+# Removing the Meta-CSP Dependency
+
+This document records how the Meta-CSP Framework dependency was removed from CHIMP:
+the approach, the milestones, the defects found and fixed along the way, and the
+verification strategy used to prove behavior parity.
 
 ## Summary
 
-CHIMP is a hierarchical hybrid planner implemented in Java 17. It depended on the
-Meta-CSP Framework (`org.metacsp:meta-csp-framework:1.3.5`). The primary goal — make
-CHIMP completely independent of Meta-CSP, replacing the Meta-CSP storage layer with a
-CHIMP-native solver kernel — is **achieved** (branch `remove_metacsp-m15`). A separate,
-later goal is to make CHIMP available as a planner in the Unified Planning library (UP)
-— an *integration* (CHIMP as a UP planner provider), not a *dependency* (CHIMP must not
-depend on UP). CHIMP may also be ported to another programming language before UP
-integration. For constraint propagation, the CHIMP-native solver kernel may use any
-suitable constraint programming library, not necessarily UP.
+CHIMP is a hierarchical hybrid planner implemented in Java 17. It used to depend on
+the Meta-CSP Framework (`org.metacsp:meta-csp-framework:1.3.5`), whose storage layer
+(fluent, symbolic, integer, temporal constraint networks) was entangled with CHIMP's
+HTN search. The dependency was removed by first isolating every Meta-CSP concept
+behind CHIMP-owned interfaces and data structures, then replacing the storage layer
+with a CHIMP-native solver kernel (`chimp.kernel`), and finally deleting the
+Meta-CSP code entirely in an atomic swap. The removal is **complete and verified**.
 
-## Status Snapshot (branch `remove_metacsp-m15`, head `bf7b739`; pending merge to `master`)
+## Final State (branch `remove_metacsp-m15`)
 
 - `build.gradle` has **no Meta-CSP dependency**; `grep -r "org.metacsp" src/main src/test`
   returns zero compiled imports.
@@ -29,7 +31,7 @@ suitable constraint programming library, not necessarily UP.
   `e567faf`): `CHIMP.drawSearchSpace()` opens the CHIMP-native forest in the retyped
   Meta-CSP viewer; SUCCESS/FAILURE terminals are colored green/red.
 
-## Completed Milestones (history)
+## Milestones (history)
 
 Details for each milestone live in the git history (per-milestone plan docs
 were removed once superseded).
@@ -77,54 +79,38 @@ were removed once superseded).
   `c56dd39`) preserves the pre-removal code for benchmarking;
   `scripts/compare-benchmark.sh` runs both sides.
 
-## Remaining Work
+## Defects Found and Fixed During the Removal
 
-In rough priority order:
+These surfaced through benchmark-parity testing and deterministic-replay checks after
+the kernel swap; all were verified plan-neutral or parity-restoring before being kept.
 
-1. ~~Search-tree visualization gap~~ — **restored and verified** (`e567faf`):
-   `ui.SearchTreeFrame` re-hosts the Meta-CSP viewer for the CHIMP-native forest;
-   `CHIMP.drawSearchSpace()` opens it.  Verified end-to-end on a live display
-   (mobipick and RACE serve_coffee render flaw chains, edge labels, terminal
-   coloring) plus headless forest assertions in `ChimpSearchEngineTest`.
-2. ~~Schedulable conflict-detection bug~~ — **fixed** (`a66c2d7`).  The
-   `eet1` register read `getEST()` — a defect inherited verbatim from
-   upstream Meta-CSP 1.3.5 (verified by decompiling
-   `Schedulable.getConflict`).  An experiment with the fix in place showed
-   **0 of 93 benchmark plans change** (`dmin` dominates the pair bounds in
-   practice on these domains), so the fix was adopted: conflict detection
-   now matches the algorithm's intent, benchmark gate unchanged (3/93
-   known symmetric-variant mismatches, 0 solvability differences).
-3. ~~Static variable-prototype counter drift~~ — **fixed** (`98cc6c7`):
-   `VariablePrototype.resetIds()` is called at the start of each solve, and
-   `describeResolvers` uses a `LinkedHashSet` (HTNPrecondition is
-   identity-hashed).  Running the 93-problem suite in reversed order now
-   produces byte-identical plans; benchmark gate: 3/93 known symmetric-variant
-   mismatches, 0 solvability differences.
-4. **Optional performance** — the temporal solver (STN) is now the dominant cost
-   (~48% of solve time on RACE-serve_coffee) if further speedup is wanted.
-5. ~~Documentation refresh~~ — **done**: this plan, `docs/kernel-api.md` and `README.md`
-   brought in sync with the final state (bitset symbolic domains, package layout,
-   test inventory, visualization status); the STN report
-   (`docs/stn-performance-improvements.html`) was already current.
-
-## Future: UP Integration (Milestone 16, separate goal)
-
-**Goal**: Make CHIMP available as a planner in the Unified Planning library (UP).
-
-This is **not** a dependency — CHIMP must not depend on UP. CHIMP acts as a UP planner
-provider, wrapping its planning capabilities behind the UP `Planner` interface. This
-may happen after the decoupling is finalized, or after a port to another programming
-language.
-
-**Scope**: TBD — depends on the final CHIMP API surface and UP library capabilities.
-**Risk**: Medium — adapter layer, no changes to CHIMP core.
+- **Search-tree visualization gap** — restored and verified (`e567faf`):
+  `ui.SearchTreeFrame` re-hosts the Meta-CSP viewer for the CHIMP-native forest;
+  `CHIMP.drawSearchSpace()` opens it. Verified end-to-end on a live display (mobipick
+  and RACE serve_coffee render flaw chains, edge labels, terminal coloring) plus
+  headless forest assertions in `ChimpSearchEngineTest`. Also fixed a latent bug:
+  `TerminalNode.isTerminal()` was always false because the terminal flag did not flow
+  through the constructor chain.
+- **Schedulable conflict-detection bug** — fixed (`a66c2d7`). The `eet1` register read
+  `getEST()` — a defect inherited verbatim from upstream Meta-CSP 1.3.5 (verified by
+  decompiling `Schedulable.getConflict`). An experiment with the fix in place showed
+  **0 of 93 benchmark plans change** (`dmin` dominates the pair bounds in practice on
+  these domains), so the fix was adopted: conflict detection now matches the
+  algorithm's intent.
+- **Static variable-prototype counter drift** — fixed (`98cc6c7`):
+  `VariablePrototype.resetIds()` is called at the start of each solve, and
+  `describeResolvers` uses a `LinkedHashSet` (HTNPrecondition is identity-hashed).
+  Running the 93-problem suite in reversed order now produces byte-identical plans,
+  i.e. results are independent of prior solves in the same JVM.
 
 ## Verification Strategy
 
 - `./gradlew test` — full unit/integration suite (295 tests) must stay green.
 - **Benchmark gate**: `./scripts/compare-benchmark.sh 3` — 93-problem suite run against
   the `legacy-metacsp` worktree. Required after any behavior-affecting change.
-  Current state: 93/93 solve on both sides, 0 solvability differences.
+  Final result: 93/93 solve on both sides, 0 solvability differences, 3/93
+  equivalent-variant mismatches (see below), native total solver time faster than
+  legacy.
 - **Known legacy nondeterminism**: the legacy (Meta-CSP) branch flips 7 problems
   between JVM invocations (symmetric-variant plans: `leftArm1`↔`rightArm1` arm choices,
   `r1`↔`r2` robot identity in DWR). The native kernel is deterministic across runs.
@@ -135,11 +121,11 @@ language.
 - Kernel solver cross-validation tests compare native solvers against reference
   implementations (retained as regression nets).
 
-## Engineering Rules
+## Engineering Rules (followed during the removal)
 
 - Small, reviewable changes. Every change compiles and keeps `./gradlew test` green.
-- No large rewrites. Each step moves one concept behind a CHIMP-owned abstraction.
-- No speculative abstractions or layers beyond what the current step requires.
+- No large rewrites. Each step moved one concept behind a CHIMP-owned abstraction.
+- No speculative abstractions or layers beyond what the current step required.
 - Preserve existing public behavior unless the task explicitly says otherwise.
 - Keep Java 17 compatibility.
 - Avoid adding production dependencies without asking.
