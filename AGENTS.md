@@ -64,35 +64,29 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Project context
 
-CHIMP is a research project. Keep the overall architecture simple and avoid overcomplicating it during the Meta-CSP removal process. Do not introduce speculative abstractions, layers, or indirection beyond what the current step requires.
+CHIMP is a research project. Keep the overall architecture simple and do not introduce speculative abstractions, layers, or indirection beyond what the current step requires.
 
-CHIMP is a hierarchical hybrid planner implemented in Java 17. It currently depends on the Meta-CSP Framework. The primary goal is to make CHIMP completely independent of Meta-CSP, replacing the Meta-CSP storage layer with a CHIMP-native solver kernel. A separate, later goal is to make CHIMP available as a planner in the Unified Planning library (UP) — this is an integration (CHIMP as a UP planner provider), not a dependency (CHIMP must not depend on UP). CHIMP may be ported to another programming language before UP integration. For constraint propagation, the CHIMP-native solver kernel may use any suitable constraint programming library.
+CHIMP is a hierarchical hybrid planner implemented in Java 17. It is fully independent of the Meta-CSP Framework: constraint solving is provided by the CHIMP-native solver kernel in `chimp.kernel` (see `docs/kernel-api.md`), which may use any suitable constraint programming library. The Meta-CSP removal is complete and verified; `docs/metacsp-decoupling-plan.md` records the history, current status, and verification strategy. The `legacy-metacsp` branch (tag `legacy-metacsp-pre-removal`) preserves the pre-removal code as a benchmarking reference.
+
+The next planned goal is to make CHIMP available as a planner in the Unified Planning library (UP) — this is an integration (CHIMP as a UP planner provider), not a dependency (CHIMP must not depend on UP). CHIMP may be ported to another programming language before UP integration.
 
 ## Main engineering rule
 
-Do not perform large rewrites. Make small, reviewable changes. Every change should compile and should either add tests, add documentation, or move one concept behind a CHIMP-owned abstraction.
+Do not perform large rewrites. Make small, reviewable changes. Every change should compile and should either add tests, add documentation, or improve the code while preserving behavior.
 
 ## Build and test
 
 - Prefer `./gradlew test` if the Gradle wrapper exists.
+- After any behavior-affecting change, run the benchmark gate `./scripts/compare-benchmark.sh 3` (93-problem suite against the `legacy-metacsp` worktree; see the decoupling plan for how to interpret its output).
 - Also run the example planner commands when relevant.
 - If a command fails because of missing local setup, report exactly what failed and do not invent results.
 
 ## Architecture rules
 
-- Do not remove Meta-CSP directly.
-- First isolate Meta-CSP dependencies behind CHIMP-owned interfaces and data structures.
 - Preserve existing public behavior unless the task explicitly says otherwise.
 - Keep Java 17 compatibility.
 - Avoid adding production dependencies without asking.
-
-## Refactoring target
-
-The desired direction is:
-- CHIMP model classes independent of Meta-CSP.
-- CHIMP search concepts independent of Meta-CSP.
-- Meta-CSP kept temporarily as an adapter/backend.
-- Eventually replace the backend with a CHIMP-native solver kernel.
+- Keep the CHIMP-native kernel (`chimp.kernel`) free of external framework dependencies.
 
 ## Review expectations
 
