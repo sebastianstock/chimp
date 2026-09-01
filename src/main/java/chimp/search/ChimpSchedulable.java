@@ -303,7 +303,12 @@ public abstract class ChimpSchedulable extends ChimpMetaConstraint {
 
             for (int g = 0; g < mcsSize; g++) {
                 long est1 = ((Fluent) currentMcs[g]).getTemporalVariable().getEST();
-                long eet1 = ((Fluent) currentMcs[g]).getTemporalVariable().getEST();
+                // Note: reads getEET() as the variable name suggests.  Upstream
+                // Meta-CSP (1.3.5 Schedulable.getConflict) has a bug here — it
+                // reads getEST() into eet1 — which this port faithfully
+                // reproduced until verified plan-neutral on the 93-problem
+                // benchmark suite and fixed.
+                long eet1 = ((Fluent) currentMcs[g]).getTemporalVariable().getEET();
                 long lst1 = ((Fluent) currentMcs[g]).getTemporalVariable().getLST();
                 long let1 = ((Fluent) currentMcs[g]).getTemporalVariable().getLET();
 
