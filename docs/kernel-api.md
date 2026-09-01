@@ -676,8 +676,6 @@ For 100 variables (~200 time points):
 - Incremental per constraint: ~0.4ms (vs ~4ms with full FW)
 - Total for 50 constraints: ~40ms (vs ~207ms with full FW)
 
-Details and measured numbers: `docs/stn-performance-improvements.html`.
-
 ### Symbolic Solver
 
 | Operation | Notes |

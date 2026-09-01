@@ -72,8 +72,7 @@ were removed once superseded).
 - **Benchmark expansion** (`f389e74`): 40 → 93 problems (DWR, RACE, TransTerra,
   mobipick, gecko, ICO), including RACE/ICO method-level tests.
 - **Performance follow-ups**: incremental STN propagation + O(1) infeasibility
-  pre-check + time-point pooling (`7a9279b`, report in
-  `docs/stn-performance-improvements.html`); symbolic solver bitset domains,
+  pre-check + time-point pooling (`7a9279b`); symbolic solver bitset domains,
   incremental adjacency map, AC-3 worklist dedup (`7d2fc1a`).
 - **Reference branch**: `legacy-metacsp` (tag `legacy-metacsp-pre-removal`, commit
   `c56dd39`) preserves the pre-removal code for benchmarking;

@@ -18,10 +18,9 @@ Additional documentation lives in `docs/`:
 
 - `docs/kernel-api.md` — the CHIMP-native solver kernel (`chimp.kernel`): base types,
   temporal (STN), symbolic (AC-3), integer (Choco-backed) and fluent solvers.
-- `docs/metacsp-decoupling-plan.md` — how the Meta-CSP dependency was removed
+- `docs/metacsp-removal.md` — how the Meta-CSP dependency was removed
   (milestones, defects found and fixed, verification strategy against the
   `legacy-metacsp` reference branch).
-- `docs/stn-performance-improvements.html` — measured STN performance report.
 
 CHIMP can be built through [Gradle](http://gradle.org).
 The `clean` target will clean up the build directory. The target `javadoc` can be used to generate the API documentation (Javadoc), which will be placed in build/docs/javadoc.
