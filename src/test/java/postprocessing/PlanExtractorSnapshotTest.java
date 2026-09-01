@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -60,8 +61,28 @@ public class PlanExtractorSnapshotTest {
         assertTrue(writer.toString().indexOf("!move_torso") < writer.toString().indexOf("!tuck_arms"));
     }
 
+    @Test
+    public void extractsServeCoffeePlanActivitiesDespiteUngroundedFluentArgs() throws Exception {
+        CHIMP chimp = plan(DOMAIN, "problems/test_m_serve_coffee_problem_1.pdl");
+        PlanExtractor extractor = new PlanExtractor(chimp.getFluentSolver());
+        StringWriter writer = new StringWriter();
+
+        extractor.writeActions(writer);
+
+        // The YAML activity view must cover the same actions as the public
+        // extractActions() API, including fluents whose arguments are not
+        // fully grounded (arguments fall back to the first domain symbol).
+        String[] lines = writer.toString().split(System.lineSeparator());
+        long entryCount = Arrays.stream(lines).filter(l -> l.startsWith("- id:")).count();
+        assertEquals(chimp.extractActions().length, entryCount);
+    }
+
     private CHIMP plan() throws DomainParsingException {
-        CHIMP chimp = new CHIMP.CHIMPBuilder(DOMAIN, PROBLEM)
+        return plan(DOMAIN, PROBLEM);
+    }
+
+    private CHIMP plan(String domain, String problem) throws DomainParsingException {
+        CHIMP chimp = new CHIMP.CHIMPBuilder(domain, problem)
                 .horizon(3600000)
                 .valHeuristic(new UnifyDeepestWeightNewestbindingsValOH())
                 .build();

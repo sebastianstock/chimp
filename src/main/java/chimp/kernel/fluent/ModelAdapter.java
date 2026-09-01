@@ -1,10 +1,13 @@
 package chimp.kernel.fluent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import chimp.kernel.Variable;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
 import chimp.model.ChimpConstraint;
 import chimp.model.ConstraintKind;
 import chimp.model.FluentId;
@@ -29,12 +32,36 @@ public final class ModelAdapter {
         return new FluentNode(
                 new FluentId(fluent.getID()),
                 toFluentType(fluent.getTypeStr()),
-                new FluentSignature(symbolic.getPredicateName(), Arrays.asList(symbolic.getGroundArgs())),
+                new FluentSignature(symbolic.getPredicateName(), Arrays.asList(groundedArgs(symbolic))),
                 new TemporalInterval(
                         interval.getEST(),
                         interval.getLST(),
                         interval.getEET(),
                         interval.getLET()));
+    }
+
+    /**
+     * Argument view tolerant of ungrounded arguments: takes the first domain
+     * symbol per position and stops at {@link CompoundSymbolicVariable#NONESYMBOL},
+     * mirroring {@code CHIMP.toPlannedAction}. Unlike
+     * {@link CompoundSymbolicVariable#getGroundArgs()} this never throws, so
+     * plan extraction works on networks that still contain ungrounded fluents.
+     */
+    private static String[] groundedArgs(chimp.kernel.symbolic.CompoundSymbolicVariable symbolic) {
+        int argCount = symbolic.getInternalVariables().length;
+        if (argCount < 2) {
+            return new String[0];
+        }
+        List<String> args = new ArrayList<>(argCount - 1);
+        for (int i = 1; i < argCount; i++) {
+            String[] symbols = symbolic.getSymbolsAt(i);
+            String symbol = symbols.length > 0 ? symbols[0] : "";
+            if (symbol.isEmpty() || CompoundSymbolicVariable.NONESYMBOL.equals(symbol)) {
+                break;
+            }
+            args.add(symbol);
+        }
+        return args.toArray(new String[0]);
     }
 
     public ChimpConstraint toChimpConstraint(FluentConstraint constraint) {
