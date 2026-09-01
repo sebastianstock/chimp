@@ -12,7 +12,7 @@ depend on UP). CHIMP may also be ported to another programming language before U
 integration. For constraint propagation, the CHIMP-native solver kernel may use any
 suitable constraint programming library, not necessarily UP.
 
-## Status Snapshot (as of commit `7d2fc1a`)
+## Status Snapshot (branch `remove_metacsp-m15`, head `bf7b739`; pending merge to `master`)
 
 - `build.gradle` has **no Meta-CSP dependency**; `grep -r "org.metacsp" src/main src/test`
   returns zero compiled imports.
@@ -23,10 +23,11 @@ suitable constraint programming library, not necessarily UP.
   (Steps 7–8 inlined the remaining adapters; Phase 3 deleted the storage layer).
 - The 10 legacy example sources that referenced the removed API were deleted
   (`dce822f`); the `legacy-metacsp` branch retains its own copies for reference.
-- Test suite green (~290 `@Test` methods); behavior verified against the legacy branch
-  on a 93-problem benchmark suite (see Verification Strategy).
-- Search-tree visualization is preserved in `chimp.ui` (JUNG `DelegateForest` retyped,
-  Meta-CSP frames copied/retyped during M15 Step 12).
+- Test suite green (295 `@Test` methods across 39 files); behavior verified against
+  the legacy branch on a 93-problem benchmark suite (see Verification Strategy).
+- Search-tree visualization restored and verified in `chimp.ui` (`SearchTreeFrame`,
+  `e567faf`): `CHIMP.drawSearchSpace()` opens the CHIMP-native forest in the retyped
+  Meta-CSP viewer; SUCCESS/FAILURE terminals are colored green/red.
 
 ## Completed Milestones (history)
 
@@ -101,9 +102,10 @@ In rough priority order:
    mismatches, 0 solvability differences.
 4. **Optional performance** — the temporal solver (STN) is now the dominant cost
    (~48% of solve time on RACE-serve_coffee) if further speedup is wanted.
-5. **Documentation refresh** — keep this plan and `docs/kernel-api.md` in sync with
-   the final state; the STN report (`docs/stn-performance-improvements.html`) is
-   current.
+5. ~~Documentation refresh~~ — **done**: this plan, `docs/kernel-api.md` and `README.md`
+   brought in sync with the final state (bitset symbolic domains, package layout,
+   test inventory, visualization status); the STN report
+   (`docs/stn-performance-improvements.html`) was already current.
 
 ## Future: UP Integration (Milestone 16, separate goal)
 
@@ -119,7 +121,7 @@ language.
 
 ## Verification Strategy
 
-- `./gradlew test` — full unit/integration suite (~290 tests) must stay green.
+- `./gradlew test` — full unit/integration suite (295 tests) must stay green.
 - **Benchmark gate**: `./scripts/compare-benchmark.sh 3` — 93-problem suite run against
   the `legacy-metacsp` worktree. Required after any behavior-affecting change.
   Current state: 93/93 solve on both sides, 0 solvability differences.

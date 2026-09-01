@@ -29,9 +29,8 @@ chimp.kernel/
 │   ├── SymbolicConstraint.java
 │   ├── SymbolicSolver.java
 │   ├── CompoundSymbolicVariable.java
-│   ├── CompoundSymbolicConstraint.java
-│   ├── CompoundSymbolicSolver.java
-│   └── RoutedConstraint.java
+│   ├── CompoundSymbolicConstraint.java   # RoutedConstraint is a nested record
+│   └── CompoundSymbolicSolver.java
 │
 ├── integer/                   # Integer solver (Choco-backed)
 │   ├── IntegerVariable.java
@@ -42,7 +41,13 @@ chimp.kernel/
 └── fluent/                    # Fluent solver (composes temporal + symbolic + integer)
     ├── Fluent.java
     ├── FluentConstraint.java
-    └── FluentNetworkSolver.java
+    ├── FluentNetworkSolver.java
+    ├── FluentStoreImpl.java    # FluentStore implementation used by the planner
+    ├── ModelAdapter.java
+    ├── ProblemCompiler.java
+    ├── ResourceCapacityAdapter.java
+    ├── ResourceRequirementAdapter.java
+    └── StateVariableAdapter.java
 ```
 
 ### Design principles
@@ -344,9 +349,10 @@ public final class SymbolicDomain {
 }
 ```
 
-Maintains a boolean array of possible symbols. The AC-3 revision
-operations return: 0 (no change), 1 (from changed), 2 (to changed),
-or 3 (both changed).
+Maintains the set of possible symbols as a bitset — a `long[]` word array
+with one bit per symbol. Intersections and prunings in the AC-3 revision
+operations are word-wise (`&`). The revision operations return:
+0 (no change), 1 (from changed), 2 (to changed), or 3 (both changed).
 
 ### SymbolicConstraint
 
@@ -381,7 +387,10 @@ public class SymbolicSolver extends ConstraintSolver {
 ```
 
 Parameterized by a fixed set of symbols. Propagation uses AC-3
-arc-consistency with backup/restore on failure.
+arc-consistency with backup/restore on failure. An incremental
+constraint→variable adjacency map (`varToConstraints`) is maintained on
+add/remove so backtracking only touches the sub-network affected by the
+changed constraints; the AC-3 worklist de-duplicates entries by identity.
 
 ### CompoundSymbolicVariable
 
@@ -667,6 +676,8 @@ For 100 variables (~200 time points):
 - Incremental per constraint: ~0.4ms (vs ~4ms with full FW)
 - Total for 50 constraints: ~40ms (vs ~207ms with full FW)
 
+Details and measured numbers: `docs/stn-performance-improvements.html`.
+
 ### Symbolic Solver
 
 | Operation | Notes |
@@ -853,7 +864,14 @@ solver.addConstraint(opens);
 
 | Test file | What it validates |
 |-----------|-------------------|
+| `KernelBaseTypesTest` | Base variable/constraint/network semantics |
+| `temporal/SimpleTemporalNetworkTest` | STN propagation and distance bounds |
+| `temporal/SimpleTemporalNetworkIncrementalTest` | Incremental tightening vs full rebuild |
+| `temporal/TemporalTypesTest` | Temporal variable/constraint API and relation math |
 | `temporal/AllRelationTypesTest` | All 35 Allen relation types |
+| `symbolic/SymbolicSolverTest` | AC-3, unary/binary constraints, rollback on failure |
+| `integer/IntegerSolverTest` | ARITHM / ALLDIFFERENT / ALLEQUAL propagation |
+| `fluent/FluentNetworkSolverTest` | Fluent constraint compilation and routing |
 | `fluent/KernelIntegrationTest` | End-to-end integration scenarios |
 
 Cross-validation suites against the Meta-CSP framework were used during the

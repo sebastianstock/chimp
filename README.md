@@ -14,9 +14,21 @@ CHIMP aims at enabling a mobile robot to use different forms of knowledge in its
 Documentation
 -------------
 
+Additional documentation lives in `docs/`:
+
+- `docs/kernel-api.md` — the CHIMP-native solver kernel (`chimp.kernel`): base types,
+  temporal (STN), symbolic (AC-3), integer (Choco-backed) and fluent solvers.
+- `docs/metacsp-decoupling-plan.md` — plan and status of the Meta-CSP decoupling,
+  including the verification strategy against the `legacy-metacsp` reference branch.
+- `docs/stn-performance-improvements.html` — measured STN performance report.
+
 CHIMP can be built through [Gradle](http://gradle.org).
 The `clean` target will clean up the build directory. The target `javadoc` can be used to generate the API documentation (Javadoc), which will be placed in build/docs/javadoc.
 To import CHIMP into eclipse you can use the target `eclipse` which will generate `.classpath`, `.settings` and `.project` files and directories.
+
+Run the test suite with `./gradlew test`. The 93-problem benchmark against the
+`legacy-metacsp` reference branch is `./scripts/compare-benchmark.sh 3`
+(see the decoupling plan for how to read its output).
 
 ### Examples ###
 
