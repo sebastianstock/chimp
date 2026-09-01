@@ -85,14 +85,14 @@ In rough priority order:
    `CHIMP.drawSearchSpace()` opens it.  Verified end-to-end on a live display
    (mobipick and RACE serve_coffee render flaw chains, edge labels, terminal
    coloring) plus headless forest assertions in `ChimpSearchEngineTest`.
-2. **Schedulable conflict-detection bug (upstream port, decision pending)** —
-   `ChimpSchedulable` (~line 307) reads `eet1` via `getEST()`.  Decompiling
-   Meta-CSP 1.3.5 (`Schedulable.getConflict`) shows the upstream code has the
-   identical defect, so CHIMP faithfully preserves buggy legacy behavior.  Fixing
-   it changes `dmax` in the direct-pair check and thus resource-conflict
-   detection — a semantic change that would diverge from legacy and requires a
-   benchmark-gate re-run plus an equivalence argument for any new plan
-   differences.  Kept as-is until decided.
+2. ~~Schedulable conflict-detection bug~~ — **fixed** (`a66c2d7`).  The
+   `eet1` register read `getEST()` — a defect inherited verbatim from
+   upstream Meta-CSP 1.3.5 (verified by decompiling
+   `Schedulable.getConflict`).  An experiment with the fix in place showed
+   **0 of 93 benchmark plans change** (`dmin` dominates the pair bounds in
+   practice on these domains), so the fix was adopted: conflict detection
+   now matches the algorithm's intent, benchmark gate unchanged (3/93
+   known symmetric-variant mismatches, 0 solvability differences).
 3. ~~Static variable-prototype counter drift~~ — **fixed** (`98cc6c7`):
    `VariablePrototype.resetIds()` is called at the start of each solve, and
    `describeResolvers` uses a `LinkedHashSet` (HTNPrecondition is
