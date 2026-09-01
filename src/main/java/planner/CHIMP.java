@@ -287,7 +287,9 @@ public class CHIMP {
 				}
 			}
 		}
-		// TODO replace with CHIMP-native network visualization
+		// Text-only dump. Pre-removal master opened Meta-CSP's ConstraintNetworkFrame
+		// here; CHIMP has no graphical constraint-network view yet (the graphical
+		// hierarchy view is drawPlanHierarchy()/PlanHierarchyFrame).
 		System.out.println("Hierarchy network: " + cn);
 	}
 	
