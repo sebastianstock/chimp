@@ -1,12 +1,32 @@
 package planner;
 
+import java.awt.Color;
+import java.io.PrintStream;
+import java.util.*;
+
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.search.SearchTreeEdge;
+import chimp.search.SearchTreeNode;
+import edu.uci.ics.jung.graph.DelegateForest;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.ProblemCompiler;
+import chimp.kernel.fluent.ResourceCapacityAdapter;
+import chimp.kernel.fluent.StateVariableAdapter;
+import chimp.kernel.integer.IntegerVariable;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.kernel.temporal.TemporalVariable;
+import chimp.model.FluentMarking;
+import chimp.model.PlannedAction;
+import chimp.model.ResourceCapacity;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 import externalPathPlanning.MoveBaseDurationEstimator;
 import externalPathPlanning.MoveBaseMetaConstraint;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
 import htn.HTNMetaConstraint;
 import htn.HTNPlanner;
 import htn.PlanReportroryItem;
@@ -15,21 +35,11 @@ import htn.guessOrdering.GuessOrderingValOH;
 import htn.valOrderingHeuristics.UnifyFewestsubsEarliesttasksNewestbindingsValOH;
 import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.DomainParsingException;
-import postprocessing.PlanExtractor;
 import hybridDomainParsing.ProblemParser;
 import hybridDomainParsing.classic.antlr.ChimpClassicReader;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
+import postprocessing.PlanExtractor;
 import ui.PlanHierarchyFrame;
-import unify.CompoundSymbolicVariableConstraintSolver;
-
-import java.awt.*;
-import java.io.PrintStream;
-import java.util.*;
+import ui.SearchTreeFrame;
 
 /**
  * A wrapper for the HTN-Planner that bundles the features of the planner CHIMP.
@@ -38,18 +48,25 @@ import java.util.*;
  *
  */
 public class CHIMP {
+	private static final ResourceCapacityAdapter RESOURCE_CAPACITY_ADAPTER =
+			new ResourceCapacityAdapter();
+	private static final StateVariableAdapter STATE_VARIABLE_ADAPTER =
+			new StateVariableAdapter();
+	private static final ProblemCompiler PROBLEM_COMPILER =
+			new ProblemCompiler();
 
 	private HTNPlanner planner;
 	private FluentNetworkSolver fluentSolver;
 	private boolean foundPlan = false;
 	private long planningTime = -1;
 	private PlanHierarchyFrame planHierarchyFrame = null;
+	private SearchTreeFrame searchTreeFrame = null;
 
 	public static class CHIMPBuilder {
 		
 		private final CHIMPProblem problem;
 		private final ClassicHybridDomain domain;
-		private ValueOrderingH htnValOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+		private Comparator<ConstraintNetwork> htnValOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
 		private MoveBaseDurationEstimator mbEstimator;
 		private boolean guessOrdering = false;
 		boolean htnUnification = false;
@@ -93,7 +110,7 @@ public class CHIMP {
 		 * @param valOH The heuristic that shall be used by the HTNPlanner. Default: UnifyFewestsubsEarliesttasksNewestbindingsValOH
 		 * @return This {@link CHIMPBuilder}.
 		 */
-		public CHIMPBuilder valHeuristic(ValueOrderingH valOH) {
+		public CHIMPBuilder valHeuristic(Comparator<ConstraintNetwork> valOH) {
 			this.htnValOH = valOH;
 			return this;
 		}
@@ -163,12 +180,13 @@ public class CHIMP {
 		initMetaConstraints(builder.domain, builder.htnValOH, builder.mbEstimator, builder.guessOrdering, builder.htnUnification);
 		
 		// create initial state:
-		fluentSolver = (FluentNetworkSolver)planner.getConstraintSolvers()[0];
-		builder.problem.createState(fluentSolver, builder.domain);
-		((CompoundSymbolicVariableConstraintSolver) fluentSolver.getConstraintSolvers()[0]).propagateAllSub();
+		fluentSolver = planner.getFluentNetworkSolver();
+		PROBLEM_COMPILER.compile(builder.problem.getProblemDefinition(), fluentSolver, builder.domain);
+		fluentSolver.getSymbolicSolver().propagateAllSub();
 	}
 	
 	public boolean generatePlan() {
+		VariablePrototype.resetIds();
 		long startTime = System.nanoTime();
 		boolean result = planner.backtrack();
 		long endTime = System.nanoTime();
@@ -182,7 +200,28 @@ public class CHIMP {
 	 * Draws the search space of the meta-CSP.
 	 */
 	public void drawSearchSpace() {
-		planner.draw();
+		DelegateForest<SearchTreeNode, SearchTreeEdge> tree = planner.getSearchTree();
+		if (tree == null) {
+			System.err.println("No search tree to draw (run generatePlan() first)");
+			return;
+		}
+		if (this.searchTreeFrame != null) { // close the old frame
+			this.disposeSearchTreeFrame();
+		}
+		try {
+			this.searchTreeFrame = SearchTreeFrame.draw(tree);
+		} catch (Exception e) {
+			System.err.println("Caught exception while drawing search tree: " + e.toString());
+		}
+	}
+
+	public void disposeSearchTreeFrame() {
+		if (this.searchTreeFrame != null) { // close the old frame
+			this.searchTreeFrame.setVisible(false);
+			this.searchTreeFrame.dispose();
+		} else {
+			System.out.println("no active searchTreeFrame");
+		}
 	}
 	
 	/**
@@ -236,45 +275,81 @@ public class CHIMP {
 	 * Draws the plan hierarchy as a constraint network.
 	 */
 	public void drawHierarchyNetwork() {
-		ConstraintNetwork cn = new ConstraintNetwork(null);
+		ConstraintNetwork cn = new ConstraintNetwork();
 		for (Constraint con : fluentSolver.getConstraintNetwork().getConstraints()) {
 			if (con instanceof FluentConstraint) {
 				FluentConstraint fc = (FluentConstraint) con;
 				if (fc.getType() == FluentConstraint.Type.MATCHES) {
-					fc.getFrom().setMarking(HTNMetaConstraint.markings.UNIFIED);
+					fc.getFrom().setMarking(FluentMarking.UNIFIED.ordinal());
 					cn.addConstraint(fc);
 				} else if (fc.getType() == FluentConstraint.Type.DC) {
 					cn.addConstraint(fc);
 				}
 			}
 		}
-		ConstraintNetwork.draw(cn);
+		// Text-only dump. Pre-removal master opened Meta-CSP's ConstraintNetworkFrame
+		// here; CHIMP has no graphical constraint-network view yet (the graphical
+		// hierarchy view is drawPlanHierarchy()/PlanHierarchyFrame).
+		System.out.println("Hierarchy network: " + cn);
 	}
 	
-	public Variable[] extractActions() {
+	public PlannedAction[] extractActions() {
 		if (foundPlan) {
-			ArrayList<Variable> plan = new ArrayList<Variable>();
+			ArrayList<Fluent> plan = new ArrayList<Fluent>();
 			for (Variable var : fluentSolver.getVariables()) {
 				if (var instanceof Fluent) {
 					String fluentType = ((Fluent) var).getTypeStr();
 					if (fluentType.equals(Fluent.ACTIVITY_TYPE_STR)) {
-						plan.add(var);
+						plan.add((Fluent) var);
 					}
 				}
 			}
-			Variable[] planVector = plan.toArray(new Variable[plan.size()]);
-			Arrays.sort(planVector, new Comparator<Variable>() {
-				@Override
-				public int compare(Variable o1, Variable o2) {
-					Fluent f1 = (Fluent)o1;
-					Fluent f2 = (Fluent)o2;
-					return ((int)f1.getTemporalVariable().getEST()-(int)f2.getTemporalVariable().getEST());
-				}
-			});
-			return planVector;
+			plan.sort(Comparator.comparingLong(f -> f.getTemporalVariable().getEST()));
+
+			PlannedAction[] result = new PlannedAction[plan.size()];
+			for (int i = 0; i < plan.size(); i++) {
+				result[i] = toPlannedAction(plan.get(i));
+			}
+			return result;
 		} else {
-			return new Variable[0];
+			return new PlannedAction[0];
 		}
+	}
+
+	private static PlannedAction toPlannedAction(Fluent fluent) {
+		CompoundSymbolicVariable csv = fluent.getCompoundSymbolicVariable();
+		String name = csv.getSymbolsAt(0)[0];
+		int argCount = csv.getInternalVariables().length - 1;
+		List<String> arguments = new ArrayList<>(argCount);
+		for (int i = 1; i <= argCount; i++) {
+			String[] symbols = csv.getSymbolsAt(i);
+			String symbol = symbols.length > 0 ? symbols[0] : "";
+			// Match CompoundSymbolicVariable.getShortName(): stop at NONESYMBOL ("n")
+			if (symbol.isEmpty() || CompoundSymbolicVariable.NONESYMBOL.equals(symbol)) {
+				break;
+			}
+			arguments.add(symbol);
+		}
+
+		TemporalVariable interval = fluent.getTemporalVariable();
+		long est = interval.getEST();
+		long lst = interval.getLST();
+		long eet = interval.getEET();
+		long let = interval.getLET();
+
+		IntegerVariable[] intVars = fluent.getIntegerVariables();
+		List<String> intValues = new ArrayList<>(intVars.length);
+		for (IntegerVariable iv : intVars) {
+			intValues.add(iv.toString());
+		}
+
+		return new PlannedAction(
+				fluent.getID(),
+				fluent.getComponent(),
+				name,
+				arguments,
+				est, lst, eet, let,
+				intValues);
 	}
 	
 	/**
@@ -311,7 +386,7 @@ public class CHIMP {
 		}
 	}
 	
-	private void initMetaConstraints(ClassicHybridDomain domain, ValueOrderingH valOH,
+	private void initMetaConstraints(ClassicHybridDomain domain, Comparator<ConstraintNetwork> valOH,
 									 MoveBaseDurationEstimator mbEstimator, boolean guessOrdering,
 									 boolean htnUnification) {
 		HTNMetaConstraint htnConstraint = new HTNMetaConstraint(valOH);
@@ -322,16 +397,18 @@ public class CHIMP {
 			htnConstraint.enableUnification();
 		}
 		
-		for (FluentScheduler fs : domain.getFluentSchedulers()) {
-			planner.addMetaConstraint(fs);
+		for (var definition : domain.getStateVariableDefinitions()) {
+			for (var scheduler : STATE_VARIABLE_ADAPTER.toFluentSchedulers(definition)) {
+				planner.addMetaConstraint(scheduler);
+			}
 		}
 		
-		for (FluentResourceUsageScheduler rs : domain.getResourceSchedulers()) {
-			planner.addMetaConstraint(rs);
+		for (ResourceCapacity resourceCapacity : domain.getResourceCapacities()) {
+			planner.addMetaConstraint(RESOURCE_CAPACITY_ADAPTER.toResourceScheduler(resourceCapacity));
 		}
 		
 		if (guessOrdering) {
-			ValueOrderingH guessOH = new GuessOrderingValOH();
+			Comparator<ConstraintNetwork> guessOH = new GuessOrderingValOH();
 			GuessOrderingMetaConstraint ordConstraint = new GuessOrderingMetaConstraint(guessOH);
 			planner.addMetaConstraint(ordConstraint);
 		}

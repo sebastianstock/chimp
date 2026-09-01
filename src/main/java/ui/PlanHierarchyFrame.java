@@ -16,9 +16,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.apache.commons.collections15.Transformer;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.Variable;
 
+import chimp.kernel.Constraint;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
@@ -27,8 +29,6 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
 
 /**
  * Based on SearchTreeFrame form the MetaCSP-Framework by Federico Pecora.

@@ -13,6 +13,7 @@ bin/
 msg_gen/
 srv_gen/
 *.pyc
+testing/ChimpIO_testplan.txt
 .gradle/
 .svn
 *.bak

@@ -2,14 +2,12 @@ package examples.chimp;
 
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import htn.valOrderingHeuristics.CHIMPValOH;
+import chimp.logging.ChimpLogging;
 import planner.CHIMP;
-import postprocessing.EsterelGenerator;
 
-import java.io.StringWriter;
 import java.util.logging.Level;
+import chimp.model.PlannedAction;
 
 public class TestMobipickSimple {
 
@@ -27,7 +25,7 @@ public class TestMobipickSimple {
 //        String problemFile = "problems/test_m_serve_coffee_problem_1.pdl";
 //        String domainFile = "domains/ordered_domain.ddl";
 
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
         CHIMP.CHIMPBuilder builder;
 
@@ -45,22 +43,22 @@ public class TestMobipickSimple {
         }
         CHIMP chimp = builder.build();
 
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.FINE);
+//		ChimpLogging.setLevel(Level.FINE);
         if (!LOGGING) {
-            MetaCSPLogging.setLevel(Level.OFF);
+            ChimpLogging.setLevel(Level.OFF);
         }
 
         System.out.println("Found plan? " + chimp.generatePlan());
         chimp.printStats(System.out);
 
         if (PRINT_PLAN) {
-            Variable[] planVector = chimp.extractActions();
+            PlannedAction[] planVector = chimp.extractActions();
             int c = 0;
-            for (Variable act : planVector) {
-                if (act.getComponent() != null)
+            for (PlannedAction act : planVector) {
+                if (act.component() != null)
                     System.out.println(c++ + ".\t" + act);
             }
 
@@ -72,11 +70,6 @@ public class TestMobipickSimple {
 //            ConstraintNetwork.draw(chimp.getFluentSolver().getConstraintNetwork());
 
 //            System.out.println(chimp.printDescription());
-
-            StringWriter sw = new StringWriter();
-            EsterelGenerator.generateEsterelGraph(chimp, sw);
-            System.out.println("Generated Esterel Graph:");
-            System.out.println(sw.toString());
 
         }
 

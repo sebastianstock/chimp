@@ -38,9 +38,6 @@ group = 'chimp'
 
 dependencies {
 
-  implementation group: 'org.metacsp', name: 'meta-csp-framework', version: '1.3.5'
-  //compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
-
   implementation group: 'info.picocli', name: 'picocli', version: '4.7.7'
 
   implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'
@@ -72,3 +69,22 @@ task fatJar(type: Jar) {
     with jar
 }
 
+task benchmark(type: JavaExec) {
+    group = 'verification'
+    description = 'Runs the full-CHIMP end-to-end benchmark.'
+    mainClass = 'benchmark.FullChimpBenchmark'
+    classpath = sourceSets.main.runtimeClasspath
+    // working dir = project root so domain/problem relative paths resolve
+    workingDir = project.projectDir
+    // args: output CSV path, run count
+    args = ['build/benchmark/native.csv', '3']
+    if (project.hasProperty('benchmarkArgs')) {
+        args = project.property('benchmarkArgs').toString().split(' ') as List
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'junit:junit:4.13.2'
+    }
+}

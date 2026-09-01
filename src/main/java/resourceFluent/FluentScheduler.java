@@ -1,50 +1,47 @@
 package resourceFluent;
 
+import java.util.Comparator;
 import java.util.Vector;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariableOrderingH;
-import org.metacsp.meta.symbolsAndTime.Schedulable;
-import org.metacsp.multi.activity.Activity;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.symbolic.CompoundSymbolicConstraint;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.search.ChimpFlaw;
+import chimp.search.ChimpSchedulable;
+import htn.GroundSolverHolder;
 
-import fluentSolver.Fluent;
-import unify.CompoundSymbolicValueConstraint;
-import unify.CompoundSymbolicVariable;
+public class FluentScheduler extends ChimpSchedulable implements GroundSolverHolder {
 
-public class FluentScheduler extends Schedulable {
-	
 	private final String predicateName;
 	private final int field;
 	private final String fieldValues;
+	private FluentNetworkSolver groundSolver;
 
-	public FluentScheduler(VariableOrderingH varOH, ValueOrderingH valOH, String predicateName, 
+	public FluentScheduler(Comparator<ChimpFlaw> varOH, Comparator<ConstraintNetwork> valOH, String predicateName,
 			int field, String fieldValues) {
 		super(varOH, valOH);
 		this.predicateName = predicateName;
 		this.field = field;
 		this.fieldValues = fieldValues;
-		this.setPeakCollectionStrategy(PEAKCOLLECTION.BINARY);
+		this.setPeakCollectionStrategy(PeakCollection.BINARY);
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2767348254309353956L;
-	
-	
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
+	}
+
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		updateUsage();
 		return super.getMetaVariables();
 	}
 
 	public void updateUsage() {
-		// TODO test if this is fast enough
-		if (activities == null) activities = new Vector<Activity>();
+		if (activities == null) activities = new Vector<Fluent>();
 		else activities.clear();
 		ConstraintSolver s = this.getGroundSolver();
 		for (Variable var : s.getVariables()) {
@@ -57,19 +54,18 @@ public class FluentScheduler extends Schedulable {
 			}
 		}
 	}
-	
 
 	@Override
-	public boolean isConflicting(Activity[] peak) {
+	public boolean isConflicting(Fluent[] peak) {
 		if (peak.length < 2) return false;
-		Fluent f1 = (Fluent)peak[0].getVariable();
-		Fluent f2 = (Fluent)peak[1].getVariable();
-		CompoundSymbolicValueConstraint con = new CompoundSymbolicValueConstraint(CompoundSymbolicValueConstraint.Type.MATCHES);
+		Fluent f1 = peak[0];
+		Fluent f2 = peak[1];
+		CompoundSymbolicConstraint con = new CompoundSymbolicConstraint(CompoundSymbolicConstraint.Type.MATCHES);
 		con.setFrom(f1.getCompoundSymbolicVariable());
 		con.setTo(f2.getCompoundSymbolicVariable());
-//		System.out.println("testing if constraint works:\n" + con);
-		if (f1.getCompoundSymbolicVariable().getConstraintSolver().addConstraint(con)) {
-			f1.getCompoundSymbolicVariable().getConstraintSolver().removeConstraint(con);
+		ConstraintSolver solver = f1.getCompoundSymbolicVariable().getConstraintSolver();
+		if (solver.addConstraint(con)) {
+			solver.removeConstraint(con);
 			return false;
 		} else {
 			return true;
@@ -77,14 +73,8 @@ public class FluentScheduler extends Schedulable {
 	}
 
 	@Override
-	public void draw(ConstraintNetwork network) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override
@@ -97,23 +87,4 @@ public class FluentScheduler extends Schedulable {
 		sb.append(fieldValues);
 		return sb.toString();
 	}
-
-	@Override
-	public String getEdgeLabel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

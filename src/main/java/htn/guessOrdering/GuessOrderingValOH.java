@@ -1,9 +1,10 @@
 package htn.guessOrdering;
 
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
+import chimp.kernel.ConstraintNetwork;
 
-public class GuessOrderingValOH extends ValueOrderingH {
+import java.util.Comparator;
+
+public class GuessOrderingValOH implements Comparator<ConstraintNetwork> {
 
 	@Override
 	public int compare(ConstraintNetwork cn0, ConstraintNetwork cn1) {

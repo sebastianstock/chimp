@@ -1,139 +1,30 @@
 package htn.valOrderingHeuristics;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ValueOrderingH;
+import chimp.kernel.ConstraintNetwork;
+import chimp.search.ChimpSearchAdapter;
+import chimp.search.ResolverCandidate;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentConstraint.Type;
+import java.util.Comparator;
 
 /**
- * Basic class for different value ordering heuristics.
- * 
- * @author Sebastian Stock
+ * CHIMP-native resolver ordering heuristic.
+ *
+ * <p>Implements {@link Comparator}<{@link ConstraintNetwork}> so it can be used
+ * directly as the value-ordering heuristic in {@link planner.CHIMP.CHIMPBuilder}.
  */
-public abstract class CHIMPValOH extends ValueOrderingH {
+public abstract class CHIMPValOH implements Comparator<ConstraintNetwork> {
 
-	protected FluentConstraint getPlanned(ConstraintNetwork cn) {
-		for (Constraint con : cn.getConstraints()) {
-			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
-				return (FluentConstraint) con;
-			}
-		}
-		return null;
-		
-	}
-	
-	protected int countSubtasks(ConstraintNetwork cn) {
-		int ret = 0;
-		for (Constraint con : cn.getConstraints()) {
-			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.DC) {
-				ret++;
-			}
-		}
-		return ret;
-		
-	}
-	
-	protected int checkMatches(ConstraintNetwork cn0, ConstraintNetwork cn1) {
-		FluentConstraint m0 = searchMatches(cn0);
-		FluentConstraint m1 = searchMatches(cn1);
-		if (m0 == null) {
-			if (m1 == null) {
-				return 0; // both do not contain matches
-			} else {
-				return 1; // only cn1 contains matches
-			}
-		} else {
-			if (m1 == null) {
-				return -1; // only cn0 contains matches
-			} else {
-				return 0; // both contain matches TODO compare intervals
-			}
-		}
-	}
-	
-	protected FluentConstraint searchMatches(ConstraintNetwork cn) {
-		for (Constraint con : cn.getConstraints()) {
-			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.MATCHES) {
-				return (FluentConstraint) con;
-			}
-		}
-		return null;
-	}
-	
-	protected int comparePreconditions(ConstraintNetwork cn0, ConstraintNetwork cn1) {
-		long cn0ESTSum = calcPreconditionESTSum(cn0);
-		long cn1ESTSum = calcPreconditionESTSum(cn1);
+    private static final ChimpSearchAdapter SEARCH_ADAPTER = new ChimpSearchAdapter();
+    private final Comparator<ResolverCandidate> comparator;
 
-//		Fluent t0 = getPlannedTask(cn0);
-//		Fluent t1 = getPlannedTask(cn1);
-//		return t0.toString().hashCode() - t1.toString().hashCode();
+    protected CHIMPValOH(Comparator<ResolverCandidate> comparator) {
+        this.comparator = comparator;
+    }
 
-		if (cn0ESTSum > cn1ESTSum) {
-			return -1;
-		} else if (cn0ESTSum < cn1ESTSum) {
-			return 1;
-		} else {
-			return 0;
-//			Fluent t0 = getPlannedTask(cn0);
-//			Fluent t1 = getPlannedTask(cn1);
-//			int ret =  cn0.toString().hashCode() - cn1.toString().hashCode();
-//			if (ret != 0) {
-//				return ret;
-//			} else {
-//				System.out.println("HASH IS ZERO");
-//				return 2;
-//			}
-			
-		}
-	}
-	
-	protected Fluent getPlannedTask(ConstraintNetwork cn) {
-		for (Constraint con : cn.getConstraints()) {
-			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
-				return (Fluent) ((FluentConstraint) con).getFrom();
-			}
-		}
-		return null;
-	}
-	
-	protected FluentConstraint getUnaryApplied(ConstraintNetwork cn) {
-		for (Constraint con : cn.getConstraints()) {
-			if (con instanceof FluentConstraint && ((FluentConstraint) con).getType() == Type.UNARYAPPLIED) {
-				return (FluentConstraint) con;
-			}
-		}
-		return null;
-	}
-	
-	protected int getTaskDepth(ConstraintNetwork cn) {
-		FluentConstraint ua = getUnaryApplied(cn);
-		if (ua != null) {
-			try {
-				return ua.getDepth();
-			} catch (IllegalAccessException e) {
-				return 0;
-			}
-		} else {
-			return 0;
-		}
-	}
-	
-	protected long calcPreconditionESTSum(ConstraintNetwork cn) {
-		long sum = 0;
-		for(Constraint con : cn.getConstraints()) {
-
-			if (con instanceof FluentConstraint) {
-				FluentConstraint flc = (FluentConstraint) con;
-				if (flc.getType() == Type.PRE) {
-					sum += ((Fluent) flc.getFrom()).getAllenInterval().getEST();
-				}
-
-			}
-		}
-		return sum;
-	}
-
+    @Override
+    public int compare(ConstraintNetwork left, ConstraintNetwork right) {
+        return comparator.compare(
+                SEARCH_ADAPTER.toResolverCandidate(left),
+                SEARCH_ADAPTER.toResolverCandidate(right));
+    }
 }

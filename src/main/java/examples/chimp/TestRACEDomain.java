@@ -2,14 +2,14 @@ package examples.chimp;
 
 import java.util.logging.Level;
 
-import org.metacsp.framework.ValueOrderingH;
-import org.metacsp.framework.Variable;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import htn.valOrderingHeuristics.CHIMPValOH;
+import chimp.logging.ChimpLogging;
 
 import externalPathPlanning.LookUpTableDurationEstimator;
 import htn.valOrderingHeuristics.UnifyDeepestWeightNewestbindingsValOH;
 import hybridDomainParsing.DomainParsingException;
 import planner.CHIMP;
+import chimp.model.PlannedAction;
 
 public class TestRACEDomain {
 
@@ -77,13 +77,13 @@ public class TestRACEDomain {
         String problemFile = "problems/test_m_serve_coffee_problem_1.pdl"; // #0
         String domainFile = "domains/ordered_domain.ddl";
 
-//		ValueOrderingH valOH = new UnifyEarlisttasksValOH();
-//		ValueOrderingH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
-//		ValueOrderingH valOH = new UnifyFewestsubsNewestbindingsValOH();
-//		ValueOrderingH valOH = new DeepestNewestbindingsValOH();
-//		ValueOrderingH valOH = new DeepestWeightNewestbindingsValOH();
-//		ValueOrderingH valOH = new DeepestFewestsubsNewestbindingsValOH();
-        ValueOrderingH valOH = new UnifyDeepestWeightNewestbindingsValOH();
+//		CHIMPValOH valOH = new UnifyEarlisttasksValOH();
+//		CHIMPValOH valOH = new UnifyFewestsubsEarliesttasksNewestbindingsValOH();
+//		CHIMPValOH valOH = new UnifyFewestsubsNewestbindingsValOH();
+//		CHIMPValOH valOH = new DeepestNewestbindingsValOH();
+//		CHIMPValOH valOH = new DeepestWeightNewestbindingsValOH();
+//		CHIMPValOH valOH = new DeepestFewestsubsNewestbindingsValOH();
+        CHIMPValOH valOH = new UnifyDeepestWeightNewestbindingsValOH();
 
         CHIMP.CHIMPBuilder builder;
 
@@ -102,22 +102,22 @@ public class TestRACEDomain {
         }
         CHIMP chimp = builder.build();
 
-//		MetaCSPLogging.setLevel(planner.getClass(), Level.FINEST);
-//		MetaCSPLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
+//		ChimpLogging.setLevel(planner.getClass(), Level.FINEST);
+//		ChimpLogging.setLevel(HTNMetaConstraint.class, Level.FINEST);
 
-//		MetaCSPLogging.setLevel(Level.FINE);
+//		ChimpLogging.setLevel(Level.FINE);
         if (!LOGGING) {
-            MetaCSPLogging.setLevel(Level.OFF);
+            ChimpLogging.setLevel(Level.OFF);
         }
 
         System.out.println("Found plan? " + chimp.generatePlan());
         chimp.printStats(System.out);
 
         if (PRINT_PLAN) {
-            Variable[] planVector = chimp.extractActions();
+            PlannedAction[] planVector = chimp.extractActions();
             int c = 0;
-            for (Variable act : planVector) {
-                if (act.getComponent() != null)
+            for (PlannedAction act : planVector) {
+                if (act.component() != null)
                     System.out.println(c++ + ".\t" + act);
             }
 

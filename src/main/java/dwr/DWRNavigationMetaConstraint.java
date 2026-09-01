@@ -1,62 +1,68 @@
 package dwr;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import htn.HTNMetaConstraint;
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.ConstraintNetwork;
-import org.metacsp.framework.ConstraintSolver;
-import org.metacsp.framework.Variable;
-import org.metacsp.framework.VariablePrototype;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.kernel.temporal.TemporalConstraint;
+import chimp.model.FluentId;
+import chimp.model.FluentMarking;
+import chimp.model.TemporalBounds;
+import chimp.search.ChimpFlaw;
+import chimp.search.ChimpMetaConstraint;
+import chimp.search.ChimpResolver;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
+import htn.GroundSolverHolder;
+import htn.HTNMetaConstraint;
 import hybridDomainParsing.HybridDomain;
-import unify.CompoundSymbolicVariable;
 
 
 
-public class DWRNavigationMetaConstraint extends MetaConstraint {
+public class DWRNavigationMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
 
 	private static final long serialVersionUID = 8908231006136514834L;
 	private static final String NAVIGATE_TASK_NAME = "navigate";
 	private static final String CONNECTED_NAME = "connected";
+	private FluentNetworkSolver groundSolver;
 
 	public DWRNavigationMetaConstraint() {
 		super(null, null);
+	}
+
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 	/** 
 	 * @return All {@link MetaVariable}s with the marking UNPLANNED and which have no unplanned 
 	 * predecessors.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
+		List<ChimpFlaw> ret = new ArrayList<>();
 		for (Variable var : groundSolver.getVariables()) {
 			if (((Fluent) var).getCompoundSymbolicVariable().getPredicateName().equals(NAVIGATE_TASK_NAME)) {
-				//			if (var.getMarking() != null && var.getMarking().equals(markings.UNPLANNED)) {
 				if ( !checkApplied((Fluent) var)) {
 					if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-						ConstraintNetwork nw = new ConstraintNetwork(null);
-						nw.addVariable(var);
-						ret.add(nw);
+						ret.add(new ChimpFlaw(List.of(new FluentId(var.getID()))));
 					}
 				}
 			}
-			//			}
 		}
 		logger.finest("MetaVariables: " + ret);
-		return ret.toArray(new ConstraintNetwork[ret.size()]);
-	
+		return ret.toArray(new ChimpFlaw[ret.size()]);
+
 	}
 	
 	/**
@@ -105,18 +111,22 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		Fluent taskFluent = (Fluent)problematicNetwork.getVariables()[0];
-		
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
+		FluentNetworkSolver groundSolver = (FluentNetworkSolver) this.getGroundSolver();
+		Variable[] conflicts = new Variable[flaw.taskIds().size()];
+		for (int i = 0; i < flaw.taskIds().size(); i++) {
+			conflicts[i] = groundSolver.getVariable((int) flaw.taskIds().get(i).value());
+		}
+		Fluent taskFluent = (Fluent) conflicts[0];
+
+
 		logger.fine("getMetaValues for: " + taskFluent);
-		
+
 //		return estimateDuration(taskFluent);
 		Graph<String, String> g = createGraph();
 		DijkstraShortestPath<String,String> dijk = new DijkstraShortestPath<String,String>(g);
-		
-		Variable[] conflicts = metaVariable.getConstraintNetwork().getVariables();
-		ConstraintNetwork cn = new ConstraintNetwork(null);
+
+		ConstraintNetwork cn = new ConstraintNetwork();
 		for (int i = 0; i < conflicts.length; i++) {
 			Fluent nav = (Fluent) conflicts[i];
 			if (! nav.getCompoundSymbolicVariable().getPredicateName().equals(NAVIGATE_TASK_NAME)) {
@@ -138,8 +148,8 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 				args[2] = s_items[1].substring(0, s_items[1].length()-1);
 				args[3] = HybridDomain.EMPTYSTRING;
 				args[4] = HybridDomain.EMPTYSTRING;
-				VariablePrototype vp = new VariablePrototype(this.getGroundSolver(), "Activity", "!move", args);
-				vp.setMarking(HTNMetaConstraint.markings.UNPLANNED);
+				VariablePrototype vp = VariablePrototype.forFluent(this.getGroundSolver(), "Activity", "!move", args);
+				vp.setMarking(FluentMarking.UNPLANNED.ordinal());
 				prototypes[j] = vp;
 				FluentConstraint dc = new FluentConstraint(FluentConstraint.Type.DC);
 				dc.setFrom(nav);
@@ -150,8 +160,9 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 					bc.setFrom(prev);
 					bc.setTo(vp);
 					cn.addConstraint(bc);
-					AllenIntervalConstraint aiCon = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before, 
-							AllenIntervalConstraint.Type.Before.getDefaultBounds());
+					TemporalConstraint aiCon = new TemporalConstraint(
+							chimp.model.TemporalRelation.Before,
+							new TemporalBounds[] { new TemporalBounds(0, TemporalBounds.INFINITY) });
 					aiCon.setFrom(prev);
 					aiCon.setTo(vp);
 					cn.addConstraint(aiCon);
@@ -178,43 +189,19 @@ public class DWRNavigationMetaConstraint extends MetaConstraint {
 			cn.addConstraint(applicationCon);	
 		}
 		
-		return new ConstraintNetwork[] {cn};
+		return new ChimpResolver[] { new ChimpResolver(cn) };
 
 	}
 	
 	
-	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) {
-		// nothing to do here
-	}
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-	}
-
 	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override
 	public String toString() {
 		return "DWRNavigationMetaConstraint";
-	}
-
-	@Override
-	public String getEdgeLabel() {
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		return false;
 	}
 
 }

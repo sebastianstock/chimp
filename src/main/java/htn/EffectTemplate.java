@@ -2,10 +2,9 @@ package htn;
 
 import java.util.Vector;
 
-import fluentSolver.Fluent;
-import org.metacsp.framework.VariablePrototype;
-
-import fluentSolver.FluentNetworkSolver;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentNetworkSolver;
 import hybridDomainParsing.HybridDomain;
 
 public class EffectTemplate {
@@ -47,7 +46,7 @@ public class EffectTemplate {
 		for (int i = args.length; i < maxArgs; i++) {
 			filledArgs[i] = HybridDomain.EMPTYSTRING;
 		}
-		this.prototype = new VariablePrototype(groundSolver, comp, name, filledArgs);
+		this.prototype = VariablePrototype.forFluent(groundSolver, comp, name, filledArgs);
 	}
 
 	public VariablePrototype getPrototype(FluentNetworkSolver groundSolver) {
@@ -83,6 +82,14 @@ public class EffectTemplate {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getComponent() {
+		return comp;
+	}
+
+	public int getMaxArgs() {
+		return maxArgs;
 	}
 
 	public void setComponentToActivity() {

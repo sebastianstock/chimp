@@ -1,18 +1,30 @@
 package htn;
 
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.*;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.framework.meta.MetaVariable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-import resourceFluent.ResourceUsageTemplate;
-
 import java.util.*;
 
+import chimp.kernel.Constraint;
+import chimp.kernel.ConstraintNetwork;
+import chimp.kernel.ConstraintSolver;
+import chimp.kernel.Variable;
+import chimp.kernel.VariablePrototype;
+import chimp.kernel.fluent.Fluent;
+import chimp.kernel.fluent.FluentConstraint;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.ResourceRequirementAdapter;
+import chimp.kernel.symbolic.CompoundSymbolicVariable;
+import chimp.kernel.temporal.TemporalVariable;
+import chimp.model.FluentId;
+import chimp.model.ResourceRequirement;
+import chimp.search.ChimpFlaw;
+import chimp.search.ChimpMetaConstraint;
+import chimp.search.ChimpResolver;
+import chimp.search.ChimpSearchAdapter;
 
-public class HTNMetaConstraint extends MetaConstraint {
+
+public class HTNMetaConstraint extends ChimpMetaConstraint implements GroundSolverHolder {
+	private static final ResourceRequirementAdapter RESOURCE_ADAPTER =
+			new ResourceRequirementAdapter();
+	private static final ChimpSearchAdapter SEARCH_ADAPTER = new ChimpSearchAdapter();
 
 	public enum markings {UNPLANNED, SELECTED, PLANNED, OPEN, CLOSED, UNJUSTIFIED, JUSTIFIED, UNIFIED}
 
@@ -24,17 +36,23 @@ public class HTNMetaConstraint extends MetaConstraint {
 	private final Set<String> operatorNames = new HashSet<>();
 	private final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
 
-	private Map<String, List<ResourceUsageTemplate>> resourcesTemplatesMap;  //resource type -> templates
+	private Map<String, List<ResourceRequirement>> resourcesTemplatesMap;  //resource type -> templates
 	
 	// try to unify tasks with planned tasks?
 	private boolean tryUnification = false;
 	
-	public HTNMetaConstraint(ValueOrderingH valOH) {
+	private FluentNetworkSolver groundSolver;
+	
+	public HTNMetaConstraint(Comparator<ConstraintNetwork> valOH) {
 		super(null, valOH);
 	}
 	
 	public HTNMetaConstraint() {
 		super(null, null);
+	}
+	
+	public void setGroundSolver(FluentNetworkSolver groundSolver) {
+		this.groundSolver = groundSolver;
 	}
 	
 	private boolean checkApplied(Fluent task) {
@@ -51,35 +69,29 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 * predecessors.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaVariables() {
+	public ChimpFlaw[] getMetaVariables() {
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors 
-		// add it to the ConstraintNetwork network
-		ConstraintNetwork nw = new ConstraintNetwork(null);
+		List<FluentId> eligibleTaskIds = new ArrayList<>();
+		// for every variable that has the marking UNPLANNED and that has no unplanned predecessors
+		// add it to the eligible task list
 		List<Variable> tasks = new LinkedList<Variable>(Arrays.asList(groundSolver.getVariables("Activity")));
 		tasks.addAll(Arrays.asList(groundSolver.getVariables("Task")));
 		for (Variable var : tasks) {
 			if (!checkApplied((Fluent)var)) {
 				if (checkPredecessors(var, groundSolver)) {  // only add it if there are no predecessors
-					nw.addVariable(var);
+					eligibleTaskIds.add(new FluentId(var.getID()));
 				}
 			}
 		}
-		
-		if (nw.getVariables().length > 0) {
-				ret.add(nw);
-		}
-//		logger.finest("MetaVariables: " + ret);
 
 		logger.info("getMetaVariables-Invocation: " + ++getVarsCNT);
 		if (DEBUG) {
-			logger.info("  Meta-Variables: " + ret);
-			//			if (applicationCNT == 300) {
-			//				ret.clear();
-			//			}
+			logger.info("  Meta-Variables: " + eligibleTaskIds);
 		}
-		return ret.toArray(new ConstraintNetwork[ret.size()]);
+		if (eligibleTaskIds.isEmpty()) {
+			return new ChimpFlaw[0];
+		}
+		return new ChimpFlaw[] { new ChimpFlaw(eligibleTaskIds) };
 	}
 	
 	
@@ -104,15 +116,22 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 * @return All meta values for the given{@link MetaVariable}s.
 	 */
 	@Override
-	public ConstraintNetwork[] getMetaValues(MetaVariable metaVariable) {
+	public ChimpResolver[] resolvers(ChimpFlaw flaw) {
 		long startTime = System.nanoTime();
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
-		
+
 		FluentNetworkSolver groundSolver = (FluentNetworkSolver)this.getGroundSolver();
-			
-		ConstraintNetwork problematicNetwork = metaVariable.getConstraintNetwork();
-		
-		for (Variable var : problematicNetwork.getVariables()) {
+
+		Map<Long, Variable> variablesById = new HashMap<>();
+		for (FluentId taskId : flaw.taskIds()) {
+			Variable var = groundSolver.getVariable((int) taskId.value());
+			if (var == null) {
+				throw new IllegalArgumentException("Planning flaw references unknown task ID " + taskId);
+			}
+			variablesById.put(taskId.value(), var);
+		}
+		for (FluentId taskId : flaw.taskIds()) {
+			Variable var = variablesById.get(taskId.value());
 			Fluent taskFluent = (Fluent) var;
 			String taskName = taskFluent.getCompoundSymbolicVariable().getPossiblePredicateNames()[0];
 			if (operatorNames.contains(taskName)) {
@@ -127,17 +146,17 @@ public class HTNMetaConstraint extends MetaConstraint {
 				ret.addAll(applyPlanrepoirtroryItems(taskFluent, methods, groundSolver));
 			}
 		}
-		
+
 		long endTime = System.nanoTime();
-		logger.finest("Computed metaValues for " + problematicNetwork.getVariables().length + " tasks");
+		logger.finest("Computed metaValues for " + flaw.taskIds().size() + " tasks");
 		logger.finest("Found " + ret.size() + " metaValues");
 		if (DEBUG) {
 			logger.info("  Found " + ret.size() + " metaValues");
 		}
 		logger.finest("HTN GetMetaValues Took: " + ((endTime - startTime) / 1000000) + " ms");
-		
-		if (!ret.isEmpty()) 
-			return ret.toArray(new ConstraintNetwork[ret.size()]);
+
+		if (!ret.isEmpty())
+			return ret.stream().map(ChimpResolver::new).toArray(ChimpResolver[]::new);
 		return null;
 	}
 	
@@ -167,7 +186,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		}
 		
 		for (Fluent fl : possibleMatchingTasks) {
-			ConstraintNetwork cn = new ConstraintNetwork(null);
+			ConstraintNetwork cn = new ConstraintNetwork();
 			// add unification
 			FluentConstraint mc = new FluentConstraint(FluentConstraint.Type.MATCHES);
 			mc.setFrom(task);
@@ -180,6 +199,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 			applicationCon.setTo(task);
 //			applicationCon.setDepth(depth);
 			cn.addConstraint(applicationCon);
+			SEARCH_ADAPTER.annotateTaskUnification(cn, task, fl);
 			ret.add(cn);
 		}
 		if (ret.size() > 0 ) {
@@ -189,7 +209,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 		return ret;
 	}
 	
-	private boolean checkTime(AllenInterval taskInterval, AllenInterval varInterval) {
+	private boolean checkTime(TemporalVariable taskInterval, TemporalVariable varInterval) {
 
 		return varInterval.getEST() <= taskInterval.getLST()
 				&& taskInterval.getEST() <= varInterval.getLST()
@@ -237,7 +257,7 @@ public class HTNMetaConstraint extends MetaConstraint {
 			}
 		}
 
-		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getAllenInterval());
+		Fluent[] openFluents = groundSolver.getOpenFluents(fl.getTemporalVariable());
 
 		Vector<ConstraintNetwork> ret = new Vector<ConstraintNetwork>();
 		for (PlanReportroryItem item : items) {
@@ -253,11 +273,12 @@ public class HTNMetaConstraint extends MetaConstraint {
 				if (v instanceof VariablePrototype &&
 						!(((VariablePrototype) v).getParameters()[0] instanceof VariablePrototype)) {
 					String symbol = (String)((VariablePrototype) v).getParameters()[1];
-					List<ResourceUsageTemplate> rtList = resourcesTemplatesMap.get(symbol);
+					List<ResourceRequirement> rtList = resourcesTemplatesMap.get(symbol);
 					if (rtList != null) {
-						for (ResourceUsageTemplate rt : rtList) {
+						for (ResourceRequirement rt : rtList) {
 							FluentConstraint resourceCon = 
-									new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE, rt);
+									new FluentConstraint(FluentConstraint.Type.RESOURCEUSAGE,
+											RESOURCE_ADAPTER.toResourceUsageTemplate(rt));
 							resourceCon.setFrom(v);
 							resourceCon.setTo(v);
 							cn.addConstraint(resourceCon);
@@ -271,35 +292,13 @@ public class HTNMetaConstraint extends MetaConstraint {
 	}
 
 	@Override
-	public void markResolvedSub(MetaVariable metaVariable, ConstraintNetwork metaValue) { }
-
-	@Override
-	public void draw(ConstraintNetwork network) {
-	}
-
-	@Override
 	public ConstraintSolver getGroundSolver() {
-		return this.metaCS.getConstraintSolvers()[0];
+		return groundSolver;
 	}
 
 	@Override
 	public String toString() {
 		return "PFD0MetaConstraint";
-	}
-
-	@Override
-	public String getEdgeLabel() {
-		return null;
-	}
-
-	@Override
-	public Object clone() {
-		return null;
-	}
-
-	@Override
-	public boolean isEquivalent(Constraint c) {
-		return false;
 	}
 
 	public void addOperators(List<PlanReportroryItem> operators) {
@@ -327,23 +326,25 @@ public class HTNMetaConstraint extends MetaConstraint {
 	 * When creating effects these will be used to add resource constraints to those fluents.
 	 * @param resourceTemplates Indicate the resource usages.
 	 */
-	public void setResourceUsages(List<ResourceUsageTemplate> resourceTemplates) {
+	public void setResourceUsages(List<ResourceRequirement> resourceTemplates) {
 		resourcesTemplatesMap = createResourceUsagesMap(resourceTemplates);
 	}
 	
 	/**
-	 * Generate a map from resource types to lists of ResourceUsageTemplates.
+	 * Generate a map from fluent types to resource requirements.
 	 * @param resourceTemplates Indicate the resource usages.
-	 * @return Map from resource types to a list of ResourceUsageTemplates.
+	 * @return Map from fluent types to their resource requirements.
 	 */
-	public static Map<String, List<ResourceUsageTemplate>> createResourceUsagesMap(List<ResourceUsageTemplate> resourceTemplates) {
-		Map<String, List<ResourceUsageTemplate>> ret = 
-				new HashMap<String, List<ResourceUsageTemplate>>();  //resource type -> templates
-		for (ResourceUsageTemplate rt : resourceTemplates){
-			List<ResourceUsageTemplate> l = ret.get(rt.getFluentType());
+	public static Map<String, List<ResourceRequirement>> createResourceUsagesMap(List<ResourceRequirement> resourceTemplates) {
+		Map<String, List<ResourceRequirement>> ret =
+				new HashMap<String, List<ResourceRequirement>>();  //resource type -> templates
+		for (ResourceRequirement rt : resourceTemplates){
+			String fluentType = rt.fluentType().orElseThrow(
+					() -> new IllegalArgumentException("Fluent resource usage requires a fluent type"));
+			List<ResourceRequirement> l = ret.get(fluentType);
 			if (l == null) {
-				l = new ArrayList<ResourceUsageTemplate>();
-				ret.put(rt.getFluentType(), l);
+				l = new ArrayList<ResourceRequirement>();
+				ret.put(fluentType, l);
 			}
 			l.add(rt);
 		}

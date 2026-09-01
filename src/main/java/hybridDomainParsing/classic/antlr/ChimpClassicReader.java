@@ -1,6 +1,14 @@
 package hybridDomainParsing.classic.antlr;
 
 import com.google.common.primitives.Ints;
+import chimp.model.TemporalBounds;
+import chimp.model.TemporalConstraintTemplate;
+import chimp.model.TemporalRelation;
+import chimp.model.IntegerConstraintKind;
+import chimp.model.ResourceParameterRequirement;
+import chimp.model.ResourceRequirement;
+import chimp.model.ResourceCapacity;
+import chimp.model.StateVariableDefinition;
 import htn.AdditionalConstraintTemplate;
 import htn.EffectTemplate;
 import htn.HTNMethod;
@@ -14,19 +22,12 @@ import hybridDomainParsing.ClassicHybridDomain;
 import hybridDomainParsing.DomainParsingException;
 import hybridDomainParsing.HybridDomain;
 import hybridDomainParsing.SubDifferentDefinition;
-import integers.IntegerConstraint;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
-import org.metacsp.time.APSPSolver;
-import org.metacsp.time.Bounds;
-import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,12 +37,11 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     public class ParsedDomain implements ClassicHybridDomain {
         public final List<PlanReportroryItem> operators = new ArrayList<PlanReportroryItem>();
         public final List<PlanReportroryItem> methods = new ArrayList<PlanReportroryItem>();
-        public final List<FluentScheduler> fluentSchedulers = new ArrayList<FluentScheduler>();
+        public final List<StateVariableDefinition> stateVariableDefinitions = new ArrayList<>();
         public String name;
-        public final List<FluentResourceUsageScheduler> resourceSchedulers =
-                new ArrayList<FluentResourceUsageScheduler>();
-        public final List<ResourceUsageTemplate> fluentResourceUsages =
-                new ArrayList<ResourceUsageTemplate>();
+        public final List<ResourceCapacity> resourceCapacities = new ArrayList<ResourceCapacity>();
+        public final List<ResourceRequirement> fluentResourceUsages =
+                new ArrayList<ResourceRequirement>();
 
         public int maxArgs; // Maximum number of arguments of a fluent.
         public int maxIntArgs; // Maximum number of integer variables of a fluent.
@@ -58,8 +58,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         }
 
         @Override
-        public List<FluentScheduler> getFluentSchedulers() {
-            return fluentSchedulers;
+        public List<StateVariableDefinition> getStateVariableDefinitions() {
+            return stateVariableDefinitions;
         }
 
         @Override
@@ -68,12 +68,12 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         }
 
         @Override
-        public List<FluentResourceUsageScheduler> getResourceSchedulers() {
-            return resourceSchedulers;
+        public List<ResourceCapacity> getResourceCapacities() {
+            return resourceCapacities;
         }
 
         @Override
-        public List<ResourceUsageTemplate> getFluentResourceUsages() {
+        public List<ResourceRequirement> getFluentResourceUsages() {
             return fluentResourceUsages;
         }
 
@@ -170,10 +170,10 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             if (d instanceof ChimpClassicParser.Domain_item_operatorContext) {
                 ret.operators.add(visitDomain_item_operator((ChimpClassicParser.Domain_item_operatorContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_resourceContext) {
-                ret.resourceSchedulers.add(
+                ret.resourceCapacities.add(
                         visitDomain_item_resource((ChimpClassicParser.Domain_item_resourceContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_statevariableContext) {
-                ret.fluentSchedulers.addAll(
+                ret.stateVariableDefinitions.add(
                         visitDomain_item_statevariable((ChimpClassicParser.Domain_item_statevariableContext) d));
             } else if (d instanceof ChimpClassicParser.Domain_item_methodContext) {
                 ret.methods.add(visitDomain_item_method((ChimpClassicParser.Domain_item_methodContext) d));
@@ -187,18 +187,18 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public FluentResourceUsageScheduler visitDomain_item_resource(ChimpClassicParser.Domain_item_resourceContext ctx) {
+    public ResourceCapacity visitDomain_item_resource(ChimpClassicParser.Domain_item_resourceContext ctx) {
         return visitResource_def(ctx.resource_def());
     }
 
     @Override
-    public ResourceUsageTemplate visitDomain_item_fluentresourceusage(
+    public ResourceRequirement visitDomain_item_fluentresourceusage(
             ChimpClassicParser.Domain_item_fluentresourceusageContext ctx) {
         return visitFluentresourceusage_def(ctx.fluentresourceusage_def());
     }
 
     @Override
-    public List<FluentScheduler> visitDomain_item_statevariable(ChimpClassicParser.Domain_item_statevariableContext ctx) {
+    public StateVariableDefinition visitDomain_item_statevariable(ChimpClassicParser.Domain_item_statevariableContext ctx) {
         return visitStatevariable_def(ctx.statevariable_def());
     }
 
@@ -246,20 +246,19 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public FluentResourceUsageScheduler visitResource_def(ChimpClassicParser.Resource_defContext ctx) {
-        return new FluentResourceUsageScheduler(null, null, ctx.NAME().getText(),
-                numberToInt(ctx.NUMBER()));
+    public ResourceCapacity visitResource_def(ChimpClassicParser.Resource_defContext ctx) {
+        return new ResourceCapacity(ctx.NAME().getText(), numberToInt(ctx.NUMBER()));
     }
 
     @Override
-    public List<FluentScheduler> visitStatevariable_def(ChimpClassicParser.Statevariable_defContext ctx) {
+    public StateVariableDefinition visitStatevariable_def(ChimpClassicParser.Statevariable_defContext ctx) {
         String name = visitStatevariable_name(ctx.statevariable_name());
         int field = numberToInt(ctx.NUMBER());
-        List<FluentScheduler> schedulers = new ArrayList<>();
+        List<String> exclusiveValues = new ArrayList<>();
         for (TerminalNode fieldValue : ctx.NAME()) {
-            schedulers.add(new FluentScheduler(null, null, name, field, fieldValue.getText()));
+            exclusiveValues.add(fieldValue.getText());
         }
-        return schedulers;
+        return new StateVariableDefinition(name, field, exclusiveValues);
     }
 
     @Override
@@ -282,7 +281,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<SubDifferentDefinition> subDifferentDefinitions = new ArrayList<>();
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
         List<ParsedOrdering> parsedOrderingConstraints = new ArrayList<>();
-        List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
+        List<ResourceRequirement> resourceUsageTemplates = new ArrayList<>();
         List<IntegerConstraintTemplate> integerConstraintTemplates = new ArrayList<>();
         for (ChimpClassicParser.Method_elementContext d : ctx.method_element()) {
             if (d instanceof ChimpClassicParser.Precondition_m_elementContext) {
@@ -344,7 +343,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         method.setIntegerConstraintTemplates(
                 integerConstraintTemplates.toArray(new IntegerConstraintTemplate[integerConstraintTemplates.size()]));
 
-        method.addResourceUsageTemplates(resourceUsageTemplates);
+        method.addResourceRequirements(resourceUsageTemplates);
 
         return method;
     }
@@ -401,7 +400,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         List<SubDifferentDefinition> subDifferentDefinitions = new ArrayList<>();
         List<AdditionalConstraintTemplate> temporalConstraintTemplates = new ArrayList<>();
         List<IntegerConstraintTemplate> integerConstraintTemplates = new ArrayList<>();
-        List<ResourceUsageTemplate> resourceUsageTemplates = new ArrayList<>();
+        List<ResourceRequirement> resourceUsageTemplates = new ArrayList<>();
         for (ChimpClassicParser.Op_elementContext d : ctx.op_element()) {
             if (d instanceof ChimpClassicParser.Precondition_op_elementContext) {
                 parsedPreconditions.add(visitPrecondition_op_element(
@@ -461,7 +460,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
         op.setIntegerConstraintTemplates(
                 integerConstraintTemplates.toArray(new IntegerConstraintTemplate[integerConstraintTemplates.size()]));
 
-        op.addResourceUsageTemplates(resourceUsageTemplates);
+        op.addResourceRequirements(resourceUsageTemplates);
 
         return op;
     }
@@ -576,7 +575,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitResource_usage_m_element(ChimpClassicParser.Resource_usage_m_elementContext ctx) {
+    public ResourceRequirement visitResource_usage_m_element(ChimpClassicParser.Resource_usage_m_elementContext ctx) {
         return visitResource_usage_def(ctx.resource_usage_def());
     }
 
@@ -641,7 +640,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitResource_usage_op_element(ChimpClassicParser.Resource_usage_op_elementContext ctx) {
+    public ResourceRequirement visitResource_usage_op_element(ChimpClassicParser.Resource_usage_op_elementContext ctx) {
         return visitResource_usage_def(ctx.resource_usage_def());
     }
 
@@ -787,7 +786,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             varKeys = new String[] {v0};
             cste = intArg1.constValue;
         }
-        return new IntegerConstraintTemplate(IntegerConstraint.Type.ARITHM, varKeys, op1, op2, cste);
+        return new IntegerConstraintTemplate(IntegerConstraintKind.ARITHMETIC, varKeys, op1, op2, cste);
     }
 
     @Override
@@ -805,7 +804,7 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             varKeys = new String[] {v0, v1};
             cste = intArg2.constValue;
         }
-        return new IntegerConstraintTemplate(IntegerConstraint.Type.ARITHM, varKeys, op1, op2, cste);
+        return new IntegerConstraintTemplate(IntegerConstraintKind.ARITHMETIC, varKeys, op1, op2, cste);
     }
 
     @Override
@@ -831,33 +830,28 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     @Override
     public AdditionalConstraintTemplate visitUnary_temporal_constraint_def(
             ChimpClassicParser.Unary_temporal_constraint_defContext ctx) {
-        AllenIntervalConstraint.Type constraintType =
+        TemporalRelation constraintType =
                 visitUnary_temporal_constraint_type(ctx.unary_temporal_constraint_type());
         String from = visitId_or_task(ctx.id_or_task());
         return createAdditionalConstraintTemplate(constraintType, from, from, visitBounds_list(ctx.bounds_list()));
     }
 
-    public AdditionalConstraintTemplate createAdditionalConstraintTemplate(AllenIntervalConstraint.Type constraintType,
-                                              String from, String to, Bounds[] bounds) {
-        AllenIntervalConstraint con;
-        if (bounds.length > 0) {
-            con = new AllenIntervalConstraint(constraintType, bounds);
-        } else {
-            con = new AllenIntervalConstraint(constraintType);
-        }
+    public AdditionalConstraintTemplate createAdditionalConstraintTemplate(TemporalRelation constraintType,
+                                              String from, String to, List<TemporalBounds> bounds) {
+        TemporalConstraintTemplate con = new TemporalConstraintTemplate(constraintType, bounds);
         return new AdditionalConstraintTemplate(con, from, to);
     }
 
     @Override
-    public AllenIntervalConstraint.Type visitUnary_temporal_constraint_type(
+    public TemporalRelation visitUnary_temporal_constraint_type(
             ChimpClassicParser.Unary_temporal_constraint_typeContext ctx) {
-        return AllenIntervalConstraint.Type.valueOf(ctx.getText().split(" ")[1]);
+        return TemporalRelation.valueOf(ctx.getText().split(" ")[1]);
     }
 
     @Override
     public AdditionalConstraintTemplate visitBinary_temporal_constraint_def(
             ChimpClassicParser.Binary_temporal_constraint_defContext ctx) {
-        AllenIntervalConstraint.Type constraintType =
+        TemporalRelation constraintType =
                 visitBinary_temporal_constraint_type(ctx.binary_temporal_constraint_type());
         String from = visitId_or_task(ctx.id_or_task(0));
         String to = visitId_or_task(ctx.id_or_task(1));
@@ -865,30 +859,30 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public AllenIntervalConstraint.Type visitBinary_temporal_constraint_type(ChimpClassicParser.Binary_temporal_constraint_typeContext ctx) {
-        return AllenIntervalConstraint.Type.valueOf(ctx.getText());
+    public TemporalRelation visitBinary_temporal_constraint_type(ChimpClassicParser.Binary_temporal_constraint_typeContext ctx) {
+        return TemporalRelation.valueOf(ctx.getText());
     }
 
     @Override
-    public Bounds[] visitBounds_list(ChimpClassicParser.Bounds_listContext ctx) {
-        Bounds[] bounds = new Bounds[ctx.bounds().size()];
+    public List<TemporalBounds> visitBounds_list(ChimpClassicParser.Bounds_listContext ctx) {
+        List<TemporalBounds> bounds = new ArrayList<>();
         for (int i = 0; i < ctx.bounds().size(); i++) {
-            bounds[i] = visitBounds(ctx.bounds(i));
+            bounds.add(visitBounds(ctx.bounds(i)));
         }
         return bounds;
     }
 
     @Override
-    public Bounds visitBounds(ChimpClassicParser.BoundsContext ctx) {
+    public TemporalBounds visitBounds(ChimpClassicParser.BoundsContext ctx) {
         Long lb = visitBound(ctx.bound(0));
         Long ub = visitBound(ctx.bound(1));
-        return new Bounds(lb, ub);
+        return new TemporalBounds(lb, ub);
     }
 
     @Override
     public Long visitBound(ChimpClassicParser.BoundContext ctx) {
         if (ctx.getText().equals("INF")) {
-            return APSPSolver.INF;
+            return TemporalBounds.INFINITY;
         } else {
             return numberToLong(ctx.NUMBER());
         }
@@ -901,11 +895,8 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
     }
 
     @Override
-    public ResourceUsageTemplate visitResource_usage_def(ChimpClassicParser.Resource_usage_defContext ctx) {
-        String fluentType = "";
-
-        int[] resourceRequirementPositions = new int[ctx.param_item().size()];
-        String[] resourceRequirements = new String[ctx.param_item().size()];
+    public ResourceRequirement visitResource_usage_def(ChimpClassicParser.Resource_usage_defContext ctx) {
+        List<ResourceParameterRequirement> parameterRequirements = new ArrayList<>();
         String resourceName;
         int usageLevel;
 
@@ -918,31 +909,26 @@ public class ChimpClassicReader implements ChimpClassicVisitor {
             usageLevel = usage.usageLevel;
             for (int i = 0; i < ctx.param_item().size(); ++i) {
                 UsageParam param = visitParam_item(ctx.param_item(i));
-                resourceRequirementPositions[i] = param.position;
-                resourceRequirements[i] = param.paramName;
-            }
-        }
-        return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions,
-                resourceRequirements, usageLevel);
-    }
+				parameterRequirements.add(new ResourceParameterRequirement(param.position, param.paramName));
+			}
+		}
+		return new ResourceRequirement(resourceName, parameterRequirements, usageLevel);
+	}
 
-    @Override
-    public ResourceUsageTemplate visitFluentresourceusage_def(ChimpClassicParser.Fluentresourceusage_defContext ctx) {
+	@Override
+	public ResourceRequirement visitFluentresourceusage_def(ChimpClassicParser.Fluentresourceusage_defContext ctx) {
         String fluentType = visitFluent_def(ctx.fluent_def());
 
         String resourceName = ctx.usage_def().NAME().getText();
         int usageLevel = numberToInt(ctx.usage_def().NUMBER());
 
-        int[] resourceRequirementPositions = new int[ctx.param_item().size()];
-        String[] resourceRequirements = new String[ctx.param_item().size()];
+		List<ResourceParameterRequirement> parameterRequirements = new ArrayList<>();
 
         for (int i = 0; i < ctx.param_item().size(); ++i) {
             UsageParam param = visitParam_item(ctx.param_item(i));
-            resourceRequirementPositions[i] = param.position;
-            resourceRequirements[i] = param.paramName;
-        }
-        return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions,
-                resourceRequirements, usageLevel);
+			parameterRequirements.add(new ResourceParameterRequirement(param.position, param.paramName));
+		}
+		return new ResourceRequirement(resourceName, fluentType, parameterRequirements, usageLevel);
     }
 
     @Override

@@ -3,33 +3,25 @@ package postprocessing;
 import java.io.*;
 import java.util.*;
 
-import org.metacsp.framework.Constraint;
-import org.metacsp.framework.Variable;
-import org.metacsp.multi.allenInterval.AllenInterval;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Table;
-
-import fluentSolver.Fluent;
-import fluentSolver.FluentConstraint;
-import fluentSolver.FluentNetworkSolver;
-import unify.CompoundSymbolicVariable;
+import chimp.kernel.fluent.FluentNetworkSolver;
+import chimp.kernel.fluent.FluentStoreImpl;
+import chimp.model.ChimpConstraint;
+import chimp.model.ConstraintKind;
+import chimp.model.FluentId;
+import chimp.model.FluentSignature;
+import chimp.model.FluentStore;
+import chimp.model.FluentType;
+import chimp.model.FluentView;
+import chimp.model.TemporalInterval;
 
 public class PlanExtractor {
 	
-	private final FluentNetworkSolver fluentSolver;
+	private final FluentStore fluentStore;
 	
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-	
-	private ListMultimap<Fluent, FluentConstraint> fluentsOutgoingDCsMultiMap;
-	private Table<Fluent, Fluent, FluentConstraint> beforesTable;
 
 	public PlanExtractor(FluentNetworkSolver fluentSolver) {
-		this.fluentSolver = fluentSolver;
+		this.fluentStore = new FluentStoreImpl(fluentSolver);
 	}
 
 	public void printActions() {
@@ -70,56 +62,27 @@ public class PlanExtractor {
 	public void writeROSPlanFormat(Writer writer) throws IOException {
 		writer.write("; Actions:");
 		writer.append(LINE_SEPARATOR);
-		Fluent[] actions = getActions();
-		sortFluentsByEst(actions);
-		for (Fluent action : actions) {
+		for (FluentView action : getActions()) {
 			writer.write(formatActionToROSPlan(action));
 			writer.append(LINE_SEPARATOR);
 		}
 	}
 
 	public void writeActions(Writer writer) {
-		Fluent[] actions = getActions();
-		sortFluentsByEst(actions);
-
-		for (Fluent act : actions) {
-			if (act.getComponent() != null)
-				try {
-					activityToYaml((Fluent) act, writer);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
-
-	}
-
-	private static void sortFluentsByEst(Fluent[] actions) {
-		Arrays.sort(actions, new Comparator<Variable>() {
-			@Override
-			public int compare(Variable o1, Variable o2) {
-				Fluent f1 = (Fluent)o1;
-				Fluent f2 = (Fluent)o2;
-				return Long.compare(f1.getTemporalVariable().getEST(), f2.getTemporalVariable().getEST());
-			}
-		});
-	}
-
-	private static boolean fluentIsAction(Variable var) {
-		String component = var.getComponent();
-		if (component != null && component.equals("Activity")) {
-			return true;
-		}
-		return false;
-	}
-
-	private Fluent[] getActions() {
-		ArrayList<Fluent> plan = new ArrayList<Fluent>();
-		for (Variable var : fluentSolver.getVariables()) {
-			if (fluentIsAction(var)) {
-				plan.add((Fluent) var);
+		for (FluentView action : getActions()) {
+			try {
+				activityToYaml(action, writer);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
-		return plan.toArray(new Fluent[plan.size()]);
+
+	}
+
+	private List<FluentView> getActions() {
+		List<FluentView> actions = new ArrayList<>(fluentStore.fluents(FluentType.ACTIVITY));
+		actions.sort(Comparator.comparingLong(action -> action.temporalInterval().earliestStart()));
+		return actions;
 	}
 
 	/**
@@ -128,54 +91,49 @@ public class PlanExtractor {
 	 * @param action
 	 * @return
 	 */
-	private String formatActionToROSPlan(Fluent action) {
-		AllenInterval interval = action.getAllenInterval();
-		double estSeconds = ((double) interval.getEST()) / 1000;
-		double minDurationSeconds = ((double) (interval.getEET() - interval.getEST())) / 1000;
+	private String formatActionToROSPlan(FluentView action) {
+		TemporalInterval interval = action.temporalInterval();
+		double estSeconds = ((double) interval.earliestStart()) / 1000;
+		double minDurationSeconds = ((double) (interval.earliestEnd() - interval.earliestStart())) / 1000;
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(estSeconds);
 		sb.append(": (");
-		CompoundSymbolicVariable csv = (CompoundSymbolicVariable) action.getInternalVariables()[0];
-		sb.append(csv.getPredicateName()).append(" ");
-		sb.append(String.join(" ", csv.getGroundArgs()));
+		FluentSignature signature = action.signature();
+		sb.append(signature.predicate()).append(" ");
+		sb.append(String.join(" ", signature.arguments()));
 		sb.append(") [");
 		sb.append(String.format(Locale.ROOT,"%.3f", minDurationSeconds));
 		sb.append("]");
 		return sb.toString();
 	}
 
-	private void activityToYaml(Fluent activity, Writer w) throws IOException {
-		CompoundSymbolicVariable csv = (CompoundSymbolicVariable) activity.getInternalVariables()[0];
+	private void activityToYaml(FluentView activity, Writer w) throws IOException {
+		FluentSignature signature = activity.signature();
 
-		w.write("- id: " + activity.getID());
+		w.write("- id: " + activity.id().value());
 		w.append(LINE_SEPARATOR);
 		
-		w.write("  name: \"" + csv.getPredicateName() + '"');
+		w.write("  name: \"" + signature.predicate() + '"');
 		w.append(LINE_SEPARATOR);
-		Variable[] params = csv.getInternalVariables();
 		StringBuilder argsbuilder = new StringBuilder("  arguments: [");
-		if (params.length > 1 && params[1].toString().length() > 0) {
+		List<String> arguments = signature.arguments();
+		if (!arguments.isEmpty()) {
 			argsbuilder.append('"');
-			argsbuilder.append(params[1].toString());
+			argsbuilder.append(arguments.get(0));
 			argsbuilder.append('"');
 		}
-		for (int i = 2; i < params.length; i++) {
-			String varStr = params[i].toString();
-			if(varStr.length() > 0 && ! varStr.equals(CompoundSymbolicVariable.NONESYMBOL) ) {
-				argsbuilder.append(", \"");
-				argsbuilder.append(params[i].toString());
-				argsbuilder.append('"');
-			} else {
-				break;
-			}
+		for (int i = 1; i < arguments.size(); i++) {
+			argsbuilder.append(", \"");
+			argsbuilder.append(arguments.get(i));
+			argsbuilder.append('"');
 		}
 		argsbuilder.append(']');
 		w.write(argsbuilder.toString());
 		w.append(LINE_SEPARATOR);
-		AllenInterval ai = activity.getAllenInterval();
-		ai.toString();
-		w.write("  time: " + ai.getDomain());
+		TemporalInterval interval = activity.temporalInterval();
+		w.write("  time: [[" + interval.earliestStart() + ", " + interval.latestStart()
+				+ "], [" + interval.earliestEnd() + ", " + interval.latestEnd() + "]]");
 		w.append(LINE_SEPARATOR);
 	}
 	
@@ -183,43 +141,40 @@ public class PlanExtractor {
 	 * Prints the current plan on the command line.
 	 */
 	public void printPlan() {
-		List<Fluent> plannedFluents = filterPlannedFluents();
+		List<FluentView> plannedFluents = filterPlannedFluents();
 		
-		List<Fluent> rootTasks = filterRootTasks(plannedFluents);
-		
-		createOutgoingDCMultiMap();
+		List<FluentView> rootTasks = filterRootTasks(plannedFluents);
 
 		System.out.println("#######  PLAN ######");
-		for (Fluent root : rootTasks) {
+		for (FluentView root : rootTasks) {
 			printDecomposition(root, "");
 		}
 		
 	}	
 	
 	public void printAllFluents() {
-		for (Variable var : fluentSolver.getVariables()) {
-//			ret.add((Fluent) var);
-			System.out.println(var);
+		for (FluentView fluent : fluentStore.fluents()) {
+			System.out.println(formatFluent(fluent));
 		}
 	}
 	
-	private void printDecomposition(Fluent task, String indentation) {
-		System.out.println(indentation + task);
+	private void printDecomposition(FluentView task, String indentation) {
+		System.out.println(indentation + formatFluent(task));
 		
 		String nextIndentation = indentation + "  ";
 		
-		List<FluentConstraint> dcs = fluentsOutgoingDCsMultiMap.get(task);
-		List<Fluent> subtasks = new ArrayList<Fluent>();
-		for (FluentConstraint dc : dcs) {
-			subtasks.add((Fluent) dc.getTo());
+		List<FluentView> subtasks = new ArrayList<>();
+		for (ChimpConstraint decomposition
+				: fluentStore.outgoing(task.id(), ConstraintKind.DECOMPOSITION)) {
+			subtasks.add(requireFluent(decomposition.to()));
 		}
 		
-		Collections.sort(subtasks, new Comparator<Fluent>() {
+		Collections.sort(subtasks, new Comparator<FluentView>() {
 			@Override
-			public int compare(final Fluent obj1, final Fluent obj2) {
-				if (beforesTable.contains(obj1, obj2)) {
+			public int compare(final FluentView obj1, final FluentView obj2) {
+				if (hasBefore(obj1.id(), obj2.id())) {
 					return -1;
-				} else if (beforesTable.contains(obj2, obj1)) {
+				} else if (hasBefore(obj2.id(), obj1.id())) {
 					return 1;
 				} else {
 					return 0;
@@ -227,21 +182,21 @@ public class PlanExtractor {
 			}
 		});
 		
-		for (Fluent sub : subtasks) {
+		for (FluentView sub : subtasks) {
 			printDecomposition(sub, nextIndentation);
 		}
 		
 		for (int i = 0; i < subtasks.size(); i++) {
-			Fluent from = subtasks.get(i);
+			FluentView from = subtasks.get(i);
 			for (int j = i+1; j < subtasks.size(); j++) {
-				Fluent to = subtasks.get(j);
-				if (beforesTable.contains(from, to)) {
+				FluentView to = subtasks.get(j);
+				if (hasBefore(from.id(), to.id())) {
 					StringBuilder sb = new StringBuilder();
 					sb.append(nextIndentation);
 					sb.append("Before: ");
-					sb.append(from.getID());
+					sb.append(from.id().value());
 					sb.append(" --> ");
-					sb.append(to.getID());
+					sb.append(to.id().value());
 					System.out.println(sb.toString());
 				}
 			}
@@ -249,58 +204,40 @@ public class PlanExtractor {
 		
 	}
 	
-	private List<Fluent> filterPlannedFluents() {
-		ArrayList<Fluent> ret = new ArrayList<Fluent>();
-		for (Variable var : fluentSolver.getVariables("Activity")) {
-			ret.add((Fluent) var);
-		}
-		for (Variable var : fluentSolver.getVariables("Task")) {
-			ret.add((Fluent) var);
-		}
-		
+	private List<FluentView> filterPlannedFluents() {
+		List<FluentView> ret = new ArrayList<>();
+		ret.addAll(fluentStore.fluents(FluentType.ACTIVITY));
+		ret.addAll(fluentStore.fluents(FluentType.TASK));
 		return ret;
 	}
 	
-	private List<Fluent> filterRootTasks(List<Fluent> tasks) {
-		ArrayList<Fluent> ret = new ArrayList<Fluent>();
-		SetMultimap<Fluent, FluentConstraint> fluentsIncomingDCsMultiMap = HashMultimap.create();
-		
-		for (Constraint con : fluentSolver.getConstraints()) {
-			if (con instanceof FluentConstraint) {
-				FluentConstraint.Type type = ((FluentConstraint) con).getType();
-				if (type.equals(FluentConstraint.Type.DC)) {
-					fluentsIncomingDCsMultiMap.put((Fluent) ((FluentConstraint) con).getTo(), 
-							(FluentConstraint) con); 
-				}
+	private List<FluentView> filterRootTasks(List<FluentView> tasks) {
+		List<FluentView> ret = new ArrayList<>();
+		for (FluentView task : tasks) {
+			if (fluentStore.incoming(task.id(), ConstraintKind.DECOMPOSITION).isEmpty()) {
+				ret.add(task);
 			}
 		}
-		
-		for (Fluent t : tasks) {
-			if (! fluentsIncomingDCsMultiMap.containsKey(t)) {
-				ret.add(t);
-			}
-		}
-		
 		return ret;
 	}
 	
-	private void createOutgoingDCMultiMap() {
-		fluentsOutgoingDCsMultiMap = ArrayListMultimap.create();
-		beforesTable = HashBasedTable.create();
-		
-		for (Constraint con : fluentSolver.getConstraints()) {
-			if (con instanceof FluentConstraint) {
-				Fluent from = (Fluent) ((FluentConstraint) con).getFrom();
-				Fluent to = (Fluent) ((FluentConstraint) con).getTo();
-				FluentConstraint.Type type = ((FluentConstraint) con).getType();
-				if (type.equals(FluentConstraint.Type.DC)) {
-					fluentsOutgoingDCsMultiMap.put(from, (FluentConstraint) con); 
-				}
-				if (type.equals(FluentConstraint.Type.BEFORE)) {
-					beforesTable.put(from, to, (FluentConstraint) con);
-				}
+	private boolean hasBefore(FluentId from, FluentId to) {
+		for (ChimpConstraint before : fluentStore.outgoing(from, ConstraintKind.BEFORE)) {
+			if (before.to().equals(to)) {
+				return true;
 			}
 		}
+		return false;
+	}
+
+	private FluentView requireFluent(FluentId id) {
+		return fluentStore.fluent(id)
+				.orElseThrow(() -> new IllegalStateException(
+						"Constraint references unknown fluent ID: " + id.value()));
+	}
+
+	private String formatFluent(FluentView fluent) {
+		return fluent.toString();
 	}
 
 	

@@ -1,20 +1,20 @@
 package htn;
 
-import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
+import chimp.model.TemporalConstraintTemplate;
 
 public class AdditionalConstraintTemplate {
 
-	private final AllenIntervalConstraint constraint;
+	private final TemporalConstraintTemplate constraint;
 	private final String fromKey;
 	private final String toKey;
 	
-	public AdditionalConstraintTemplate(AllenIntervalConstraint constraint, String fromKey, String toKey) {
+	public AdditionalConstraintTemplate(TemporalConstraintTemplate constraint, String fromKey, String toKey) {
 		this.constraint = constraint;
 		this.fromKey = fromKey;
 		this.toKey = toKey;
 	}
 
-	public AllenIntervalConstraint getConstraint() {
+	public TemporalConstraintTemplate getConstraint() {
 		return constraint;
 	}
 

@@ -7,28 +7,27 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import fluentSolver.FluentNetworkSolver;
-import org.metacsp.framework.meta.MetaConstraint;
-import org.metacsp.utility.logging.MetaCSPLogging;
+import chimp.search.FlawProvider;
+import chimp.logging.ChimpLogging;
 
 import htn.HTNMethod;
 import htn.HTNOperator;
 import htn.PlanReportroryItem;
-import resourceFluent.FluentResourceUsageScheduler;
-import resourceFluent.FluentScheduler;
-import resourceFluent.ResourceUsageTemplate;
+import chimp.model.ResourceParameterRequirement;
+import chimp.model.ResourceRequirement;
+import chimp.model.ResourceCapacity;
+import chimp.model.StateVariableDefinition;
 
 
 public class HybridDomain implements ClassicHybridDomain {
 
 	private final Vector<PlanReportroryItem> operators = new Vector<PlanReportroryItem>();
 	private final Vector<PlanReportroryItem> methods = new Vector<PlanReportroryItem>();
-	private final Vector<FluentScheduler> fluentSchedulers = new Vector<FluentScheduler>();
+	private final Vector<StateVariableDefinition> stateVariableDefinitions = new Vector<>();
 	private String name;
-	private final Vector<FluentResourceUsageScheduler> resourceSchedulers = 
-			new Vector<FluentResourceUsageScheduler>();
-	private final Vector<ResourceUsageTemplate> fluentResourceUsages = 
-			new Vector<ResourceUsageTemplate>();
+	private final Vector<ResourceCapacity> resourceCapacities = new Vector<ResourceCapacity>();
+	private final Vector<ResourceRequirement> fluentResourceUsages =
+			new Vector<ResourceRequirement>();
 	
 	private int maxArgs; // Maximum number of arguments of a fluent.
 	private final String domainStr;
@@ -78,15 +77,15 @@ public class HybridDomain implements ClassicHybridDomain {
 		return methods;
 	}
 	
-	public Vector<FluentScheduler> getFluentSchedulers() {
-		return fluentSchedulers;
+	public Vector<StateVariableDefinition> getStateVariableDefinitions() {
+		return stateVariableDefinitions;
 	}
 	
-	public Vector<FluentResourceUsageScheduler> getResourceSchedulers() {
-		return resourceSchedulers;
+	public Vector<ResourceCapacity> getResourceCapacities() {
+		return resourceCapacities;
 	}
 	
-	public Vector<ResourceUsageTemplate> getFluentResourceUsages() {
+	public Vector<ResourceRequirement> getFluentResourceUsages() {
 		return fluentResourceUsages;
 	}
 	
@@ -108,15 +107,12 @@ public class HybridDomain implements ClassicHybridDomain {
 		}
 	}
 
-	private void createFluentSchedulers(String stateStr) {
-		// Parse Head	
+	static StateVariableDefinition parseStateVariableDefinition(String stateStr) {
 		String[] elements = stateStr.split(" ");
 		String head = elements[0];
 		int field = Integer.parseInt(elements[1]);
-		String[] fieldValues = Arrays.copyOfRange(elements, 2, elements.length);
-		for (String fieldValue : fieldValues) {
-			this.fluentSchedulers.add(new FluentScheduler(null, null, head, field, fieldValue));
-		}
+		List<String> fieldValues = Arrays.asList(Arrays.copyOfRange(elements, 2, elements.length));
+		return new StateVariableDefinition(head, field, fieldValues);
 	}
 	
 	private static String readDomain(String fileName) throws DomainParsingException{
@@ -147,32 +143,25 @@ public class HybridDomain implements ClassicHybridDomain {
 
 	/**
 	 * Parses a domain file (see domains/testDomain.ddl for an example) and instantiates
-	 * the necessary {@link MetaConstraint}s.
+	 * the necessary {@link FlawProvider}s.
 	 * @throws DomainParsingException Throws this exception if the domain cannot be parsed.
 	 */
 	public void parseDomain(Map<String, String[]> typesInstancesMap) throws DomainParsingException {
 		name = parseKeyword(DOMAIN_KEYWORD, domainStr)[0];
 		
-		// Parse Resources and create ResourceSchedulers
+		// Parse resource capacities.
 		String[] resourceElements = parseKeyword(RESOURCE_KEYWORD, domainStr);
-		Map<String,Integer> resources = processResources(resourceElements);
-		resourceSchedulers.clear();
-		for (Entry<String, Integer> entry : resources.entrySet()) {
-			FluentResourceUsageScheduler rs = new FluentResourceUsageScheduler(null, null, entry.getKey(), 
-					entry.getValue().intValue());
-			
-//			resourceSchedulers.add(new FluentResourceUsageScheduler(null, null, entry.getKey(), 
-//					entry.getValue().intValue()));
-			resourceSchedulers.add(rs);
-		}
+		List<ResourceCapacity> resources = processResources(resourceElements);
+		resourceCapacities.clear();
+		resourceCapacities.addAll(resources);
 		
 		// Parse FluentResourceUsages
 		String[] usageElements = parseKeyword(FLUENT_RESOURCE_KEYWORD, domainStr);
 		processFluentResourceUsages(usageElements);
 		// test if all resources are listed:
-		for (ResourceUsageTemplate rt : fluentResourceUsages) {
-			if (!resources.containsKey(rt.getResourceName())) {
-				throw new DomainParsingException("Resource " + rt.getResourceName() + " is not defined");
+		for (ResourceRequirement rt : fluentResourceUsages) {
+			if (resources.stream().noneMatch(capacity -> capacity.resourceName().equals(rt.resourceName()))) {
+				throw new DomainParsingException("Resource " + rt.resourceName() + " is not defined");
 			}
 		}
 		
@@ -195,7 +184,7 @@ public class HybridDomain implements ClassicHybridDomain {
 		// Parse state variables:
 		String[] stateVariableElements = parseKeyword(STATE_VARIBALE_KEYWORD, domainStr);
 		for (String stateStr : stateVariableElements) {
-			createFluentSchedulers(stateStr);
+			stateVariableDefinitions.add(parseStateVariableDefinition(stateStr));
 		}
 	}
 
@@ -235,12 +224,12 @@ public class HybridDomain implements ClassicHybridDomain {
 		return elements.toArray(new String[elements.size()]);		
 	}
 
-	protected static HashMap<String,Integer> processResources (String[] resources) {
-		HashMap<String, Integer> ret = new HashMap<String, Integer>();
+	protected static List<ResourceCapacity> processResources (String[] resources) {
+		List<ResourceCapacity> ret = new ArrayList<ResourceCapacity>();
 		for (String resourceElement : resources) {
 			String resourceName = resourceElement.substring(0,resourceElement.indexOf(" ")).trim();
 			int resourceCap = Integer.parseInt(resourceElement.substring(resourceElement.indexOf(" ")).trim());
-			ret.put(resourceName, resourceCap);
+			ret.add(new ResourceCapacity(resourceName, resourceCap));
 		}
 		return ret;
 	}
@@ -258,7 +247,7 @@ public class HybridDomain implements ClassicHybridDomain {
 	 * @param stateUsage True if it is a state fluent that uses the resource, false if it is an action.
 	 * @return
 	 */
-	static ResourceUsageTemplate parseResourceUsage(String usageElement, 
+	static ResourceRequirement parseResourceUsage(String usageElement,
 			boolean stateUsage) {
 		// parse Resource
 		
@@ -279,18 +268,17 @@ public class HybridDomain implements ClassicHybridDomain {
 
 		// parse Params
 		String[] paramElements = parseKeyword(PARAM_KEYWORD, usageElement);
-		int[] resourceRequirementPositions = new int[paramElements.length];
-		String[] resourceRequirements = new String[paramElements.length];
+		List<ResourceParameterRequirement> parameterRequirements = new ArrayList<>();
 		for (int j = 0; j < paramElements.length; j++) {
 			String paramElement = paramElements[j];
-			resourceRequirementPositions[j] = 
-					Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
-			resourceRequirements[j] = paramElement.substring(paramElement.indexOf(" ")).trim();
+			int position = Integer.parseInt(paramElement.substring(0, paramElement.indexOf(" ")).trim());
+			String value = paramElement.substring(paramElement.indexOf(" ")).trim();
+			parameterRequirements.add(new ResourceParameterRequirement(position, value));
 		}
-		
 
-		return new ResourceUsageTemplate(resourceName, fluentType, resourceRequirementPositions, 
-				resourceRequirements, usageLevel);
+		return stateUsage
+				? new ResourceRequirement(resourceName, fluentType, parameterRequirements, usageLevel)
+				: new ResourceRequirement(resourceName, parameterRequirements, usageLevel);
 	}
 
 	private static String[] parsePredicateSymbols(String everything) {
@@ -299,7 +287,7 @@ public class HybridDomain implements ClassicHybridDomain {
 			String[] parsedSymbols = parsed[0].split("\\s+");
 			return parsedSymbols;
 		} else  {
-			MetaCSPLogging.getLogger(HybridDomain.class).warning("Warning: No predicate symbols specified in domain!");
+			ChimpLogging.getLogger(HybridDomain.class).warning("Warning: No predicate symbols specified in domain!");
 			return new String[]{};
 		}
 	}
