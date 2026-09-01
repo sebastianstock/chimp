@@ -83,6 +83,19 @@ were removed once superseded).
 These surfaced through benchmark-parity testing and deterministic-replay checks after
 the kernel swap; all were verified plan-neutral or parity-restoring before being kept.
 
+- **CLI plan extraction crashed on ungrounded fluent arguments** — fixed
+  (`2541108`): the fluent-read boundary introduced at `1dbd52b` eagerly converted
+  every Activity fluent with the strict `getGroundArgs()`, throwing
+  `IllegalStateException` for fluents whose arguments are not fully grounded —
+  e.g. the documented README example (`ordered_domain.ddl` + serve_coffee)
+  crashed after finding a solution, where pre-removal `master` printed the plan
+  (it read arguments tolerantly via `Variable.toString()`). The benchmark gate
+  missed it because `FullChimpBenchmark` extracts plans via the tolerant
+  `CHIMP.extractActions()` path and `ordered_domain` CLI output was outside the
+  93-problem suite. `ModelAdapter.toFluentNode` now reads arguments tolerantly
+  (first domain symbol, stop at NONESYMBOL — same semantics as
+  `extractActions`), restoring master's plan output.
+
 - **Search-tree visualization gap** — restored and verified (`e567faf`):
   `ui.SearchTreeFrame` re-hosts the Meta-CSP viewer for the CHIMP-native forest;
   `CHIMP.drawSearchSpace()` opens it. Verified end-to-end on a live display (mobipick
