@@ -110,9 +110,10 @@ up-chimp/
 Solve flow: `writer` serialises the UP problem to temp `.ddl`/`.pdl` → run
 `java -jar chimp.jar domain.ddl problem.pdl -o plan.yaml` (timeout handling,
 exit-code mapping) → `reader` maps YAML activities to UP `ActionInstance`s
-(match by name+arguments) → `TimeTriggeredPlan` with start times (v1:
-earliest start from the flexible intervals; CHIMP's scheduler can produce a
-dispatched schedule later if exact times are wanted).
+(match by name+arguments) → `TimeTriggeredPlan` with start times
+(decided: earliest start/eet from the flexible intervals, using UP's
+`correct_plan_generation_result` epsilon helper for coinciding times;
+`STNPlan` output may be added later as an additive option).
 
 Gradle task to build the bundled jar (fat jar incl. Choco/ANTLR; the
 `application` plugin's `installDist` or a manual jar — build detail, decided
@@ -148,10 +149,10 @@ them, UP mapping is a separate step), resources, `NEGATIVE_CONDITIONS`,
 | Step | Content | Verify | Effort |
 |---|---|---|---|
 | M16.0 spike | Hand-write a small `HierarchicalProblem` (UP) and its hand-converted `.ddl`/`.pdl`; run ChimpIO; pin down the DurativeAction→Allen-constraint mapping on a real case | plan matches expectation; decisions recorded here | 2–3 d |
-| M16.1 packaging | `up-chimp/` skeleton, engine class, jar build + bundling, `up.ini` registration, credits, timeout/exit-code handling | `pip install -e up-chimp`; `OneshotPlanner(name='chimp')` returns "unsupported kind" for a non-HTN problem | 2–3 d |
+| M16.1 packaging | `up-chimp/` skeleton, engine class, jar build + bundling, `up.ini` registration (see Decisions), credits, timeout/exit-code handling | `pip install -e up-chimp`; `OneshotPlanner(name='chimp')` returns "unsupported kind" for a non-HTN problem | 2–3 d |
 | M16.2 writer | types/objects/fluents/actions/methods/task-network/initial state → `.ddl`/`.pdl` | golden-file unit tests vs. the M16.0 files; round-trip: converted problem solved by ChimpIO | 5–8 d |
 | M16.3 reader | YAML → `TimeTriggeredPlan`, status mapping | unit tests; end-to-end solve of the M16.0 problem through the engine | 2–3 d |
-| M16.4 validation | pytest suite on several UP problems (logistics-style HTN example + a RACE/Mobipick-style service task); README; CI (build jar + pytest) | CI green; `up.engines.get_engine('chimp')` works for a documented UP problem | 3–4 d |
+| M16.4 validation | pytest suite on several UP problems (logistics-style HTN example + a RACE/Mobipick-style service task); validate returned plans with UP's `TimeTriggeredPlanValidator` (catches infeasible earliest-start dispatches); README; CI (build jar + pytest) | CI green; `up.engines.get_engine('chimp')` works for a documented UP problem | 3–4 d |
 | M16.5 (later) | PR to unified-planning for `DEFAULT_ENGINES`; PyPI release; revisit gRPC/validator/anytime | upstream review | — |
 
 **Total for a working MVP: ~15–20 person-days (3–4 weeks full-time).**
@@ -177,14 +178,23 @@ sits.
 - **Jar size on PyPI** (fat jar incl. Choco/ANTLR/JUNG, likely 20–40 MB):
   acceptable (ENHSP bundles a jar too); offer `CHIMP_JAR` env override.
 
-## Open decisions
+## Decisions (resolved)
 
-1. Package repo layout: `up-chimp/` inside this repository (recommended,
-   Aries model) vs. separate repository (ENHSP model).
-2. Language-port sequencing: file-based integration is orthogonal to a port
-   (contract is CLI + formats), so the port question can stay open. Confirm
-   UP integration first, port later.
-3. Plan times: v1 uses earliest-start dispatch of the flexible intervals —
-   or should the engine run CHIMP's scheduler to return dispatched times?
-4. Registration stopgap before upstream `DEFAULT_ENGINES` inclusion: ship an
-   `up.ini` snippet + `add_engine` helper in the README.
+1. **Package layout: `up-chimp/` inside this repository** (Aries model).
+   Rationale: the writer/reader encode CHIMP's private contracts (DDL/PDL
+   syntax, YAML plan format); co-evolution in one repo/CI prevents version
+   drift. Extraction later is mechanical if ever needed.
+2. **Sequencing: integrate now (provisional)** — the file-based contract
+   (CLI + file formats) is language-agnostic, so the integration does not
+   foreclose a possible language port, which may be scoped/planned in
+   parallel on separate branches. Nothing in M16 becomes throwaway under a
+   port; revisit after port scoping.
+3. **Plan times: earliest start/end + epsilon correction** (UP's
+   `correct_plan_generation_result`), feasibility checked by
+   `TimeTriggeredPlanValidator` in the test suite. `STNPlan` output is a
+   deferred, additive option. Dispatched schedules (via CHIMP's scheduler)
+   rejected for now — would require Java-side CLI changes.
+4. **Registration: `up.ini` snippet now, upstream `DEFAULT_ENGINES` PR as
+   M16.5, no import-time auto-registration** (fragile; Aries does not do it
+   either). The `up.ini` stopgap remains the documented fallback if upstream
+   stalls.
